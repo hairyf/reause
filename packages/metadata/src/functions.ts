@@ -1480,6 +1480,15 @@ export const functions: FunctionInfo[] = [
     lastUpdated: 1789147565000,
   },
   {
+    name: 'useId',
+    file: 'packages/core/useId/index.tsx',
+    pkg: 'core',
+    dir: 'useId',
+    category: 'Utilities',
+    source: 'mantine',
+    lastUpdated: 1789253000000,
+  },
+  {
     name: 'useIDBKeyval',
     file: 'packages/integrations/useIDBKeyval/index.tsx',
     pkg: 'integrations',
@@ -3683,6 +3692,15 @@ export const pages: FunctionPageInfo[] = [
     category: 'Browser',
     description: 'shorthand for a reactive `window.location.hash`',
     lastUpdated: 1789147565000,
+  },
+  {
+    name: 'useId',
+    pkg: 'core',
+    doc: 'packages/core/useId/index.md',
+    category: 'Utilities',
+    description:
+      "SSR-safe id with an optional static override — React port of `@mantine/hooks`' `useId` (upstream mapping files: `source/mantine/packages/@mantine/hooks/src/use-id/use-id.ts`",
+    lastUpdated: 1789253000000,
   },
   {
     name: 'useIDBKeyval',

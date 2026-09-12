@@ -169,6 +169,7 @@
 | vueuse    | `useGamepad`                      | packages/core/useGamepad                      | `packages/core/useGamepad/index.tsx`                      | ✅ ported                           |
 | vueuse    | `useGeolocation`                  | packages/core/useGeolocation                  | `packages/core/useGeolocation/index.tsx`                  | ✅ ported                           |
 | vueuse    | `useRouteHash`                    | packages/router/useRouteHash                  | `packages/core/useHash/index.tsx`                         | ✅ ported                           |
+| mantine   | `useId`                           | packages/@mantine/hooks/src                   | `packages/core/useId/index.tsx`                           | ✅ ported                           |
 | vueuse    | `useIDBKeyval`                    | packages/integrations/useIDBKeyval            | `packages/integrations/useIDBKeyval/index.tsx`            | ✅ ported                           |
 | vueuse    | `useIdle`                         | packages/core/useIdle                         | `packages/core/useIdle/index.tsx`                         | ✅ ported                           |
 | vueuse    | `useImage`                        | packages/core/useImage                        | `packages/core/useImage/index.tsx`                        | ✅ ported                           |
