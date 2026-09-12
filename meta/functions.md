@@ -27,6 +27,7 @@
 | vueuse    | `createGenericProjection`         | packages/math/createGenericProjection         | `packages/math/createGenericProjection/index.tsx`         | ✅ ported                           |
 | vueuse    | `createGlobalState`               | packages/shared/createGlobalState             | `packages/shared/createGlobalState/index.tsx`             | ✅ ported                           |
 | vueuse    | `createInjectionState`            | packages/shared/createInjectionState          | `packages/shared/createInjectionState/index.tsx`          | ✅ ported                           |
+| react-use | `createMemo`                      | src/factory/createMemo.ts                     | `packages/shared/createMemo/index.tsx`                    | ✅ ported                           |
 | vueuse    | `createReusableTemplate`          | packages/core/createReusableTemplate          | `packages/core/createPortalSlot/index.tsx`                | ✅ ported                           |
 | vueuse    | `createProjection`                | packages/math/createProjection                | `packages/math/createProjection/index.tsx`                | ✅ ported                           |
 | vueuse    | `createTemplatePromise`           | packages/core/createTemplatePromise           | `packages/core/createPromisifiedComponent/index.tsx`      | ✅ ported                           |

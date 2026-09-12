@@ -218,6 +218,15 @@ export const functions: FunctionInfo[] = [
     lastUpdated: 1788958778000,
   },
   {
+    name: 'createMemo',
+    file: 'packages/shared/createMemo/index.tsx',
+    pkg: 'shared',
+    dir: 'createMemo',
+    category: 'Factory',
+    source: 'react-use',
+    lastUpdated: 1789255071000,
+  },
+  {
     name: 'createPortalSlot',
     file: 'packages/core/createPortalSlot/index.tsx',
     pkg: 'core',
@@ -2908,6 +2917,14 @@ export const pages: FunctionPageInfo[] = [
     lastUpdated: 1788958778000,
   },
   {
+    name: 'createMemo',
+    pkg: 'shared',
+    doc: 'packages/shared/createMemo/index.md',
+    category: 'Factory',
+    description: "turn a pure function into a memoising hook — React port of react-use's `createMemo`",
+    lastUpdated: 1789255071000,
+  },
+  {
     name: 'createPortalSlot',
     pkg: 'core',
     doc: 'packages/core/createPortalSlot/index.md',
@@ -4983,6 +5000,7 @@ export const categoryNames: string[] = [
   '@Integrations',
   '@Math',
   '@RxJS',
+  'Factory',
   'Lifecycle',
   'Side-effects',
 ]
