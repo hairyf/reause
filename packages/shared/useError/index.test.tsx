@@ -43,9 +43,11 @@ interface ThrowOnDispatchProps {
   onRender: () => void
   /** Records whether calling `dispatchError` returned normally or threw. */
   onDispatch: (result: 'returned' | 'threw') => void
+  /** Message of the error handed to `dispatchError`. */
+  message?: string
 }
 
-function ThrowOnDispatch({ onRender, onDispatch }: ThrowOnDispatchProps) {
+function ThrowOnDispatch({ onRender, onDispatch, message = 'boom' }: ThrowOnDispatchProps) {
   const dispatchError = useError()
   onRender()
 
@@ -53,7 +55,7 @@ function ThrowOnDispatch({ onRender, onDispatch }: ThrowOnDispatchProps) {
     <button
       onClick={() => {
         try {
-          dispatchError(new Error('boom'))
+          dispatchError(new Error(message))
           onDispatch('returned')
         }
         catch {
@@ -71,12 +73,12 @@ function captureRootOptions(reactReported: unknown[]) {
 }
 
 /** Renders a fresh boundary around a dispatching component. */
-async function renderBoundary(reactReported: unknown[] = []) {
+async function renderBoundary(reactReported: unknown[] = [], message?: string) {
   const caught: Error[] = []
 
   const screen = await render(
     <ErrorBoundary onError={error => caught.push(error)}>
-      <ThrowOnDispatch onRender={() => {}} onDispatch={() => {}} />
+      <ThrowOnDispatch onRender={() => {}} onDispatch={() => {}} message={message} />
     </ErrorBoundary>,
     { createRootOptions: captureRootOptions(reactReported) },
   )
@@ -157,12 +159,15 @@ it('is not one-shot: a different error catches in a fresh boundary too', async (
   await expect.element(first.screen.getByText('boundary caught: boom')).toBeVisible()
   await expect.poll(() => first.caught.length).toBe(1)
   await expect.poll(() => firstReport.length).toBeGreaterThan(0)
+  expect(first.caught[0]?.message).toBe('boom')
   await first.screen.unmount()
 
+  // a *different* error, dispatched through a freshly mounted hook instance
   const secondReport: unknown[] = []
-  const second = await renderBoundary(secondReport)
+  const second = await renderBoundary(secondReport, 'second-boom')
   await second.screen.getByRole('button', { name: 'dispatch' }).click()
-  await expect.element(second.screen.getByText('boundary caught: boom')).toBeVisible()
+  await expect.element(second.screen.getByText('boundary caught: second-boom')).toBeVisible()
   await expect.poll(() => second.caught.length).toBe(1)
   await expect.poll(() => secondReport.length).toBeGreaterThan(0)
+  expect(second.caught[0]?.message).toBe('second-boom')
 })
