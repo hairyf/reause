@@ -14,6 +14,7 @@ export function noop(): void {}
 export * from './createEventHook'
 export * from './createGlobalState'
 export * from './createInjectionState'
+export * from './createMemo'
 export * from './createSharedHook'
 // export * from './injectLocal'
 export * from './isDefined'
