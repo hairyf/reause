@@ -1633,6 +1633,15 @@ export const functions: FunctionInfo[] = [
     lastUpdated: 1788942682000,
   },
   {
+    name: 'useLatest',
+    file: 'packages/shared/useLatest/index.tsx',
+    pkg: 'shared',
+    dir: 'useLatest',
+    category: 'State',
+    source: 'react-use',
+    lastUpdated: 1789252819000,
+  },
+  {
     name: 'useListener',
     file: 'packages/shared/useListener/index.tsx',
     pkg: 'shared',
@@ -3789,6 +3798,15 @@ export const pages: FunctionPageInfo[] = [
     category: 'State',
     description: 'records the timestamp of the last change',
     lastUpdated: 1788942682000,
+  },
+  {
+    name: 'useLatest',
+    pkg: 'shared',
+    doc: 'packages/shared/useLatest/index.md',
+    category: 'State',
+    description:
+      "returns a ref object whose `.current` always holds the latest value of the render that produced it — React port of react-use's [`useLatest`](https://github.com/streamich/react-use/blob/master/docs/useLatest.md) (upstream mapping files: `source/react-use/src/useLatest.ts`",
+    lastUpdated: 1789252819000,
   },
   {
     name: 'useListener',

@@ -186,6 +186,7 @@
 | vueuse    | `onKeyStroke`                     | packages/core/onKeyStroke                     | `packages/core/useKeyStroke/index.tsx`                    | ✅ ported                           |
 | vueuse    | `onKeyUp`                         | packages/core/onKeyStroke                     | `packages/core/useKeyStroke/index.tsx`                    | ✅ ported                           |
 | vueuse    | `useLastChanged`                  | packages/shared/useLastChanged                | `packages/shared/useLastChanged/index.tsx`                | ✅ ported                           |
+| react-use | `useLatest`                       | src/useLatest.ts                              | `packages/shared/useLatest/index.tsx`                     | ✅ ported                           |
 | —         | `useListener`                     | —                                             | `packages/shared/useListener/index.tsx`                   | ✅ reause-only export               |
 | vueuse    | `useLiveAnnouncer`                | packages/core/useLiveAnnouncer                | `packages/core/useLiveAnnouncer/index.tsx`                | ✅ ported                           |
 | vueuse    | `useLocalStorage`                 | packages/core/useLocalStorage                 | `packages/core/useLocalStorage/index.tsx`                 | ✅ ported                           |
