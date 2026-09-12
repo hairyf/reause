@@ -852,6 +852,15 @@ export const functions: FunctionInfo[] = [
     lastUpdated: 1789147565000,
   },
   {
+    name: 'useAsyncFn',
+    file: 'packages/core/useAsyncFn/index.tsx',
+    pkg: 'core',
+    dir: 'useAsyncFn',
+    category: 'Side-effects',
+    source: 'react-use',
+    lastUpdated: 1789254431000,
+  },
+  {
     name: 'useAsyncQueue',
     file: 'packages/core/useAsyncQueue/index.tsx',
     pkg: 'core',
@@ -3129,6 +3138,15 @@ export const pages: FunctionPageInfo[] = [
     category: 'Reactivity',
     description: 'derived value for async functions',
     lastUpdated: 1789147565000,
+  },
+  {
+    name: 'useAsyncFn',
+    pkg: 'core',
+    doc: 'packages/core/useAsyncFn/index.md',
+    category: 'Side-effects',
+    description:
+      "returns state and a callback for an `async` function (or any function returning a promise) — React port of react-use's [`useAsyncFn`](https://github.com/streamich/react-use/blob/master/docs/useAsyncFn.md) (upstream mapping files: `source/react-use/src/useAsyncFn.ts`",
+    lastUpdated: 1789254431000,
   },
   {
     name: 'useAsyncQueue',

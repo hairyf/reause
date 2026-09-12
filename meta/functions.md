@@ -99,6 +99,7 @@
 | vueuse    | `useArraySome`                    | packages/shared/useArraySome                  | `packages/shared/useArraySome/index.tsx`                  | ✅ ported                           |
 | vueuse    | `useArrayUnique`                  | packages/shared/useArrayUnique                | `packages/shared/useArrayUnique/index.tsx`                | ✅ ported                           |
 | vueuse    | `computedAsync`                   | packages/core/computedAsync                   | `packages/core/useAsync/index.tsx`                        | ✅ ported                           |
+| react-use | `useAsyncFn`                      | src/useAsyncFn.ts                             | `packages/core/useAsyncFn/index.tsx`                      | ✅ ported                           |
 | vueuse    | `useAsyncQueue`                   | packages/core/useAsyncQueue                   | `packages/core/useAsyncQueue/index.tsx`                   | ✅ ported                           |
 | vueuse    | `useAsyncState`                   | packages/core/useAsyncState                   | `packages/core/useAsyncState/index.tsx`                   | ✅ ported                           |
 | vueuse    | `useAsyncValidator`               | packages/integrations/useAsyncValidator       | `packages/integrations/useAsyncValidator/index.tsx`       | ✅ ported                           |
