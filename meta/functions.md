@@ -42,6 +42,8 @@
 | vueuse    | `formatTimeAgo`                   | packages/core/useTimeAgo                      | `packages/core/useTimeAgo/index.tsx`                      | ✅ ported                           |
 | vueuse    | `formatTimeAgoIntl`               | packages/core/useTimeAgoIntl                  | `packages/core/useTimeAgoIntl/index.tsx`                  | ✅ ported                           |
 | vueuse    | `formatTimeAgoIntlParts`          | packages/core/useTimeAgoIntl                  | `packages/core/useTimeAgoIntl/index.tsx`                  | ✅ ported                           |
+| mantine   | `getHotkeyHandler`                | packages/@mantine/hooks/src/use-hotkeys       | `packages/core/useHotkeys/index.tsx`                      | ✅ ported                           |
+| mantine   | `getHotkeyMatcher`                | packages/@mantine/hooks/src/use-hotkeys       | `packages/core/useHotkeys/index.tsx`                      | ✅ ported                           |
 | vueuse    | `guessSerializerType`             | packages/core/useStorage                      | `packages/core/useStorage/index.tsx`                      | ✅ ported                           |
 | vueuse    | `hasOwn`                          | packages/shared/utils                         | `packages/shared/utils/index.tsx`                         | ✅ ported                           |
 | vueuse    | `hyphenate`                       | packages/shared/utils                         | `packages/shared/utils/index.tsx`                         | ✅ ported                           |
@@ -66,6 +68,7 @@
 | vueuse    | `now`                             | packages/shared/utils                         | `packages/shared/utils/index.tsx`                         | ✅ ported                           |
 | vueuse    | `objectOmit`                      | packages/shared/utils                         | `packages/shared/utils/index.tsx`                         | ✅ ported                           |
 | vueuse    | `objectPick`                      | packages/shared/utils                         | `packages/shared/utils/index.tsx`                         | ✅ ported                           |
+| mantine   | `parseHotkey`                     | packages/@mantine/hooks/src/use-hotkeys       | `packages/core/useHotkeys/index.tsx`                      | ✅ ported                           |
 | vueuse    | `promiseTimeout`                  | packages/shared/utils                         | `packages/shared/utils/index.tsx`                         | ✅ ported                           |
 | vueuse    | `pxValue`                         | packages/shared/utils                         | `packages/shared/utils/index.tsx`                         | ✅ ported                           |
 | vueuse    | `rand`                            | packages/shared/utils                         | `packages/shared/utils/index.tsx`                         | ✅ ported                           |
@@ -172,6 +175,7 @@
 | vueuse    | `useGamepad`                      | packages/core/useGamepad                      | `packages/core/useGamepad/index.tsx`                      | ✅ ported                           |
 | vueuse    | `useGeolocation`                  | packages/core/useGeolocation                  | `packages/core/useGeolocation/index.tsx`                  | ✅ ported                           |
 | vueuse    | `useRouteHash`                    | packages/router/useRouteHash                  | `packages/core/useHash/index.tsx`                         | ✅ ported                           |
+| mantine   | `useHotkeys`                      | packages/@mantine/hooks/src/use-hotkeys       | `packages/core/useHotkeys/index.tsx`                      | ✅ ported                           |
 | mantine   | `useId`                           | packages/@mantine/hooks/src                   | `packages/core/useId/index.tsx`                           | ✅ ported                           |
 | vueuse    | `useIDBKeyval`                    | packages/integrations/useIDBKeyval            | `packages/integrations/useIDBKeyval/index.tsx`            | ✅ ported                           |
 | vueuse    | `useIdle`                         | packages/core/useIdle                         | `packages/core/useIdle/index.tsx`                         | ✅ ported                           |

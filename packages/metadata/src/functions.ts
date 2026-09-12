@@ -351,6 +351,24 @@ export const functions: FunctionInfo[] = [
     lastUpdated: 1789147565000,
   },
   {
+    name: 'getHotkeyHandler',
+    file: 'packages/core/useHotkeys/index.tsx',
+    pkg: 'core',
+    dir: 'useHotkeys',
+    category: 'Sensors',
+    source: 'mantine',
+    lastUpdated: 1789256170000,
+  },
+  {
+    name: 'getHotkeyMatcher',
+    file: 'packages/core/useHotkeys/index.tsx',
+    pkg: 'core',
+    dir: 'useHotkeys',
+    category: 'Sensors',
+    source: 'mantine',
+    lastUpdated: 1789256170000,
+  },
+  {
     name: 'guessSerializerType',
     file: 'packages/core/useStorage/index.tsx',
     pkg: 'core',
@@ -564,6 +582,15 @@ export const functions: FunctionInfo[] = [
     category: 'Utilities',
     source: 'vueuse',
     lastUpdated: 1789147565000,
+  },
+  {
+    name: 'parseHotkey',
+    file: 'packages/core/useHotkeys/index.tsx',
+    pkg: 'core',
+    dir: 'useHotkeys',
+    category: 'Sensors',
+    source: 'mantine',
+    lastUpdated: 1789256170000,
   },
   {
     name: 'promiseTimeout',
@@ -1505,6 +1532,15 @@ export const functions: FunctionInfo[] = [
     category: 'Browser',
     source: 'vueuse',
     lastUpdated: 1789147565000,
+  },
+  {
+    name: 'useHotkeys',
+    file: 'packages/core/useHotkeys/index.tsx',
+    pkg: 'core',
+    dir: 'useHotkeys',
+    category: 'Sensors',
+    source: 'mantine',
+    lastUpdated: 1789256170000,
   },
   {
     name: 'useId',
@@ -3754,6 +3790,15 @@ export const pages: FunctionPageInfo[] = [
     category: 'Browser',
     description: 'shorthand for a reactive `window.location.hash`',
     lastUpdated: 1789147565000,
+  },
+  {
+    name: 'useHotkeys',
+    pkg: 'core',
+    doc: 'packages/core/useHotkeys/index.md',
+    category: 'Sensors',
+    description:
+      'keyboard shortcuts written as hotkey strings — `mod+K` means `⌘K` on Apple hardware and `Ctrl+K` elsewhere',
+    lastUpdated: 1789256170000,
   },
   {
     name: 'useId',
