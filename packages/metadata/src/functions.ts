@@ -11,6 +11,13 @@ export interface FunctionInfo {
   dir: string
   file: string
   category: string
+  /**
+   * Upstream source this export ports from (`vueuse`, `react-use`,
+   * `react-hookz`, `mantine`, `ahooks`, `react-spring`), resolved from the
+   * port's own annotation against that source's pinned tree. Absent for a pure
+   * reause-only export (the table's `—`).
+   */
+  source?: string
   lastUpdated?: number
 }
 
@@ -36,6 +43,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'utils',
     category: 'Utilities',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -44,6 +52,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useBreakpoints',
     category: 'Browser',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -52,6 +61,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useBreakpoints',
     category: 'Browser',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -60,6 +70,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useBreakpoints',
     category: 'Browser',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -68,6 +79,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useBreakpoints',
     category: 'Browser',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -76,6 +88,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useBreakpoints',
     category: 'Browser',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -84,6 +97,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useBreakpoints',
     category: 'Browser',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -92,6 +106,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useBreakpoints',
     category: 'Browser',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -100,6 +115,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useBreakpoints',
     category: 'Browser',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -108,6 +124,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useBreakpoints',
     category: 'Browser',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -116,6 +133,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useBreakpoints',
     category: 'Browser',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -124,6 +142,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useBreakpoints',
     category: 'Browser',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -132,6 +151,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'utils',
     category: 'Utilities',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -140,6 +160,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useCloned',
     category: 'Utilities',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -148,6 +169,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'integrations',
     dir: 'useCookies',
     category: '@Integrations',
+    source: 'vueuse',
     lastUpdated: 1788976915000,
   },
   {
@@ -156,6 +178,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'createEventHook',
     category: 'Utilities',
+    source: 'vueuse',
     lastUpdated: 1788992100000,
   },
   {
@@ -164,6 +187,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useFetch',
     category: 'Network',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -172,6 +196,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'math',
     dir: 'createGenericProjection',
     category: '@Math',
+    source: 'vueuse',
     lastUpdated: 1788958332000,
   },
   {
@@ -180,6 +205,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'createGlobalState',
     category: 'State',
+    source: 'vueuse',
     lastUpdated: 1789010295000,
   },
   {
@@ -188,6 +214,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'createInjectionState',
     category: 'State',
+    source: 'vueuse',
     lastUpdated: 1788958778000,
   },
   {
@@ -196,6 +223,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'createPortalSlot',
     category: 'Component',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -204,6 +232,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'math',
     dir: 'createProjection',
     category: '@Math',
+    source: 'vueuse',
     lastUpdated: 1788958332000,
   },
   {
@@ -212,6 +241,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'createPromisifiedComponent',
     category: 'Component',
+    source: 'vueuse',
     lastUpdated: 1789024203000,
   },
   {
@@ -220,6 +250,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'createSharedHook',
     category: 'State',
+    source: 'vueuse',
     lastUpdated: 1789022210000,
   },
   {
@@ -228,6 +259,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'utils',
     category: 'Utilities',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -236,6 +268,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useStorage',
     category: 'State',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -244,6 +277,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'useWatchWithFilter',
     category: 'Watch',
+    source: 'vueuse',
     lastUpdated: 1788994784000,
   },
   {
@@ -268,6 +302,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useEventBus',
     category: 'Utilities',
+    source: 'vueuse',
     lastUpdated: 1788942682000,
   },
   {
@@ -276,6 +311,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'useDateFormat',
     category: 'Time',
+    source: 'vueuse',
     lastUpdated: 1788958330000,
   },
   {
@@ -284,6 +320,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useTimeAgo',
     category: 'Time',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -292,6 +329,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useTimeAgoIntl',
     category: 'Time',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -300,6 +338,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useTimeAgoIntl',
     category: 'Time',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -308,6 +347,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useStorage',
     category: 'State',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -316,6 +356,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'utils',
     category: 'Utilities',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -324,6 +365,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'utils',
     category: 'Utilities',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -332,6 +374,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'utils',
     category: 'Utilities',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -340,6 +383,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'integrations',
     dir: 'useSortable',
     category: '@Integrations',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -348,6 +392,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'utils',
     category: 'Utilities',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -356,6 +401,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'utils',
     category: 'Utilities',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -364,6 +410,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'isDefined',
     category: 'Utilities',
+    source: 'vueuse',
     lastUpdated: 1788999327000,
   },
   {
@@ -372,6 +419,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useStartTyping',
     category: 'Sensors',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -380,6 +428,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'utils',
     category: 'Utilities',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -388,6 +437,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'utils',
     category: 'Utilities',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -404,6 +454,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useStartTyping',
     category: 'Sensors',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -412,6 +463,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'math',
     dir: 'logicAnd',
     category: '@Math',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -420,6 +472,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'math',
     dir: 'logicNot',
     category: '@Math',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -428,6 +481,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'math',
     dir: 'logicOr',
     category: '@Math',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -436,6 +490,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'makeDestructurable',
     category: 'Utilities',
+    source: 'vueuse',
     lastUpdated: 1788999468000,
   },
   {
@@ -444,6 +499,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useGamepad',
     category: 'Browser',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -452,6 +508,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'integrations',
     dir: 'useSortable',
     category: '@Integrations',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -460,6 +517,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'utils',
     category: 'Utilities',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -468,6 +526,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'useDateFormat',
     category: 'Time',
+    source: 'vueuse',
     lastUpdated: 1788958330000,
   },
   {
@@ -476,6 +535,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'utils',
     category: 'Utilities',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -484,6 +544,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'utils',
     category: 'Utilities',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -492,6 +553,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'utils',
     category: 'Utilities',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -500,6 +562,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'utils',
     category: 'Utilities',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -508,6 +571,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'utils',
     category: 'Utilities',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -516,6 +580,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'utils',
     category: 'Utilities',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -524,6 +589,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'integrations',
     dir: 'useSortable',
     category: '@Integrations',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -548,6 +614,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useSSRWidth',
     category: 'Browser',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -556,6 +623,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'syncState',
     category: 'Reactivity',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -564,6 +632,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'syncStates',
     category: 'Reactivity',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -572,6 +641,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'useWatchWithFilter',
     category: 'Watch',
+    source: 'vueuse',
     lastUpdated: 1788994784000,
   },
   {
@@ -580,6 +650,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'utils',
     category: 'Utilities',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -588,6 +659,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'utils',
     category: 'Utilities',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -596,6 +668,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'rxjs',
     dir: 'toObserver',
     category: '@RxJS',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -604,6 +677,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'utils',
     category: 'Utilities',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -612,6 +686,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useTransition',
     category: 'Animation',
+    source: 'vueuse',
     lastUpdated: 1788994691000,
   },
   {
@@ -620,6 +695,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'unrefElement',
     category: 'Component',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -628,6 +704,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'until',
     category: 'Watch',
+    source: 'vueuse',
     lastUpdated: 1789000817000,
   },
   {
@@ -636,6 +713,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'math',
     dir: 'useAbs',
     category: '@Math',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -644,6 +722,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useActiveElement',
     category: 'Elements',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -652,6 +731,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useAnimate',
     category: 'Animation',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -660,6 +740,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'useArrayDifference',
     category: 'Array',
+    source: 'vueuse',
     lastUpdated: 1788958330000,
   },
   {
@@ -668,6 +749,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'useArrayEvery',
     category: 'Array',
+    source: 'vueuse',
     lastUpdated: 1788958330000,
   },
   {
@@ -676,6 +758,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'useArrayFilter',
     category: 'Array',
+    source: 'vueuse',
     lastUpdated: 1789000901000,
   },
   {
@@ -684,6 +767,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'useArrayFind',
     category: 'Array',
+    source: 'vueuse',
     lastUpdated: 1788958330000,
   },
   {
@@ -692,6 +776,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'useArrayFindIndex',
     category: 'Array',
+    source: 'vueuse',
     lastUpdated: 1788942682000,
   },
   {
@@ -700,6 +785,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'useArrayFindLast',
     category: 'Array',
+    source: 'vueuse',
     lastUpdated: 1788958330000,
   },
   {
@@ -708,6 +794,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'useArrayIncludes',
     category: 'Array',
+    source: 'vueuse',
     lastUpdated: 1788958330000,
   },
   {
@@ -716,6 +803,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'useArrayJoin',
     category: 'Array',
+    source: 'vueuse',
     lastUpdated: 1789001105000,
   },
   {
@@ -724,6 +812,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'useArrayMap',
     category: 'Array',
+    source: 'vueuse',
     lastUpdated: 1789000678000,
   },
   {
@@ -732,6 +821,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'useArrayReduce',
     category: 'Array',
+    source: 'vueuse',
     lastUpdated: 1788958330000,
   },
   {
@@ -740,6 +830,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'useArraySome',
     category: 'Array',
+    source: 'vueuse',
     lastUpdated: 1788958330000,
   },
   {
@@ -748,6 +839,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'useArrayUnique',
     category: 'Array',
+    source: 'vueuse',
     lastUpdated: 1788958330000,
   },
   {
@@ -756,6 +848,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useAsync',
     category: 'Reactivity',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -764,6 +857,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useAsyncQueue',
     category: 'Utilities',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -772,6 +866,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useAsyncState',
     category: 'State',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -780,6 +875,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'integrations',
     dir: 'useAsyncValidator',
     category: '@Integrations',
+    source: 'vueuse',
     lastUpdated: 1788994827000,
   },
   {
@@ -788,6 +884,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'firebase',
     dir: 'useAuth',
     category: '@Firebase',
+    source: 'vueuse',
     lastUpdated: 1789017154000,
   },
   {
@@ -796,6 +893,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'math',
     dir: 'useAverage',
     category: '@Math',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -804,6 +902,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'integrations',
     dir: 'useAxios',
     category: '@Integrations',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -812,6 +911,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useBase64',
     category: 'Utilities',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -820,6 +920,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useBattery',
     category: 'Sensors',
+    source: 'vueuse',
     lastUpdated: 1788942682000,
   },
   {
@@ -828,6 +929,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useBluetooth',
     category: 'Browser',
+    source: 'vueuse',
     lastUpdated: 1788953542000,
   },
   {
@@ -836,6 +938,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useBreakpoints',
     category: 'Browser',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -844,6 +947,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useBroadcastChannel',
     category: 'Browser',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -852,6 +956,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useBrowserLocation',
     category: 'Browser',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -860,6 +965,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useCached',
     category: 'Utilities',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -868,6 +974,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'math',
     dir: 'useCeil',
     category: '@Math',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -876,6 +983,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'integrations',
     dir: 'useChangeCase',
     category: '@Integrations',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -884,6 +992,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'math',
     dir: 'useClamp',
     category: '@Math',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -892,6 +1001,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useClickOutside',
     category: 'Sensors',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -900,6 +1010,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useClipboard',
     category: 'Browser',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -908,6 +1019,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useClipboardItems',
     category: 'Browser',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -916,6 +1028,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useCloned',
     category: 'Utilities',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -924,6 +1037,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useColorMode',
     category: 'Browser',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -932,6 +1046,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useConfirmDialog',
     category: 'Utilities',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -956,6 +1071,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'integrations',
     dir: 'useCookies',
     category: '@Integrations',
+    source: 'vueuse',
     lastUpdated: 1788976915000,
   },
   {
@@ -964,6 +1080,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useCountdown',
     category: 'Time',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -972,6 +1089,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'useCounter',
     category: 'State',
+    source: 'vueuse',
     lastUpdated: 1788996836000,
   },
   {
@@ -980,6 +1098,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useCssSupports',
     category: 'Browser',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -988,6 +1107,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useCssVar',
     category: 'Browser',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -996,6 +1116,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useCycleList',
     category: 'Utilities',
+    source: 'vueuse',
     lastUpdated: 1788958794000,
   },
   {
@@ -1004,6 +1125,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useDark',
     category: 'Browser',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -1012,6 +1134,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'useDateFormat',
     category: 'Time',
+    source: 'vueuse',
     lastUpdated: 1788958330000,
   },
   {
@@ -1020,6 +1143,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'useDebounceFn',
     category: 'Utilities',
+    source: 'vueuse',
     lastUpdated: 1788984677000,
   },
   {
@@ -1028,6 +1152,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useDeviceMotion',
     category: 'Sensors',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -1036,6 +1161,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useDeviceOrientation',
     category: 'Sensors',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -1044,6 +1170,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useDevicePixelRatio',
     category: 'Sensors',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -1052,6 +1179,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useDevicesList',
     category: 'Sensors',
+    source: 'vueuse',
     lastUpdated: 1788966944000,
   },
   {
@@ -1060,6 +1188,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useDisplayMedia',
     category: 'Sensors',
+    source: 'vueuse',
     lastUpdated: 1788970689000,
   },
   {
@@ -1068,6 +1197,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useDocumentVisibility',
     category: 'Elements',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -1076,6 +1206,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useDraggable',
     category: 'Elements',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -1084,6 +1215,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'integrations',
     dir: 'useDrauu',
     category: '@Integrations',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -1092,6 +1224,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useDropZone',
     category: 'Elements',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -1100,6 +1233,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useElementBounding',
     category: 'Elements',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -1108,6 +1242,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useElementByPoint',
     category: 'Sensors',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -1116,6 +1251,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useElementHover',
     category: 'Sensors',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -1124,6 +1260,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useElementOverflow',
     category: 'Elements',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -1132,6 +1269,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useElementRemoval',
     category: 'Sensors',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -1140,6 +1278,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useElementSize',
     category: 'Elements',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -1148,6 +1287,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useElementVisibility',
     category: 'Elements',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -1156,6 +1296,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useEventBus',
     category: 'Utilities',
+    source: 'vueuse',
     lastUpdated: 1788942682000,
   },
   {
@@ -1164,6 +1305,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useEventListener',
     category: 'Browser',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -1172,6 +1314,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useEventSource',
     category: 'Network',
+    source: 'vueuse',
     lastUpdated: 1788971998000,
   },
   {
@@ -1180,6 +1323,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'rxjs',
     dir: 'useExtractedObservable',
     category: '@RxJS',
+    source: 'vueuse',
     lastUpdated: 1789020143000,
   },
   {
@@ -1188,6 +1332,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useEyeDropper',
     category: 'Browser',
+    source: 'vueuse',
     lastUpdated: 1788942682000,
   },
   {
@@ -1196,6 +1341,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useFavicon',
     category: 'Browser',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -1204,6 +1350,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useFetch',
     category: 'Network',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -1212,6 +1359,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useFileDialog',
     category: 'Browser',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -1220,6 +1368,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useFileSystemAccess',
     category: 'Browser',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -1228,6 +1377,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'firebase',
     dir: 'useFirestore',
     category: '@Firebase',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -1236,6 +1386,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'math',
     dir: 'useFloor',
     category: '@Math',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -1244,6 +1395,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useFocus',
     category: 'Sensors',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -1252,6 +1404,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'integrations',
     dir: 'useFocusTrap',
     category: '@Integrations',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -1260,6 +1413,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useFocusWithin',
     category: 'Sensors',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -1268,6 +1422,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useFps',
     category: 'Sensors',
+    source: 'vueuse',
     lastUpdated: 1788971997000,
   },
   {
@@ -1276,6 +1431,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'rxjs',
     dir: 'useFrom',
     category: '@RxJS',
+    source: 'vueuse',
     lastUpdated: 1789031655000,
   },
   {
@@ -1284,6 +1440,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useFullscreen',
     category: 'Browser',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -1292,6 +1449,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'integrations',
     dir: 'useFuse',
     category: '@Integrations',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -1300,6 +1458,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useGamepad',
     category: 'Browser',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -1308,6 +1467,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useGeolocation',
     category: 'Sensors',
+    source: 'vueuse',
     lastUpdated: 1788942682000,
   },
   {
@@ -1316,6 +1476,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useHash',
     category: 'Browser',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -1324,6 +1485,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'integrations',
     dir: 'useIDBKeyval',
     category: '@Integrations',
+    source: 'vueuse',
     lastUpdated: 1788991159000,
   },
   {
@@ -1332,6 +1494,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useIdle',
     category: 'Sensors',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -1340,6 +1503,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useImage',
     category: 'Browser',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -1348,6 +1512,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useInfiniteScroll',
     category: 'Sensors',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -1356,6 +1521,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useIntersectionObserver',
     category: 'Elements',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -1364,6 +1530,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'useInterval',
     category: 'Animation',
+    source: 'vueuse',
     lastUpdated: 1788985429000,
   },
   {
@@ -1372,6 +1539,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'useIntervalFn',
     category: 'Animation',
+    source: 'vueuse',
     lastUpdated: 1788999284000,
   },
   {
@@ -1380,6 +1548,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'electron',
     dir: 'useIpcRenderer',
     category: '@Electron',
+    source: 'vueuse',
     lastUpdated: 1788988203000,
   },
   {
@@ -1388,6 +1557,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'electron',
     dir: 'useIpcRendererInvoke',
     category: '@Electron',
+    source: 'vueuse',
     lastUpdated: 1788988307000,
   },
   {
@@ -1396,6 +1566,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'electron',
     dir: 'useIpcRendererOn',
     category: '@Electron',
+    source: 'vueuse',
     lastUpdated: 1788942682000,
   },
   {
@@ -1404,6 +1575,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'integrations',
     dir: 'useJwt',
     category: '@Integrations',
+    source: 'vueuse',
     lastUpdated: 1788991529000,
   },
   {
@@ -1412,6 +1584,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useKeyStroke',
     category: 'Sensors',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -1420,6 +1593,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useKeyModifier',
     category: 'Sensors',
+    source: 'vueuse',
     lastUpdated: 1788984370000,
   },
   {
@@ -1428,6 +1602,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useKeyStroke',
     category: 'Sensors',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -1436,6 +1611,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useKeyStroke',
     category: 'Sensors',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -1444,6 +1620,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useKeyStroke',
     category: 'Sensors',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -1452,6 +1629,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'useLastChanged',
     category: 'State',
+    source: 'vueuse',
     lastUpdated: 1788942682000,
   },
   {
@@ -1468,6 +1646,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useLiveAnnouncer',
     category: 'Browser',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -1476,6 +1655,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useLocalStorage',
     category: 'State',
+    source: 'vueuse',
     lastUpdated: 1788942682000,
   },
   {
@@ -1484,6 +1664,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useLongPress',
     category: 'Sensors',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -1492,6 +1673,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useMagicKeys',
     category: 'Sensors',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -1500,6 +1682,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'math',
     dir: 'useMath',
     category: '@Math',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -1508,6 +1691,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'math',
     dir: 'useMax',
     category: '@Math',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -1516,6 +1700,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useMediaControls',
     category: 'Browser',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -1524,6 +1709,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useMediaQuery',
     category: 'Browser',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -1532,6 +1718,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useMemoize',
     category: 'Utilities',
+    source: 'vueuse',
     lastUpdated: 1788989746000,
   },
   {
@@ -1540,6 +1727,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useMemory',
     category: 'Browser',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -1548,6 +1736,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'math',
     dir: 'useMin',
     category: '@Math',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -1556,6 +1745,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'useMount',
     category: 'Lifecycle',
+    source: 'react-use',
     lastUpdated: 1788946165000,
   },
   {
@@ -1564,6 +1754,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useMounted',
     category: 'Component',
+    source: 'vueuse',
     lastUpdated: 1788990050000,
   },
   {
@@ -1572,6 +1763,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useMouse',
     category: 'Sensors',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -1580,6 +1772,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useMouseInElement',
     category: 'Elements',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -1588,6 +1781,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useMousePressed',
     category: 'Sensors',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -1596,6 +1790,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useMutationObserver',
     category: 'Elements',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -1604,6 +1799,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useNavigatorLanguage',
     category: 'Sensors',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -1612,6 +1808,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useNetwork',
     category: 'Sensors',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -1620,6 +1817,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useNow',
     category: 'Animation',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -1628,6 +1826,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'integrations',
     dir: 'useNProgress',
     category: '@Integrations',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -1636,6 +1835,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useObjectUrl',
     category: 'Browser',
+    source: 'vueuse',
     lastUpdated: 1788958794000,
   },
   {
@@ -1644,6 +1844,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'rxjs',
     dir: 'useObservable',
     category: '@RxJS',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -1652,6 +1853,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useOffsetPagination',
     category: 'Utilities',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -1660,6 +1862,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useOnline',
     category: 'Sensors',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -1668,6 +1871,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'usePageLeave',
     category: 'Sensors',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -1676,6 +1880,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useParallax',
     category: 'Sensors',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -1684,6 +1889,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useParams',
     category: 'Browser',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -1692,6 +1898,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useParentElement',
     category: 'Elements',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -1700,6 +1907,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'usePerformanceObserver',
     category: 'Browser',
+    source: 'vueuse',
     lastUpdated: 1788991736000,
   },
   {
@@ -1708,6 +1916,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'usePermission',
     category: 'Browser',
+    source: 'vueuse',
     lastUpdated: 1788992388000,
   },
   {
@@ -1716,6 +1925,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'usePointer',
     category: 'Sensors',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -1724,6 +1934,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'usePointerLock',
     category: 'Sensors',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -1732,6 +1943,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'usePointerSwipe',
     category: 'Sensors',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -1740,6 +1952,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'math',
     dir: 'usePrecision',
     category: '@Math',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -1748,6 +1961,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'usePreferredColorScheme',
     category: 'Browser',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -1756,6 +1970,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'usePreferredContrast',
     category: 'Browser',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -1764,6 +1979,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'usePreferredDark',
     category: 'Browser',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -1772,6 +1988,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'usePreferredLanguages',
     category: 'Browser',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -1780,6 +1997,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'usePreferredReducedMotion',
     category: 'Browser',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -1788,6 +2006,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'usePreferredReducedTransparency',
     category: 'Browser',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -1796,6 +2015,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'usePrevious',
     category: 'Utilities',
+    source: 'vueuse',
     lastUpdated: 1788964249000,
   },
   {
@@ -1804,6 +2024,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'math',
     dir: 'useProjection',
     category: '@Math',
+    source: 'vueuse',
     lastUpdated: 1788995800000,
   },
   {
@@ -1812,6 +2033,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'integrations',
     dir: 'useQRCode',
     category: '@Integrations',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -1820,6 +2042,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useQuery',
     category: 'Browser',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -1828,6 +2051,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useRafFn',
     category: 'Animation',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -1836,6 +2060,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useRefsList',
     category: 'Component',
+    source: 'vueuse',
     lastUpdated: 1788963203000,
   },
   {
@@ -1844,6 +2069,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useResizeObserver',
     category: 'Elements',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -1852,6 +2078,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'math',
     dir: 'useRound',
     category: '@Math',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -1860,6 +2087,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'firebase',
     dir: 'useRTDB',
     category: '@Firebase',
+    source: 'vueuse',
     lastUpdated: 1788942682000,
   },
   {
@@ -1868,6 +2096,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useScreenOrientation',
     category: 'Browser',
+    source: 'vueuse',
     lastUpdated: 1788960166000,
   },
   {
@@ -1876,6 +2105,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useScreenSafeArea',
     category: 'Browser',
+    source: 'vueuse',
     lastUpdated: 1788942682000,
   },
   {
@@ -1884,6 +2114,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useScriptTag',
     category: 'Browser',
+    source: 'vueuse',
     lastUpdated: 1788963761000,
   },
   {
@@ -1892,6 +2123,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useScroll',
     category: 'Sensors',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -1900,6 +2132,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useScrollLock',
     category: 'Sensors',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -1908,6 +2141,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useSessionStorage',
     category: 'State',
+    source: 'vueuse',
     lastUpdated: 1788960102000,
   },
   {
@@ -1916,6 +2150,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useShare',
     category: 'Browser',
+    source: 'vueuse',
     lastUpdated: 1788963984000,
   },
   {
@@ -1924,6 +2159,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'integrations',
     dir: 'useSortable',
     category: '@Integrations',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -1932,6 +2168,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useSorted',
     category: 'Array',
+    source: 'vueuse',
     lastUpdated: 1788962909000,
   },
   {
@@ -1940,6 +2177,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useSpeechRecognition',
     category: 'Sensors',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -1948,6 +2186,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useSpeechSynthesis',
     category: 'Sensors',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -1956,6 +2195,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useSSRWidth',
     category: 'Browser',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -1964,6 +2204,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useStartTyping',
     category: 'Sensors',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -1972,6 +2213,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'useStateAutoReset',
     category: 'Reactivity',
+    source: 'vueuse',
     lastUpdated: 1788977666000,
   },
   {
@@ -1980,6 +2222,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'useStateDebounced',
     category: 'Reactivity',
+    source: 'vueuse',
     lastUpdated: 1789000838000,
   },
   {
@@ -1988,6 +2231,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useStateDebouncedHistory',
     category: 'State',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -1996,6 +2240,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'useStateDefault',
     category: 'Reactivity',
+    source: 'vueuse',
     lastUpdated: 1788998493000,
   },
   {
@@ -2004,6 +2249,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useStateHistory',
     category: 'State',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -2012,6 +2258,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useStateManualHistory',
     category: 'State',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -2020,6 +2267,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'useStateManualReset',
     category: 'Reactivity',
+    source: 'vueuse',
     lastUpdated: 1788997642000,
   },
   {
@@ -2028,6 +2276,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'useStateThrottled',
     category: 'Reactivity',
+    source: 'vueuse',
     lastUpdated: 1789000282000,
   },
   {
@@ -2036,6 +2285,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useStateThrottledHistory',
     category: 'State',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -2044,6 +2294,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'useStateWithControl',
     category: 'Reactivity',
+    source: 'vueuse',
     lastUpdated: 1788998206000,
   },
   {
@@ -2052,6 +2303,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useStepper',
     category: 'Utilities',
+    source: 'vueuse',
     lastUpdated: 1788965950000,
   },
   {
@@ -2060,6 +2312,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useStorage',
     category: 'State',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -2068,6 +2321,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useStorageAsync',
     category: 'State',
+    source: 'vueuse',
     lastUpdated: 1788966005000,
   },
   {
@@ -2076,6 +2330,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useStyleTag',
     category: 'Browser',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -2084,6 +2339,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'rxjs',
     dir: 'useSubject',
     category: '@RxJS',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -2092,6 +2348,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'rxjs',
     dir: 'useSubscription',
     category: '@RxJS',
+    source: 'vueuse',
     lastUpdated: 1789017877000,
   },
   {
@@ -2100,6 +2357,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'math',
     dir: 'useSum',
     category: '@Math',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -2108,6 +2366,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useSupported',
     category: 'Utilities',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -2116,6 +2375,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useSwipe',
     category: 'Sensors',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -2124,6 +2384,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useTemporalNow',
     category: 'Time',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -2132,6 +2393,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useTextareaAutosize',
     category: 'Browser',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -2140,6 +2402,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useTextDirection',
     category: 'Browser',
+    source: 'vueuse',
     lastUpdated: 1788996791000,
   },
   {
@@ -2148,6 +2411,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useTextSelection',
     category: 'Sensors',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -2156,6 +2420,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'useThrottleFn',
     category: 'Utilities',
+    source: 'vueuse',
     lastUpdated: 1788998912000,
   },
   {
@@ -2164,6 +2429,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useTimeAgo',
     category: 'Time',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -2172,6 +2438,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useTimeAgoIntl',
     category: 'Time',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -2180,6 +2447,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'useTimeout',
     category: 'Animation',
+    source: 'vueuse',
     lastUpdated: 1788981733000,
   },
   {
@@ -2188,6 +2456,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'useTimeoutFn',
     category: 'Animation',
+    source: 'vueuse',
     lastUpdated: 1788981739000,
   },
   {
@@ -2196,6 +2465,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useTimeoutPoll',
     category: 'Utilities',
+    source: 'vueuse',
     lastUpdated: 1788994903000,
   },
   {
@@ -2204,6 +2474,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useTimestamp',
     category: 'Animation',
+    source: 'vueuse',
     lastUpdated: 1788998330000,
   },
   {
@@ -2212,6 +2483,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useTitle',
     category: 'Browser',
+    source: 'vueuse',
     lastUpdated: 1788991870000,
   },
   {
@@ -2220,6 +2492,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'useToggle',
     category: 'Utilities',
+    source: 'vueuse',
     lastUpdated: 1788981648000,
   },
   {
@@ -2228,6 +2501,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'useToNumber',
     category: 'Utilities',
+    source: 'vueuse',
     lastUpdated: 1788942682000,
   },
   {
@@ -2236,6 +2510,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'useToString',
     category: 'Utilities',
+    source: 'vueuse',
     lastUpdated: 1789001834000,
   },
   {
@@ -2244,6 +2519,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useTransition',
     category: 'Animation',
+    source: 'vueuse',
     lastUpdated: 1788994691000,
   },
   {
@@ -2252,6 +2528,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'math',
     dir: 'useTrunc',
     category: '@Math',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -2260,6 +2537,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'useUnmount',
     category: 'Lifecycle',
+    source: 'react-use',
     lastUpdated: 1788942682000,
   },
   {
@@ -2268,6 +2546,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'useUpdate',
     category: 'Animation',
+    source: 'react-use',
     lastUpdated: 1788942682000,
   },
   {
@@ -2276,6 +2555,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useUrlSearchParams',
     category: 'Browser',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -2284,6 +2564,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useUserMedia',
     category: 'Sensors',
+    source: 'vueuse',
     lastUpdated: 1788997864000,
   },
   {
@@ -2292,6 +2573,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useVibrate',
     category: 'Browser',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -2300,6 +2582,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useVirtualList',
     category: 'Component',
+    source: 'vueuse',
     lastUpdated: 1788996627000,
   },
   {
@@ -2308,6 +2591,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useWakeLock',
     category: 'Browser',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -2316,6 +2600,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'useWatch',
     category: 'Watch',
+    source: 'vueuse',
     lastUpdated: 1789001849000,
   },
   {
@@ -2324,6 +2609,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'useWatchArray',
     category: 'Watch',
+    source: 'vueuse',
     lastUpdated: 1789001863000,
   },
   {
@@ -2332,6 +2618,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'useWatchAtMost',
     category: 'Watch',
+    source: 'vueuse',
     lastUpdated: 1788986162000,
   },
   {
@@ -2340,6 +2627,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'useWatchDebounced',
     category: 'Watch',
+    source: 'vueuse',
     lastUpdated: 1789001877000,
   },
   {
@@ -2348,6 +2636,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'useWatchDeep',
     category: 'Watch',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -2356,6 +2645,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'rxjs',
     dir: 'useWatchExtractedObservable',
     category: '@RxJS',
+    source: 'vueuse',
     lastUpdated: 1789010190000,
   },
   {
@@ -2364,6 +2654,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'useWatchIgnorable',
     category: 'Watch',
+    source: 'vueuse',
     lastUpdated: 1788986154000,
   },
   {
@@ -2372,6 +2663,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'useWatchImmediate',
     category: 'Watch',
+    source: 'vueuse',
     lastUpdated: 1788942682000,
   },
   {
@@ -2380,6 +2672,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'useWatchOnce',
     category: 'Watch',
+    source: 'vueuse',
     lastUpdated: 1789001932000,
   },
   {
@@ -2388,6 +2681,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'useWatchPausable',
     category: 'Watch',
+    source: 'vueuse',
     lastUpdated: 1788994734000,
   },
   {
@@ -2396,6 +2690,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'useWatchThrottled',
     category: 'Watch',
+    source: 'vueuse',
     lastUpdated: 1788994759000,
   },
   {
@@ -2404,6 +2699,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'useWatchTriggerable',
     category: 'Watch',
+    source: 'vueuse',
     lastUpdated: 1788988809000,
   },
   {
@@ -2412,6 +2708,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'useWatchWithFilter',
     category: 'Watch',
+    source: 'vueuse',
     lastUpdated: 1788994784000,
   },
   {
@@ -2420,6 +2717,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useWebMCP',
     category: 'Browser',
+    source: 'vueuse',
     lastUpdated: 1789150290000,
   },
   {
@@ -2428,6 +2726,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useWebNotification',
     category: 'Browser',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -2436,6 +2735,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useWebSocket',
     category: 'Browser',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -2444,6 +2744,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useWebWorker',
     category: 'Browser',
+    source: 'vueuse',
     lastUpdated: 1788998635000,
   },
   {
@@ -2452,6 +2753,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useWebWorkerFn',
     category: 'Browser',
+    source: 'vueuse',
     lastUpdated: 1788999163000,
   },
   {
@@ -2460,6 +2762,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'useWhenever',
     category: 'Watch',
+    source: 'vueuse',
     lastUpdated: 1788988828000,
   },
   {
@@ -2468,6 +2771,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useWindowFocus',
     category: 'Elements',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -2476,6 +2780,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useWindowScroll',
     category: 'Elements',
+    source: 'vueuse',
     lastUpdated: 1788993907000,
   },
   {
@@ -2484,6 +2789,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'core',
     dir: 'useWindowSize',
     category: 'Elements',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -2492,6 +2798,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'electron',
     dir: 'useZoomFactor',
     category: '@Electron',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {
@@ -2500,6 +2807,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'electron',
     dir: 'useZoomLevel',
     category: '@Electron',
+    source: 'vueuse',
     lastUpdated: 1789147565000,
   },
   {

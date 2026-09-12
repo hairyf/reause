@@ -50,64 +50,229 @@ interface MappedPage {
 
 const RE_EXPORT = /export\s+(?:async\s+)?function\s+(\w+)|export\s+const\s+(\w+)\s*=/g
 
+/**
+ * One upstream source reause ports from (issue #915). Every mounted
+ * `source/<id>` is a pinned checkout read for provenance; `react-spring` has no
+ * mount at all — it is a re-export-only dependency whose claims name a source
+ * but no pinned path to verify.
+ *
+ * The trees are shaped differently per source, which is why each entry declares
+ * its own marker, file glob and module key rather than sharing one probe:
+ * VueUse keys modules by directory (`packages/core/useNow`), react-use is flat
+ * (`src/useMount.ts`), react-hookz is `src/<name>/index.ts`, mantine is
+ * kebab-cased (`packages/@mantine/hooks/src/use-collapse/`) and ahooks is
+ * `packages/hooks/src/<name>/index.ts`.
+ */
+interface UpstreamSource {
+  /** Source id, as rendered in the table's `source` column and `meta/functions.ts`. */
+  id: string
+  /**
+   * Token a `Map from` annotation uses for this source, matched from the token
+   * right after `Map from`. Capture group 1, when present, is the package
+   * qualifier (`@vueuse/core` → `core`).
+   */
+  marker: RegExp
+  /** Pinned checkout under the repo root; absent for a re-export-only source. */
+  tree?: string
+  /** The export-defining files under `tree`. */
+  files?: string[]
+  /**
+   * How a file keys its module: `dir` when one directory is one module
+   * (`packages/core/useNow`, `src/useMap`), `file` for a flat layout
+   * (react-use's `src/useMount.ts`).
+   */
+  modulePer?: 'dir' | 'file'
+  /**
+   * Candidate module paths for a bare `` `symbol` `` claim, confirmed against
+   * the pin like every other candidate — never assumed to exist.
+   */
+  modulesOf?: (qualifier: string | undefined, symbol: string) => string[]
+}
+
+const SOURCES: UpstreamSource[] = [
+  {
+    id: 'vueuse',
+    marker: /@vueuse\/([a-z0-9-]+)/,
+    tree: 'source/vueuse',
+    files: ['packages/{shared,core,integrations,math,rxjs,electron,firebase,router}/**/*.ts'],
+    modulePer: 'dir',
+    modulesOf: (pkg, symbol) => pkg ? [`packages/${pkg}/${symbol.replace(/\.ts$/, '')}`] : [],
+  },
+  {
+    id: 'react-use',
+    marker: /\breact-use\b/,
+    tree: 'source/react-use',
+    files: ['src/**/*.{ts,tsx}'],
+    modulePer: 'file',
+    modulesOf: (_pkg, symbol) => {
+      const name = symbol.replace(/\.tsx?$/, '')
+      return [`src/${name}.ts`, `src/${name}.tsx`]
+    },
+  },
+  {
+    id: 'react-hookz',
+    marker: /\breact-hookz\b/,
+    tree: 'source/react-hookz',
+    files: ['src/**/*.{ts,tsx}'],
+    modulePer: 'dir',
+    modulesOf: (_pkg, symbol) => [`src/${symbol}`],
+  },
+  {
+    id: 'mantine',
+    marker: /@mantine\/hooks/,
+    tree: 'source/mantine',
+    files: ['packages/@mantine/hooks/src/**/*.{ts,tsx}'],
+    modulePer: 'dir',
+    modulesOf: (_pkg, symbol) => [`packages/@mantine/hooks/src/${kebabCase(symbol)}`],
+  },
+  {
+    id: 'ahooks',
+    marker: /\bahooks\b/,
+    tree: 'source/ahooks',
+    files: ['packages/hooks/src/**/*.{ts,tsx}'],
+    modulePer: 'dir',
+    modulesOf: (_pkg, symbol) => [`packages/hooks/src/${symbol}`],
+  },
+  // No `source/react-spring` submodule: the mount does not exist, so a claim on
+  // this source is provenance without a pinned path — rendered `✅ re-exported`
+  // with `—` in the path column rather than as a hand-written port.
+  { id: 'react-spring', marker: /@react-spring\/web/ },
+]
+
+const SOURCE_BY_ID = new Map(SOURCES.map(source => [source.id, source]))
+
+/**
+ * Source id → pinned tree, relative to the repo root (a source with no mount,
+ * `react-spring`, is absent). Exported so the structural guard in
+ * `test/functions-table.test.ts` resolves each committed row against its own
+ * pin rather than assuming `source/vueuse`.
+ */
+export const sourceTrees: Record<string, string> = Object.fromEntries(
+  SOURCES.filter(source => source.tree).map(source => [source.id, source.tree!]),
+)
+
+/** `useCollapse` → `use-collapse` (mantine's per-hook directory naming). */
+function kebabCase(name: string) {
+  return name.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase()
+}
+
 /** One provenance claim a hook source makes about an export. */
 interface UpstreamClaim {
+  /** Source id the claim names (see `SOURCES`). */
+  source: string
   /**
-   * Upstream module the claim names (`packages/<pkg>/<dir>`), or `''` when the
-   * claim only names a symbol (the `React port of VueUse's \`x\`` prose form).
+   * Pin-relative upstream module the claim names, or `''` when the claim only
+   * names a symbol (the `React port of VueUse's \`x\`` prose form, and a `Map
+   * from` claim on a source with no pinned tree).
    */
   module: string
   /** Upstream symbol the claim names. */
   symbol: string
+  /** The marker's package qualifier, when it has one (`@vueuse/core` → `core`). */
+  qualifier?: string
   /** Offset of the claim in its source file, to pair it with an export. */
   offset: number
 }
 
-const RE_MAP_FROM = /Map from @vueuse\/[^\n]*(?:\n[^\n]*)?/g
+// Every `Map from` annotation, whatever source it names. The window is the rest
+// of the annotation line plus the next one, so an explicit
+// `(source/<id>/<module>)` reference on the following line is seen too. A
+// window that names no registered source (e.g. reause's own
+// `Map from @reause/shared \`useListener\``) is skipped by `matchSource`, so
+// widening this pattern from `@vueuse/` changes no VueUse resolution.
+const RE_MAP_FROM = /Map from [^\n]*(?:\n[^\n]*)?/g
+
+// The prose form stays VueUse-only — a deliberate decision recorded in issue
+// #915 rather than an oversight. It names no source token at all ("React port of
+// VueUse's `x`"), so generalising it would mean inventing per-source prose
+// spellings ("Mantine's", "ahooks's") that no port uses. Every non-VueUse port
+// must therefore carry the explicit `Map from <marker> \`<name>\`` annotation,
+// which the registry resolves against that source's own pinned tree; the prose
+// branch in `resolveExport` searches the pin only for `source: 'vueuse'`.
 const RE_PROSE_PORT = /port of VueUse's `([A-Z_]\w*)`/gi
 
 /**
+ * The source a `Map from` window names, and the marker that names it. The
+ * earliest marker wins, so a line that happens to mention two source ids still
+ * resolves to the one beginning the claim.
+ */
+function matchSource(window: string): { source: UpstreamSource, index: number, length: number, qualifier?: string } | undefined {
+  let hit: { source: UpstreamSource, index: number, length: number, qualifier?: string } | undefined
+  for (const source of SOURCES) {
+    const match = window.match(source.marker)
+    if (!match || match.index === undefined)
+      continue
+    if (!hit || match.index < hit.index)
+      hit = { source, index: match.index, length: match[0].length, qualifier: match[1] }
+  }
+  return hit
+}
+
+/**
+ * The literal `source/<tree>/<path>` reference a claim may carry next to its
+ * marker (`` (`source/vueuse/packages/core/useNow/`) ``), normalized to the
+ * module path the table renders. VueUse's documented form is the two-segment
+ * module directory — the exact shape the pre-registry parser read — while the
+ * other trees are flatter, so their reference is taken whole.
+ */
+function claimedPath(source: UpstreamSource, window: string): string | undefined {
+  if (!source.tree)
+    return undefined
+  if (source.id === 'vueuse') {
+    const match = window.match(/source\/vueuse\/packages\/([a-z0-9-]+)\/([\w-]+)/)
+    return match ? `packages/${match[1]}/${match[2]}` : undefined
+  }
+  const dir = source.tree.replace(/^source\//, '')
+  const match = window.match(new RegExp(`source/${dir}/([\\w@./-]+)`))
+  if (!match)
+    return undefined
+  return match[1].replace(/\/$/, '').replace(/\/index\.tsx?$/, '')
+}
+
+/**
  * Every provenance claim a hook file makes, in source order: the
- * `Map from @vueuse/<pkg> \`<name>\`` form reause documents ports with (also
- * the explicit `source/vueuse/packages/<pkg>/<name>` path form, the slash form
- * `@vueuse/firebase/useAuth` and the bare form `@vueuse/shared watchOnce`), plus
- * the `React port of VueUse's \`<name>\`` prose form some hooks use instead.
- * A file may claim several upstreams (one per export — `useKeyStroke`'s file
- * claims `onKeyStroke`, `onKeyDown`, `onKeyPressed` and `onKeyUp`), so claims
- * keep their offsets and `resolveUpstream` pairs each with its own export.
+ * `Map from <marker> \`<name>\`` form reause documents ports with (for VueUse
+ * also the explicit `source/vueuse/packages/<pkg>/<name>` path form, the slash
+ * form `@vueuse/firebase/useAuth` and the bare form `@vueuse/shared watchOnce`;
+ * for the other sources the marker alone names the pinned tree), plus the
+ * VueUse-only `React port of VueUse's \`<name>\`` prose form some hooks use
+ * instead. A file may claim several upstreams (one per export —
+ * `useKeyStroke`'s file claims `onKeyStroke`, `onKeyDown`, `onKeyPressed` and
+ * `onKeyUp`), so claims keep their offsets and `resolveExport` pairs each with
+ * its own export.
  */
 function parseClaims(content: string): UpstreamClaim[] {
   const claims: UpstreamClaim[] = []
   // The `Map from` marker sits in a JSDoc `*` line; read to the end of that
   // line, plus the next line so a following explicit
-  // `(source/vueuse/packages/<pkg>/<name>/...)` reference is seen too.
+  // `(source/<source>/<path>)` reference is seen too.
   for (const match of content.matchAll(RE_MAP_FROM)) {
-    const line = match[0]
-    const pkg = line.match(/@vueuse\/([a-z0-9-]+)/)?.[1]
-    if (!pkg)
+    const window = match[0]
+    const found = matchSource(window)
+    if (!found)
       continue
-    const path = line.match(/source\/vueuse\/packages\/([a-z0-9-]+)\/([\w-]+)/)
+    const { source, qualifier } = found
     // The symbol is the token the marker is followed by — `` `onLongPress` ``,
     // `/useAuth` or ` watchOnce`. Read it from that position only: a later
     // backticked mention is context, not the claim (`useWatchPausable` says
     // "Map from @vueuse/shared watchPausable. Upstream wraps `watchWithFilter`"),
     // so scanning the whole window would claim the wrong upstream.
-    const tail = line.slice(line.indexOf(`@vueuse/${pkg}`) + `@vueuse/${pkg}`.length)
-    const symbol = tail.match(/^\s*`([A-Z_][\w.]*)`/i)?.[1]
+    const tail = window.slice(found.index + found.length)
+    const token = tail.match(/^\s*`([A-Z_][\w.]*)`/i)?.[1]
       || tail.match(/^\/([\w-]+)/)?.[1]
       || tail.match(/^\s+([\w-]+)/)?.[1]
+    const path = claimedPath(source, window)
+    const derived = path || (token && source.modulesOf ? source.modulesOf(qualifier, token)[0] : '')
     claims.push({
-      module: path
-        ? `packages/${path[1]}/${path[2]}`
-        : symbol
-          ? `packages/${pkg}/${symbol.replace(/\.ts$/, '')}`
-          : '',
-      symbol: symbol || path?.[2] || '',
+      source: source.id,
+      qualifier,
+      module: derived || '',
+      symbol: token || (path ? path.split('/').pop()! : ''),
       offset: match.index,
     })
   }
   for (const match of content.matchAll(RE_PROSE_PORT))
-    claims.push({ module: '', symbol: match[1], offset: match.index })
+    claims.push({ source: 'vueuse', module: '', symbol: match[1], offset: match.index })
   return claims.sort((a, b) => a.offset - b.offset)
 }
 
@@ -148,6 +313,15 @@ function relativeTo(rootDir: string, file: string) {
 /** The pinned upstream checkout, read-only: `source/vueuse`. */
 const UPSTREAM_ROOT = join(root, 'source/vueuse').replace(/\\/g, '/').replace(/\/$/, '')
 
+/**
+ * One pinned source's module index: every module path of that source mapped to
+ * the files defining it, plus the parsed export names per file.
+ */
+interface SourceIndex {
+  modules: Map<string, string[]>
+  exports: Map<string, Set<string>>
+}
+
 /** `packages/<pkg>/<dir>` module directories upstream, each mapped to its files. */
 let upstreamModules: Map<string, string[]> | undefined
 /** Parsed export names per upstream file, filled lazily and shared across lookups. */
@@ -160,6 +334,10 @@ const upstreamExports = new Map<string, Set<string>>()
  * live in, so a symbol can be found in the module that actually exports it
  * rather than in a same-name directory that may not exist. `exportsOf` is the
  * shared symbol scanner; every answer is confirmed against the sources.
+ *
+ * Kept separate from `collectSourceModules` on purpose: this is the VueUse
+ * reader the pre-registry resolver used, and routing the other sources through
+ * their own globs must not widen the VueUse index.
  */
 function collectUpstreamModules() {
   if (upstreamModules)
@@ -173,7 +351,7 @@ function collectUpstreamModules() {
   for (const file of files) {
     // The module directory owns its files: `packages/core/useBreakpoints`
     // covers `index.ts` and `breakpoints.ts`, exactly as the table's
-    // `source (vueuse)` column is expected to read.
+    // `source path` column is expected to read.
     const module = relativeTo(UPSTREAM_ROOT, file).split('/').slice(0, -1).join('/')
     const owners = modules.get(module)
     if (owners)
@@ -183,6 +361,59 @@ function collectUpstreamModules() {
   }
   upstreamModules = modules
   return modules
+}
+
+/** Module indexes of the other pinned sources, built lazily once per source. */
+const sourceIndexes = new Map<string, SourceIndex>()
+
+/**
+ * Index one non-VueUse pinned source, keyed the way that source lays its tree
+ * out (`modulePer`): one directory per module for react-hookz / mantine /
+ * ahooks, one file per module for react-use's flat `src/`.
+ */
+function collectSourceModules(source: UpstreamSource): SourceIndex {
+  const cached = sourceIndexes.get(source.id)
+  if (cached)
+    return cached
+  const treeRoot = join(root, source.tree!).replace(/\\/g, '/').replace(/\/$/, '')
+  const modules = new Map<string, string[]>()
+  const files = globSync(source.files!, {
+    cwd: treeRoot,
+    absolute: true,
+    // Tests, stories and demos never define the public hook.
+    ignore: ['**/*.test.*', '**/*.spec.*', '**/*.story.*', '**/*.stories.*', '**/__tests__/**', '**/demo/**'],
+  })
+  for (const file of files) {
+    const rel = relativeTo(treeRoot, file)
+    const module = source.modulePer === 'file' ? rel : rel.split('/').slice(0, -1).join('/')
+    const owners = modules.get(module)
+    if (owners)
+      owners.push(file)
+    else
+      modules.set(module, [file])
+  }
+  const index: SourceIndex = { modules, exports: new Map() }
+  sourceIndexes.set(source.id, index)
+  return index
+}
+
+/**
+ * The module index of a source id. VueUse reuses its own reader unchanged;
+ * a re-export-only source (`react-spring`) has no pin, so its index is empty
+ * and its claims can never be "confirmed" against disk.
+ */
+function indexOf(sourceId: string): SourceIndex {
+  const source = SOURCE_BY_ID.get(sourceId)!
+  if (!source.tree)
+    return { modules: new Map(), exports: new Map() }
+  if (sourceId === 'vueuse')
+    return { modules: collectUpstreamModules(), exports: upstreamExports }
+  return collectSourceModules(source)
+}
+
+/** A source with no pinned checkout — provenance without a path to verify. */
+function isReexportOnly(sourceId: string): boolean {
+  return !SOURCE_BY_ID.get(sourceId)?.tree
 }
 
 function exportsOf(content: string): Set<string> {
@@ -197,14 +428,29 @@ function exportsOf(content: string): Set<string> {
         names.add(name)
     }
   }
+  // Default exports also carry the upstream name on their declaration:
+  // react-use writes `export default useMount` / `export default function
+  // useUpdate`, ahooks `export default useRafInterval`. Without this, a claim on
+  // such a module could never be confirmed against the pin. An identifier is
+  // only counted when the same file declares it, so `export default { … }` and
+  // `export default defineConfig(…)` contribute nothing.
+  const declared = content.match(/export\s+default\s+(?:async\s+)?function\s+(\w+)/)?.[1]
+  if (declared)
+    names.add(declared)
+  const identifier = content.match(/export\s+default\s+(\w+)\s*(?:;\s*)?$/m)?.[1]
+  if (identifier && !['async', 'class', 'function'].includes(identifier)
+    && new RegExp(`(?:function|const|let|var|class)\\s+${identifier}\\b`).test(content)) {
+    names.add(identifier)
+  }
   return names
 }
 
-/** Does the upstream `module` really export `symbol`? (Never assumed.) */
-function moduleExports(module: string, symbol: string): boolean {
-  for (const file of collectUpstreamModules().get(module) || []) {
-    const exports = upstreamExports.get(file) || exportsOf(readFileSync(file, 'utf-8'))
-    upstreamExports.set(file, exports)
+/** Does the pinned `source`'s `module` really export `symbol`? (Never assumed.) */
+function moduleExports(sourceId: string, module: string, symbol: string): boolean {
+  const index = indexOf(sourceId)
+  for (const file of index.modules.get(module) || []) {
+    const exports = index.exports.get(file) || exportsOf(readFileSync(file, 'utf-8'))
+    index.exports.set(file, exports)
     if (exports.has(symbol))
       return true
   }
@@ -241,17 +487,48 @@ function collectVueApiSymbols() {
 }
 
 /**
- * The upstream module exporting `name`, searched in the given modules (and
- * only those). Shallower directories win, so a symbol that upstream defines in
- * a module file (`packages/core/useBreakpoints`) is preferred over one that
- * only re-exports it from a nested internal directory.
+ * The module of `sourceId` exporting `name`, searched in the given module paths
+ * (and only those). Shallower directories win, so a symbol that upstream
+ * defines in a module file (`packages/core/useBreakpoints`) is preferred over
+ * one that only re-exports it from a nested internal directory.
  */
-function findUpstreamModule(modules: string[], name: string): string | undefined {
-  const index = collectUpstreamModules()
+function findModuleIn(sourceId: string, modules: string[], name: string): string | undefined {
+  const index = indexOf(sourceId)
   const candidates = modules
-    .filter(module => index.has(module))
+    .filter(module => index.modules.has(module))
     .sort((a, b) => a.split('/').length - b.split('/').length || a.localeCompare(b))
-  return candidates.find(module => moduleExports(module, name))
+  return candidates.find(module => moduleExports(sourceId, module, name))
+}
+
+/** VueUse's own lookup, the name the VueUse fallback steps read by. */
+function findUpstreamModule(modules: string[], name: string): string | undefined {
+  return findModuleIn('vueuse', modules, name)
+}
+
+/**
+ * The first module of `sourceId` that exports `name` — a symbol scan rather
+ * than a path guess, for sources whose directory naming cannot be derived from
+ * the symbol (mantine's kebab-cased `use-collapse`) or whose claim named no
+ * module at all. Barrel `index.ts` modules sort last so a per-symbol module
+ * wins, and shallower modules win over nested internals.
+ */
+function findSourceModuleBySymbol(sourceId: string, name: string): string | undefined {
+  const index = indexOf(sourceId)
+  const isBarrel = (module: string) => /(?:^|\/)index\.tsx?$/.test(module) ? 1 : 0
+  const modules = [...index.modules.keys()].sort((a, b) =>
+    isBarrel(a) - isBarrel(b) || a.split('/').length - b.split('/').length || a.localeCompare(b))
+  return modules.find(module => moduleExports(sourceId, module, name))
+}
+
+/**
+ * The module a bare `` `symbol` `` claim of `sourceId` names, confirmed against
+ * that source's pin: the source's own derived paths first (so the table renders
+ * the canonical `src/useMount.ts` / `packages/hooks/src/useRafInterval`), then
+ * a symbol scan for layouts the derivation cannot guess.
+ */
+function findClaimedModule(sourceId: string, qualifier: string | undefined, symbol: string): string | undefined {
+  const derived = SOURCE_BY_ID.get(sourceId)?.modulesOf?.(qualifier, symbol) || []
+  return findModuleIn(sourceId, derived, symbol) || findSourceModuleBySymbol(sourceId, symbol)
 }
 
 /**
@@ -259,7 +536,7 @@ function findUpstreamModule(modules: string[], name: string): string | undefined
  * the package root itself: `collectUpstreamModules()` keys a file by its
  * dirname, so a root-level file (`packages/math/utils.ts`) keys as
  * `packages/math` — which a trailing-slash prefix alone would exclude, hiding
- * its exports from the symbol search in step 1's prose branch and step 4.
+ * its exports from the symbol search in step 2's prose branch and step 6.
  */
 function modulesOfPackage(pkg: string): string[] {
   const prefix = `packages/${pkg}/`
@@ -269,8 +546,21 @@ function modulesOfPackage(pkg: string): string[] {
 
 /** What one reause export resolves to, and the claim that decided it. */
 interface ResolvedExport {
+  /**
+   * Source id the resolved upstream belongs to (`vueuse`, `react-use`, …), or
+   * `undefined` when the export is reause-only. Set for a re-export whose
+   * source has no pinned tree (`react-spring`), which has no `upstream` path.
+   */
+  source?: string
   /** Resolved upstream module, or `undefined` when the export is reause-only. */
   upstream?: string
+  /**
+   * Upstream symbol the row names — the port's own annotation when it has one
+   * (so a renamed port shows both names), otherwise the reause export name.
+   */
+  symbol?: string
+  /** Whether the export re-exports its upstream instead of porting it. */
+  reexported?: boolean
   /** Upstream module this export's own annotation names, when it names one. */
   claimed?: string
   /** Whether `claimed` exists upstream and really exports the symbol it names. */
@@ -286,81 +576,128 @@ interface ResolvedExport {
 /**
  * Resolve the real upstream module of one reause export, in order:
  *
- * 1. the claim the port itself makes for this export — its `Map from` (or
- *    `React port of VueUse's`) annotation, paired by offset — accepted only
- *    when it is materially true (the upstream module exists *and* exports the
- *    symbol the claim names). This is what resolves renames (`useLongPress` ←
- *    `onLongPress`, `useWatchAtMost` ← `watchAtMost`), which a
- *    same-name-directory probe can never see;
- * 2. another module the file claims that exports this symbol under a different
+ * 1. the claim the port itself makes for this export — its `Map from` (or, for
+ *    VueUse, `React port of VueUse's`) annotation, paired by offset — accepted
+ *    only when it is materially true (the upstream module exists *and* exports
+ *    the symbol the claim names). The claim is resolved against **its own
+ *    source's** pinned tree (issue #915), so `Map from react-use \`useMount\``
+ *    resolves to `src/useMount.ts` and never to the VueUse pin. This is what
+ *    resolves renames (`useLongPress` ← `onLongPress`, `useIntervalRafFn` ←
+ *    ahooks' `useRafInterval`), which a same-name-directory probe can never
+ *    see;
+ * 2. the VueUse prose form, which names a symbol without a package: the
+ *    page's own upstream package, then `shared/utils`;
+ * 3. another module the file claims that exports this symbol under a different
  *    name (`SSRWidthProvider` is reause's React component for the `useSSRWidth`
  *    page) — same confirmation, never "the module merely exists";
- * 3. the page's upstream directory (`packages/<pkg>/<dir>`), confirmed by an
+ * 4. any module of a non-VueUse source the file claims (a symbol scan inside
+ *    that source only — never the VueUse heuristics below, which would
+ *    mislabel a port whose pin does not confirm the claim);
+ * 5. the page's upstream directory (`packages/<pkg>/<dir>`), confirmed by an
  *    actual export rather than assumed — covers a page's secondary exports;
- * 4. any upstream module of the page's own package (`breakpointsTailwind` is
+ * 6. any upstream module of the page's own package (`breakpointsTailwind` is
  *    defined in `useBreakpoints`, `createCookies` in `useCookies`);
- * 5. upstream `shared/utils`, which has one barrel and no per-symbol dirs
+ * 7. upstream `shared/utils`, which has one barrel and no per-symbol dirs
  *    (`clamp`, `noop`, `debounceFilter`, …).
  *
- * Anything left has no module in the pinned submodule — either because the port
+ * Anything left has no module in a pinned submodule — either because the port
  * claims an upstream the pin cannot confirm, or because it is genuinely
  * reause-only (`missingFrom` records which, so the status column never calls a
- * Vue API or a post-pin hook "reause-only"). What it never means is "the
- * same-name directory does not exist", which is what the removed probe
- * reported for every renamed and secondary export.
+ * Vue API or a post-pin hook "reause-only", and never calls a non-VueUse port
+ * one either). What it never means is "the same-name directory does not exist",
+ * which is what the removed probe reported for every renamed and secondary
+ * export.
  */
 function resolveExport(name: string, pkg: string, dir: string, file: string): ResolvedExport {
   const content = readFileSync(file, 'utf-8')
   const claims = claimsByExport(content)
   const own = claims.get(name) || []
+  const all = [...claims.values()].flat()
   // The upstream this export's own annotation names, and whether that claim is
   // materially true — surfaced on the row so the structural guard can assert
   // that a `reause-only` verdict is never contradicted by the port's own claim.
-  const named = own.find(claim => claim.module)
+  // A `Map from` that names a module is preferred over the prose form, and a
+  // non-VueUse marker counts even without a module (`react-spring` has no pin
+  // to derive one from).
+  const named = own.find(claim => claim.module) || own.find(claim => claim.source !== 'vueuse')
   const claimed = named?.module
-  const claimConfirmed = !!named && moduleExports(named.module, named.symbol)
-  const withClaim = (upstream: string | undefined): ResolvedExport => {
-    if (upstream)
-      return { upstream, claimed, claimConfirmed }
-    // No module in the pinned submodule has this export. Say *why*, so the
-    // status column stops calling a Vue API or a post-pin hook "reause-only":
-    // a claim the pin cannot confirm (`useWebMCP` postdates it; `useWatch` is
-    // Vue's own `watch`), or a symbol VueUse itself imports from `vue`
-    // (`toValue`) rather than defines.
-    return {
-      claimed,
-      claimConfirmed,
-      missingFrom: named ? 'unconfirmed-claim' : collectVueApiSymbols().has(name) ? 'vue-api' : 'reause-only',
-    }
-  }
+  const claimedSymbol = named?.symbol
+  const claimedSource = named?.source
+  const claimConfirmed = !!named && (named.module
+    ? moduleExports(named.source, named.module, named.symbol)
+    // A source with no pin cannot be verified against disk; the annotation is
+    // the provenance, and the row renders `✅ re-exported` rather than `ported`.
+    : isReexportOnly(named.source))
 
-  // 1 — the claim this export's own annotation makes.
+  // `upstream || undefined`: a claim on a source with no pin resolves to the
+  // source alone (`react-spring`), and an empty module path must read as "no
+  // pinned path", not as a path.
+  const resolved = (source: string, upstream: string | undefined, symbol: string | undefined): ResolvedExport =>
+    ({ source, upstream: upstream || undefined, symbol, reexported: isReexportOnly(source), claimed, claimConfirmed })
+
+  // 1 — the claim this export's own annotation makes, in its own source.
   if (claimConfirmed)
-    return withClaim(claimed)
+    return resolved(claimedSource!, claimed, claimedSymbol)
+
   for (const claim of own) {
-    // The prose form names a symbol without a package: look for the module
-    // defining it in the page's own upstream package, then in `shared/utils`.
-    if (!claim.module && claim.symbol) {
+    // 2 — the VueUse prose form names a symbol without a package: look for the
+    // module defining it in the page's own upstream package, then `shared/utils`
+    // (the VueUse pin only — see `RE_PROSE_PORT`).
+    if (!claim.module && claim.symbol && claim.source === 'vueuse') {
       const hit = findUpstreamModule(modulesOfPackage(pkg), claim.symbol)
         || findUpstreamModule(['packages/shared/utils'], claim.symbol)
       if (hit)
-        return withClaim(hit)
+        return resolved('vueuse', hit, claim.symbol)
+    }
+    // 2b — a `Map from` claim on a source that named no module path.
+    if (!claim.module && claim.symbol && claim.source !== 'vueuse') {
+      const hit = findClaimedModule(claim.source, claim.qualifier, claim.symbol)
+      if (hit)
+        return resolved(claim.source, hit, claim.symbol)
     }
   }
-  // 2 — a module the file claims that exports this symbol under another name.
-  const sibling = findUpstreamModule([...claims.values()].flat().map(claim => claim.module), name)
-  if (sibling)
-    return withClaim(sibling)
-  // 3 — the page maps onto an upstream directory of the same name.
+  // 3 — a module the file claims that exports this symbol under another name.
+  for (const claim of all) {
+    if (claim.module && moduleExports(claim.source, claim.module, name))
+      return resolved(claim.source, claim.module, name)
+  }
+  // 4 — a source the file claims whose pin did not confirm the annotation:
+  // search that source's own tree, and stop there. Falling through to the
+  // VueUse heuristics below would label a non-VueUse port with a VueUse module.
+  for (const source of new Set(all.map(claim => claim.source).filter(id => id !== 'vueuse'))) {
+    const hit = findSourceModuleBySymbol(source, name)
+    if (hit)
+      return resolved(source, hit, name)
+  }
+  // 5 — the page maps onto an upstream VueUse directory of the same name.
   const page = `packages/${pkg}/${dir}`
   if (findUpstreamModule([page], name))
-    return withClaim(page)
-  // 4 — another module of the page's own upstream package.
+    return resolved('vueuse', page, name)
+  // 6 — another module of the page's own upstream VueUse package.
   const withinPackage = findUpstreamModule(modulesOfPackage(pkg), name)
   if (withinPackage)
-    return withClaim(withinPackage)
-  // 5 — upstream `shared/utils` (one barrel, no per-symbol directories).
-  return withClaim(findUpstreamModule(['packages/shared/utils'], name))
+    return resolved('vueuse', withinPackage, name)
+  // 7 — upstream `shared/utils` (one barrel, no per-symbol directories).
+  const shared = findUpstreamModule(['packages/shared/utils'], name)
+  if (shared)
+    return resolved('vueuse', shared, name)
+
+  // No module in a pinned submodule has this export. Say *why*, so the status
+  // column stops calling a Vue API or a post-pin hook "reause-only": a claim the
+  // pin cannot confirm (`useWebMCP` postdates it; `useWatch` is Vue's own
+  // `watch`), or a symbol VueUse itself imports from `vue` (`toValue`) rather
+  // than defines. A non-VueUse claim is *always* reported as an unconfirmed
+  // claim, never as `reause-only` (issue #915).
+  const missingFrom = named
+    ? 'unconfirmed-claim'
+    : collectVueApiSymbols().has(name) ? 'vue-api' : 'reause-only'
+  return {
+    claimed,
+    claimConfirmed,
+    symbol: claimedSymbol || name,
+    source: missingFrom === 'reause-only' ? undefined : claimedSource || 'vueuse',
+    missingFrom,
+  }
 }
 function parseExports(file: string): string[] {
   const content = readFileSync(file, 'utf-8')
@@ -395,31 +732,41 @@ function getLastUpdated(file: string): number | undefined {
  * mirroring VueUse's metadata-driven function list.
  */
 export async function generateFunctionsMD() {
-  const rows = collectFunctionRows().map(({ name, file, upstream, missingFrom }) => {
-    // A resolved upstream is a real path; `—` is reserved for exports with no
-    // module in the pinned submodule, and the status distinguishes *why*:
+  const rows = collectFunctionRows().map(({ name, file, source, upstream, symbol, reexported, missingFrom }) => {
+    // The `source` column names the upstream a row belongs to and is `—` for a
+    // pure reause-only export (nothing upstream defines or re-exports it).
+    // `upstream function` is the symbol the port's own annotation names — the
+    // upstream name for a renamed port (`useRafInterval` ← ahooks, reause
+    // `useIntervalRafFn`), otherwise the reause export name.
+    //
+    // `source path` is the resolved pin-relative module; `—` means no module in
+    // a pinned submodule has this export, and the status distinguishes *why*:
     //   - `reause-only export`  — nothing upstream defines or re-exports it;
+    //   - `re-exported` — the port re-exports a source that has no pin to resolve
+    //     (`react-spring`), so it is not a hand-written port;
     //   - `not in pinned submodule` — the port claims an upstream the pin cannot
     //     confirm (`useWebMCP` postdates it, `useWatch` is Vue's `watch`) or the
     //     symbol is one VueUse takes from `vue` (`toValue`).
     // Neither is "no upstream match" for a renamed or secondary export, which is
     // what the removed same-name-directory probe used to report.
-    const status = upstream
-      ? '✅ ported'
-      : missingFrom === 'reause-only' ? '✅ reause-only export' : '✅ ported (not in pinned submodule)'
-    return `| \`${name}\` | ${upstream || '—'} | \`${file}\` | ${status} |`
+    const status = reexported
+      ? '✅ re-exported'
+      : upstream
+        ? '✅ ported'
+        : missingFrom === 'reause-only' ? '✅ reause-only export' : '✅ ported (not in pinned submodule)'
+    return `| ${source || '—'} | \`${symbol || name}\` | ${upstream || '—'} | \`${file}\` | ${status} |`
   })
 
   const md = `# Function mapping status
 
 > Auto-generated by \`npm run update\` (scripts/update.ts) — do not edit by hand.
-> The upstream source of truth is the \`source/vueuse\` submodule.
+> The upstream sources of truth are the pinned \`source/*\` submodules: \`source/vueuse\` for ports that name no other source, and the tree of the source the row's own \`Map from\` annotation names otherwise — react-use, react-hookz, mantine and ahooks have pins, react-spring has none (re-export only). Only \`source/vueuse\` is polled for upstream updates (docs/upstream-monitoring.md §1).
 > Export-driven: every row is an export of this repo, so an upstream function with no reause port would simply be absent — this table is a port registry, not a coverage proof (audit procedure: docs/upstream-monitoring.md §3.2).
-> Status: \`✅ ported\` = resolved to an upstream module; \`✅ ported (not in pinned submodule)\` = the port's upstream is newer than the pin, or a symbol VueUse re-exports from \`vue\`; \`✅ reause-only export\` = nothing upstream defines or re-exports it.
+> Status: \`✅ ported\` = resolved to a module in its source's pin; \`✅ re-exported\` = re-exports a source that has no pinned checkout (\`react-spring\`); \`✅ ported (not in pinned submodule)\` = the port's upstream is newer than the pin, or a symbol VueUse re-exports from \`vue\`; \`✅ reause-only export\` = nothing upstream defines or re-exports it.
 
-| VueUse function | source (vueuse) | reause | status |
-|---|---|---|---|
-${rows.join('\n') || '| — | — | — | no hooks mapped yet |'}
+| source | upstream function | source path (pinned) | reause | status |
+|---|---|---|---|---|
+${rows.join('\n') || '| — | — | — | — | no hooks mapped yet |'}
 `
 
   writeFileSync(join(root, 'meta/functions.md'), await format(md, { parser: 'markdown' }))
@@ -427,12 +774,12 @@ ${rows.join('\n') || '| — | — | — | no hooks mapped yet |'}
 }
 
 /**
- * One `meta/functions.md` row: the reause export, the source file it points at,
- * the resolved upstream module (`undefined` when the export is genuinely
- * reause-only) and the provenance claim the port itself makes for that export.
- * Exported so the structural guard in `test/functions-table.test.ts` can assert
- * the resolver's output directly, rather than only the committed (and lagging)
- * generated table.
+ * One `meta/functions.md` row / `meta/functions.ts` entry: the reause export,
+ * the source file it points at, the upstream source and module it resolves to
+ * (`undefined` when the export is genuinely reause-only) and the provenance
+ * claim the port itself makes for that export. Exported so the structural guard
+ * in `test/functions-table.test.ts` can assert the resolver's output directly,
+ * rather than only the committed (and lagging) generated table.
  */
 export interface FunctionRow extends ResolvedExport {
   name: string
@@ -548,7 +895,7 @@ function extractDescription(md: string): string {
 
 /**
  * Write `packages/metadata/src/functions.ts` — the structured function
- * registry (name/pkg/file/category/lastUpdated) consumed by the docs
+ * registry (name/pkg/file/category/source/lastUpdated) consumed by the docs
  * markdown transformer, the PWA route list and the theme's FunctionsList
  * (category filter / search / sort), plus the page-level `pages` view the
  * agent-skill generator consumes. Mirrors VueUse's generated
@@ -559,7 +906,7 @@ async function generateFunctionsTS() {
   // functions whose co-located page (index.md) exists, so every entry in
   // the FunctionsList links to a real page (mirrors VueUse's page-driven
   // metadata; the progress table in meta/functions.md keeps all entries).
-  const functions = collectFunctions().filter((fn) => {
+  const all = collectFunctions().filter((fn) => {
     const [, pkg, dir] = fn.file.match(/^packages\/(\w+)\/([^/]+)\/index\.tsx$/) || []
     if (!pkg || !dir)
       return false
@@ -571,6 +918,25 @@ async function generateFunctionsTS() {
       return false
     }
   })
+
+  // The registry carries the same `source` the markdown table's column renders
+  // (issue #915), resolved by the one resolver both artifacts already share.
+  // `undefined` — a pure reause-only export — is dropped by JSON.stringify, so
+  // consumers see `fn.source` only where an upstream source exists. The key
+  // order matches the committed registry (`name, file, pkg, dir, category,
+  // lastUpdated`) so adding a field does not rewrite every entry.
+  const provenance = new Map(
+    collectFunctionRows().map(row => [`${row.name}\u0000${row.file}`, row.source]),
+  )
+  const functions = all.map(fn => ({
+    name: fn.name,
+    file: fn.file,
+    pkg: fn.pkg,
+    dir: fn.dir,
+    category: fn.category,
+    source: provenance.get(`${fn.name}\u0000${fn.file}`),
+    lastUpdated: fn.lastUpdated,
+  }))
 
   const pages = collectPages(functions)
 
@@ -593,6 +959,13 @@ export interface FunctionInfo {
   dir: string
   file: string
   category: string
+  /**
+   * Upstream source this export ports from (\`vueuse\`, \`react-use\`,
+   * \`react-hookz\`, \`mantine\`, \`ahooks\`, \`react-spring\`), resolved from the
+   * port's own annotation against that source's pinned tree. Absent for a pure
+   * reause-only export (the table's \`—\`).
+   */
+  source?: string
   lastUpdated?: number
 }
 
