@@ -292,6 +292,7 @@
 | vueuse    | `useTrunc`                        | packages/math/useTrunc                        | `packages/math/useTrunc/index.tsx`                        | ✅ ported                           |
 | react-use | `useUnmount`                      | src/useUnmount.ts                             | `packages/shared/useUnmount/index.tsx`                    | ✅ ported                           |
 | react-use | `useUpdate`                       | src/useUpdate.ts                              | `packages/shared/useUpdate/index.tsx`                     | ✅ ported                           |
+| react-use | `useUpdateEffect`                 | src/useUpdateEffect.ts                        | `packages/shared/useUpdateEffect/index.tsx`               | ✅ ported                           |
 | vueuse    | `useUrlSearchParams`              | packages/core/useUrlSearchParams              | `packages/core/useUrlSearchParams/index.tsx`              | ✅ ported                           |
 | vueuse    | `useUserMedia`                    | packages/core/useUserMedia                    | `packages/core/useUserMedia/index.tsx`                    | ✅ ported                           |
 | vueuse    | `useVibrate`                      | packages/core/useVibrate                      | `packages/core/useVibrate/index.tsx`                      | ✅ ported                           |

@@ -2586,6 +2586,15 @@ export const functions: FunctionInfo[] = [
     lastUpdated: 1788942682000,
   },
   {
+    name: 'useUpdateEffect',
+    file: 'packages/shared/useUpdateEffect/index.tsx',
+    pkg: 'shared',
+    dir: 'useUpdateEffect',
+    category: 'Lifecycle',
+    source: 'react-use',
+    lastUpdated: 1789254853000,
+  },
+  {
     name: 'useUrlSearchParams',
     file: 'packages/core/useUrlSearchParams/index.tsx',
     pkg: 'core',
@@ -4696,6 +4705,15 @@ export const pages: FunctionPageInfo[] = [
     description:
       "a force-update hook — React port of react-use's [`useUpdate`](https://streamich.github.io/react-use/?path=/story/animation-useupdate--docs)",
     lastUpdated: 1788942682000,
+  },
+  {
+    name: 'useUpdateEffect',
+    pkg: 'shared',
+    doc: 'packages/shared/useUpdateEffect/index.md',
+    category: 'Lifecycle',
+    description:
+      "`useEffect` that skips the first render — React port of react-use's [`useUpdateEffect`](https://streamich.github.io/react-use/?path=/story/lifecycle-useupdateeffect--docs)",
+    lastUpdated: 1789254853000,
   },
   {
     name: 'useUrlSearchParams',
