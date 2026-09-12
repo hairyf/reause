@@ -4,3 +4,15 @@
 [submodule "source/react-use"]
 	path = source/react-use
 	url = https://github.com/streamich/react-use.git
+[submodule "source/react-hookz"]
+	path = source/react-hookz
+	url = https://github.com/react-hookz/web.git
+[submodule "source/usehooks"]
+	path = source/usehooks
+	url = https://github.com/uidotdev/usehooks.git
+[submodule "source/mantine"]
+	path = source/mantine
+	url = https://github.com/mantinedev/mantine.git
+[submodule "source/ahooks"]
+	path = source/ahooks
+	url = https://github.com/alibaba/hooks.git
