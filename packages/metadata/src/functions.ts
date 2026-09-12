@@ -1291,6 +1291,15 @@ export const functions: FunctionInfo[] = [
     lastUpdated: 1789147565000,
   },
   {
+    name: 'useError',
+    file: 'packages/shared/useError/index.tsx',
+    pkg: 'shared',
+    dir: 'useError',
+    category: 'Side-effects',
+    source: 'react-use',
+    lastUpdated: 1789254261000,
+  },
+  {
     name: 'useEventBus',
     file: 'packages/core/useEventBus/index.tsx',
     pkg: 'core',
@@ -3521,6 +3530,15 @@ export const pages: FunctionPageInfo[] = [
     lastUpdated: 1789147565000,
   },
   {
+    name: 'useError',
+    pkg: 'shared',
+    doc: 'packages/shared/useError/index.md',
+    category: 'Side-effects',
+    description:
+      'returns a referentially stable error dispatcher whose error is re-thrown from a `useEffect` on the next render',
+    lastUpdated: 1789254261000,
+  },
+  {
     name: 'useEventBus',
     pkg: 'core',
     doc: 'packages/core/useEventBus/index.md',
@@ -4930,6 +4948,7 @@ export const categoryNames: string[] = [
   '@Math',
   '@RxJS',
   'Lifecycle',
+  'Side-effects',
 ]
 
 export const coreCategoryNames = categoryNames.filter(c => !c.startsWith('@'))

@@ -148,6 +148,7 @@
 | vueuse    | `onElementRemoval`                | packages/core/onElementRemoval                | `packages/core/useElementRemoval/index.tsx`               | ✅ ported                           |
 | vueuse    | `useElementSize`                  | packages/core/useElementSize                  | `packages/core/useElementSize/index.tsx`                  | ✅ ported                           |
 | vueuse    | `useElementVisibility`            | packages/core/useElementVisibility            | `packages/core/useElementVisibility/index.tsx`            | ✅ ported                           |
+| react-use | `useError`                        | src/useError.ts                               | `packages/shared/useError/index.tsx`                      | ✅ ported                           |
 | vueuse    | `useEventBus`                     | packages/core/useEventBus                     | `packages/core/useEventBus/index.tsx`                     | ✅ ported                           |
 | vueuse    | `useEventListener`                | packages/core/useEventListener                | `packages/core/useEventListener/index.tsx`                | ✅ ported                           |
 | vueuse    | `useEventSource`                  | packages/core/useEventSource                  | `packages/core/useEventSource/index.tsx`                  | ✅ ported                           |
