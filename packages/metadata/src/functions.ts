@@ -1041,6 +1041,15 @@ export const functions: FunctionInfo[] = [
     lastUpdated: 1789147565000,
   },
   {
+    name: 'useClickAway',
+    file: 'packages/core/useClickAway/index.tsx',
+    pkg: 'core',
+    dir: 'useClickAway',
+    category: 'Sensors',
+    source: 'ahooks',
+    lastUpdated: 1789256593000,
+  },
+  {
     name: 'useClickOutside',
     file: 'packages/core/useClickOutside/index.tsx',
     pkg: 'core',
@@ -3337,6 +3346,15 @@ export const pages: FunctionPageInfo[] = [
     category: '@Math',
     description: 'reactively clamp a value between two other values',
     lastUpdated: 1789147565000,
+  },
+  {
+    name: 'useClickAway',
+    pkg: 'core',
+    doc: 'packages/core/useClickAway/index.md',
+    category: 'Sensors',
+    description:
+      "fire a handler when a click lands outside one or more target elements — the reause port of ahooks' [`useClickAway`](https://github.com/alibaba/hooks/blob/master/packages/hooks/src/useClickAway/index.ts) (upstream mapping files: `source/ahooks/packages/hooks/src/useClickAway/index.ts`",
+    lastUpdated: 1789256593000,
   },
   {
     name: 'useClickOutside',

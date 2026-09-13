@@ -120,6 +120,7 @@
 | vueuse    | `useCeil`                         | packages/math/useCeil                         | `packages/math/useCeil/index.tsx`                         | ✅ ported                           |
 | vueuse    | `useChangeCase`                   | packages/integrations/useChangeCase           | `packages/integrations/useChangeCase/index.tsx`           | ✅ ported                           |
 | vueuse    | `useClamp`                        | packages/math/useClamp                        | `packages/math/useClamp/index.tsx`                        | ✅ ported                           |
+| ahooks    | `useClickAway`                    | packages/hooks/src/useClickAway               | `packages/core/useClickAway/index.tsx`                    | ✅ ported                           |
 | vueuse    | `onClickOutside`                  | packages/core/onClickOutside                  | `packages/core/useClickOutside/index.tsx`                 | ✅ ported                           |
 | vueuse    | `useClipboard`                    | packages/core/useClipboard                    | `packages/core/useClipboard/index.tsx`                    | ✅ ported                           |
 | vueuse    | `useClipboardItems`               | packages/core/useClipboardItems               | `packages/core/useClipboardItems/index.tsx`               | ✅ ported                           |
