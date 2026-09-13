@@ -1,7 +1,7 @@
 {
   "name": "reause",
   "type": "module",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "private": true,
   "packageManager": "pnpm@11.25.0",
   "description": "Reactive utilities for React — an experimental 1:1 AI-mapped port of VueUse",
