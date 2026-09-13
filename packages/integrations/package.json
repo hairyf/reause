@@ -44,6 +44,7 @@
     "prepack": "pnpm run build"
   },
   "peerDependencies": {
+    "@react-spring/web": "^10",
     "async-validator": "^4",
     "axios": "^1",
     "change-case": "^5",
@@ -59,6 +60,7 @@
     "universal-cookie": "^7 || ^8"
   },
   "peerDependenciesMeta": {
+    "@react-spring/web": { "optional": true },
     "async-validator": { "optional": true },
     "axios": { "optional": true },
     "change-case": { "optional": true },
