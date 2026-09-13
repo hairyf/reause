@@ -2324,6 +2324,15 @@ export const functions: FunctionInfo[] = [
     lastUpdated: 1788960102000,
   },
   {
+    name: 'useSet',
+    file: 'packages/shared/useSet/index.tsx',
+    pkg: 'shared',
+    dir: 'useSet',
+    category: 'State',
+    source: 'react-hookz',
+    lastUpdated: 1789275061000,
+  },
+  {
     name: 'useShallowCompareEffect',
     file: 'packages/shared/useShallowCompareEffect/index.tsx',
     pkg: 'shared',
@@ -4581,6 +4590,14 @@ export const pages: FunctionPageInfo[] = [
     category: 'State',
     description: 'reactive [SessionStorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage)',
     lastUpdated: 1788960102000,
+  },
+  {
+    name: 'useSet',
+    pkg: 'shared',
+    doc: 'packages/shared/useSet/index.md',
+    category: 'State',
+    description: "a real `Set` whose mutations re-render — React port of react-hookz's `useSet`",
+    lastUpdated: 1789275061000,
   },
   {
     name: 'useShallowCompareEffect',
