@@ -1629,7 +1629,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useId',
     category: 'Utilities',
     source: 'mantine',
-    lastUpdated: 1789253000000,
+    lastUpdated: 1789273543000,
   },
   {
     name: 'useIDBKeyval',
@@ -1720,6 +1720,15 @@ export const functions: FunctionInfo[] = [
     category: '@Electron',
     source: 'vueuse',
     lastUpdated: 1788942682000,
+  },
+  {
+    name: 'useIsomorphicLayoutEffect',
+    file: 'packages/shared/useIsomorphicLayoutEffect/index.tsx',
+    pkg: 'shared',
+    dir: 'useIsomorphicLayoutEffect',
+    category: 'Lifecycle',
+    source: 'react-use',
+    lastUpdated: 1789273543000,
   },
   {
     name: 'useJwt',
@@ -3967,7 +3976,7 @@ export const pages: FunctionPageInfo[] = [
     category: 'Utilities',
     description:
       "SSR-safe id with an optional static override — React port of `@mantine/hooks`' `useId` (upstream mapping files: `source/mantine/packages/@mantine/hooks/src/use-id/use-id.ts`",
-    lastUpdated: 1789253000000,
+    lastUpdated: 1789273543000,
   },
   {
     name: 'useIDBKeyval',
@@ -4050,6 +4059,14 @@ export const pages: FunctionPageInfo[] = [
     description:
       'use [ipcRenderer.on](https://www.electronjs.org/docs/api/ipc-renderer#ipcrendereronchannel-listener) with ease and [ipcRenderer.removeListener](https://www.electronjs.org/docs/api/ipc-renderer#ipcrendererremovelistenerchannel-listener) automatically on unmounted',
     lastUpdated: 1788942682000,
+  },
+  {
+    name: 'useIsomorphicLayoutEffect',
+    pkg: 'shared',
+    doc: 'packages/shared/useIsomorphicLayoutEffect/index.md',
+    category: 'Lifecycle',
+    description: '`useLayoutEffect` on the client',
+    lastUpdated: 1789273543000,
   },
   {
     name: 'useJwt',

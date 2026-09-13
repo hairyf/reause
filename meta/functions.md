@@ -196,6 +196,7 @@
 | vueuse    | `useIpcRenderer`                  | packages/electron/useIpcRenderer              | `packages/electron/useIpcRenderer/index.tsx`              | ✅ ported                           |
 | vueuse    | `useIpcRendererInvoke`            | packages/electron/useIpcRendererInvoke        | `packages/electron/useIpcRendererInvoke/index.tsx`        | ✅ ported                           |
 | vueuse    | `useIpcRendererOn`                | packages/electron/useIpcRendererOn            | `packages/electron/useIpcRendererOn/index.tsx`            | ✅ ported                           |
+| react-use | `useIsomorphicLayoutEffect`       | src/useIsomorphicLayoutEffect.ts              | `packages/shared/useIsomorphicLayoutEffect/index.tsx`     | ✅ ported                           |
 | vueuse    | `useJwt`                          | packages/integrations/useJwt                  | `packages/integrations/useJwt/index.tsx`                  | ✅ ported                           |
 | vueuse    | `onKeyDown`                       | packages/core/onKeyStroke                     | `packages/core/useKeyStroke/index.tsx`                    | ✅ ported                           |
 | vueuse    | `useKeyModifier`                  | packages/core/useKeyModifier                  | `packages/core/useKeyModifier/index.tsx`                  | ✅ ported                           |
