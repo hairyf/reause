@@ -429,7 +429,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useSortable',
     category: '@Integrations',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789312513000,
   },
   {
     name: 'isClient',
@@ -563,7 +563,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useSortable',
     category: '@Integrations',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789312513000,
   },
   {
     name: 'noop',
@@ -653,7 +653,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useSortable',
     category: '@Integrations',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789312513000,
   },
   {
     name: 'resolveIpcRenderer',
@@ -686,7 +686,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useSSRWidth',
     category: 'Browser',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789312513000,
   },
   {
     name: 'syncState',
@@ -2429,7 +2429,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useSortable',
     category: '@Integrations',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789312513000,
   },
   {
     name: 'useSorted',
@@ -2483,7 +2483,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useSSRWidth',
     category: 'Browser',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789312513000,
   },
   {
     name: 'useStartTyping',
@@ -4797,7 +4797,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/integrations/useSortable/index.md',
     category: '@Integrations',
     description: 'wrapper for [`sortablejs`](https://github.com/SortableJS/Sortable)',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789312513000,
   },
   {
     name: 'useSorted',
@@ -4846,7 +4846,7 @@ export const pages: FunctionPageInfo[] = [
     category: 'Browser',
     description:
       'used to set a global viewport width which will be used when rendering SSR components that rely on the viewport width like `useMediaQuery` or `useBreakpoints`',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789312513000,
   },
   {
     name: 'useStartTyping',
