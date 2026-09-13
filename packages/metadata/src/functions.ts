@@ -1892,6 +1892,15 @@ export const functions: FunctionInfo[] = [
     lastUpdated: 1789276266000,
   },
   {
+    name: 'useMask',
+    file: 'packages/core/useMask/index.tsx',
+    pkg: 'core',
+    dir: 'useMask',
+    category: 'Browser',
+    source: 'mantine',
+    lastUpdated: 1789285795000,
+  },
+  {
     name: 'useMath',
     file: 'packages/math/useMath/index.tsx',
     pkg: 'math',
@@ -4254,6 +4263,14 @@ export const pages: FunctionPageInfo[] = [
     category: 'State',
     description: "a real `Map` whose mutations re-render — React port of react-hookz's `useMap`",
     lastUpdated: 1789276266000,
+  },
+  {
+    name: 'useMask',
+    pkg: 'core',
+    doc: 'packages/core/useMask/index.md',
+    category: 'Browser',
+    description: 'input masking engine',
+    lastUpdated: 1789285795000,
   },
   {
     name: 'useMath',
