@@ -168,6 +168,7 @@
 | vueuse    | `useFirestore`                    | packages/firebase/useFirestore                | `packages/firebase/useFirestore/index.tsx`                | ✅ ported                           |
 | vueuse    | `useFloor`                        | packages/math/useFloor                        | `packages/math/useFloor/index.tsx`                        | ✅ ported                           |
 | vueuse    | `useFocus`                        | packages/core/useFocus                        | `packages/core/useFocus/index.tsx`                        | ✅ ported                           |
+| mantine   | `useFocusReturn`                  | packages/@mantine/hooks/src/use-focus-return  | `packages/core/useFocusReturn/index.tsx`                  | ✅ ported                           |
 | vueuse    | `useFocusTrap`                    | packages/integrations/useFocusTrap            | `packages/integrations/useFocusTrap/index.tsx`            | ✅ ported                           |
 | vueuse    | `useFocusWithin`                  | packages/core/useFocusWithin                  | `packages/core/useFocusWithin/index.tsx`                  | ✅ ported                           |
 | vueuse    | `useFps`                          | packages/core/useFps                          | `packages/core/useFps/index.tsx`                          | ✅ ported                           |

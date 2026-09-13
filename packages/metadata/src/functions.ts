@@ -1471,6 +1471,15 @@ export const functions: FunctionInfo[] = [
     lastUpdated: 1789147565000,
   },
   {
+    name: 'useFocusReturn',
+    file: 'packages/core/useFocusReturn/index.tsx',
+    pkg: 'core',
+    dir: 'useFocusReturn',
+    category: 'Sensors',
+    source: 'mantine',
+    lastUpdated: 1789257282000,
+  },
+  {
     name: 'useFocusTrap',
     file: 'packages/integrations/useFocusTrap/index.tsx',
     pkg: 'integrations',
@@ -3751,6 +3760,15 @@ export const pages: FunctionPageInfo[] = [
     category: 'Sensors',
     description: 'reactive utility to track or set the focus state of a DOM element',
     lastUpdated: 1789147565000,
+  },
+  {
+    name: 'useFocusReturn',
+    pkg: 'core',
+    doc: 'packages/core/useFocusReturn/index.md',
+    category: 'Sensors',
+    description:
+      "return focus to the element that was active before an overlay opened — React port of `@mantine/hooks`' `useFocusReturn` (upstream mapping file: `source/mantine/packages/@mantine/hooks/src/use-focus-return/use-focus-return.ts`",
+    lastUpdated: 1789257282000,
   },
   {
     name: 'useFocusTrap',
