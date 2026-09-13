@@ -122,6 +122,17 @@ General conventions to apply (from [`packages/guide/architecture.md`](../package
 
 ## Acceptance criteria
 
+- [ ] DOM / element target parameters follow the binding standard in
+      [`AGENTS.md`](../AGENTS.md) §2 — a single target is `RefOrValue<T>`; a
+      multi-target array is accepted in either wrapping
+      (`RefOrValue<Arrayable<T>>` as in `useEventListener`, or `RefOrValue<T>[]`
+      as in `useClickAway`), the only requirement being that **every element has
+      the same type `T`**. The upstream permissive target type (e.g. ahooks
+      `BasicTarget | BasicTarget[]`) is **not** mirrored: §2 wins over §1.1's
+      direct-mirror rule for parameter _types_
+- [ ] when upstream takes multiple targets, the docs/demo show the
+      multi-target form and state the homogeneous-`T` limit; when it does not,
+      a single target is used
 - [ ] implementation `packages/<pkg>/<fn>/index.tsx` + one barrel line `export * from './<fn>'` in `packages/<pkg>/index.ts`
 - [ ] test `packages/<pkg>/<fn>/index.test.tsx` (vitest-browser-react), mirroring the upstream test files
 - [ ] docs page `packages/<pkg>/<fn>/index.md` + co-located demo `packages/<pkg>/<fn>/demo.tsx`
