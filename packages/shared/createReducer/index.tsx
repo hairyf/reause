@@ -103,7 +103,7 @@ function composeMiddleware<Action, State>(chain: Middleware<Action, State>[]) {
  * upstream uses" does not survive the pin: `source/react-use/src/factory/createReducer.ts`
  * contains **no `as` at all** (67 lines, zero assertions). The only type-level
  * convergence in upstream is the `MutableRefObject<Dispatch<Action>>`
- * annotation*, and because `action` is annotated `Action` here (strict mode
+ * annotation, and because `action` is annotated `Action` here (strict mode
  * forbids upstream's implicit `any`), `useCallback` infers `(action: Action) =>
  * Action`, which is structurally assignable to the `void`-returning
  * `Dispatch<Action>` — so no assertion is needed, and adding one would be a
