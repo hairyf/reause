@@ -1,5 +1,7 @@
-import type { MaskSlot } from './index'
-import { describe, expect, expectTypeOf, it } from 'vitest'
+import type * as React from 'react'
+import type { MaskSlot } from './engine'
+import { afterEach, beforeEach, describe, expect, expectTypeOf, it, vi } from 'vitest'
+import { renderHook } from 'vitest-browser-react'
 import {
   applyMaskToRaw,
   buildDisplayValue,
@@ -14,20 +16,21 @@ import {
   getResolvedOptions,
   getSlotChar,
   isMaskComplete,
-
+  MAX_UNDO_HISTORY,
   parseMask,
   processInput,
   unformatMask,
-} from './index'
-
-// Mirrors the pure half of upstream `source/mantine/packages/@mantine/hooks/src/use-mask/use-mask.test.ts`
-// (the four `utility` describes plus the `mask parsing` describe). The hook
-// half of that file — every DOM, caret and undo case — belongs to the hook
-// body and is deliberately not exercised here: this file must stay DOM-free so
-// an engine regression localises without browser noise.
+} from './engine'
+import { useMask } from './index'
 
 const PHONE: MaskSlot[] = parseMask('(999) 999-9999', DEFAULT_TOKENS)
 const DATE: MaskSlot[] = parseMask('99/99/9999', DEFAULT_TOKENS)
+
+// Mirrors the pure half of upstream `source/mantine/packages/@mantine/hooks/src/use-mask/use-mask.test.ts`
+// (the four `utility` describes plus the `mask parsing` describe); the hook half
+// (DOM, caret, undo) lives in the `useMask` describe below. The engine's own
+// imports come from `./engine` because that is the module it lives in, while
+// the hook is imported from the page module that re-exports it.
 
 // One shared custom token, declared once and referenced by the cases that need
 // it. It is written with an explicit case range rather than the `i` flag to
@@ -657,5 +660,1291 @@ describe('public types', () => {
     expectTypeOf(generatePattern).parameters.toEqualTypeOf<
       ['full' | 'full-inexact', import('./index').UseMaskOptions]
     >()
+  })
+})
+
+// ---------------------------------------------------------------------------
+// The hook half: mirrors upstream's `useMask hook` describe — the DOM value, the
+// caret, the selection, the undo/redo history, blur/autoClear and the ARIA
+// state. The inputs are real elements created by hand (as upstream does) and
+// attached to the document, because the hook manipulates the element's `value`
+// and selection directly rather than through React props.
+// ---------------------------------------------------------------------------
+
+interface Act {
+  (callback: () => void | Promise<void>): Promise<void>
+}
+
+/** Create an input and attach it to the document. */
+function createMaskedInput(): HTMLInputElement {
+  const input = document.createElement('input')
+  document.body.appendChild(input)
+  return input
+}
+
+/**
+ * Dispatch one `keydown` inside its own `act()`.
+ *
+ * Each event has to flush on its own: the hook reads `processedRef` at the
+ * start of a handler, and React does not commit the state it writes until
+ * `act()` exits, so two keystrokes batched into one `act()` would both see the
+ * pre-first-keystroke value. Upstream's jest tests get this for free because
+ * every dispatch sits in its own `act`.
+ */
+async function pressKey(
+  input: HTMLInputElement,
+  act: Act,
+  key: string,
+  init: KeyboardEventInit = {},
+): Promise<void> {
+  await act(() => {
+    input.dispatchEvent(new KeyboardEvent('keydown', { key, ...init }))
+  })
+}
+
+/** Type `text` one keystroke at a time, flushing after each. */
+async function typeText(input: HTMLInputElement, act: Act, text: string): Promise<void> {
+  for (const char of text) {
+    await pressKey(input, act, char)
+  }
+}
+
+/**
+ * Write a value into the input the way an edit that bypasses `keydown` does
+ * (`cut`, drag-drop, an IME commit): through the native setter so the property
+ * really is replaced, followed by an `input` event.
+ */
+async function writeValueNatively(
+  input: HTMLInputElement,
+  act: Act,
+  value: string,
+): Promise<void> {
+  await act(() => {
+    const nativeSetter = Object.getOwnPropertyDescriptor(
+      window.HTMLInputElement.prototype,
+      'value',
+    )!.set!
+    nativeSetter.call(input, value)
+    input.dispatchEvent(new InputEvent('input', { inputType: 'deleteByCut' }))
+  })
+}
+
+/** Wait for a pending `requestAnimationFrame` (the caret clamps run in one). */
+async function nextFrame(act: Act): Promise<void> {
+  await act(async () => {
+    await new Promise<void>((resolve) => {
+      requestAnimationFrame(() => resolve())
+    })
+  })
+}
+
+function selectRange(input: HTMLInputElement, act: Act, start: number, end: number): Promise<void> {
+  return act(() => {
+    input.setSelectionRange(start, end)
+  })
+}
+
+describe('useMask', () => {
+  beforeEach(() => {
+    document.body.innerHTML = ''
+  })
+
+  afterEach(() => {
+    document.body.innerHTML = ''
+  })
+
+  // --- mount, ref callback and ARIA state --------------------------------
+
+  it('returns the initial empty state and the five contract members', async () => {
+    const { result } = await renderHook(() => useMask({ mask: '(999) 999-9999' }))
+
+    expect(result.current.value).toBe('')
+    expect(result.current.rawValue).toBe('')
+    expect(result.current.isComplete).toBe(false)
+    expect(result.current.ref).toBeDefined()
+    expect(result.current.reset).toBeDefined()
+    expectTypeOf(result.current.ref).toEqualTypeOf<React.RefCallback<HTMLInputElement>>()
+    expectTypeOf(result.current.value).toEqualTypeOf<string>()
+    expectTypeOf(result.current.rawValue).toEqualTypeOf<string>()
+    expectTypeOf(result.current.isComplete).toEqualTypeOf<boolean>()
+    expectTypeOf(result.current.reset).toEqualTypeOf<() => void>()
+  })
+
+  it('returns a ref callback function', async () => {
+    const { result } = await renderHook(() => useMask({ mask: '999' }))
+
+    expect(typeof result.current.ref).toBe('function')
+  })
+
+  it('shows the mask on attach when alwaysShowMask is true', async () => {
+    const input = createMaskedInput()
+    const { result, act } = await renderHook(() =>
+      useMask({ mask: '99/99', alwaysShowMask: true, slotChar: '_' }),
+    )
+
+    await act(() => {
+      result.current.ref(input)
+    })
+
+    expect(input.value).toBe('__/__')
+    expect(result.current.value).toBe('__/__')
+  })
+
+  it('shows a multi-character slotChar hint on attach', async () => {
+    const input = createMaskedInput()
+    const { result, act } = await renderHook(() =>
+      useMask({ mask: '99/99/9999', alwaysShowMask: true, slotChar: 'DD/MM/YYYY' }),
+    )
+
+    await act(() => {
+      result.current.ref(input)
+    })
+
+    expect(input.value).toBe('DD/MM/YYYY')
+  })
+
+  it('leaves the field empty on attach when alwaysShowMask is false', async () => {
+    const input = createMaskedInput()
+    const { result, act } = await renderHook(() =>
+      useMask({ mask: '99/99', alwaysShowMask: false }),
+    )
+
+    await act(() => {
+      result.current.ref(input)
+    })
+
+    expect(input.value).toBe('')
+  })
+
+  it('adopts a value the node already carries, without notifying', async () => {
+    // The adopted value is re-derived through the mask, so it is reshaped
+    // rather than kept verbatim: `12/25` on a `99/99/9999` mask ends up as
+    // `12/25/` and not as the new mask's `12/25/____`, because the first pass
+    // runs with no raw value to resolve `modify` against and the second pass
+    // sees the six-character processed string. Upstream does the same.
+    const input = createMaskedInput()
+    input.value = '12/25'
+    const onChangeRaw = vi.fn()
+    const onComplete = vi.fn()
+    const { result, act } = await renderHook(() =>
+      useMask({ mask: '99/99/9999', onChangeRaw, onComplete }),
+    )
+
+    await act(() => {
+      result.current.ref(input)
+    })
+
+    expect(input.value).toBe('12/25/')
+    expect(result.current.value).toBe('12/25/')
+    expect(result.current.rawValue).toBe('1225')
+    // attaching a ref is not a user edit
+    expect(onChangeRaw).not.toHaveBeenCalled()
+    expect(onComplete).not.toHaveBeenCalled()
+  })
+
+  it('sets aria-invalid when invalid is true', async () => {
+    const input = createMaskedInput()
+    const { result, act } = await renderHook(() => useMask({ mask: '999', invalid: true }))
+
+    await act(() => {
+      result.current.ref(input)
+    })
+
+    expect(input.getAttribute('aria-invalid')).toBe('true')
+  })
+
+  it('does not set aria-invalid when invalid is false', async () => {
+    const input = createMaskedInput()
+    const { result, act } = await renderHook(() => useMask({ mask: '999', invalid: false }))
+
+    await act(() => {
+      result.current.ref(input)
+    })
+
+    expect(input.hasAttribute('aria-invalid')).toBe(false)
+  })
+
+  it('re-applies aria-invalid when the option flips on a mounted input', async () => {
+    const input = createMaskedInput()
+    const { result, rerender, act } = await renderHook(
+      (props?: { invalid: boolean }) => useMask({ mask: '999', invalid: props?.invalid }),
+      { initialProps: { invalid: false } },
+    )
+
+    await act(() => {
+      result.current.ref(input)
+    })
+    expect(input.hasAttribute('aria-invalid')).toBe(false)
+
+    await rerender({ invalid: true })
+    expect(input.getAttribute('aria-invalid')).toBe('true')
+
+    await rerender({ invalid: false })
+    expect(input.hasAttribute('aria-invalid')).toBe(false)
+  })
+
+  it('removes every event listener when the ref is detached', async () => {
+    const input = createMaskedInput()
+    const removeSpy = vi.spyOn(input, 'removeEventListener')
+    const { result, act } = await renderHook(() => useMask({ mask: '999' }))
+
+    await act(() => {
+      result.current.ref(input)
+    })
+    await act(() => {
+      result.current.ref(null)
+    })
+
+    expect(removeSpy.mock.calls.map(call => call[0]).sort()).toEqual([
+      'blur',
+      'focus',
+      'input',
+      'keydown',
+      'mousedown',
+      'mouseup',
+      'paste',
+    ])
+  })
+
+  // --- focus, blur and autoClear -----------------------------------------
+
+  it('reveals the mask on focus and clears it on blur when nothing was typed', async () => {
+    const input = createMaskedInput()
+    const { result, act } = await renderHook(() => useMask({ mask: '(999) 999-9999' }))
+
+    await act(() => {
+      result.current.ref(input)
+    })
+    await act(() => {
+      input.focus()
+    })
+
+    expect(input.value).toBe('(___) ___-____')
+
+    await act(() => {
+      input.blur()
+    })
+
+    expect(input.value).toBe('')
+    expect(result.current.value).toBe('')
+    expect(result.current.rawValue).toBe('')
+  })
+
+  it('clears the display on blur when the typed value was fully deleted', async () => {
+    const input = createMaskedInput()
+    const { result, act } = await renderHook(() => useMask({ mask: '(999) 999-9999' }))
+
+    await act(() => {
+      result.current.ref(input)
+    })
+    await act(() => {
+      input.focus()
+    })
+    await pressKey(input, act, '1')
+    await pressKey(input, act, 'Backspace')
+
+    await act(() => {
+      input.blur()
+    })
+
+    expect(input.value).toBe('')
+    expect(result.current.value).toBe('')
+    expect(result.current.rawValue).toBe('')
+  })
+
+  it('keeps a partially filled value on blur, without its placeholders', async () => {
+    const input = createMaskedInput()
+    const { result, act } = await renderHook(() => useMask({ mask: '99/99/9999' }))
+
+    await act(() => {
+      result.current.ref(input)
+    })
+    await act(() => {
+      input.focus()
+    })
+    await typeText(input, act, '12')
+    expect(input.value).toBe('12/__/____')
+
+    await act(() => {
+      input.blur()
+    })
+
+    expect(input.value).toBe('12/')
+    expect(result.current.rawValue).toBe('12')
+  })
+
+  it('alwaysShowMask keeps the placeholders after blur', async () => {
+    const input = createMaskedInput()
+    const { result, act } = await renderHook(() =>
+      useMask({ mask: '99/99/9999', alwaysShowMask: true }),
+    )
+
+    await act(() => {
+      result.current.ref(input)
+    })
+    await act(() => {
+      input.focus()
+    })
+    await typeText(input, act, '12')
+
+    await act(() => {
+      input.blur()
+    })
+
+    expect(input.value).toBe('12/__/____')
+    expect(result.current.rawValue).toBe('12')
+  })
+
+  it('autoClear empties an incomplete field on blur and notifies with empty strings', async () => {
+    const input = createMaskedInput()
+    const onChangeRaw = vi.fn()
+    const { result, act } = await renderHook(() =>
+      useMask({ mask: '99:99', autoClear: true, onChangeRaw }),
+    )
+
+    await act(() => {
+      result.current.ref(input)
+    })
+    await act(() => {
+      input.focus()
+    })
+    await typeText(input, act, '12')
+    expect(result.current.rawValue).toBe('12')
+
+    await act(() => {
+      input.blur()
+    })
+
+    expect(input.value).toBe('')
+    expect(result.current.value).toBe('')
+    expect(result.current.rawValue).toBe('')
+    expect(onChangeRaw).toHaveBeenLastCalledWith('', '')
+  })
+
+  it('autoClear keeps a complete value on blur', async () => {
+    const input = createMaskedInput()
+    const onChangeRaw = vi.fn()
+    const { result, act } = await renderHook(() =>
+      useMask({ mask: '99:99', autoClear: true, onChangeRaw }),
+    )
+
+    await act(() => {
+      result.current.ref(input)
+    })
+    await act(() => {
+      input.focus()
+    })
+    await typeText(input, act, '1230')
+
+    await act(() => {
+      input.blur()
+    })
+
+    expect(input.value).toBe('12:30')
+    expect(result.current.rawValue).toBe('1230')
+    expect(onChangeRaw).not.toHaveBeenCalledWith('', '')
+  })
+
+  it('autoClear repaints the empty mask on blur when alwaysShowMask is on', async () => {
+    const input = createMaskedInput()
+    const { result, act } = await renderHook(() =>
+      useMask({ mask: '99:99', autoClear: true, alwaysShowMask: true }),
+    )
+
+    await act(() => {
+      result.current.ref(input)
+    })
+    await act(() => {
+      input.focus()
+    })
+    await typeText(input, act, '12')
+
+    await act(() => {
+      input.blur()
+    })
+
+    expect(input.value).toBe('__:__')
+    expect(result.current.rawValue).toBe('')
+    expect(result.current.value).toBe('__:__')
+  })
+
+  it('showMaskOnFocus false keeps the field blank until something is typed', async () => {
+    const input = createMaskedInput()
+    const { result, act } = await renderHook(() =>
+      useMask({ mask: '99/99', showMaskOnFocus: false }),
+    )
+
+    await act(() => {
+      result.current.ref(input)
+    })
+    await act(() => {
+      input.focus()
+    })
+    expect(input.value).toBe('')
+
+    await typeText(input, act, '1')
+    expect(input.value).toBe('1_/__')
+
+    await act(() => {
+      input.blur()
+    })
+    expect(input.value).toBe('1')
+  })
+
+  // --- caret and selection ------------------------------------------------
+
+  it('moves the caret to the end of the typed value when it lands before the first editable slot', async () => {
+    const input = createMaskedInput()
+    const { result, act } = await renderHook(() => useMask({ mask: '(999) 999-9999' }))
+
+    await act(() => {
+      result.current.ref(input)
+    })
+    await act(() => {
+      input.focus()
+    })
+    await typeText(input, act, '123')
+
+    const endOfTyped = input.selectionStart
+    expect(endOfTyped).toBeGreaterThan(0)
+
+    await selectRange(input, act, 0, 0)
+    await act(() => {
+      input.dispatchEvent(new MouseEvent('mouseup'))
+    })
+
+    expect(input.selectionStart).toBe(endOfTyped)
+    expect(input.selectionEnd).toBe(endOfTyped)
+  })
+
+  it('preserves an active selection on mouseup', async () => {
+    const input = createMaskedInput()
+    const { result, act } = await renderHook(() => useMask({ mask: '(999) 999-9999' }))
+
+    await act(() => {
+      result.current.ref(input)
+    })
+    await act(() => {
+      input.focus()
+    })
+    await typeText(input, act, '123')
+
+    const fullDisplayLength = input.value.length
+    await selectRange(input, act, 0, fullDisplayLength)
+    await act(() => {
+      input.dispatchEvent(new MouseEvent('mouseup'))
+    })
+
+    expect(input.selectionStart).toBe(0)
+    expect(input.selectionEnd).toBe(fullDisplayLength)
+  })
+
+  it('clamps the caret to the end of the typed value on mousedown past that point', async () => {
+    const input = createMaskedInput()
+    const { result, act } = await renderHook(() => useMask({ mask: '(999) 999-9999' }))
+
+    await act(() => {
+      result.current.ref(input)
+    })
+    await act(() => {
+      input.focus()
+    })
+    await typeText(input, act, '123')
+
+    const endOfTyped = input.selectionStart
+    expect(endOfTyped).toBeGreaterThan(0)
+
+    await selectRange(input, act, input.value.length, input.value.length)
+    await act(() => {
+      input.dispatchEvent(new MouseEvent('mousedown'))
+    })
+    await nextFrame(act)
+
+    expect(input.selectionStart).toBe(endOfTyped)
+    expect(input.selectionEnd).toBe(endOfTyped)
+  })
+
+  it('leaves the caret alone on mousedown when it is inside the typed content', async () => {
+    const input = createMaskedInput()
+    const { result, act } = await renderHook(() => useMask({ mask: '(999) 999-9999' }))
+
+    await act(() => {
+      result.current.ref(input)
+    })
+    await act(() => {
+      input.focus()
+    })
+    await typeText(input, act, '123')
+
+    await selectRange(input, act, 3, 3)
+    await act(() => {
+      input.dispatchEvent(new MouseEvent('mousedown'))
+    })
+    await nextFrame(act)
+
+    expect(input.selectionStart).toBe(3)
+  })
+
+  it('positions the caret at the cut location when content is removed by an input event', async () => {
+    const input = createMaskedInput()
+    const { result, act } = await renderHook(() => useMask({ mask: '(999) 999-9999' }))
+
+    await act(() => {
+      result.current.ref(input)
+    })
+    await act(() => {
+      input.focus()
+    })
+    await typeText(input, act, '3334445555')
+
+    expect(input.value).toBe('(333) 444-5555')
+
+    await selectRange(input, act, 6, 9)
+    await writeValueNatively(input, act, '(333) -5555')
+    await selectRange(input, act, 6, 6)
+
+    expect(input.selectionStart).toBe(6)
+    expect(input.selectionEnd).toBe(6)
+    expect(result.current.rawValue).toBe('3335555')
+  })
+
+  it('positions the caret at the cut location for a partially filled mask with placeholders', async () => {
+    const input = createMaskedInput()
+    const { result, act } = await renderHook(() => useMask({ mask: '(999) 999-9999' }))
+
+    await act(() => {
+      result.current.ref(input)
+    })
+    await act(() => {
+      input.focus()
+    })
+    await typeText(input, act, '12345')
+
+    expect(input.value).toBe('(123) 45_-____')
+
+    await selectRange(input, act, 6, 7)
+    await writeValueNatively(input, act, '(123) 5_-____')
+    await selectRange(input, act, 6, 6)
+
+    expect(input.selectionStart).toBe(6)
+    expect(input.selectionEnd).toBe(6)
+    expect(result.current.rawValue).toBe('1235')
+  })
+
+  it('positions the caret after pasted content rather than at the end', async () => {
+    const input = createMaskedInput()
+    const { result, act } = await renderHook(() => useMask({ mask: '(999) 999-9999' }))
+
+    await act(() => {
+      result.current.ref(input)
+    })
+    await act(() => {
+      input.focus()
+    })
+    await typeText(input, act, '3335555')
+
+    await act(() => {
+      input.setSelectionRange(4, 4)
+      const pasteEvent = new Event('paste', { bubbles: true, cancelable: true })
+      Object.defineProperty(pasteEvent, 'clipboardData', {
+        value: { getData: () => '444' },
+      })
+      input.dispatchEvent(pasteEvent)
+    })
+
+    expect(input.value).toBe('(333) 444-5555')
+    expect(input.selectionStart).toBe(10)
+    expect(input.selectionEnd).toBe(10)
+  })
+
+  it('hops over literals with ArrowRight and ArrowLeft', async () => {
+    const input = createMaskedInput()
+    const { result, act } = await renderHook(() => useMask({ mask: '(999) 999-9999' }))
+
+    await act(() => {
+      result.current.ref(input)
+    })
+    await act(() => {
+      input.focus()
+    })
+    await typeText(input, act, '123')
+    // The caret lands past the `)` literal: `newCursorPos` is computed against
+    // the masked value, so finishing a literal-bounded run parks the caret at
+    // the end of the processed value (`(123) `.length), not on the third digit.
+    expect(input.selectionStart).toBe(6)
+
+    // forward from there walks the space literal to the next token slot
+    await pressKey(input, act, 'ArrowRight')
+    expect(input.selectionStart).toBe(6)
+
+    // left from a token slot just after a literal is not intercepted: the
+    // handler leaves `preventDefault` to the browser, whose own one-position
+    // move wins and lands the caret inside the `)` literal
+    await selectRange(input, act, 5, 5)
+    await pressKey(input, act, 'ArrowLeft')
+    expect(input.selectionStart).toBe(4)
+
+    // left from index 3 stays put: `start - 1` is already a token
+    await selectRange(input, act, 3, 3)
+    await pressKey(input, act, 'ArrowLeft')
+    expect(input.selectionStart).toBe(3)
+
+    // left from index 1 stays put too: slot 0 is the `(` literal but it is the
+    // token at index 0 that decides, so nothing moves
+    await selectRange(input, act, 1, 1)
+    await pressKey(input, act, 'ArrowLeft')
+    expect(input.selectionStart).toBe(1)
+  })
+
+  // --- keystroke editing --------------------------------------------------
+
+  it('inserts a character through the mask and swallows a rejected one', async () => {
+    const input = createMaskedInput()
+    const { result, act } = await renderHook(() => useMask({ mask: '(999) 999-9999' }))
+
+    await act(() => {
+      result.current.ref(input)
+    })
+    await act(() => {
+      input.focus()
+    })
+
+    await pressKey(input, act, '1')
+    expect(input.value).toBe('(1__) ___-____')
+    expect(result.current.rawValue).toBe('1')
+
+    // `a` is rejected by the digit slot: the field is untouched
+    await pressKey(input, act, 'a')
+    expect(input.value).toBe('(1__) ___-____')
+    expect(result.current.rawValue).toBe('1')
+  })
+
+  it('backspace removes the character to the left, skipping literals', async () => {
+    const input = createMaskedInput()
+    const { result, act } = await renderHook(() => useMask({ mask: '999-99-9999' }))
+
+    await act(() => {
+      result.current.ref(input)
+    })
+    await act(() => {
+      input.focus()
+    })
+    await typeText(input, act, '123')
+    expect(input.value).toBe('123-__-____')
+
+    await pressKey(input, act, 'Backspace')
+    expect(result.current.rawValue).toBe('12')
+
+    await pressKey(input, act, 'Backspace')
+    await pressKey(input, act, 'Backspace')
+    expect(result.current.rawValue).toBe('')
+
+    // nothing left to delete: the handler returns without touching the field
+    await pressKey(input, act, 'Backspace')
+    expect(result.current.rawValue).toBe('')
+  })
+
+  it('delete removes the character at the caret', async () => {
+    const input = createMaskedInput()
+    const { result, act } = await renderHook(() => useMask({ mask: '(999) 999-9999' }))
+
+    await act(() => {
+      result.current.ref(input)
+    })
+    await act(() => {
+      input.focus()
+    })
+    await typeText(input, act, '1234')
+    expect(input.value).toBe('(123) 4__-____')
+
+    await selectRange(input, act, 1, 1)
+    await pressKey(input, act, 'Delete')
+
+    expect(result.current.rawValue).toBe('234')
+  })
+
+  it('backspace over a selection removes the whole selection', async () => {
+    const input = createMaskedInput()
+    const { result, act } = await renderHook(() => useMask({ mask: '(999) 999-9999' }))
+
+    await act(() => {
+      result.current.ref(input)
+    })
+    await act(() => {
+      input.focus()
+    })
+    await typeText(input, act, '1234')
+
+    await selectRange(input, act, 1, 4)
+    await pressKey(input, act, 'Backspace')
+
+    expect(result.current.rawValue).toBe('4')
+  })
+
+  it('ctrl+Backspace clears everything left of the caret', async () => {
+    const input = createMaskedInput()
+    const { result, act } = await renderHook(() => useMask({ mask: '(999) 999-9999' }))
+
+    await act(() => {
+      result.current.ref(input)
+    })
+    await act(() => {
+      input.focus()
+    })
+    await typeText(input, act, '1234')
+
+    await selectRange(input, act, 5, 5)
+    await pressKey(input, act, 'Backspace', { ctrlKey: true })
+
+    expect(result.current.rawValue).toBe('4')
+  })
+
+  it('typing over a selection replaces the selected characters', async () => {
+    const input = createMaskedInput()
+    const { result, act } = await renderHook(() => useMask({ mask: '(999) 999-9999' }))
+
+    await act(() => {
+      result.current.ref(input)
+    })
+    await act(() => {
+      input.focus()
+    })
+    await typeText(input, act, '1234')
+
+    await selectRange(input, act, 1, 4)
+    await typeText(input, act, '9')
+
+    expect(result.current.rawValue).toBe('94')
+  })
+
+  // --- undo / redo --------------------------------------------------------
+
+  it('undoes a single character insertion via Ctrl+Z', async () => {
+    const input = createMaskedInput()
+    const { result, act } = await renderHook(() => useMask({ mask: '(999) 999-9999' }))
+
+    await act(() => {
+      result.current.ref(input)
+    })
+    await act(() => {
+      input.focus()
+    })
+    await pressKey(input, act, '1')
+
+    expect(input.value).toBe('(1__) ___-____')
+    expect(result.current.rawValue).toBe('1')
+
+    await pressKey(input, act, 'z', { ctrlKey: true })
+
+    expect(result.current.rawValue).toBe('')
+  })
+
+  it('undoes a backspace deletion and restores the caret position', async () => {
+    const input = createMaskedInput()
+    const { result, act } = await renderHook(() => useMask({ mask: '(999) 999-9999' }))
+
+    await act(() => {
+      result.current.ref(input)
+    })
+    await act(() => {
+      input.focus()
+    })
+    await typeText(input, act, '123')
+
+    await selectRange(input, act, 3, 3)
+    await pressKey(input, act, 'Backspace')
+    expect(result.current.rawValue).toBe('13')
+
+    await pressKey(input, act, 'z', { ctrlKey: true })
+
+    expect(result.current.rawValue).toBe('123')
+    expect(input.selectionStart).toBe(3)
+  })
+
+  it('supports redo via Ctrl+Shift+Z', async () => {
+    const input = createMaskedInput()
+    const { result, act } = await renderHook(() => useMask({ mask: '(999) 999-9999' }))
+
+    await act(() => {
+      result.current.ref(input)
+    })
+    await act(() => {
+      input.focus()
+    })
+    await typeText(input, act, '12')
+    expect(result.current.rawValue).toBe('12')
+
+    await pressKey(input, act, 'z', { ctrlKey: true })
+    expect(result.current.rawValue).toBe('1')
+
+    await pressKey(input, act, 'z', { ctrlKey: true, shiftKey: true })
+    expect(result.current.rawValue).toBe('12')
+  })
+
+  it('supports redo via Ctrl+Y', async () => {
+    const input = createMaskedInput()
+    const { result, act } = await renderHook(() => useMask({ mask: '(999) 999-9999' }))
+
+    await act(() => {
+      result.current.ref(input)
+    })
+    await act(() => {
+      input.focus()
+    })
+    await pressKey(input, act, '1')
+
+    await pressKey(input, act, 'z', { ctrlKey: true })
+    expect(result.current.rawValue).toBe('')
+
+    await pressKey(input, act, 'y', { ctrlKey: true })
+    expect(result.current.rawValue).toBe('1')
+  })
+
+  it('supports Cmd+Z for undo', async () => {
+    const input = createMaskedInput()
+    const { result, act } = await renderHook(() => useMask({ mask: '(999) 999-9999' }))
+
+    await act(() => {
+      result.current.ref(input)
+    })
+    await act(() => {
+      input.focus()
+    })
+    await pressKey(input, act, '1')
+
+    await pressKey(input, act, 'z', { metaKey: true })
+
+    expect(result.current.rawValue).toBe('')
+  })
+
+  it('does nothing on undo with an empty history', async () => {
+    const input = createMaskedInput()
+    const { result, act } = await renderHook(() => useMask({ mask: '(999) 999-9999' }))
+
+    await act(() => {
+      result.current.ref(input)
+    })
+    await act(() => {
+      input.focus()
+    })
+
+    await pressKey(input, act, 'z', { ctrlKey: true })
+
+    expect(result.current.rawValue).toBe('')
+    expect(input.value).toBe('(___) ___-____')
+  })
+
+  it('clears the redo stack on a new edit', async () => {
+    const input = createMaskedInput()
+    const { result, act } = await renderHook(() => useMask({ mask: '(999) 999-9999' }))
+
+    await act(() => {
+      result.current.ref(input)
+    })
+    await act(() => {
+      input.focus()
+    })
+    await typeText(input, act, '12')
+
+    await pressKey(input, act, 'z', { ctrlKey: true })
+    expect(result.current.rawValue).toBe('1')
+
+    await pressKey(input, act, '9')
+    expect(result.current.rawValue).toBe('19')
+
+    // redo does nothing: the new edit dropped the redo stack
+    await pressKey(input, act, 'z', { ctrlKey: true, shiftKey: true })
+    expect(result.current.rawValue).toBe('19')
+  })
+
+  it('clears both stacks on reset, so undo afterwards is a no-op', async () => {
+    const input = createMaskedInput()
+    const { result, act } = await renderHook(() => useMask({ mask: '(999) 999-9999' }))
+
+    await act(() => {
+      result.current.ref(input)
+    })
+    await act(() => {
+      input.focus()
+    })
+    await pressKey(input, act, '1')
+
+    await act(() => {
+      result.current.reset()
+    })
+    await pressKey(input, act, 'z', { ctrlKey: true })
+
+    expect(result.current.rawValue).toBe('')
+  })
+
+  it('caps the undo history at MAX_UNDO_HISTORY entries', async () => {
+    // An unbounded mask, so the field never fills up: 150 single-character
+    // pushes, of which only the newest 100 survive. Unwinding the whole stack
+    // therefore stops at raw length 50 and the 101st undo is a no-op. Without
+    // the cap the same loop would unwind all 150 characters to an empty value,
+    // so the exact stop position is what pins the cap down.
+    const input = createMaskedInput()
+    const { result, act } = await renderHook(() => useMask({ mask: '9'.repeat(200) }))
+
+    await act(() => {
+      result.current.ref(input)
+    })
+    await act(() => {
+      input.focus()
+    })
+
+    for (let i = 0; i < 150; i++) {
+      await pressKey(input, act, '7')
+    }
+
+    expect(result.current.rawValue).toBe('7'.repeat(150))
+
+    for (let i = 0; i < MAX_UNDO_HISTORY; i++) {
+      await pressKey(input, act, 'z', { ctrlKey: true })
+    }
+    expect(result.current.rawValue).toBe('7'.repeat(50))
+
+    await pressKey(input, act, 'z', { ctrlKey: true })
+    expect(result.current.rawValue).toBe('7'.repeat(50))
+  })
+
+  // --- callbacks ----------------------------------------------------------
+
+  it('calls onChangeRaw with the raw and masked values on each keystroke', async () => {
+    const input = createMaskedInput()
+    const onChangeRaw = vi.fn()
+    const { result, act } = await renderHook(() =>
+      useMask({ mask: '99/99/9999', onChangeRaw }),
+    )
+
+    await act(() => {
+      result.current.ref(input)
+    })
+    await act(() => {
+      input.focus()
+    })
+    await typeText(input, act, '12')
+
+    // the masked argument is the full padded display, not the bare prefix
+    expect(onChangeRaw).toHaveBeenNthCalledWith(1, '1', '1_/__/____')
+    expect(onChangeRaw).toHaveBeenNthCalledWith(2, '12', '12/__/____')
+  })
+
+  it('calls onComplete once, on the transition into completeness', async () => {
+    const input = createMaskedInput()
+    const onComplete = vi.fn()
+    const { result, act } = await renderHook(() =>
+      useMask({ mask: '(999) 999-9999', onComplete }),
+    )
+
+    await act(() => {
+      result.current.ref(input)
+    })
+    await act(() => {
+      input.focus()
+    })
+    await typeText(input, act, '123456789')
+
+    expect(onComplete).not.toHaveBeenCalled()
+    expect(result.current.isComplete).toBe(false)
+
+    await pressKey(input, act, '0')
+
+    expect(result.current.isComplete).toBe(true)
+    expect(onComplete).toHaveBeenCalledTimes(1)
+    expect(onComplete).toHaveBeenLastCalledWith('(123) 456-7890', '1234567890')
+
+    // A further keystroke on the now-full field is rejected by the insert
+    // branch (`insertPos >= slots.length`), so no commit happens and the field
+    // is not re-announced as complete.
+    await pressKey(input, act, '1')
+    expect(onComplete).toHaveBeenCalledTimes(1)
+    expect(result.current.rawValue).toBe('1234567890')
+  })
+
+  it('drives per-keystroke overrides through modify', async () => {
+    // `modify` is resolved against the raw value **before** the keystroke being
+    // handled: `getResolvedOptions(opts, rawValue)` runs at the top of the
+    // keydown handler, so the override a 5th keystroke returns cannot affect
+    // that same keystroke's own validation — it lands on the next one, which
+    // is why the mask flips when the 6th character is typed.
+    const input = createMaskedInput()
+    const modify = vi.fn((value: string) => (value === '1234' ? { mask: '99/99/99' } : undefined))
+    const { result, act } = await renderHook(() => useMask({ mask: '999999', modify }))
+
+    await act(() => {
+      result.current.ref(input)
+    })
+    await act(() => {
+      input.focus()
+    })
+    await typeText(input, act, '1234')
+
+    expect(modify).toHaveBeenCalled()
+    expect(result.current.rawValue).toBe('1234')
+
+    // the 5th keystroke resolves `modify('1234')`, so it is masked as `99/99/99`
+    await pressKey(input, act, '5')
+
+    expect(result.current.rawValue).toBe('12345')
+    expect(input.value).toBe('12345_')
+  })
+
+  it('applies transform before validating each character', async () => {
+    const input = createMaskedInput()
+    const { result, act } = await renderHook(() =>
+      useMask({ mask: 'AAAA', transform: char => char.toUpperCase() }),
+    )
+
+    await act(() => {
+      result.current.ref(input)
+    })
+    await act(() => {
+      input.focus()
+    })
+    await typeText(input, act, 'ab')
+
+    // the lowercase keys pass the `[A-Z]` pattern only because `transform`
+    // upper-cases them first; the two unused slots keep their placeholder
+    expect(result.current.rawValue).toBe('AB')
+    expect(input.value).toBe('AB__')
+  })
+
+  it('never calls beforeMaskedStateChange, which the pin accepts but does not wire', async () => {
+    // Absence-by-construction: upstream declares the option and never reads it
+    // (its only occurrence is the declaration), so this port keeps the type for
+    // API compatibility and leaves the callback unreachable. The test exists so
+    // a later port that *does* wire it shows up as a behaviour change instead of
+    // being mistaken for coverage.
+    const input = createMaskedInput()
+    const beforeMaskedStateChange = vi.fn(() => ({ value: 'x', selection: null }))
+    const { result, act } = await renderHook(() =>
+      useMask({ mask: '999', beforeMaskedStateChange }),
+    )
+
+    await act(() => {
+      result.current.ref(input)
+    })
+    await act(() => {
+      input.focus()
+    })
+    await typeText(input, act, '123')
+
+    expect(beforeMaskedStateChange).not.toHaveBeenCalled()
+    expect(result.current.value).toBe('123')
+  })
+
+  it('treats separate as inert, because the pin accepts it and never reads it', async () => {
+    // `separate` is resolved by `getResolvedOptions`, carried in its return
+    // value, and never consumed by any caller — so `separate: true` and the
+    // default produce the same display from the same input. Upstream's docs page
+    // documents neither `separate` nor `beforeMaskedStateChange`. Measured here
+    // rather than assumed, because the issue claims `separate` decouples `value`
+    // from `rawValue`.
+    const input = createMaskedInput()
+    const { result, act } = await renderHook(() => useMask({ mask: '99/99', separate: true }))
+
+    await act(() => {
+      result.current.ref(input)
+    })
+    await act(() => {
+      input.focus()
+    })
+    await typeText(input, act, '12')
+
+    expect(result.current.value).toBe('12/__')
+    expect(result.current.rawValue).toBe('12')
+    // The hook's raw value is derived before the display is padded, so it is
+    // `12`. The standalone `unformatMask` helper reads positionally and does
+    // **not** recognise placeholders, so running it over the padded display
+    // returns `12__` — the two placeholders at token positions count as raw
+    // characters. That gap is upstream's too (it is the same `extractRaw`), and
+    // it is why the hook keeps its own raw value instead of calling the helper.
+    expect(unformatMask(result.current.value, { mask: '99/99' })).toBe('12__')
+    expect(isMaskComplete(result.current.value, { mask: '99/99' })).toBe(false)
+  })
+
+  it('separate does not change the value a full mask produces', async () => {
+    const input = createMaskedInput()
+    const { result, act } = await renderHook(() => useMask({ mask: '99:99', separate: true }))
+
+    await act(() => {
+      result.current.ref(input)
+    })
+    await act(() => {
+      input.focus()
+    })
+    await typeText(input, act, '1230')
+
+    expect(result.current.value).toBe('12:30')
+    expect(result.current.rawValue).toBe('1230')
+  })
+
+  // --- slotChar -----------------------------------------------------------
+
+  it('null disables placeholders entirely', async () => {
+    const input = createMaskedInput()
+    const { result, act } = await renderHook(() =>
+      useMask({ mask: '99/99', slotChar: null, alwaysShowMask: true }),
+    )
+
+    await act(() => {
+      result.current.ref(input)
+    })
+
+    expect(input.value).toBe('')
+    expect(result.current.value).toBe('')
+  })
+
+  it('reads a multi-character slotChar at the slot index, not at a slots-filled cursor', async () => {
+    // The hint is indexed by the slot's own position, and `getSlotChar` is only
+    // reached for token slots. With `99/99` the hint's `/` therefore never
+    // appears — slot 2 is the mask's own `/` literal — and slot 3 reads the
+    // hint's `M`, so the display is `DD/MM` by coincidence of alignment rather
+    // than by the hint being walked. The placeholder also falls back to `_` past
+    // the end of the hint string.
+    const input = createMaskedInput()
+    const { result, act } = await renderHook(() =>
+      useMask({ mask: '99/99', slotChar: 'DD/MM', alwaysShowMask: true }),
+    )
+
+    await act(() => {
+      result.current.ref(input)
+    })
+
+    expect(input.value).toBe('DD/MM')
+
+    const shortHint = createMaskedInput()
+    const short = await renderHook(() =>
+      useMask({ mask: '999999', slotChar: 'DD', alwaysShowMask: true }),
+    )
+    await short.act(() => {
+      short.result.current.ref(shortHint)
+    })
+
+    // slots 0 and 1 take `D`; the four past the end of the hint fall back to `_`
+    expect(shortHint.value).toBe('DD____')
+  })
+
+  // --- optional segments and isComplete -----------------------------------
+
+  it('marks trailing slots optional, so the required prefix completes the mask', async () => {
+    const input = createMaskedInput()
+    const { result, act } = await renderHook(() =>
+      useMask({ mask: '(999) 999-9999? x9999' }),
+    )
+
+    await act(() => {
+      result.current.ref(input)
+    })
+    await act(() => {
+      input.focus()
+    })
+    await typeText(input, act, '1234567890')
+
+    expect(result.current.isComplete).toBe(true)
+    expect(result.current.rawValue).toBe('1234567890')
+
+    await pressKey(input, act, 'Backspace')
+    expect(result.current.isComplete).toBe(false)
+  })
+
+  // --- reset --------------------------------------------------------------
+
+  it('reset clears the state and calls onChangeRaw with empty strings', async () => {
+    const input = createMaskedInput()
+    const onChangeRaw = vi.fn()
+    const { result, act } = await renderHook(() => useMask({ mask: '999', onChangeRaw }))
+
+    await act(() => {
+      result.current.ref(input)
+    })
+    await act(() => {
+      input.focus()
+    })
+    await typeText(input, act, '123')
+    expect(result.current.isComplete).toBe(true)
+
+    await act(() => {
+      result.current.reset()
+    })
+
+    expect(input.value).toBe('')
+    expect(result.current.value).toBe('')
+    expect(result.current.rawValue).toBe('')
+    expect(result.current.isComplete).toBe(false)
+    expect(onChangeRaw).toHaveBeenLastCalledWith('', '')
+  })
+
+  it('reset repaints the empty mask under alwaysShowMask', async () => {
+    const input = createMaskedInput()
+    const { result, act } = await renderHook(() =>
+      useMask({ mask: '99/99', alwaysShowMask: true }),
+    )
+
+    await act(() => {
+      result.current.ref(input)
+    })
+    await act(() => {
+      input.focus()
+    })
+    await typeText(input, act, '12')
+
+    await act(() => {
+      result.current.reset()
+    })
+
+    expect(input.value).toBe('__/__')
+    expect(result.current.value).toBe('__/__')
+    expect(result.current.rawValue).toBe('')
+  })
+
+  it('reset with no element attached still clears the state', async () => {
+    const { result, act } = await renderHook(() => useMask({ mask: '999' }))
+
+    await act(() => {
+      result.current.reset()
+    })
+
+    expect(result.current.value).toBe('')
+    expect(result.current.rawValue).toBe('')
+  })
+
+  // --- re-attach ----------------------------------------------------------
+
+  it('detaches from the previous node and attaches to the new one', async () => {
+    const first = createMaskedInput()
+    const second = createMaskedInput()
+    const { result, act } = await renderHook(() => useMask({ mask: '99/99' }))
+
+    await act(() => {
+      result.current.ref(first)
+    })
+    // re-binding the ref detaches the first node: the previous `refCallback`
+    // removes its seven listeners before the new node is wired up
+    await act(() => {
+      result.current.ref(second)
+    })
+    // `options` is in the ref callback's dependencies, so the `refCallback`
+    // identity changes on the re-render this state write causes — React calls
+    // the stale ref with `null` and this one with nothing. Calling `ref` again
+    // on the re-rendered callback is what re-attaches, which is why a bare
+    // re-bind through the hook is not enough in practice.
+    await act(() => {
+      result.current.ref(second)
+    })
+    await act(() => {
+      second.focus()
+    })
+    await typeText(second, act, '12')
+
+    expect(second.value).toBe('12/__')
+    expect(result.current.rawValue).toBe('12')
+
+    // the first node keeps no live handler: typing into it changes nothing
+    first.focus()
+    first.dispatchEvent(new KeyboardEvent('keydown', { key: '9' }))
+    expect(first.value).toBe('')
+    expect(result.current.rawValue).toBe('12')
   })
 })
