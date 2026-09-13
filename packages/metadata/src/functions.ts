@@ -351,6 +351,15 @@ export const functions: FunctionInfo[] = [
     lastUpdated: 1789147565000,
   },
   {
+    name: 'getElementHeight',
+    file: 'packages/core/useCollapse/index.tsx',
+    pkg: 'core',
+    dir: 'useCollapse',
+    category: 'Animation',
+    source: 'mantine',
+    lastUpdated: 1789259540000,
+  },
+  {
     name: 'getHotkeyHandler',
     file: 'packages/core/useHotkeys/index.tsx',
     pkg: 'core',
@@ -457,6 +466,15 @@ export const functions: FunctionInfo[] = [
     category: 'Utilities',
     source: 'vueuse',
     lastUpdated: 1789147565000,
+  },
+  {
+    name: 'isMeasured',
+    file: 'packages/core/useCollapse/index.tsx',
+    pkg: 'core',
+    dir: 'useCollapse',
+    category: 'Animation',
+    source: 'mantine',
+    lastUpdated: 1789259540000,
   },
   {
     name: 'isObject',
@@ -1084,6 +1102,15 @@ export const functions: FunctionInfo[] = [
     category: 'Utilities',
     source: 'vueuse',
     lastUpdated: 1789147565000,
+  },
+  {
+    name: 'useCollapse',
+    file: 'packages/core/useCollapse/index.tsx',
+    pkg: 'core',
+    dir: 'useCollapse',
+    category: 'Animation',
+    source: 'mantine',
+    lastUpdated: 1789259540000,
   },
   {
     name: 'useColorMode',
@@ -3414,6 +3441,15 @@ export const pages: FunctionPageInfo[] = [
     category: 'Utilities',
     description: 'reactive clone of a value',
     lastUpdated: 1789147565000,
+  },
+  {
+    name: 'useCollapse',
+    pkg: 'core',
+    doc: 'packages/core/useCollapse/index.md',
+    category: 'Animation',
+    description:
+      "animate an element's height between `0` and its measured content height — a four-state machine (`entered` / `entering` / `exiting` / `exited`) plus a `getCollapseProps()` bundle you spread on the collapsible element",
+    lastUpdated: 1789259540000,
   },
   {
     name: 'useColorMode',

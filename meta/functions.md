@@ -42,6 +42,7 @@
 | vueuse    | `formatTimeAgo`                   | packages/core/useTimeAgo                      | `packages/core/useTimeAgo/index.tsx`                      | ✅ ported                           |
 | vueuse    | `formatTimeAgoIntl`               | packages/core/useTimeAgoIntl                  | `packages/core/useTimeAgoIntl/index.tsx`                  | ✅ ported                           |
 | vueuse    | `formatTimeAgoIntlParts`          | packages/core/useTimeAgoIntl                  | `packages/core/useTimeAgoIntl/index.tsx`                  | ✅ ported                           |
+| mantine   | `useCollapse`                     | packages/@mantine/hooks/src/use-collapse      | `packages/core/useCollapse/index.tsx`                     | ✅ ported                           |
 | mantine   | `getHotkeyHandler`                | packages/@mantine/hooks/src/use-hotkeys       | `packages/core/useHotkeys/index.tsx`                      | ✅ ported                           |
 | mantine   | `getHotkeyMatcher`                | packages/@mantine/hooks/src/use-hotkeys       | `packages/core/useHotkeys/index.tsx`                      | ✅ ported                           |
 | vueuse    | `guessSerializerType`             | packages/core/useStorage                      | `packages/core/useStorage/index.tsx`                      | ✅ ported                           |
@@ -54,6 +55,7 @@
 | vueuse    | `isDefined`                       | packages/shared/isDefined                     | `packages/shared/isDefined/index.tsx`                     | ✅ ported                           |
 | vueuse    | `isFocusedElementEditable`        | packages/core/onStartTyping                   | `packages/core/useStartTyping/index.tsx`                  | ✅ ported                           |
 | vueuse    | `isIOS`                           | packages/shared/utils                         | `packages/shared/utils/index.tsx`                         | ✅ ported                           |
+| mantine   | `useCollapse`                     | packages/@mantine/hooks/src/use-collapse      | `packages/core/useCollapse/index.tsx`                     | ✅ ported                           |
 | vueuse    | `isObject`                        | packages/shared/utils                         | `packages/shared/utils/index.tsx`                         | ✅ ported                           |
 | —         | `isRefLike`                       | —                                             | `packages/shared/utils/index.tsx`                         | ✅ reause-only export               |
 | vueuse    | `isTypedCharValid`                | packages/core/onStartTyping                   | `packages/core/useStartTyping/index.tsx`                  | ✅ ported                           |
@@ -125,6 +127,7 @@
 | vueuse    | `useClipboard`                    | packages/core/useClipboard                    | `packages/core/useClipboard/index.tsx`                    | ✅ ported                           |
 | vueuse    | `useClipboardItems`               | packages/core/useClipboardItems               | `packages/core/useClipboardItems/index.tsx`               | ✅ ported                           |
 | vueuse    | `useCloned`                       | packages/core/useCloned                       | `packages/core/useCloned/index.tsx`                       | ✅ ported                           |
+| mantine   | `useCollapse`                     | packages/@mantine/hooks/src/use-collapse      | `packages/core/useCollapse/index.tsx`                     | ✅ ported                           |
 | vueuse    | `useColorMode`                    | packages/core/useColorMode                    | `packages/core/useColorMode/index.tsx`                    | ✅ ported                           |
 | vueuse    | `useConfirmDialog`                | packages/core/useConfirmDialog                | `packages/core/useConfirmDialog/index.tsx`                | ✅ ported                           |
 | —         | `useConst`                        | —                                             | `packages/shared/useConst/index.tsx`                      | ✅ reause-only export               |
