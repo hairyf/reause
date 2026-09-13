@@ -2774,6 +2774,15 @@ export const functions: FunctionInfo[] = [
     lastUpdated: 1788942682000,
   },
   {
+    name: 'useUnmountedRef',
+    file: 'packages/shared/useUnmountedRef/index.tsx',
+    pkg: 'shared',
+    dir: 'useUnmountedRef',
+    category: 'Lifecycle',
+    source: 'ahooks',
+    lastUpdated: 1789277394000,
+  },
+  {
     name: 'useUpdate',
     file: 'packages/shared/useUpdate/index.tsx',
     pkg: 'shared',
@@ -5029,6 +5038,15 @@ export const pages: FunctionPageInfo[] = [
     description:
       "runs a callback when the component unmounts — React port of react-use's [`useUnmount`](https://streamich.github.io/react-use/?path=/story/lifecycle-useunmount--docs)",
     lastUpdated: 1788942682000,
+  },
+  {
+    name: 'useUnmountedRef',
+    pkg: 'shared',
+    doc: 'packages/shared/useUnmountedRef/index.md',
+    category: 'Lifecycle',
+    description:
+      "a ref that reports whether the component has unmounted — React port of ahooks' [`useUnmountedRef`](https://ahooks.js.org/hooks/use-unmounted-ref) (`source/ahooks/packages/hooks/src/useUnmountedRef/`; upstream exports it as the **default** export",
+    lastUpdated: 1789277394000,
   },
   {
     name: 'useUpdate',

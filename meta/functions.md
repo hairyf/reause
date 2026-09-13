@@ -313,6 +313,7 @@
 | vueuse      | `useTransition`                   | packages/core/useTransition                     | `packages/core/useTransition/index.tsx`                   | ✅ ported                           |
 | vueuse      | `useTrunc`                        | packages/math/useTrunc                          | `packages/math/useTrunc/index.tsx`                        | ✅ ported                           |
 | react-use   | `useUnmount`                      | src/useUnmount.ts                               | `packages/shared/useUnmount/index.tsx`                    | ✅ ported                           |
+| ahooks      | `useUnmountedRef`                 | packages/hooks/src/useUnmountedRef              | `packages/shared/useUnmountedRef/index.tsx`               | ✅ ported                           |
 | react-use   | `useUpdate`                       | src/useUpdate.ts                                | `packages/shared/useUpdate/index.tsx`                     | ✅ ported                           |
 | react-use   | `useUpdateEffect`                 | src/useUpdateEffect.ts                          | `packages/shared/useUpdateEffect/index.tsx`               | ✅ ported                           |
 | vueuse      | `useUrlSearchParams`              | packages/core/useUrlSearchParams                | `packages/core/useUrlSearchParams/index.tsx`              | ✅ ported                           |
