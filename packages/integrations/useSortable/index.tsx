@@ -248,7 +248,9 @@ export function removeNode(node: Node) {
 /**
  * Move an element of `list` from `from` to `to`, returning a NEW array.
  *
- * Map from @vueuse/integrations `useSortable`'s `moveArrayElement`, with one
+ * Map from @vueuse/integrations `moveArrayElement` — the helper module
+ * (`source/vueuse/packages/integrations/useSortable/`) shares its directory
+ * with the `useSortable` hook ported above. With one
  * deliberate deviation: upstream mutates the caller's array in place (and
  * defers the splice with `nextTick` when the list is a ref), which cannot work
  * in React — an in-place mutation does not re-render. This implementation is

@@ -39,7 +39,7 @@ function normalizeWidth(width: number | null | undefined): number | undefined {
 /**
  * Provide a global viewport width to the components below it.
  *
- * Map from @vueuse/core `useSSRWidth`
+ * Map from @vueuse/core `provideSSRWidth`
  * (`source/vueuse/packages/core/useSSRWidth/`). This is the providing half of
  * upstream's `provideSSRWidth` / `useSSRWidth` pair: render it above the
  * subtree that needs the width and every `useSSRWidth()` below it reads the
