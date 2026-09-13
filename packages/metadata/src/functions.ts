@@ -1758,6 +1758,15 @@ export const functions: FunctionInfo[] = [
     lastUpdated: 1788984370000,
   },
   {
+    name: 'useKeyPress',
+    file: 'packages/core/useKeyPress/index.tsx',
+    pkg: 'core',
+    dir: 'useKeyPress',
+    category: 'Sensors',
+    source: 'ahooks',
+    lastUpdated: 1789275170000,
+  },
+  {
     name: 'useKeyPressed',
     file: 'packages/core/useKeyStroke/index.tsx',
     pkg: 'core',
@@ -4093,6 +4102,14 @@ export const pages: FunctionPageInfo[] = [
     description:
       'reactive [Modifier State](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/getModifierState)',
     lastUpdated: 1788984370000,
+  },
+  {
+    name: 'useKeyPress',
+    pkg: 'core',
+    doc: 'packages/core/useKeyPress/index.md',
+    category: 'Sensors',
+    description: 'listen for a key press by `keyCode`',
+    lastUpdated: 1789275170000,
   },
   {
     name: 'useKeyStroke',

@@ -200,6 +200,7 @@
 | vueuse      | `useJwt`                          | packages/integrations/useJwt                  | `packages/integrations/useJwt/index.tsx`                  | ✅ ported                           |
 | vueuse      | `onKeyDown`                       | packages/core/onKeyStroke                     | `packages/core/useKeyStroke/index.tsx`                    | ✅ ported                           |
 | vueuse      | `useKeyModifier`                  | packages/core/useKeyModifier                  | `packages/core/useKeyModifier/index.tsx`                  | ✅ ported                           |
+| ahooks      | `useKeyPress`                     | packages/hooks/src/useKeyPress                | `packages/core/useKeyPress/index.tsx`                     | ✅ ported                           |
 | vueuse      | `onKeyPressed`                    | packages/core/onKeyStroke                     | `packages/core/useKeyStroke/index.tsx`                    | ✅ ported                           |
 | vueuse      | `onKeyStroke`                     | packages/core/onKeyStroke                     | `packages/core/useKeyStroke/index.tsx`                    | ✅ ported                           |
 | vueuse      | `onKeyUp`                         | packages/core/onKeyStroke                     | `packages/core/useKeyStroke/index.tsx`                    | ✅ ported                           |
