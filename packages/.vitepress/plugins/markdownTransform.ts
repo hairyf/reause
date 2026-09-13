@@ -1,6 +1,6 @@
 import type { Plugin } from 'vite'
 import { existsSync } from 'node:fs'
-import { upstreamPaths } from '../../metadata/src/upstream'
+import { upstreamPaths, upstreamSources } from '../../metadata/src/upstream'
 import { findSourceFile, getTypeDefinitions, resetTypeCache } from './type-definitions'
 
 /**
@@ -23,15 +23,27 @@ import { findSourceFile, getTypeDefinitions, resetTypeCache } from './type-defin
 export interface FunctionRef {
   name: string
   pkg: string
+  /** Page directory from the registry (`packages/<pkg>/<dir>/`). */
+  dir?: string
+  /** Upstream source id from the registry (`vueuse`, `react-use`, …). */
+  source?: string
   /** Source file from the registry (`packages/<pkg>/<dir>/index.tsx`). */
   file?: string
 }
 
 const REPO = 'https://github.com/hairyf/reause'
-const VUEUSE_REPO = 'https://github.com/vueuse/vueuse'
 
 /** Map a docs-page id (`.../packages/<pkg>/<Fn>/index.md`) to its parts. */
 const PAGE_RE = /packages\/(core|shared|math|integrations|electron|firebase|rxjs)\/([^/]+)\/index\.md$/
+
+/** Page id (`<pkg>/<dir>`) of a registry row, as `upstreamPaths` keys it. */
+function pageOf(fn: FunctionRef): string {
+  if (fn.dir)
+    return `${fn.pkg}/${fn.dir}`
+  return (fn.file ?? `packages/${fn.pkg}/${fn.name}/index.tsx`)
+    .replace(/^packages\//, '')
+    .replace(/\/index\.tsx?$/, '')
+}
 
 /** Wrap a long code block in a collapsible <details> (mirrors VueUse). */
 function collapsible(code: string): string {
@@ -42,33 +54,53 @@ function collapsible(code: string): string {
 
 /**
  * Build the `## Source` link row for a function page:
- * reause source file · co-located demo · upstream VueUse module.
+ * reause source file · co-located demo · upstream module.
+ *
+ * The upstream link is composed from two data sources rather than a hard-coded
+ * repository: the *source id* comes from the provenance registry (whose
+ * `source` column `scripts/update.ts` resolves), and the pin-relative *path*
+ * from `upstreamPaths`. The label and repository therefore follow whatever
+ * source the registry records, so a react-use, ahooks, mantine, react-hookz or
+ * react-spring page links its own upstream instead of emitting nothing — and
+ * never a mislabelled VueUse link.
  */
-function sourceLinks(pkg: string, dir: string): string {
+function sourceLinks(pkg: string, dir: string, source?: string): string {
   // hooks live co-located with their docs: packages/<pkg>/<dir>/index.tsx
   const rel = `packages/${pkg}/${dir}/index`
   const src = (['.tsx', '.ts'] as const).map(ext => `${rel}${ext}`).find(p => existsSync(p))
   const demo = `packages/${pkg}/${dir}/demo.tsx`
-  const upstream = upstreamPaths[`${pkg}/${dir}`]
+  const path = upstreamPaths[`${pkg}/${dir}`]
+  const upstream = source ? upstreamSources[source] : undefined
 
   const links = []
   if (src)
     links.push(`[Source](${REPO}/blob/main/${src})`)
   if (existsSync(demo))
     links.push(`[Demo](${REPO}/blob/main/${demo})`)
-  if (upstream)
-    links.push(`[VueUse](${VUEUSE_REPO}/blob/main/${upstream})`)
+  // A source with a pin links the module it pins; a re-export-only source
+  // (`react-spring`) has no checkout, so its link stops at the repository root
+  // rather than inventing a path that cannot be verified. A pin whose module the
+  // resolver could not locate stays linkless.
+  if (upstream) {
+    const url = upstream.branch
+      ? (path && `${upstream.repo}/blob/${upstream.branch}/${path}`)
+      : upstream.repo
+    if (url)
+      links.push(`[${upstream.label}](${url})`)
+  }
   return links.join(' · ')
 }
 
 export function MarkdownTransform(functions: FunctionRef[]): Plugin {
-  const registered = new Map(functions.map((fn) => {
-    // registry `file` is `packages/<pkg>/<dir>/index.tsx` — page is `/pkg/dir/`
-    const page = (fn.file ?? `packages/${fn.pkg}/${fn.name}/index.tsx`)
-      .replace(/^packages\//, '')
-      .replace(/\/index\.tsx?$/, '')
-    return [fn.name, `/${page}/`]
-  }))
+  const registered = new Map(functions.map(fn => [fn.name, `/${pageOf(fn)}/`]))
+  // Upstream source id per docs page, straight from the registry's `source`
+  // column (the provenance of record); a reause-only page has none and so gets
+  // no upstream link.
+  const sourceOfPage = new Map<string, string>()
+  for (const fn of functions) {
+    if (fn.source && !sourceOfPage.has(pageOf(fn)))
+      sourceOfPage.set(pageOf(fn), fn.source)
+  }
 
   return {
     name: 'reause-markdown-transform',
@@ -120,7 +152,7 @@ export function MarkdownTransform(functions: FunctionRef[]): Plugin {
       const types = srcFile ? getTypeDefinitions(srcFile) : ''
       if (types)
         footer.push('## Type Declarations', '', collapsible(types), '')
-      const links = sourceLinks(pkg, dir)
+      const links = sourceLinks(pkg, dir, sourceOfPage.get(`${pkg}/${dir}`))
       if (links)
         footer.push('## Source', '', links, '')
       footer.push(`<Contributors name="${dir}" />`)
