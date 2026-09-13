@@ -1,5 +1,6 @@
 import type { DependencyList, EffectCallback } from 'react'
-import { useEffect, useRef } from 'react'
+import { useEffect } from 'react'
+import { useIsFirstRender } from '../useIsFirstRender'
 
 /**
  * React port of react-use's `useUpdateEffect`.
@@ -13,16 +14,22 @@ import { useEffect, useRef } from 'react'
  * upstream default-exports the hook; reause exports it as a named export, the
  * convention for these mirrors.
  *
- * `useFirstMountState` — the react-use helper this hook is built on — is inlined
- * as the private helper below instead of being exported: it is deliberately not
- * part of this issue set, and exporting it would grow the public surface beyond
- * upstream's `useUpdateEffect` with a hook nobody asked for. File a separate
- * issue if it should ever become public.
+ * `useFirstMountState` — the react-use helper this hook is built on — is now the
+ * shared `useIsFirstRender` (#940), imported above instead of inlined. react-use's
+ * helper and mantine's `useIsFirstRender` are line-for-line the same algorithm
+ * (`if (isFirst.current)` over a `useRef(true)`, flipped during the render phase,
+ * returning the same `boolean`), and they were measured to be indistinguishable
+ * on every axis that matters here: the value per render pass, the value under
+ * `<StrictMode>` (both mount-render passes share the ref, so the committed pass
+ * reads `false`), per-instance isolation, and behaviour across unmount/remount.
+ * Importing it keeps one copy of the primitive in the package instead of a third;
+ * the reference is relative (`../useIsFirstRender`) like every other intra-package
+ * import here.
  *
- * The helper flips its ref during the render phase, and that is kept exactly as
- * upstream wrote it. The flag has to be `false` by the time the *mount* commit's
- * effect runs, so flipping it inside an effect would be too late: that first
- * effect would still observe `true` and skip, and the hook would only start
+ * That primitive flips its ref during the render phase, and that is kept exactly
+ * as upstream wrote it. The flag has to be `false` by the time the *mount*
+ * commit's effect runs, so flipping it inside an effect would be too late: that
+ * first effect would still observe `true` and skip, and the hook would only start
  * working one render later — which is the whole point of the render-phase flip.
  *
  * StrictMode caveat — upstream's behaviour, mirrored deliberately, development
@@ -48,27 +55,11 @@ import { useEffect, useRef } from 'react'
  * }, [count])
  */
 export function useUpdateEffect(effect: EffectCallback, deps?: DependencyList): void {
-  const isFirstMount = useFirstMountState()
+  const isFirstMount = useIsFirstRender()
 
   useEffect(() => {
     if (!isFirstMount) {
       return effect()
     }
   }, deps)
-}
-
-/**
- * `true` only for the component's first render. Inlined from react-use's
- * `useFirstMountState` — private on purpose, see `useUpdateEffect` above.
- */
-function useFirstMountState(): boolean {
-  const isFirst = useRef(true)
-
-  if (isFirst.current) {
-    isFirst.current = false
-
-    return true
-  }
-
-  return isFirst.current
 }

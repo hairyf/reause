@@ -1722,6 +1722,15 @@ export const functions: FunctionInfo[] = [
     lastUpdated: 1788942682000,
   },
   {
+    name: 'useIsFirstRender',
+    file: 'packages/shared/useIsFirstRender/index.tsx',
+    pkg: 'shared',
+    dir: 'useIsFirstRender',
+    category: 'Lifecycle',
+    source: 'mantine',
+    lastUpdated: 1789276355000,
+  },
+  {
     name: 'useIsomorphicLayoutEffect',
     file: 'packages/shared/useIsomorphicLayoutEffect/index.tsx',
     pkg: 'shared',
@@ -1854,6 +1863,15 @@ export const functions: FunctionInfo[] = [
     category: 'Sensors',
     source: 'vueuse',
     lastUpdated: 1789147565000,
+  },
+  {
+    name: 'useMap',
+    file: 'packages/shared/useMap/index.tsx',
+    pkg: 'shared',
+    dir: 'useMap',
+    category: 'State',
+    source: 'react-hookz',
+    lastUpdated: 1789276266000,
   },
   {
     name: 'useMath',
@@ -2771,7 +2789,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useUpdateEffect',
     category: 'Lifecycle',
     source: 'react-use',
-    lastUpdated: 1789254853000,
+    lastUpdated: 1789276355000,
   },
   {
     name: 'useUrlSearchParams',
@@ -4079,6 +4097,15 @@ export const pages: FunctionPageInfo[] = [
     lastUpdated: 1788942682000,
   },
   {
+    name: 'useIsFirstRender',
+    pkg: 'shared',
+    doc: 'packages/shared/useIsFirstRender/index.md',
+    category: 'Lifecycle',
+    description:
+      "`true` on the very first render of a component instance and `false` on every render after it — a React port of `@mantine/hooks`' `useIsFirstRender` (upstream mapping file: `source/mantine/packages/@mantine/hooks/src/use-is-first-render/use-is-first-render.ts`",
+    lastUpdated: 1789276355000,
+  },
+  {
     name: 'useIsomorphicLayoutEffect',
     pkg: 'shared',
     doc: 'packages/shared/useIsomorphicLayoutEffect/index.md',
@@ -4175,6 +4202,14 @@ export const pages: FunctionPageInfo[] = [
     category: 'Sensors',
     description: 'reactive keys pressed state',
     lastUpdated: 1789147565000,
+  },
+  {
+    name: 'useMap',
+    pkg: 'shared',
+    doc: 'packages/shared/useMap/index.md',
+    category: 'State',
+    description: "a real `Map` whose mutations re-render — React port of react-hookz's `useMap`",
+    lastUpdated: 1789276266000,
   },
   {
     name: 'useMath',
@@ -5011,7 +5046,7 @@ export const pages: FunctionPageInfo[] = [
     category: 'Lifecycle',
     description:
       "`useEffect` that skips the first render — React port of react-use's [`useUpdateEffect`](https://streamich.github.io/react-use/?path=/story/lifecycle-useupdateeffect--docs)",
-    lastUpdated: 1789254853000,
+    lastUpdated: 1789276355000,
   },
   {
     name: 'useUrlSearchParams',
