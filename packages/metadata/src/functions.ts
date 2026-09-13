@@ -2333,6 +2333,15 @@ export const functions: FunctionInfo[] = [
     lastUpdated: 1788942682000,
   },
   {
+    name: 'useSafeState',
+    file: 'packages/shared/useSafeState/index.tsx',
+    pkg: 'shared',
+    dir: 'useSafeState',
+    category: 'State',
+    source: 'ahooks',
+    lastUpdated: 1789308388000,
+  },
+  {
     name: 'useScreenOrientation',
     file: 'packages/core/useScreenOrientation/index.tsx',
     pkg: 'core',
@@ -4698,6 +4707,15 @@ export const pages: FunctionPageInfo[] = [
     category: '@Firebase',
     description: 'reactive [Firebase Realtime Database](https://firebase.google.com/docs/database) binding',
     lastUpdated: 1788942682000,
+  },
+  {
+    name: 'useSafeState',
+    pkg: 'shared',
+    doc: 'packages/shared/useSafeState/index.md',
+    category: 'State',
+    description:
+      "a `useState` whose setter is a no-op once the component has unmounted — React port of ahooks' [`useSafeState`](https://ahooks.js.org/hooks/use-safe-state) (`source/ahooks/packages/hooks/src/useSafeState/`; upstream exports it as the **default** export",
+    lastUpdated: 1789308388000,
   },
   {
     name: 'useScreenOrientation',

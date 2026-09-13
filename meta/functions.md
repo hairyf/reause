@@ -264,6 +264,7 @@
 | vueuse       | `useResizeObserver`               | packages/core/useResizeObserver                 | `packages/core/useResizeObserver/index.tsx`               | ✅ ported                           |
 | vueuse       | `useRound`                        | packages/math/useRound                          | `packages/math/useRound/index.tsx`                        | ✅ ported                           |
 | vueuse       | `useRTDB`                         | packages/firebase/useRTDB                       | `packages/firebase/useRTDB/index.tsx`                     | ✅ ported                           |
+| ahooks       | `useSafeState`                    | packages/hooks/src/useSafeState                 | `packages/shared/useSafeState/index.tsx`                  | ✅ ported                           |
 | vueuse       | `useScreenOrientation`            | packages/core/useScreenOrientation              | `packages/core/useScreenOrientation/index.tsx`            | ✅ ported                           |
 | vueuse       | `useScreenSafeArea`               | packages/core/useScreenSafeArea                 | `packages/core/useScreenSafeArea/index.tsx`               | ✅ ported                           |
 | vueuse       | `useScriptTag`                    | packages/core/useScriptTag                      | `packages/core/useScriptTag/index.tsx`                    | ✅ ported                           |
