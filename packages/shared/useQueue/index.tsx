@@ -58,16 +58,21 @@ export interface QueueMethods<T> {
  * That only yields a value when React invokes the updater **eagerly**, which it
  * does solely on the idle-fiber fast path: React evaluates the reducer
  * immediately when the fiber (and its alternate) have no pending lanes, and
- * skips that evaluation as soon as a lane is already scheduled. The consequence,
- * measured in this port's test file rather than assumed: with an idle queue the
- * first `remove()` in a handler returns the head, while a **second `remove()`
- * issued in the same event handler, before React has rendered, returns
- * `undefined`** — the second updater runs only during the render, long after
- * `return result` has executed. `undefined` is also what an empty queue returns,
- * because the eager head of `[]` is `undefined`. Callers who need the value must
- * therefore remove one item per commit; the declaration `() => T` is upstream's
- * and is deliberately not narrowed. This rests on an implementation detail of
- * React's dispatcher, not on a public contract, so it is pinned by a test.
+ * skips that evaluation as soon as a lane is already scheduled. Measured here
+ * (React 19.2.8, chromium) rather than assumed: the head comes back for a
+ * dispatch made while the queue's fiber is idle — the first dispatch after a
+ * mount, and again after a render that this component's own state update did not
+ * drive (a parent re-render, a props-only re-render) — and `undefined` comes
+ * back in every other case the test file pins: a second `remove()` in the same
+ * handler, a `remove()` straight after `add()` in the same handler, a `remove()`
+ * in a commit that followed a previous `remove()`, a `remove()` in a later
+ * macrotask with no intervening render, and an empty queue (whose eager head is
+ * `undefined`). The removal itself always applies, because the queued updater
+ * runs during the next render — only the return value depends on the fast path.
+ * Read `first` before calling `remove()` when the value matters. The declaration
+ * `() => T` is upstream's and is deliberately not narrowed. This rests on an
+ * implementation detail of React's dispatcher, not on a public contract, so it
+ * is pinned by a test.
  *
  * Under `StrictMode` React double-invokes the updater to surface impurity. The
  * capture is idempotent — both invocations receive the same queue and assign the
