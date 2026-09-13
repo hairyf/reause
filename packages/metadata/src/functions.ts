@@ -2648,6 +2648,15 @@ export const functions: FunctionInfo[] = [
     lastUpdated: 1788994903000,
   },
   {
+    name: 'useTimeoutRafFn',
+    file: 'packages/shared/useTimeoutRafFn/index.tsx',
+    pkg: 'shared',
+    dir: 'useTimeoutRafFn',
+    category: 'Animation',
+    source: 'ahooks',
+    lastUpdated: 1789273126000,
+  },
+  {
     name: 'useTimestamp',
     file: 'packages/core/useTimestamp/index.tsx',
     pkg: 'core',
@@ -4861,6 +4870,14 @@ export const pages: FunctionPageInfo[] = [
     category: 'Utilities',
     description: 'use timeout to poll something — it triggers the callback after the last task is done',
     lastUpdated: 1788994903000,
+  },
+  {
+    name: 'useTimeoutRafFn',
+    pkg: 'shared',
+    doc: 'packages/shared/useTimeoutRafFn/index.md',
+    category: 'Animation',
+    description: 'fire a callback once on the first animation frame at or after a delay',
+    lastUpdated: 1789273126000,
   },
   {
     name: 'useTimestamp',

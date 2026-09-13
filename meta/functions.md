@@ -299,6 +299,7 @@
 | vueuse    | `useTimeout`                      | packages/shared/useTimeout                    | `packages/shared/useTimeout/index.tsx`                    | ✅ ported                           |
 | vueuse    | `useTimeoutFn`                    | packages/shared/useTimeoutFn                  | `packages/shared/useTimeoutFn/index.tsx`                  | ✅ ported                           |
 | vueuse    | `useTimeoutPoll`                  | packages/core/useTimeoutPoll                  | `packages/core/useTimeoutPoll/index.tsx`                  | ✅ ported                           |
+| ahooks    | `useRafTimeout`                   | packages/hooks/src/useRafTimeout              | `packages/shared/useTimeoutRafFn/index.tsx`               | ✅ ported                           |
 | vueuse    | `useTimestamp`                    | packages/core/useTimestamp                    | `packages/core/useTimestamp/index.tsx`                    | ✅ ported                           |
 | vueuse    | `useTitle`                        | packages/core/useTitle                        | `packages/core/useTitle/index.tsx`                        | ✅ ported                           |
 | vueuse    | `useToggle`                       | packages/shared/useToggle                     | `packages/shared/useToggle/index.tsx`                     | ✅ ported                           |
