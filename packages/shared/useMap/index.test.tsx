@@ -172,6 +172,34 @@ describe('useMap', () => {
     }
   })
 
+  it('mirrors upstream\'s prototype spy — `set` calls the original `Map.prototype.set`', async () => {
+    // Upstream's `index.dom.test.ts` asserts exactly this with
+    // `vi.spyOn(Map.prototype, 'set')`. It is kept as its own case because a spy
+    // makes every `Map.prototype.set` call visible — including vitest's own —
+    // so it is paired with nothing that counts calls, while the
+    // `countProtoCalls` cases above measure the `proto.set.apply` call as a
+    // delta. Probed rather than assumed: a `Set.prototype.add` spy is what the
+    // sibling `useSet` port reported as unusable under this repo's vitest 5, and
+    // that finding does not generalise to `Map.prototype.set`, which works.
+    const spy = vi.spyOn(Map.prototype, 'set')
+    try {
+      let i = 0
+      const { result, act } = await renderHook(() => [++i, useMap<string, string>()] as const)
+      const value = result.current!
+
+      await act(() => {
+        expect(value[1].set('foo', 'bar')).toBe(value[1])
+      })
+
+      expect(spy).toHaveBeenCalledWith('foo', 'bar')
+      expect(i).toBe(2)
+      expect(result.current[1].get('foo')).toBe('bar')
+    }
+    finally {
+      spy.mockRestore()
+    }
+  })
+
   it('`clear` invokes the pristine Map method and re-renders the component', async () => {
     const counter = countProtoCalls('clear')
     try {
