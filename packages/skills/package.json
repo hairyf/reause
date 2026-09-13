@@ -1,7 +1,7 @@
 {
   "name": "@reause/skills",
   "type": "module",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Agent Skills for reause",
   "license": "MIT",
   "homepage": "https://github.com/hairyf/reause#readme",
