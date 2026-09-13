@@ -28,8 +28,8 @@
 - **参数类型**：
   - **只读 value-source 参数**：仅接受纯类型 `T`（严禁 `RefOrValue` / `State<T>` / getter）。
   - **内部写入参数**：仅接受 `State<T>`。
-  - **DOM Hook 参数**：仅接受 `RefOrValue<T>`。
-    - **多目标**：单个目标为 `RefOrValue<T>`；多个目标为**元素类型一致的**数组 `RefOrValue<T>[]`（两种形式都接受普通元素或 ref-like `{ current }`）。
+  - **DOM Hook 参数**：单个目标仅接受 `RefOrValue<T>`。
+    - **多目标**：接受**元素类型一致的**数组——`RefOrValue<T[]>`、`RefOrValue<T>[]`、`RefOrValue<T | T[]>` 都只是同一规则的不同写法，判定标准只有一条：数组里每个元素的类型必须相同（`T` 为元素类型）。既有的两种包装都合规：整体包装（`useEventListener` 的 `RefOrValue<Arrayable<T>>`）与逐元素包装（`useClickAway` 的 `RefOrValue<T>[]`）。
       异构目标数组（如 `[buttonRef, divRef]`，元素类型不同）**刻意不支持**，也不会通过类型检查；需要宽元素类型时由调用方自行收窄或包装成同一 `T`。
       与 §1.1 的分工：本节的 DOM 目标类型规则**优先于** §1.1 的直接镜像——上游 DOM 目标类型更宽时按本条收窄，这属于参数类型收窄、不算偏离镜像规则；其余（命名、返回值结构）仍按 §1.1 镜像。
 - **返回值约束（VueUse 转换类）**：
