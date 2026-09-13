@@ -31,6 +31,7 @@
 | vueuse    | `createReusableTemplate`          | packages/core/createReusableTemplate          | `packages/core/createPortalSlot/index.tsx`                | ✅ ported                           |
 | vueuse    | `createProjection`                | packages/math/createProjection                | `packages/math/createProjection/index.tsx`                | ✅ ported                           |
 | vueuse    | `createTemplatePromise`           | packages/core/createTemplatePromise           | `packages/core/createPromisifiedComponent/index.tsx`      | ✅ ported                           |
+| react-use | `createReducer`                   | src/factory/createReducer.ts                  | `packages/shared/createReducer/index.tsx`                 | ✅ ported                           |
 | vueuse    | `createSharedComposable`          | packages/shared/createSharedComposable        | `packages/shared/createSharedHook/index.tsx`              | ✅ ported                           |
 | vueuse    | `createSingletonPromise`          | packages/shared/utils                         | `packages/shared/utils/index.tsx`                         | ✅ ported                           |
 | vueuse    | `customStorageEventName`          | packages/core/useStorage                      | `packages/core/useStorage/index.tsx`                      | ✅ ported                           |

@@ -254,6 +254,15 @@ export const functions: FunctionInfo[] = [
     lastUpdated: 1789024203000,
   },
   {
+    name: 'createReducer',
+    file: 'packages/shared/createReducer/index.tsx',
+    pkg: 'shared',
+    dir: 'createReducer',
+    category: 'Factory',
+    source: 'react-use',
+    lastUpdated: 1789272862000,
+  },
+  {
     name: 'createSharedHook',
     file: 'packages/shared/createSharedHook/index.tsx',
     pkg: 'shared',
@@ -3072,6 +3081,15 @@ export const pages: FunctionPageInfo[] = [
     category: 'Component',
     description: 'template as Promise',
     lastUpdated: 1789024203000,
+  },
+  {
+    name: 'createReducer',
+    pkg: 'shared',
+    doc: 'packages/shared/createReducer/index.md',
+    category: 'Factory',
+    description:
+      "build a `useReducer`-shaped hook around a Redux-style middleware chain — React port of react-use's `createReducer`",
+    lastUpdated: 1789272862000,
   },
   {
     name: 'createSharedHook',
