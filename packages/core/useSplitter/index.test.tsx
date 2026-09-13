@@ -1,5 +1,8 @@
-import type { UseSplitterResolvedPanel } from './engine'
+import type { SplitterPaneSize, UseSplitterResolvedPanel } from './engine'
+import type { UseSplitterOptions, UseSplitterReturnValue } from './index'
+import { act as reactAct } from 'react'
 import { describe, expect, it, vi } from 'vitest'
+import { render, renderHook } from 'vitest-browser-react'
 import {
   applyAdjacentOnly,
   applyConstraints,
@@ -24,23 +27,27 @@ import {
   resolveWorkingSizes,
   sizeMagnitude,
 } from './engine'
+import { useSplitter } from './index'
 
 /**
- * Tests for the sizing engine half of `useSplitter`.
+ * Tests for `useSplitter`, in two halves, both in one file.
  *
- * Upstream's suite (`use-splitter.test.tsx`, 1270 lines) drives every one of
- * these code paths through `renderHook` + `fireEvent`, which is why its CSS-unit
- * block needs a `getBoundingClientRect` spy: the hook's keyboard and drag
- * handlers are the only public way in. Turn 1 ports the arithmetic directly, so
- * each upstream assertion about resolved sizes, redistribution and collapse is
- * reproduced here as a plain function call — no React, no rendering, no refs.
+ * The first half is the pure sizing engine. Upstream's suite
+ * (`use-splitter.test.tsx`, 1270 lines) drives those code paths through
+ * `renderHook` + `fireEvent`, which is why its CSS-unit block needs a
+ * `getBoundingClientRect` spy: the hook's keyboard and drag handlers are the
+ * only public way in. Porting the arithmetic directly lets each upstream
+ * assertion about resolved sizes, redistribution and collapse be reproduced as
+ * a plain function call.
  *
- * Two environment notes, both measured rather than assumed:
- * - the file is `.test.tsx` because that is the only glob vitest's browser
- *   project includes (`packages/**\/*.{test,spec}.tsx`); it renders nothing.
- * - `getRootFontSize` is the one helper that touches the DOM, and vitest's
- *   browser project provides a real `window`, so its SSR fallback branch is
- *   reasoned rather than exercised here (stated in its own test).
+ * The second half is the hook itself — the DOM behaviours (refs, pointer drag,
+ * keyboard navigation, the ARIA prop bag, collapse/expand/reset, controlled
+ * sizing, the ResizeObserver measurement and unmount cleanup) that upstream
+ * exercises with `render` + `fireEvent`. They live in the same file on purpose:
+ * a `.ts` test is collected by no vitest project (the browser project's include
+ * glob is `packages/**\/*.{test,spec}.tsx`, the exports project's is `test/*.ts`
+ * plus `packages/skills/*.ts`), so splitting the engine tests out would silently
+ * drop them from CI.
  *
  * Several of the fixed-size expectations below (`1000px` container, `16` root
  * font size) are exactly the numbers upstream's `UnitHarness` mocks, so a
@@ -98,10 +105,9 @@ describe('unit predicates', () => {
     // The regexes are anchored and single-unit: `em`, `vw`, `pixel`, an
     // upper-cased unit and a trailing space are all *flexible* sizes as far as
     // upstream is concerned — `Number.parseFloat` would happily read a number out
-    // of every one of them.
-    // The third entry is a numeric string rather than a `${number}%` template
-    // literal, so it needs the cast; the other six are only near-misses that the
-    // type would already reject, hence the untyped array.
+    // of every one of them. The last entry is a numeric string rather than a
+    // `${number}%` template literal, so it needs the cast; the others are
+    // near-misses the type would already reject, hence the untyped array.
     for (const value of ['240em', '240vw', '240pixel', '240 px', 'px240', '240PX', '240px ', '0'])
       expect(isFixedSize(value as any), value).toBe(false)
   })
@@ -729,5 +735,1169 @@ describe('resetAdjacentSizes', () => {
     // bound leaves it: the 1:3 ratio wants 250, panel 1's min 800 allows 200.
     const bounded = pixelPanels(CONTAINER, [{ defaultSize: 200 }, { defaultSize: 600, min: 800 }])
     expect(resetAdjacentSizes([500, 500], bounded, 0)).toEqual([200, 800])
+  })
+})
+
+// ---------------------------------------------------------------------------
+// The hook itself. Everything below needs a rendered tree; the pure halves above
+// need nothing.
+// ---------------------------------------------------------------------------
+
+/**
+ * Wrapper size the layouts below are rendered into. The percentage math in the
+ * tests assumes exactly this width, so the drag tests assert it rather than
+ * trusting the ambient viewport.
+ */
+const HARNESS_WIDTH = 1000
+const HARNESS_HEIGHT = 600
+
+/**
+ * Panel style: a flexible pane contributes its declared unit as `flexGrow`, a
+ * fixed pane contributes its pixel size as `flexBasis`. This is the same
+ * `flex-grow` contract `resolveWorkingSizes` documents, so what the tests
+ * measure is what a consumer would render.
+ */
+function paneStyle(size: SplitterPaneSize): React.CSSProperties {
+  const isFixed = typeof size === 'string' && (size.endsWith('px') || size.endsWith('rem'))
+  return isFixed ? { flexBasis: size, flexGrow: 0 } : { flexGrow: Number(size) }
+}
+
+/**
+ * The browser-mode port of upstream's `TestComponent`/`UnitHarness`: renders the
+ * container plus one handle per gap, and exposes the latest hook value so a test
+ * can drive `collapse`/`expand`/`reset`/`setSizes` directly.
+ */
+function Harness({
+  options,
+  splitter,
+}: {
+  options: UseSplitterOptions
+  splitter: React.RefObject<UseSplitterReturnValue<HTMLDivElement> | undefined>
+}) {
+  const result = useSplitter<HTMLDivElement>(options)
+  splitter.current = result
+
+  return (
+    <div
+      ref={result.ref}
+      data-testid="container"
+      style={{ width: HARNESS_WIDTH, height: HARNESS_HEIGHT, display: 'flex' }}
+    >
+      {result.sizes.map((size, index) => (
+        <div key={`pane-${index}`} data-testid={`pane-${index}`} style={paneStyle(size)} />
+      ))}
+      {result.sizes.slice(0, -1).map((_, index) => (
+        <div key={`handle-${index}`} data-testid={`handle-${index}`} {...result.getHandleProps({ index })} />
+      ))}
+    </div>
+  )
+}
+
+/** Mutable holder for the latest hook value, so tests read it after a render. */
+function splitterRef(): React.RefObject<UseSplitterReturnValue<HTMLDivElement> | undefined> {
+  return { current: undefined }
+}
+
+/** `act` as `vitest-browser-react` hands it out (from `render`/`renderHook`). */
+type Act = (callback: () => unknown) => Promise<void>
+
+/**
+ * `vitest-browser-react` 2.3's `render()` does **not** return an `act` (only
+ * `renderHook()` does), and the promise it resolves with is not itself a usable
+ * act, so the `render`-based tests use React's own `act` instead. That is the
+ * same batching mechanism either way: the DOM listeners below commit their state
+ * outside any React event handler, so without a flush the assertion reads the
+ * pre-event DOM.
+ */
+const act: Act = callback => reactAct(async () => {
+  await callback()
+})
+
+function handleEl(index: number): HTMLElement {
+  const el = document.querySelector(`[data-testid="handle-${index}"]`)
+  if (!(el instanceof HTMLElement)) {
+    throw new TypeError(`handle-${index} is not rendered`)
+  }
+  return el
+}
+
+function containerEl(): HTMLElement {
+  const el = document.querySelector('[data-testid="container"]')
+  if (!(el instanceof HTMLElement)) {
+    throw new TypeError('container is not rendered')
+  }
+  return el
+}
+
+/**
+ * Dispatch a real keydown on a handle and flush the React update it schedules.
+ *
+ * The flush is not optional: the handler runs from a `keydown` listener that
+ * React delegates at the root, so the state update it commits is batched until
+ * the ambient act scope ends. Asserting straight afterwards reads the pre-key
+ * `aria-valuenow` — the exact false negative that failed 29 tests on the first
+ * run of this half.
+ */
+async function keydownOn(act: Act, handleIndex: number, key: string, shiftKey = false): Promise<HTMLElement> {
+  const el = handleEl(handleIndex)
+  await act(() => {
+    el.dispatchEvent(new KeyboardEvent('keydown', { key, shiftKey, bubbles: true, cancelable: true }))
+  })
+  return el
+}
+
+/** Point `getBoundingClientRect` at a fixed size for the duration of `fn`. */
+async function withRect<R>(
+  el: HTMLElement,
+  size: { width: number, height: number },
+  fn: () => Promise<R>,
+): Promise<R> {
+  const original = el.getBoundingClientRect
+  el.getBoundingClientRect = () => ({
+    width: size.width,
+    height: size.height,
+    top: 0,
+    left: 0,
+    right: size.width,
+    bottom: size.height,
+    x: 0,
+    y: 0,
+    toJSON: () => ({}),
+  }) as DOMRect
+  try {
+    return await fn()
+  }
+  finally {
+    el.getBoundingClientRect = original
+  }
+}
+
+/**
+ * Drag `handleIndex` by `deltaX` pixels.
+ *
+ * The listeners live on `document` (attached at `pointerdown`), so the events
+ * are dispatched there rather than through the playwright mouse API: `page` is
+ * not a global in this project's browser setup, and a synthetic `PointerEvent`
+ * with explicit `clientX/clientY` makes the delta exactly what the test says it
+ * is instead of depending on the handle's on-screen position. `pointerup` is
+ * what flushes the drag — `pointermove` only schedules a
+ * `requestAnimationFrame`.
+ */
+async function dragHandle(act: Act, handleIndex: number, deltaX: number, fromX = 100): Promise<void> {
+  const handle = handleEl(handleIndex)
+  const rect = handle.getBoundingClientRect()
+  const y = rect.top + rect.height / 2 || 50
+
+  await act(() => {
+    handle.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, button: 0, clientX: fromX, clientY: y }))
+    document.dispatchEvent(new PointerEvent('pointermove', { bubbles: true, clientX: fromX + deltaX, clientY: y }))
+    document.dispatchEvent(new PointerEvent('pointerup', { bubbles: true, clientX: fromX + deltaX, clientY: y }))
+  })
+}
+
+describe('useSplitter: initial state and props', () => {
+  it('returns the declared default sizes, no collapsed panels and no active handle', async () => {
+    const { result } = await renderHook(() => useSplitter({ panels: [{ defaultSize: 30 }, { defaultSize: 70 }] }))
+
+    expect(result.current.sizes).toEqual([30, 70])
+    expect(result.current.collapsed).toEqual([false, false])
+    expect(result.current.activeHandle).toBe(-1)
+    expect(result.current.pixelMode).toBe(false)
+  })
+
+  it('returns handle props with correct ARIA attributes', async () => {
+    const { result } = await renderHook(() =>
+      useSplitter({ panels: [{ defaultSize: 50, min: 10, max: 80 }, { defaultSize: 50 }] }),
+    )
+
+    const props = result.current.getHandleProps({ index: 0 })
+    expect(props.role).toBe('separator')
+    expect(props['aria-orientation']).toBe('horizontal')
+    expect(props['aria-valuenow']).toBe(50)
+    expect(props['aria-valuemin']).toBe(10)
+    expect(props['aria-valuemax']).toBe(80)
+    expect(props.tabIndex).toBe(0)
+    expect(props['data-orientation']).toBe('horizontal')
+    expect(props['data-active']).toBeUndefined()
+  })
+
+  it('returns vertical aria-orientation when orientation is vertical', async () => {
+    const { result } = await renderHook(() =>
+      useSplitter({ panels: [{ defaultSize: 50 }, { defaultSize: 50 }], orientation: 'vertical' }),
+    )
+
+    const props = result.current.getHandleProps({ index: 0 })
+    expect(props['aria-orientation']).toBe('vertical')
+    expect(props['data-orientation']).toBe('vertical')
+  })
+
+  it('marks only the dragged handle active', async () => {
+    const splitter = splitterRef()
+    await render(
+      <Harness options={{ panels: [{ defaultSize: 50 }, { defaultSize: 50 }] }} splitter={splitter} />,
+    )
+
+    expect(splitter.current!.getHandleProps({ index: 0 })['data-active']).toBeUndefined()
+
+    const el = handleEl(0)
+    const rect = el.getBoundingClientRect()
+    await act(() => {
+      el.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, button: 0, clientX: 100, clientY: rect.top + 1 }))
+    })
+    expect(splitter.current!.getHandleProps({ index: 0 })['data-active']).toBe(true)
+
+    await act(() => {
+      document.dispatchEvent(new PointerEvent('pointerup', { bubbles: true, clientX: 100, clientY: rect.top + 1 }))
+    })
+    expect(splitter.current!.activeHandle).toBe(-1)
+    expect(splitter.current!.getHandleProps({ index: 0 })['data-active']).toBeUndefined()
+  })
+})
+
+describe('useSplitter: programmatic state', () => {
+  it('sets sizes programmatically and marks the collapsed panels', async () => {
+    const { result, act } = await renderHook(() => useSplitter({ panels: [{ defaultSize: 50 }, { defaultSize: 50 }] }))
+
+    await act(() => {
+      result.current.setSizes([30, 70])
+    })
+
+    expect(result.current.sizes).toEqual([30, 70])
+
+    await act(() => {
+      result.current.setSizes([0, 100])
+    })
+    expect(result.current.collapsed).toEqual([true, false])
+  })
+
+  it('does not collapse a panel that is not marked collapsible', async () => {
+    const { result, act } = await renderHook(() => useSplitter({ panels: [{ defaultSize: 50 }, { defaultSize: 50 }] }))
+
+    await act(() => {
+      result.current.collapse(0)
+    })
+
+    expect(result.current.sizes).toEqual([50, 50])
+  })
+
+  it('collapses a collapsible panel and reports it once', async () => {
+    const onCollapseChange = vi.fn()
+    const { result, act } = await renderHook(() =>
+      useSplitter({ panels: [{ defaultSize: 30, collapsible: true }, { defaultSize: 70 }], onCollapseChange }),
+    )
+
+    await act(() => {
+      result.current.collapse(0)
+    })
+
+    expect(result.current.sizes[0]).toBe(0)
+    expect(result.current.sizes[1]).toBe(100)
+    expect(result.current.collapsed).toEqual([true, false])
+    expect(onCollapseChange).toHaveBeenCalledWith(0, true)
+  })
+
+  it('expands a collapsed panel back to its pre-collapse size, reporting it once', async () => {
+    const onCollapseChange = vi.fn()
+    const { result, act } = await renderHook(() =>
+      useSplitter({ panels: [{ defaultSize: 30, collapsible: true }, { defaultSize: 70 }], onCollapseChange }),
+    )
+
+    await act(() => {
+      result.current.collapse(0)
+    })
+    expect(result.current.sizes).toEqual([0, 100])
+
+    await act(() => {
+      result.current.expand(0)
+    })
+
+    expect(result.current.sizes).toEqual([30, 70])
+    expect(result.current.collapsed).toEqual([false, false])
+    expect(onCollapseChange).toHaveBeenLastCalledWith(0, false)
+  })
+
+  it('does not expand, and does not report, when there is nothing to restore', async () => {
+    // Pixel mode has no measured container inside `renderHook` (there is no
+    // element for the ResizeObserver to observe), so every working size resolves
+    // to 0: the collapse has no size to hand over and expands nothing. Both panels
+    // stay put and no transition is reported.
+    const onCollapseChange = vi.fn()
+    const { result, act } = await renderHook(() =>
+      useSplitter({
+        panels: [{ defaultSize: '120px', collapsible: true }, { defaultSize: 0, min: '100px' }],
+        onCollapseChange,
+      }),
+    )
+
+    expect(result.current.sizes).toEqual(['120px', 0])
+
+    await act(() => {
+      result.current.collapse(0)
+    })
+    expect(result.current.sizes[0]).toBe('0px')
+
+    onCollapseChange.mockClear()
+    await act(() => {
+      result.current.expand(0)
+    })
+
+    // Nothing was available, so the hook bailed: no size, no report.
+    expect(result.current.sizes.every(size => sizeMagnitude(size) >= 0)).toBe(true)
+    expect(onCollapseChange).not.toHaveBeenCalled()
+  })
+
+  it('round-trips a collapse and expand in flexible mode', async () => {
+    const onCollapseChange = vi.fn()
+    const { result, act } = await renderHook(() =>
+      useSplitter({
+        panels: [{ defaultSize: 30, collapsible: true }, { defaultSize: 100, min: 100 }],
+        onCollapseChange,
+      }),
+    )
+
+    await act(() => {
+      result.current.collapse(0)
+    })
+    // Panel 1 takes panel 0's whole share; its min is satisfied by construction.
+    expect(result.current.sizes).toEqual([0, 130])
+
+    onCollapseChange.mockClear()
+    await act(() => {
+      result.current.expand(0)
+    })
+
+    expect(result.current.sizes).toEqual([30, 100])
+    expect(onCollapseChange).toHaveBeenCalledWith(0, false)
+  })
+
+  it('toggles a panel through collapse and back', async () => {
+    const onCollapseChange = vi.fn()
+    const { result, act } = await renderHook(() =>
+      useSplitter({ panels: [{ defaultSize: 40, collapsible: true }, { defaultSize: 60 }], onCollapseChange }),
+    )
+
+    await act(() => {
+      result.current.toggleCollapse(0)
+    })
+    // The toggle has to route to `collapse`: a panel is collapsed exactly when its
+    // size is 0, and `collapsed` is derived from the sizes rather than tracked.
+    expect(result.current.collapsed[0]).toBe(true)
+    expect(result.current.sizes).toEqual([0, 100])
+    expect(onCollapseChange).toHaveBeenLastCalledWith(0, true)
+
+    await act(() => {
+      result.current.toggleCollapse(0)
+    })
+    expect(result.current.collapsed[0]).toBe(false)
+    expect(result.current.sizes).toEqual([40, 60])
+    expect(onCollapseChange).toHaveBeenLastCalledWith(0, false)
+  })
+
+  it('calls onSizeChange in controlled mode', async () => {
+    const onSizeChange = vi.fn()
+    const { result, act } = await renderHook(() =>
+      useSplitter({ panels: [{ defaultSize: 50 }, { defaultSize: 50 }], sizes: [50, 50], onSizeChange }),
+    )
+
+    await act(() => {
+      result.current.setSizes([20, 80])
+    })
+
+    expect(onSizeChange).toHaveBeenCalledWith([20, 80])
+    // Controlled: the rendered sizes are the caller's, which this test never
+    // updates, so the hook must not have moved them on its own.
+    expect(result.current.sizes).toEqual([50, 50])
+  })
+
+  it('treats an undefined controlled value as uncontrolled', async () => {
+    // The distinction the internal control helper exists for: `sizes: undefined`
+    // is uncontrolled, so writes commit locally instead of vanishing into a
+    // caller that will never send a new value back.
+    const onSizeChange = vi.fn()
+    const { result, act } = await renderHook(() =>
+      useSplitter({ panels: [{ defaultSize: 50 }, { defaultSize: 50 }], sizes: undefined, onSizeChange }),
+    )
+
+    await act(() => {
+      result.current.setSizes([20, 80])
+    })
+
+    expect(result.current.sizes).toEqual([20, 80])
+    expect(onSizeChange).toHaveBeenCalledWith([20, 80])
+  })
+
+  it('follows the caller when a controlled value changes', async () => {
+    const props: { sizes: SplitterPaneSize[] } = { sizes: [50, 50] }
+    const { result, rerender } = await renderHook(
+      (initial?: { sizes: SplitterPaneSize[] }) =>
+        useSplitter({ panels: [{ defaultSize: 50 }, { defaultSize: 50 }], sizes: (initial ?? props).sizes }),
+      { initialProps: props },
+    )
+
+    expect(result.current.sizes).toEqual([50, 50])
+
+    await rerender({ sizes: [10, 90] })
+    expect(result.current.sizes).toEqual([10, 90])
+  })
+})
+
+describe('useSplitter: keyboard navigation', () => {
+  it('grows the before panel on ArrowRight and shrinks it on ArrowLeft', async () => {
+    const splitter = splitterRef()
+    await render(
+      <Harness options={{ panels: [{ defaultSize: 50 }, { defaultSize: 50 }], step: 5 }} splitter={splitter} />,
+    )
+
+    await keydownOn(act, 0, 'ArrowRight')
+    expect(handleEl(0).getAttribute('aria-valuenow')).toBe('55')
+
+    await keydownOn(act, 0, 'ArrowLeft')
+    expect(handleEl(0).getAttribute('aria-valuenow')).toBe('50')
+  })
+
+  it('uses shiftStep for a shifted arrow', async () => {
+    const splitter = splitterRef()
+    await render(
+      <Harness options={{ panels: [{ defaultSize: 50 }, { defaultSize: 50 }], step: 1, shiftStep: 10 }} splitter={splitter} />,
+    )
+
+    await keydownOn(act, 0, 'ArrowRight', true)
+    expect(handleEl(0).getAttribute('aria-valuenow')).toBe('60')
+  })
+
+  it('honours a custom step and shiftStep', async () => {
+    const splitter = splitterRef()
+    await render(
+      <Harness options={{ panels: [{ defaultSize: 50 }, { defaultSize: 50 }], step: 7, shiftStep: 21 }} splitter={splitter} />,
+    )
+
+    await keydownOn(act, 0, 'ArrowRight')
+    expect(handleEl(0).getAttribute('aria-valuenow')).toBe('57')
+
+    await keydownOn(act, 0, 'ArrowRight', true)
+    expect(handleEl(0).getAttribute('aria-valuenow')).toBe('78')
+  })
+
+  it('shrinks to min on Home and grows to max on End', async () => {
+    const splitter = splitterRef()
+    await render(
+      <Harness options={{ panels: [{ defaultSize: 50, min: 20, max: 80 }, { defaultSize: 50 }] }} splitter={splitter} />,
+    )
+
+    await keydownOn(act, 0, 'Home')
+    expect(handleEl(0).getAttribute('aria-valuenow')).toBe('20')
+
+    await keydownOn(act, 0, 'End')
+    expect(handleEl(0).getAttribute('aria-valuenow')).toBe('80')
+  })
+
+  it('respects min/max constraints during keyboard navigation', async () => {
+    const splitter = splitterRef()
+    await render(
+      <Harness
+        options={{ panels: [{ defaultSize: 50, min: 40, max: 60 }, { defaultSize: 50 }], step: 30 }}
+        splitter={splitter}
+      />,
+    )
+
+    await keydownOn(act, 0, 'ArrowRight')
+    expect(handleEl(0).getAttribute('aria-valuenow')).toBe('60')
+
+    // The step overshoots panel 0's own `min` of 40; the pair clamp — with panel
+    // 1's min at its default 0 — is what stops it there.
+    await keydownOn(act, 0, 'ArrowLeft')
+    expect(handleEl(0).getAttribute('aria-valuenow')).toBe('40')
+
+    // Already at the floor: another step cannot move it.
+    await keydownOn(act, 0, 'ArrowLeft')
+    expect(handleEl(0).getAttribute('aria-valuenow')).toBe('40')
+  })
+
+  it('inverts the horizontal arrows under dir: rtl', async () => {
+    const splitter = splitterRef()
+    await render(
+      <Harness options={{ panels: [{ defaultSize: 50 }, { defaultSize: 50 }], step: 5, dir: 'rtl' }} splitter={splitter} />,
+    )
+
+    await keydownOn(act, 0, 'ArrowLeft')
+    expect(handleEl(0).getAttribute('aria-valuenow')).toBe('55')
+
+    await keydownOn(act, 0, 'ArrowRight')
+    expect(handleEl(0).getAttribute('aria-valuenow')).toBe('50')
+  })
+
+  it('uses up/down on the vertical axis', async () => {
+    const splitter = splitterRef()
+    await render(
+      <Harness options={{ panels: [{ defaultSize: 50 }, { defaultSize: 50 }], orientation: 'vertical', step: 5 }} splitter={splitter} />,
+    )
+
+    await keydownOn(act, 0, 'ArrowDown')
+    expect(handleEl(0).getAttribute('aria-valuenow')).toBe('55')
+
+    await keydownOn(act, 0, 'ArrowUp')
+    expect(handleEl(0).getAttribute('aria-valuenow')).toBe('50')
+  })
+
+  it('ignores the wrong axis without preventing default, so the page can still scroll', async () => {
+    const splitter = splitterRef()
+    await render(
+      <Harness options={{ panels: [{ defaultSize: 50 }, { defaultSize: 50 }], orientation: 'vertical', step: 5 }} splitter={splitter} />,
+    )
+
+    const el = handleEl(0)
+    let accepted = true
+    await act(() => {
+      accepted = el.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true, cancelable: true }))
+    })
+
+    // `dispatchEvent` returns false only when a handler called preventDefault.
+    expect(accepted).toBe(true)
+    expect(handleEl(0).getAttribute('aria-valuenow')).toBe('50')
+  })
+
+  it('ignores keyboard input when disabled', async () => {
+    const splitter = splitterRef()
+    await render(
+      <Harness options={{ panels: [{ defaultSize: 50 }, { defaultSize: 50 }], step: 5, enabled: false }} splitter={splitter} />,
+    )
+
+    await keydownOn(act, 0, 'ArrowRight')
+    expect(handleEl(0).getAttribute('aria-valuenow')).toBe('50')
+  })
+
+  it('toggles collapse on Enter, preferring the smaller collapsible panel', async () => {
+    const onCollapseChange = vi.fn()
+    const splitter = splitterRef()
+    await render(
+      <Harness
+        options={{
+          panels: [{ defaultSize: 30, collapsible: true }, { defaultSize: 70, collapsible: true }],
+          onCollapseChange,
+        }}
+        splitter={splitter}
+      />,
+    )
+
+    await keydownOn(act, 0, 'Enter')
+
+    // 30 <= 70 and panel 0 is collapsible, so panel 0 is the one that collapses.
+    expect(onCollapseChange).toHaveBeenCalledWith(0, true)
+    expect(handleEl(0).getAttribute('aria-valuenow')).toBe('0')
+  })
+
+  it('collapses the after panel on Enter when only the after panel is collapsible', async () => {
+    const onCollapseChange = vi.fn()
+    const splitter = splitterRef()
+    await render(
+      <Harness
+        options={{
+          panels: [{ defaultSize: 70 }, { defaultSize: 30, collapsible: true }],
+          onCollapseChange,
+        }}
+        splitter={splitter}
+      />,
+    )
+
+    await keydownOn(act, 0, 'Enter')
+
+    expect(onCollapseChange).toHaveBeenCalledWith(1, true)
+  })
+
+  it('does not respond to Enter when neither side is collapsible', async () => {
+    const onCollapseChange = vi.fn()
+    const splitter = splitterRef()
+    await render(
+      <Harness
+        options={{ panels: [{ defaultSize: 50 }, { defaultSize: 50 }], onCollapseChange }}
+        splitter={splitter}
+      />,
+    )
+
+    await keydownOn(act, 0, 'Enter')
+    expect(onCollapseChange).not.toHaveBeenCalled()
+  })
+
+  it('fires onCollapseChange when a keyboard step collapses a panel', async () => {
+    const onCollapseChange = vi.fn()
+    const splitter = splitterRef()
+    await render(
+      <Harness
+        options={{
+          panels: [{ defaultSize: 10, collapsible: true, collapseThreshold: 5 }, { defaultSize: 90 }],
+          step: 20,
+          onCollapseChange,
+        }}
+        splitter={splitter}
+      />,
+    )
+
+    await keydownOn(act, 0, 'ArrowLeft')
+
+    expect(handleEl(0).getAttribute('aria-valuenow')).toBe('0')
+    expect(onCollapseChange).toHaveBeenCalledWith(0, true)
+  })
+
+  it('keeps the sizes summing to the container when a min constrains the step', async () => {
+    const splitter = splitterRef()
+    await render(
+      <Harness
+        options={{ panels: [{ defaultSize: 50 }, { defaultSize: 50, min: 45 }], step: 30, redistribute: 'nearest' }}
+        splitter={splitter}
+      />,
+    )
+
+    await keydownOn(act, 0, 'ArrowRight')
+
+    const sizes = splitter.current!.sizes.map(Number)
+    expect(sizes.reduce((a, b) => a + b, 0)).toBeCloseTo(100)
+    expect(sizes[1]).toBeGreaterThanOrEqual(45)
+  })
+})
+
+describe('useSplitter: pointer drag', () => {
+  it('moves the adjacent pair by the pointer delta between two flexible panes', async () => {
+    const onResizeStart = vi.fn()
+    const onResizeEnd = vi.fn()
+    const splitter = splitterRef()
+    await render(
+      <Harness
+        options={{
+          panels: [{ defaultSize: 30 }, { defaultSize: 70 }],
+          onResizeStart,
+          onResizeEnd,
+        }}
+        splitter={splitter}
+      />,
+    )
+
+    expect(splitter.current!.sizes).toEqual([30, 70])
+    expect(containerEl().getBoundingClientRect().width).toBe(HARNESS_WIDTH)
+
+    await dragHandle(act, 0, 50)
+
+    // +50px of a 1000px container is +5 percentage points.
+    expect(onResizeStart).toHaveBeenCalledWith(0)
+    expect(Number(splitter.current!.sizes[0])).toBeCloseTo(35)
+    expect(Number(splitter.current!.sizes[1])).toBeCloseTo(65)
+    expect(onResizeEnd).toHaveBeenCalled()
+    expect(onResizeEnd.mock.calls[0][0]).toBe(0)
+    expect(document.body.style.cursor).toBe('')
+    expect(document.body.style.userSelect).toBe('')
+  })
+
+  it('leaves the sizes alone when the container has not been measured', async () => {
+    const splitter = splitterRef()
+    await render(
+      <Harness options={{ panels: [{ defaultSize: 50 }, { defaultSize: 50 }] }} splitter={splitter} />,
+    )
+
+    await withRect(containerEl(), { width: 0, height: 0 }, () => dragHandle(act, 0, 50))
+
+    expect(splitter.current!.sizes).toEqual([50, 50])
+  })
+
+  it('cleans up the body styles when unmounted during an active drag', async () => {
+    const splitter = splitterRef()
+    const { unmount } = await render(
+      <Harness options={{ panels: [{ defaultSize: 50 }, { defaultSize: 50 }] }} splitter={splitter} />,
+    )
+
+    const el = handleEl(0)
+    const rect = el.getBoundingClientRect()
+    await act(() => {
+      el.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, button: 0, clientX: 100, clientY: rect.top + 1 }))
+    })
+    expect(document.body.style.cursor).toBe('col-resize')
+    expect(document.body.style.userSelect).toBe('none')
+
+    await unmount()
+
+    expect(document.body.style.cursor).toBe('')
+    expect(document.body.style.userSelect).toBe('')
+  })
+
+  it('uses a row-resize cursor on the vertical axis', async () => {
+    const splitter = splitterRef()
+    await render(
+      <Harness options={{ panels: [{ defaultSize: 50 }, { defaultSize: 50 }], orientation: 'vertical' }} splitter={splitter} />,
+    )
+
+    const el = handleEl(0)
+    const rect = el.getBoundingClientRect()
+    await act(() => {
+      el.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, button: 0, clientX: 100, clientY: rect.top + 1 }))
+    })
+    expect(document.body.style.cursor).toBe('row-resize')
+
+    await act(() => {
+      document.dispatchEvent(new PointerEvent('pointerup', { bubbles: true, clientX: 100, clientY: rect.top + 1 }))
+    })
+    expect(document.body.style.cursor).toBe('')
+  })
+
+  it('ignores a disabled hook', async () => {
+    const splitter = splitterRef()
+    await render(
+      <Harness options={{ panels: [{ defaultSize: 50 }, { defaultSize: 50 }], enabled: false }} splitter={splitter} />,
+    )
+
+    const el = handleEl(0)
+    const rect = el.getBoundingClientRect()
+    await act(() => {
+      el.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, button: 0, clientX: 100, clientY: rect.top + 1 }))
+    })
+
+    expect(splitter.current!.activeHandle).toBe(-1)
+    expect(document.body.style.cursor).toBe('')
+  })
+
+  it('ignores a non-primary button', async () => {
+    const splitter = splitterRef()
+    await render(
+      <Harness options={{ panels: [{ defaultSize: 50 }, { defaultSize: 50 }] }} splitter={splitter} />,
+    )
+
+    const el = handleEl(0)
+    const rect = el.getBoundingClientRect()
+    await act(() => {
+      el.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, button: 2, clientX: 100, clientY: rect.top + 1 }))
+    })
+
+    expect(splitter.current!.activeHandle).toBe(-1)
+    expect(document.body.style.cursor).toBe('')
+  })
+
+  it('uses the redistribute function during a drag', async () => {
+    const customFn = vi.fn((input: { sizes: number[], delta: number }) => {
+      const next = [...input.sizes]
+      next[0] += input.delta
+      next[1] -= input.delta
+      return next
+    })
+    const splitter = splitterRef()
+    await render(
+      <Harness
+        options={{ panels: [{ defaultSize: 50 }, { defaultSize: 50 }], redistribute: customFn }}
+        splitter={splitter}
+      />,
+    )
+
+    await dragHandle(act, 0, 40)
+
+    expect(customFn).toHaveBeenCalled()
+    const input = customFn.mock.calls[0][0]
+    expect(input.sizes).toEqual([50, 50])
+    expect(input.delta).toBeCloseTo(4)
+    expect(Number(splitter.current!.sizes[0])).toBeCloseTo(54)
+  })
+
+  it('spreads a drag across the donors with redistribute: equal', async () => {
+    // The `'equal'` strategy reached through the drag path is a distinct call
+    // shape from the keyboard one: the drag feeds `applyConstraints` *working*
+    // sizes (which may be pixels) and a delta derived from the pointer.
+    const splitter = splitterRef()
+    await render(
+      <Harness
+        options={{
+          panels: [{ defaultSize: 20 }, { defaultSize: 40 }, { defaultSize: 40 }],
+          redistribute: 'equal',
+        }}
+        splitter={splitter}
+      />,
+    )
+
+    await dragHandle(act, 0, 20)
+
+    // +20px of a 1000px container is +2 percentage points, spread equally over
+    // the two donors: 22 / 39 / 39.
+    expect(Number(splitter.current!.sizes[0])).toBeCloseTo(22)
+    expect(Number(splitter.current!.sizes[1])).toBeCloseTo(39)
+    expect(Number(splitter.current!.sizes[2])).toBeCloseTo(39)
+  })
+
+  it('reports a collapse when a drag crosses the threshold', async () => {
+    // The drag's collapse-transition reporting is its own code path (the
+    // keyboard path has its own): a panel that snaps to 0 mid-drag must fire
+    // `onCollapseChange` exactly once, and a drag that never crosses must not
+    // fire it at all.
+    const onCollapseChange = vi.fn()
+    const splitter = splitterRef()
+    await render(
+      <Harness
+        options={{
+          panels: [{ defaultSize: 20, collapsible: true, collapseThreshold: 10 }, { defaultSize: 80 }],
+          onCollapseChange,
+        }}
+        splitter={splitter}
+      />,
+    )
+
+    // 15px is 1.5 points: 20 -> 18.5, well above the threshold of 10.
+    await dragHandle(act, 0, -15, 300)
+    expect(onCollapseChange).not.toHaveBeenCalled()
+    expect(Number(splitter.current!.sizes[0])).toBeCloseTo(18.5)
+
+    // A second drag grabs the handle at its new position and crosses the
+    // threshold, snapping panel 0 to 0.
+    await dragHandle(act, 0, -900, 300)
+    expect(handleEl(0).getAttribute('aria-valuenow')).toBe('0')
+    expect(splitter.current!.collapsed).toEqual([true, false])
+    expect(onCollapseChange).toHaveBeenCalledTimes(1)
+    expect(onCollapseChange).toHaveBeenCalledWith(0, true)
+  })
+
+  it('reports an expand when a drag pulls a collapsed panel back out', async () => {
+    // The mirror transition: the panel starts collapsed (size 0), the drag grows
+    // it past the threshold, and the hook reports `false` once.
+    const onCollapseChange = vi.fn()
+    const splitter = splitterRef()
+    await render(
+      <Harness
+        options={{
+          panels: [{ defaultSize: 0, collapsible: true, collapseThreshold: 10 }, { defaultSize: 100 }],
+          onCollapseChange,
+        }}
+        splitter={splitter}
+      />,
+    )
+
+    expect(splitter.current!.collapsed).toEqual([true, false])
+
+    await dragHandle(act, 0, 150)
+
+    expect(Number(splitter.current!.sizes[0])).toBeCloseTo(15)
+    expect(splitter.current!.collapsed).toEqual([false, false])
+    expect(onCollapseChange).toHaveBeenCalledTimes(1)
+    expect(onCollapseChange).toHaveBeenCalledWith(0, false)
+  })
+})
+
+describe('useSplitter: reset', () => {
+  it('restores the adjacent pair to their default ratio and leaves other panels untouched', async () => {
+    const { result, act } = await renderHook(() =>
+      useSplitter({ panels: [{ defaultSize: 20 }, { defaultSize: 30 }, { defaultSize: 50 }] }),
+    )
+
+    await act(() => {
+      result.current.setSizes([10, 20, 70])
+    })
+    await act(() => {
+      result.current.reset(0)
+    })
+
+    expect(result.current.sizes).toEqual([12, 18, 70])
+  })
+
+  it('clamps the restored pair to their min constraints', async () => {
+    const { result, act } = await renderHook(() =>
+      useSplitter({ panels: [{ defaultSize: 20 }, { defaultSize: 60, min: 50 }, { defaultSize: 20 }] }),
+    )
+
+    await act(() => {
+      result.current.setSizes([55, 5, 40])
+    })
+    await act(() => {
+      result.current.reset(0)
+    })
+
+    expect(result.current.sizes).toEqual([10, 50, 40])
+  })
+
+  it('does nothing for an out-of-range handle index', async () => {
+    const { result, act } = await renderHook(() => useSplitter({ panels: [{ defaultSize: 50 }, { defaultSize: 50 }] }))
+
+    await act(() => {
+      result.current.reset(1)
+    })
+    expect(result.current.sizes).toEqual([50, 50])
+  })
+
+  it('resets on handle double-click', async () => {
+    const splitter = splitterRef()
+    await render(
+      <Harness options={{ panels: [{ defaultSize: 20 }, { defaultSize: 30 }, { defaultSize: 50 }] }} splitter={splitter} />,
+    )
+
+    for (let i = 0; i < 4; i += 1) {
+      await keydownOn(act, 0, 'ArrowRight')
+    }
+    expect(handleEl(0).getAttribute('aria-valuenow')).toBe('24')
+
+    await act(() => {
+      handleEl(0).dispatchEvent(new MouseEvent('dblclick', { bubbles: true }))
+    })
+    expect(handleEl(0).getAttribute('aria-valuenow')).toBe('20')
+  })
+
+  it('does not reset on double-click when resetOnDoubleClick is false', async () => {
+    const splitter = splitterRef()
+    await render(
+      <Harness
+        options={{ panels: [{ defaultSize: 20 }, { defaultSize: 30 }, { defaultSize: 50 }], resetOnDoubleClick: false }}
+        splitter={splitter}
+      />,
+    )
+
+    for (let i = 0; i < 4; i += 1) {
+      await keydownOn(act, 0, 'ArrowRight')
+    }
+    const before = handleEl(0).getAttribute('aria-valuenow')
+
+    await act(() => {
+      handleEl(0).dispatchEvent(new MouseEvent('dblclick', { bubbles: true }))
+    })
+    expect(handleEl(0).getAttribute('aria-valuenow')).toBe(before)
+  })
+})
+
+describe('useSplitter: CSS units', () => {
+  it('preserves declared units in the returned sizes', async () => {
+    const { result } = await renderHook(() =>
+      useSplitter({ panels: [{ defaultSize: '240px' }, { defaultSize: 60 }] }),
+    )
+
+    expect(result.current.sizes).toEqual(['240px', 60])
+    expect(result.current.pixelMode).toBe(true)
+  })
+
+  it('reports a fixed pane size through aria-valuenow', async () => {
+    const splitter = splitterRef()
+    await render(<Harness options={{ panels: [{ defaultSize: '240px' }, { defaultSize: 60 }] }} splitter={splitter} />)
+
+    expect(handleEl(0).getAttribute('aria-valuenow')).toBe('240')
+    expect(splitter.current!.sizes).toEqual(['240px', 60])
+  })
+
+  it('resolves rem sizes against the document root font size', async () => {
+    const splitter = splitterRef()
+    await render(<Harness options={{ panels: [{ defaultSize: '10rem' }, { defaultSize: 50 }] }} splitter={splitter} />)
+
+    // The root font size is measured, not assumed: 10rem must equal 10x it.
+    const rootFontSize = Number.parseFloat(getComputedStyle(document.documentElement).fontSize)
+    expect(handleEl(0).getAttribute('aria-valuenow')).toBe(String(Math.round(10 * rootFontSize)))
+  })
+
+  it('applies a pixel keyboard step to a fixed pane', async () => {
+    const splitter = splitterRef()
+    await render(
+      <Harness
+        options={{ panels: [{ defaultSize: '240px' }, { defaultSize: 60, min: 0 }], step: '10px' }}
+        splitter={splitter}
+      />,
+    )
+
+    await keydownOn(act, 0, 'ArrowRight')
+    expect(handleEl(0).getAttribute('aria-valuenow')).toBe('250')
+  })
+
+  it('treats a bare-number step as a percentage of the container in pixel mode', async () => {
+    const splitter = splitterRef()
+    await render(
+      <Harness
+        options={{ panels: [{ defaultSize: '240px' }, { defaultSize: 60, min: 0 }], step: 1 }}
+        splitter={splitter}
+      />,
+    )
+
+    // panel 0 declares `240px`, so pixel mode is on and 1 means 1% of 1000px.
+    await keydownOn(act, 0, 'ArrowRight')
+    expect(handleEl(0).getAttribute('aria-valuenow')).toBe('250')
+  })
+
+  it('clamps a fixed pane to its pixel max', async () => {
+    const splitter = splitterRef()
+    await render(
+      <Harness
+        options={{ panels: [{ defaultSize: '240px', max: '300px' }, { defaultSize: 60, min: 0 }], step: '100px' }}
+        splitter={splitter}
+      />,
+    )
+
+    await keydownOn(act, 0, 'ArrowRight')
+    expect(handleEl(0).getAttribute('aria-valuenow')).toBe('300')
+  })
+
+  it('enables pixel mode when only collapseThreshold uses a fixed unit', async () => {
+    const splitter = splitterRef()
+    await render(
+      <Harness
+        options={{ panels: [{ defaultSize: 30, collapsible: true, collapseThreshold: '120px' }, { defaultSize: 70 }] }}
+        splitter={splitter}
+      />,
+    )
+
+    // A bare 30 is 30% of the 1000px container.
+    expect(handleEl(0).getAttribute('aria-valuenow')).toBe('300')
+  })
+
+  it('updates the fixed pane in pixels and the flexible neighbour in percent on drag', async () => {
+    const splitter = splitterRef()
+    await render(
+      <Harness options={{ panels: [{ defaultSize: '200px' }, { defaultSize: 60, min: 0 }] }} splitter={splitter} />,
+    )
+
+    await dragHandle(act, 0, 50)
+
+    expect(splitter.current!.sizes[0]).toBe('250px')
+    expect(Number(splitter.current!.sizes[1])).toBeCloseTo(75)
+  })
+
+  it('respects rtl when dragging a fixed pane', async () => {
+    const splitter = splitterRef()
+    await render(
+      <Harness options={{ panels: [{ defaultSize: '200px' }, { defaultSize: 60, min: 0 }], dir: 'rtl' }} splitter={splitter} />,
+    )
+
+    await dragHandle(act, 0, 50)
+
+    // rtl inverts the pointer delta, so dragging right shrinks the before pane.
+    expect(splitter.current!.sizes[0]).toBe('150px')
+  })
+
+  it('collapses and expands a fixed pane preserving its unit', async () => {
+    const splitter = splitterRef()
+    await render(
+      <Harness
+        options={{ panels: [{ defaultSize: '240px', collapsible: true }, { defaultSize: 60, min: 0 }] }}
+        splitter={splitter}
+      />,
+    )
+
+    await act(() => splitter.current!.collapse(0))
+    expect(splitter.current!.sizes[0]).toBe('0px')
+    expect(splitter.current!.collapsed).toEqual([true, false])
+
+    await act(() => splitter.current!.expand(0))
+    expect(splitter.current!.sizes[0]).toBe('240px')
+    expect(splitter.current!.collapsed).toEqual([false, false])
+  })
+
+  it('restores a fixed pane to its original px after it collapses mid-drag, not as a percentage', async () => {
+    const splitter = splitterRef()
+    await render(
+      <Harness
+        options={{
+          panels: [
+            { defaultSize: '240px', collapsible: true, collapseThreshold: '120px', min: '0px' },
+            { defaultSize: 60, min: 0 },
+          ],
+        }}
+        splitter={splitter}
+      />,
+    )
+
+    // Drag far enough left to cross the 120px collapse threshold.
+    await dragHandle(act, 0, -200, 300)
+    expect(splitter.current!.sizes[0]).toBe('0px')
+
+    // The pre-collapse snapshot is the *raw* size, so expanding restores 240px.
+    // A numeric working snapshot would be read back as 240% of the container.
+    await act(() => splitter.current!.expand(0))
+    expect(splitter.current!.sizes[0]).toBe('240px')
+  })
+
+  it('moves the handle by the pointer delta between two flexible panes next to a fixed pane', async () => {
+    const splitter = splitterRef()
+    await render(
+      <Harness
+        options={{ panels: [{ defaultSize: '240px' }, { defaultSize: 50, min: 0 }, { defaultSize: 50, min: 0 }] }}
+        splitter={splitter}
+      />,
+    )
+
+    await dragHandle(act, 1, 100)
+
+    expect(splitter.current!.sizes[0]).toBe('240px')
+    expect(Number(splitter.current!.sizes[1])).toBeCloseTo(48)
+    expect(Number(splitter.current!.sizes[2])).toBeCloseTo(28)
+  })
+
+  it('measures the container through a ResizeObserver in pixel mode', async () => {
+    const splitter = splitterRef()
+    await render(<Harness options={{ panels: [{ defaultSize: '240px' }, { defaultSize: 60 }] }} splitter={splitter} />)
+
+    const container = containerEl()
+    // The effect measures on mount, before any resize is delivered. In pixel mode
+    // an undeclared `max` is the container, so this reports the measured width.
+    expect(splitter.current!.getHandleProps({ index: 0 })['aria-valuemax']).toBe(HARNESS_WIDTH)
+
+    // A real resize is re-measured: halving the container halves the reported max.
+    container.style.width = '500px'
+    await expect.poll(() => container.getBoundingClientRect().width).toBe(500)
+    await expect.poll(() => splitter.current!.getHandleProps({ index: 0 })['aria-valuemax']).toBe(500)
+  })
+
+  it('does not rewrite fixed sizes on a no-op drag when the panes overflow the container', async () => {
+    const splitter = splitterRef()
+    await render(
+      <Harness options={{ panels: [{ defaultSize: '600px' }, { defaultSize: '600px' }] }} splitter={splitter} />,
+    )
+
+    await withRect(containerEl(), { width: HARNESS_WIDTH, height: HARNESS_HEIGHT }, () => dragHandle(act, 0, 0))
+
+    expect(splitter.current!.sizes).toEqual(['600px', '600px'])
+  })
+
+  it('does not shrink overflowing fixed panes on a real drag', async () => {
+    const splitter = splitterRef()
+    await render(
+      <Harness options={{ panels: [{ defaultSize: '600px' }, { defaultSize: '600px' }] }} splitter={splitter} />,
+    )
+
+    // container 1000px, fixed total 1200px -> scale 1000/1200, both panes render
+    // at 500px. +50px rendered is +60px absolute each side.
+    await withRect(containerEl(), { width: HARNESS_WIDTH, height: HARNESS_HEIGHT }, () => dragHandle(act, 0, 50))
+
+    expect(splitter.current!.sizes[0]).toBe('660px')
+    expect(splitter.current!.sizes[1]).toBe('540px')
+  })
+
+  it('does not shrink overflowing fixed panes on a keyboard resize', async () => {
+    const splitter = splitterRef()
+    await render(
+      <Harness options={{ panels: [{ defaultSize: '600px' }, { defaultSize: '600px' }], step: '10px' }} splitter={splitter} />,
+    )
+
+    await withRect(containerEl(), { width: HARNESS_WIDTH, height: HARNESS_HEIGHT }, async () => {
+      await keydownOn(act, 0, 'ArrowRight')
+    })
+
+    // +10px rendered -> +12px absolute each side.
+    expect(splitter.current!.sizes[0]).toBe('612px')
+    expect(splitter.current!.sizes[1]).toBe('588px')
+  })
+
+  it('hands space to a flexible pane without scaling the fixed pane up', async () => {
+    const splitter = splitterRef()
+    await render(
+      <Harness options={{ panels: [{ defaultSize: '1200px' }, { defaultSize: 1, min: 0 }] }} splitter={splitter} />,
+    )
+
+    await withRect(containerEl(), { width: HARNESS_WIDTH, height: HARNESS_HEIGHT }, () => dragHandle(act, 0, -200, 300))
+
+    // The overflow cleared, so the untouched fixed pane is re-encoded from its
+    // working size rather than jumping back to its 1200px declared value.
+    expect(splitter.current!.sizes[0]).not.toBe('1200px')
+    expect(String(splitter.current!.sizes[0])).toMatch(/px$/)
+  })
+})
+
+describe('useSplitter: multiple panels', () => {
+  it('handles three panels, with one handle per gap', async () => {
+    const splitter = splitterRef()
+    await render(
+      <Harness
+        options={{ panels: [{ defaultSize: 20 }, { defaultSize: 30 }, { defaultSize: 50 }], step: 5 }}
+        splitter={splitter}
+      />,
+    )
+
+    expect(document.querySelectorAll('[data-testid^="handle-"]').length).toBe(2)
+    expect(splitter.current!.sizes).toEqual([20, 30, 50])
+
+    await keydownOn(act, 1, 'ArrowRight')
+    expect(handleEl(1).getAttribute('aria-valuenow')).toBe('35')
+    expect(splitter.current!.sizes).toEqual([20, 35, 45])
   })
 })
