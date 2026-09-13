@@ -276,6 +276,7 @@
 | vueuse      | `useSorted`                       | packages/core/useSorted                         | `packages/core/useSorted/index.tsx`                       | ✅ ported                           |
 | vueuse      | `useSpeechRecognition`            | packages/core/useSpeechRecognition              | `packages/core/useSpeechRecognition/index.tsx`            | ✅ ported                           |
 | vueuse      | `useSpeechSynthesis`              | packages/core/useSpeechSynthesis                | `packages/core/useSpeechSynthesis/index.tsx`              | ✅ ported                           |
+| mantine     | `useSplitter`                     | packages/@mantine/hooks/src/use-splitter        | `packages/core/useSplitter/index.tsx`                     | ✅ ported                           |
 | vueuse      | `useSSRWidth`                     | packages/core/useSSRWidth                       | `packages/core/useSSRWidth/index.tsx`                     | ✅ ported                           |
 | vueuse      | `onStartTyping`                   | packages/core/onStartTyping                     | `packages/core/useStartTyping/index.tsx`                  | ✅ ported                           |
 | vueuse      | `refAutoReset`                    | packages/shared/refAutoReset                    | `packages/shared/useStateAutoReset/index.tsx`             | ✅ ported                           |

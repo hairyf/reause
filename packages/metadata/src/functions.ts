@@ -2441,6 +2441,15 @@ export const functions: FunctionInfo[] = [
     lastUpdated: 1789147565000,
   },
   {
+    name: 'useSplitter',
+    file: 'packages/core/useSplitter/index.tsx',
+    pkg: 'core',
+    dir: 'useSplitter',
+    category: 'Elements',
+    source: 'mantine',
+    lastUpdated: 1789286495000,
+  },
+  {
     name: 'useSSRWidth',
     file: 'packages/core/useSSRWidth/index.tsx',
     pkg: 'core',
@@ -4760,6 +4769,14 @@ export const pages: FunctionPageInfo[] = [
     category: 'Sensors',
     description: 'reactive [SpeechSynthesis](https://developer.mozilla.org/en-US/docs/Web/API/SpeechSynthesis)',
     lastUpdated: 1789147565000,
+  },
+  {
+    name: 'useSplitter',
+    pkg: 'core',
+    doc: 'packages/core/useSplitter/index.md',
+    category: 'Elements',
+    description: 'resizable panel layout with draggable',
+    lastUpdated: 1789286495000,
   },
   {
     name: 'useSSRWidth',
