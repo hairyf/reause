@@ -1865,6 +1865,15 @@ export const functions: FunctionInfo[] = [
     lastUpdated: 1788942682000,
   },
   {
+    name: 'useLogger',
+    file: 'packages/shared/useLogger/index.tsx',
+    pkg: 'shared',
+    dir: 'useLogger',
+    category: 'Lifecycle',
+    source: 'react-use',
+    lastUpdated: 1789308328000,
+  },
+  {
     name: 'useLongPress',
     file: 'packages/core/useLongPress/index.tsx',
     pkg: 'core',
@@ -4266,6 +4275,14 @@ export const pages: FunctionPageInfo[] = [
     category: 'State',
     description: 'reactive [LocalStorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage)',
     lastUpdated: 1788942682000,
+  },
+  {
+    name: 'useLogger',
+    pkg: 'shared',
+    doc: 'packages/shared/useLogger/index.md',
+    category: 'Lifecycle',
+    description: "console-log a component's lifecycle transitions — mount",
+    lastUpdated: 1789308328000,
   },
   {
     name: 'useLongPress',

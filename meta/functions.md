@@ -212,6 +212,7 @@
 | —            | `useListener`                     | —                                               | `packages/shared/useListener/index.tsx`                   | ✅ reause-only export               |
 | vueuse       | `useLiveAnnouncer`                | packages/core/useLiveAnnouncer                  | `packages/core/useLiveAnnouncer/index.tsx`                | ✅ ported                           |
 | vueuse       | `useLocalStorage`                 | packages/core/useLocalStorage                   | `packages/core/useLocalStorage/index.tsx`                 | ✅ ported                           |
+| react-use    | `useLogger`                       | src/useLogger.ts                                | `packages/shared/useLogger/index.tsx`                     | ✅ ported                           |
 | vueuse       | `onLongPress`                     | packages/core/onLongPress                       | `packages/core/useLongPress/index.tsx`                    | ✅ ported                           |
 | vueuse       | `useMagicKeys`                    | packages/core/useMagicKeys                      | `packages/core/useMagicKeys/index.tsx`                    | ✅ ported                           |
 | react-hookz  | `useMap`                          | src/useMap                                      | `packages/shared/useMap/index.tsx`                        | ✅ ported                           |
