@@ -13,6 +13,7 @@ test-results/
 .vscode/
 .idea/
 .issues/
+.tmp/
 .vitest/
 .worktree-vite/
 vitest.worktree.config.ts
