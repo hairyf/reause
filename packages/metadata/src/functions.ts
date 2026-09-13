@@ -2163,6 +2163,15 @@ export const functions: FunctionInfo[] = [
     lastUpdated: 1789147565000,
   },
   {
+    name: 'useRafState',
+    file: 'packages/shared/useRafState/index.tsx',
+    pkg: 'shared',
+    dir: 'useRafState',
+    category: 'Animation',
+    source: 'react-use',
+    lastUpdated: 1789257838000,
+  },
+  {
     name: 'useRefsList',
     file: 'packages/core/useRefsList/index.tsx',
     pkg: 'core',
@@ -4368,6 +4377,14 @@ export const pages: FunctionPageInfo[] = [
     category: 'Animation',
     description: 'call function on every `requestAnimationFrame`',
     lastUpdated: 1789147565000,
+  },
+  {
+    name: 'useRafState',
+    pkg: 'shared',
+    doc: 'packages/shared/useRafState/index.md',
+    category: 'Animation',
+    description: "state updates coalesced into an animation frame — React port of react-use's `useRafState`",
+    lastUpdated: 1789257838000,
   },
   {
     name: 'useRefsList',

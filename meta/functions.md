@@ -245,6 +245,7 @@
 | vueuse    | `useQRCode`                       | packages/integrations/useQRCode               | `packages/integrations/useQRCode/index.tsx`               | ✅ ported                           |
 | vueuse    | `useRouteQuery`                   | packages/router/useRouteQuery                 | `packages/core/useQuery/index.tsx`                        | ✅ ported                           |
 | vueuse    | `useRafFn`                        | packages/core/useRafFn                        | `packages/core/useRafFn/index.tsx`                        | ✅ ported                           |
+| react-use | `useRafState`                     | src/useRafState.ts                            | `packages/shared/useRafState/index.tsx`                   | ✅ ported                           |
 | vueuse    | `useTemplateRefsList`             | packages/core/useTemplateRefsList             | `packages/core/useRefsList/index.tsx`                     | ✅ ported                           |
 | vueuse    | `useResizeObserver`               | packages/core/useResizeObserver               | `packages/core/useResizeObserver/index.tsx`               | ✅ ported                           |
 | vueuse    | `useRound`                        | packages/math/useRound                        | `packages/math/useRound/index.tsx`                        | ✅ ported                           |
