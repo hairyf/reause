@@ -1228,6 +1228,15 @@ export const functions: FunctionInfo[] = [
     lastUpdated: 1788984677000,
   },
   {
+    name: 'useDeepCompareEffect',
+    file: 'packages/shared/useDeepCompareEffect/index.tsx',
+    pkg: 'shared',
+    dir: 'useDeepCompareEffect',
+    category: 'Lifecycle',
+    source: 'react-use',
+    lastUpdated: 1789271565000,
+  },
+  {
     name: 'useDeviceMotion',
     file: 'packages/core/useDeviceMotion/index.tsx',
     pkg: 'core',
@@ -3555,6 +3564,15 @@ export const pages: FunctionPageInfo[] = [
     category: 'Utilities',
     description: 'debounce execution of a function',
     lastUpdated: 1788984677000,
+  },
+  {
+    name: 'useDeepCompareEffect',
+    pkg: 'shared',
+    doc: 'packages/shared/useDeepCompareEffect/index.md',
+    category: 'Lifecycle',
+    description:
+      '`useEffect` whose dependency comparison is **deep** — the effect re-runs only when `deps` differ structurally',
+    lastUpdated: 1789271565000,
   },
   {
     name: 'useDeviceMotion',

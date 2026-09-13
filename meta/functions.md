@@ -141,6 +141,7 @@
 | vueuse    | `useDark`                         | packages/core/useDark                         | `packages/core/useDark/index.tsx`                         | ✅ ported                           |
 | vueuse    | `useDateFormat`                   | packages/shared/useDateFormat                 | `packages/shared/useDateFormat/index.tsx`                 | ✅ ported                           |
 | vueuse    | `useDebounceFn`                   | packages/shared/useDebounceFn                 | `packages/shared/useDebounceFn/index.tsx`                 | ✅ ported                           |
+| react-use | `useDeepCompareEffect`            | src/useDeepCompareEffect.ts                   | `packages/shared/useDeepCompareEffect/index.tsx`          | ✅ ported                           |
 | vueuse    | `useDeviceMotion`                 | packages/core/useDeviceMotion                 | `packages/core/useDeviceMotion/index.tsx`                 | ✅ ported                           |
 | vueuse    | `useDeviceOrientation`            | packages/core/useDeviceOrientation            | `packages/core/useDeviceOrientation/index.tsx`            | ✅ ported                           |
 | vueuse    | `useDevicePixelRatio`             | packages/core/useDevicePixelRatio             | `packages/core/useDevicePixelRatio/index.tsx`             | ✅ ported                           |
