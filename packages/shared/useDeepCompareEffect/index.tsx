@@ -35,18 +35,15 @@ function isPrimitive(val: any): boolean {
  * `(effect: EffectCallback, deps: DependencyList) => void`: it is what lets the
  * dev-only guards below fire. Upstream ships them as part of the hook's
  * usability contract and this port keeps the same conditions and the same
- * `process.env.NODE_ENV !== 'production'` gate — a warning when `deps` is empty
- * and a warning when every dep is a primitive, both cases where a plain
- * `useEffect` is what the caller wants. One deliberate micro-divergence, in the
- * house direction: the gate is written `typeof process !== 'undefined' &&
- * process.env.NODE_ENV !== 'production'`, the guard this repo already uses in
- * `packages/core/createPortalSlot/index.tsx`. Upstream's bare `process.…`
- * throws a `ReferenceError` in a browser bundle that never replaces
- * `NODE_ENV`; the `typeof` prefix skips the warning there instead. Where the
- * build does replace `NODE_ENV` (bundlers, and this package's own tests) the
- * two forms are indistinguishable. Note also that upstream's second guard is
- * not skipped for an empty array (`[].every()` is vacuously `true`), so empty
- * deps report **both** warnings; that is mirrored as-is.
+ * `process.env.NODE_ENV !== 'production'` gate, **verbatim** — a warning when
+ * `deps` is empty and a warning when every dep is a primitive, both cases where
+ * a plain `useEffect` is what the caller wants. Like React's own source, that
+ * gate depends on the bundler replacing `process.env.NODE_ENV` with a literal
+ * at build time while configuring no `process` shim; that replacement is what
+ * makes the warnings fire in a browser development build, and it is the same
+ * assumption React itself makes. Note also that upstream's second guard is not
+ * skipped for an empty array (`[].every()` is vacuously `true`), so empty deps
+ * report **both** warnings; that is mirrored as-is.
  *
  * Boundary with {@link useWatchDeep} (VueUse): `useWatchDeep` watches a
  * reactive value and invokes a callback when it deep-changes — it observes data
@@ -71,8 +68,8 @@ function isPrimitive(val: any): boolean {
  * }, [options])
  */
 export function useDeepCompareEffect(effect: EffectCallback, deps: DependencyList): void {
-  // eslint-disable-next-line node/prefer-global/process -- browser package: `node:process` is not bundled, and this prefix keeps the reference safe in builds that do not replace `NODE_ENV` (mirrors packages/core/createPortalSlot/index.tsx)
-  if (typeof process !== 'undefined' && process.env.NODE_ENV !== 'production') {
+  // eslint-disable-next-line node/prefer-global/process -- browser package: `node:process` is not bundled; the gate relies on the bundler replacing `process.env.NODE_ENV` with a literal at build time (the assumption React's own source makes) and this repo configures no `process` shim, so the replacement is what keeps the reference safe AND keeps the warnings live in a browser dev build
+  if (process.env.NODE_ENV !== 'production') {
     if (!(Array.isArray(deps)) || !deps.length) {
       console.warn(
         '`useDeepCompareEffect` should not be used with no dependencies. Use React.useEffect instead.',

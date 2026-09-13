@@ -36,22 +36,8 @@ function messagesOf(spy: ReturnType<typeof spyOnWarn>): string[] {
   return spy.mock.calls.map(call => String(call[0]))
 }
 
-/**
- * The dev-only guards are gated on `typeof process !== 'undefined' &&
- * process.env.NODE_ENV !== 'production'` — the house guard this repo already
- * uses (`packages/core/createPortalSlot/index.tsx`). Vitest's browser bundle
- * defines no `process` object (it only inlines the `process.env.NODE_ENV`
- * expression), so the warning path has to be entered by giving the realm one —
- * the shape a Node/SSR consumer, or a browser bundle with a `process` shim,
- * actually has.
- */
-function stubProcess(): void {
-  vi.stubGlobal('process', { env: { NODE_ENV: 'test' } })
-}
-
 afterEach(() => {
   vi.restoreAllMocks()
-  vi.unstubAllGlobals()
 })
 
 it('does not re-run when the deps are a new object with structurally equal contents', async () => {
@@ -175,13 +161,15 @@ it('runs the latest effect, so the body sees current values after a deep-equal r
   await unmount()
 })
 
-it('keeps the guards inert, and never throws, where the bundle defines no `process`', async () => {
-  // Vitest's browser bundle inlines `process.env.NODE_ENV` (so this file's own
-  // reference reads `test`, i.e. not production) but defines no `process`
-  // object — the shape a bundled browser consumer gets. The `typeof` prefix is
-  // what stops upstream's bare gate from throwing here; the price is that the
-  // warnings cannot fire in this realm, which is why the warning tests below
-  // stub a `process` global.
+it('fires the guards through the bundler-replaced `NODE_ENV` literal, not a `process` object', async () => {
+  // Upstream's bare gate (`process.env.NODE_ENV !== 'production'`) only works
+  // because the bundler replaces that expression with a literal at build time —
+  // the same assumption React's own source makes. Vitest's browser bundle is a
+  // real Vite bundle: it inlines `process.env.NODE_ENV` (here `test`, i.e. not
+  // production) while defining no `process` object at all. Asserting both keeps
+  // the mechanism pinned — if the inlining ever stopped, the render below would
+  // throw instead of warn, and this test would fail loudly rather than pass
+  // with dead guards.
   expect(process.env.NODE_ENV).not.toBe('production')
   expect(typeof process).toBe('undefined')
 
@@ -190,13 +178,14 @@ it('keeps the guards inert, and never throws, where the bundle defines no `proce
     useDeepCompareEffect(() => {}, [])
   })
 
-  expect(messagesOf(warn)).toEqual([])
+  // the hook's own gate evaluated true with no `process` object in the realm,
+  // i.e. its expression was replaced too — no stub involved
+  expect(messagesOf(warn)).toContain(NO_DEPS_WARNING)
 
   await unmount()
 })
 
 it('warns when the deps array is empty', async () => {
-  stubProcess()
   const warn = spyOnWarn()
 
   const { unmount } = await renderHook(() => {
@@ -213,7 +202,6 @@ it('warns when the deps array is empty', async () => {
 })
 
 it('warns when every dep is primitive, and still compares them by value', async () => {
-  stubProcess()
   const warn = spyOnWarn()
   const runs: number[] = []
 
@@ -243,7 +231,6 @@ it('warns when every dep is primitive, and still compares them by value', async 
 })
 
 it('does not warn for object deps, where the deep comparison is the point', async () => {
-  stubProcess()
   const warn = spyOnWarn()
 
   const { unmount } = await renderHook(() => {
