@@ -1,5 +1,5 @@
 ---
-category: UI
+category: Sensors
 ---
 
 # useFocusReturn
