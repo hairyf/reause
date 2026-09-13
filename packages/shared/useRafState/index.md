@@ -1,5 +1,5 @@
 ---
-category: Animations
+category: Animation
 ---
 
 # useRafState
