@@ -42,7 +42,7 @@
 | vueuse    | `formatTimeAgo`                   | packages/core/useTimeAgo                      | `packages/core/useTimeAgo/index.tsx`                      | ✅ ported                           |
 | vueuse    | `formatTimeAgoIntl`               | packages/core/useTimeAgoIntl                  | `packages/core/useTimeAgoIntl/index.tsx`                  | ✅ ported                           |
 | vueuse    | `formatTimeAgoIntlParts`          | packages/core/useTimeAgoIntl                  | `packages/core/useTimeAgoIntl/index.tsx`                  | ✅ ported                           |
-| mantine   | `useCollapse`                     | packages/@mantine/hooks/src/use-collapse      | `packages/core/useCollapse/index.tsx`                     | ✅ ported                           |
+| mantine   | `getElementHeight`                | packages/@mantine/hooks/src/use-collapse      | `packages/core/useCollapse/index.tsx`                     | ✅ ported                           |
 | mantine   | `getHotkeyHandler`                | packages/@mantine/hooks/src/use-hotkeys       | `packages/core/useHotkeys/index.tsx`                      | ✅ ported                           |
 | mantine   | `getHotkeyMatcher`                | packages/@mantine/hooks/src/use-hotkeys       | `packages/core/useHotkeys/index.tsx`                      | ✅ ported                           |
 | vueuse    | `guessSerializerType`             | packages/core/useStorage                      | `packages/core/useStorage/index.tsx`                      | ✅ ported                           |
@@ -55,7 +55,7 @@
 | vueuse    | `isDefined`                       | packages/shared/isDefined                     | `packages/shared/isDefined/index.tsx`                     | ✅ ported                           |
 | vueuse    | `isFocusedElementEditable`        | packages/core/onStartTyping                   | `packages/core/useStartTyping/index.tsx`                  | ✅ ported                           |
 | vueuse    | `isIOS`                           | packages/shared/utils                         | `packages/shared/utils/index.tsx`                         | ✅ ported                           |
-| mantine   | `useCollapse`                     | packages/@mantine/hooks/src/use-collapse      | `packages/core/useCollapse/index.tsx`                     | ✅ ported                           |
+| mantine   | `isMeasured`                      | packages/@mantine/hooks/src/use-collapse      | `packages/core/useCollapse/index.tsx`                     | ✅ ported                           |
 | vueuse    | `isObject`                        | packages/shared/utils                         | `packages/shared/utils/index.tsx`                         | ✅ ported                           |
 | —         | `isRefLike`                       | —                                             | `packages/shared/utils/index.tsx`                         | ✅ reause-only export               |
 | vueuse    | `isTypedCharValid`                | packages/core/onStartTyping                   | `packages/core/useStartTyping/index.tsx`                  | ✅ ported                           |

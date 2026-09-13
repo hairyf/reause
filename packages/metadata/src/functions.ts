@@ -357,7 +357,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useCollapse',
     category: 'Animation',
     source: 'mantine',
-    lastUpdated: 1789259540000,
+    lastUpdated: 1789270746000,
   },
   {
     name: 'getHotkeyHandler',
@@ -474,7 +474,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useCollapse',
     category: 'Animation',
     source: 'mantine',
-    lastUpdated: 1789259540000,
+    lastUpdated: 1789270746000,
   },
   {
     name: 'isObject',
@@ -1110,7 +1110,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useCollapse',
     category: 'Animation',
     source: 'mantine',
-    lastUpdated: 1789259540000,
+    lastUpdated: 1789270746000,
   },
   {
     name: 'useColorMode',
@@ -3449,7 +3449,7 @@ export const pages: FunctionPageInfo[] = [
     category: 'Animation',
     description:
       "animate an element's height between `0` and its measured content height — a four-state machine (`entered` / `entering` / `exiting` / `exited`) plus a `getCollapseProps()` bundle you spread on the collapsible element",
-    lastUpdated: 1789259540000,
+    lastUpdated: 1789270746000,
   },
   {
     name: 'useColorMode',
