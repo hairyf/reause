@@ -14,7 +14,7 @@ import { flushSync } from 'react-dom'
  * Upstream's duration curve, ported verbatim — the timing is observable, so the
  * formula is not a detail to "clean up".
  *
- * Map from @mantine/hooks `useCollapse`
+ * Map from @mantine/hooks `getElementHeight`
  * (`source/mantine/packages/@mantine/hooks/src/use-collapse/`, defined in
  * `use-collapse.ts` and private there, hence private here as well).
  * `Math.round((4 + 15 * (height / 36) ** 0.25 + (height / 36) / 5) * 10)` on the
@@ -36,7 +36,7 @@ function getAutoHeightDuration(height: number | string) {
  * `'auto'` when the ref holds no element yet. Exported by upstream and kept
  * public here, so a custom implementation can reuse the same measure.
  *
- * Map from @mantine/hooks `useCollapse`
+ * Map from @mantine/hooks `getElementHeight`
  * (`source/mantine/packages/@mantine/hooks/src/use-collapse/`, defined in
  * `use-collapse.ts`).
  */
@@ -47,7 +47,7 @@ export function getElementHeight(elementRef: RefObject<HTMLElement | null>) {
 /**
  * Is a measured height a real number we can transition to?
  *
- * Map from @mantine/hooks `useCollapse`
+ * Map from @mantine/hooks `isMeasured`
  * (`source/mantine/packages/@mantine/hooks/src/use-collapse/`, defined in
  * `use-collapse.ts`).
  * A type guard, so the `number | string` union narrows to `number` at the call
