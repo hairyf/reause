@@ -65,7 +65,7 @@
 | vueuse       | `logicOr`                         | packages/math/logicOr                           | `packages/math/logicOr/index.tsx`                         | ✅ ported                           |
 | vueuse       | `makeDestructurable`              | packages/shared/makeDestructurable              | `packages/shared/makeDestructurable/index.tsx`            | ✅ ported                           |
 | vueuse       | `mapGamepadToXbox360Controller`   | packages/core/useGamepad                        | `packages/core/useGamepad/index.tsx`                      | ✅ ported                           |
-| vueuse       | `useSortable`                     | packages/integrations/useSortable               | `packages/integrations/useSortable/index.tsx`             | ✅ ported                           |
+| vueuse       | `moveArrayElement`                | packages/integrations/useSortable               | `packages/integrations/useSortable/index.tsx`             | ✅ ported                           |
 | vueuse       | `noop`                            | packages/shared/utils                           | `packages/shared/utils/index.tsx`                         | ✅ ported                           |
 | vueuse       | `normalizeDate`                   | packages/shared/useDateFormat                   | `packages/shared/useDateFormat/index.tsx`                 | ✅ ported                           |
 | vueuse       | `now`                             | packages/shared/utils                           | `packages/shared/utils/index.tsx`                         | ✅ ported                           |
@@ -79,7 +79,7 @@
 | —            | `resolveIpcRenderer`              | —                                               | `packages/electron/_resolve/index.tsx`                    | ✅ reause-only export               |
 | —            | `resolveWebFrame`                 | —                                               | `packages/electron/_resolve/index.tsx`                    | ✅ reause-only export               |
 | —            | `shallowEqual`                    | —                                               | `packages/shared/useShallowCompareEffect/index.tsx`       | ✅ reause-only export               |
-| vueuse       | `useSSRWidth`                     | packages/core/useSSRWidth                       | `packages/core/useSSRWidth/index.tsx`                     | ✅ ported                           |
+| vueuse       | `provideSSRWidth`                 | packages/core/useSSRWidth                       | `packages/core/useSSRWidth/index.tsx`                     | ✅ ported                           |
 | vueuse       | `syncRef`                         | packages/shared/syncRef                         | `packages/shared/syncState/index.tsx`                     | ✅ ported                           |
 | vueuse       | `syncRefs`                        | packages/shared/syncRefs                        | `packages/shared/syncStates/index.tsx`                    | ✅ ported                           |
 | vueuse       | `throttleFilter`                  | packages/shared/utils                           | `packages/shared/useWatchWithFilter/index.tsx`            | ✅ ported                           |
