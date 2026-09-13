@@ -2450,6 +2450,15 @@ export const functions: FunctionInfo[] = [
     lastUpdated: 1789286495000,
   },
   {
+    name: 'useSpring',
+    file: 'packages/integrations/useSpring/index.tsx',
+    pkg: 'integrations',
+    dir: 'useSpring',
+    category: 'Animation',
+    source: 'react-spring',
+    lastUpdated: 1789289266000,
+  },
+  {
     name: 'useSSRWidth',
     file: 'packages/core/useSSRWidth/index.tsx',
     pkg: 'core',
@@ -2781,6 +2790,15 @@ export const functions: FunctionInfo[] = [
     category: 'Utilities',
     source: 'vueuse',
     lastUpdated: 1789001834000,
+  },
+  {
+    name: 'useTrackedEffect',
+    file: 'packages/shared/useTrackedEffect/index.tsx',
+    pkg: 'shared',
+    dir: 'useTrackedEffect',
+    category: 'Lifecycle',
+    source: 'ahooks',
+    lastUpdated: 1789288373000,
   },
   {
     name: 'useTransition',
@@ -4779,6 +4797,14 @@ export const pages: FunctionPageInfo[] = [
     lastUpdated: 1789286495000,
   },
   {
+    name: 'useSpring',
+    pkg: 'integrations',
+    doc: 'packages/integrations/useSpring/index.md',
+    category: 'Animation',
+    description: 're-export of `useSpring` from',
+    lastUpdated: 1789289266000,
+  },
+  {
     name: 'useSSRWidth',
     pkg: 'core',
     doc: 'packages/core/useSSRWidth/index.md',
@@ -5082,6 +5108,15 @@ export const pages: FunctionPageInfo[] = [
     category: 'Utilities',
     description: 'convert a value to its string representation',
     lastUpdated: 1789001834000,
+  },
+  {
+    name: 'useTrackedEffect',
+    pkg: 'shared',
+    doc: 'packages/shared/useTrackedEffect/index.md',
+    category: 'Lifecycle',
+    description:
+      "`useEffect` that also reports **which** dependencies changed — React port of ahooks' [`useTrackedEffect`](https://ahooks.js.org/hooks/use-tracked-effect) (`source/ahooks/packages/hooks/src/useTrackedEffect/`; upstream exports it as the **default** export",
+    lastUpdated: 1789288373000,
   },
   {
     name: 'useTransition',
