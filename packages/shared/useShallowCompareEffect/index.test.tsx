@@ -177,28 +177,19 @@ it('compares primitive deps with Object.is: NaN equals NaN, +0 differs from -0',
   }
 })
 
-it('warns in dev for an empty deps list and for all-primitive deps, once a `process` global exists', async () => {
+it('warns in dev through the inlined gate, with no `process` object in the realm', async () => {
   const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
-  const globalWithProcess = globalThis as { process?: { env: Record<string, string> } }
-  const previousProcess = globalWithProcess.process
 
   try {
-    // The house gate is `typeof process !== 'undefined' && process.env.NODE_ENV !== 'production'`
-    // (mirroring `packages/core/createPortalSlot/index.tsx`), and the vitest
-    // browser environment has no `process` global at all — `typeof process` is
-    // `'undefined'` here — so the gate is closed and upstream's dev warnings
-    // stay silent in any browser bundle that never defines one. Pin that
-    // closed-gate half first.
-    const gated = await renderHook(() => {
-      const deps: DependencyList = []
-      useShallowCompareEffect(() => {}, deps)
-    })
-    expect(warn).not.toHaveBeenCalled()
-    await gated.unmount()
-
-    // … then install the minimal `process` global the gate expects, so the
-    // upstream guard conditions themselves are exercised
-    globalWithProcess.process = { env: { NODE_ENV: 'test' } }
+    // The gate is the pin's bare `process.env.NODE_ENV !== 'production'`, which
+    // rests on the bundler replacing `process.env.NODE_ENV` with a string
+    // literal at build time — the same assumption React's own source makes. Pin
+    // that mechanism: the value is readable and non-production even though there
+    // is no `process` global to read it from. If inlining ever stops, the bare
+    // reference throws and this fails loudly instead of the guards quietly
+    // becoming dead code behind a `typeof` prefix.
+    expect(process.env.NODE_ENV).not.toBe('production')
+    expect(typeof process).toBe('undefined')
 
     // deps with an object entry: no warning
     const objects = await renderHook(() => {
@@ -231,10 +222,6 @@ it('warns in dev for an empty deps list and for all-primitive deps, once a `proc
     await primitives.unmount()
   }
   finally {
-    if (previousProcess === undefined)
-      delete globalWithProcess.process
-    else
-      globalWithProcess.process = previousProcess
     warn.mockRestore()
   }
 })

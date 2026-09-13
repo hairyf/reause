@@ -110,16 +110,17 @@ function shallowEqualDepsList(prevDeps: DependencyList, nextDeps: DependencyList
  * The dev-only `console.warn` guards are upstream's, with the same conditions:
  * an empty (or non-array) deps list, and a deps list whose entries are all
  * primitives. Both cases mean plain `useEffect` is the right hook. The gate is
- * the house form (`typeof process !== 'undefined' && process.env.NODE_ENV !==
- * 'production'`) so the reference stays safe in browser bundles that never
- * replace `NODE_ENV`, mirroring
- * `packages/core/createPortalSlot/index.tsx`. One consequence of that house
- * form, accepted deliberately: a browser bundle that never defines a `process`
- * global closes the gate, so the warnings stay silent there — verified under
- * vitest's chromium project, where `typeof process` is `'undefined'` — and they
- * fire only where a `process` global (or a defining bundler) exists. The tests
- * install a minimal global to exercise the guard conditions and pin the
- * closed-gate half as well.
+ * the pin's bare form — `process.env.NODE_ENV !== 'production'` — and rests on
+ * the same assumption React's own source makes: the bundler replaces
+ * `process.env.NODE_ENV` with a string literal at build time, which is what
+ * keeps the reference safe in the browser and the warnings live (a production
+ * build inlines `'production'` and drops the branch entirely). The
+ * `node/prefer-global/process` disable comment records that contract. The
+ * `typeof process !== 'undefined' &&` variant used elsewhere
+ * (`packages/core/createPortalSlot/index.tsx`) closes the gate in every browser
+ * bundle that does not define a `process` global — verified under vitest's
+ * chromium project, where `typeof process` is `'undefined'` — which would make
+ * these two warnings dead code exactly where a browser consumer needs them.
  *
  * The effect runs on mount and then whenever `shallowEqualDepsList` says the
  * list changed; cleanups run before the next invocation and on unmount, exactly
@@ -141,8 +142,8 @@ function shallowEqualDepsList(prevDeps: DependencyList, nextDeps: DependencyList
  * ```
  */
 export function useShallowCompareEffect(effect: EffectCallback, deps: DependencyList): void {
-  // eslint-disable-next-line node/prefer-global/process -- browser package, no `require()` available; `typeof` keeps the reference safe in bundles that do not replace NODE_ENV
-  if (typeof process !== 'undefined' && process.env.NODE_ENV !== 'production') {
+  // eslint-disable-next-line node/prefer-global/process -- React's own source assumes the bundler replaces `process.env.NODE_ENV` with a string literal at build time; that replacement is what keeps the reference safe in the browser and the warnings live, whereas a `typeof process !== 'undefined' &&` prefix would silently close this gate in every browser bundle without a `process` global
+  if (process.env.NODE_ENV !== 'production') {
     if (!(Array.isArray(deps)) || !deps.length) {
       console.warn(
         '`useShallowCompareEffect` should not be used with no dependencies. Use React.useEffect instead.',
