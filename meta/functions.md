@@ -77,6 +77,7 @@
 | vueuse    | `removeNode`                      | packages/integrations/useSortable             | `packages/integrations/useSortable/index.tsx`             | ✅ ported                           |
 | —         | `resolveIpcRenderer`              | —                                             | `packages/electron/_resolve/index.tsx`                    | ✅ reause-only export               |
 | —         | `resolveWebFrame`                 | —                                             | `packages/electron/_resolve/index.tsx`                    | ✅ reause-only export               |
+| —         | `shallowEqual`                    | —                                             | `packages/shared/useShallowCompareEffect/index.tsx`       | ✅ reause-only export               |
 | vueuse    | `useSSRWidth`                     | packages/core/useSSRWidth                     | `packages/core/useSSRWidth/index.tsx`                     | ✅ ported                           |
 | vueuse    | `syncRef`                         | packages/shared/syncRef                       | `packages/shared/syncState/index.tsx`                     | ✅ ported                           |
 | vueuse    | `syncRefs`                        | packages/shared/syncRefs                      | `packages/shared/syncStates/index.tsx`                    | ✅ ported                           |
@@ -260,6 +261,7 @@
 | vueuse    | `useScroll`                       | packages/core/useScroll                       | `packages/core/useScroll/index.tsx`                       | ✅ ported                           |
 | vueuse    | `useScrollLock`                   | packages/core/useScrollLock                   | `packages/core/useScrollLock/index.tsx`                   | ✅ ported                           |
 | vueuse    | `useSessionStorage`               | packages/core/useSessionStorage               | `packages/core/useSessionStorage/index.tsx`               | ✅ ported                           |
+| react-use | `useShallowCompareEffect`         | src/useShallowCompareEffect.ts                | `packages/shared/useShallowCompareEffect/index.tsx`       | ✅ ported                           |
 | vueuse    | `useShare`                        | packages/core/useShare                        | `packages/core/useShare/index.tsx`                        | ✅ ported                           |
 | vueuse    | `useSortable`                     | packages/integrations/useSortable             | `packages/integrations/useSortable/index.tsx`             | ✅ ported                           |
 | vueuse    | `useSorted`                       | packages/core/useSorted                       | `packages/core/useSorted/index.tsx`                       | ✅ ported                           |

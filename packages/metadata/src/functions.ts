@@ -663,6 +663,14 @@ export const functions: FunctionInfo[] = [
     lastUpdated: 1788942682000,
   },
   {
+    name: 'shallowEqual',
+    file: 'packages/shared/useShallowCompareEffect/index.tsx',
+    pkg: 'shared',
+    dir: 'useShallowCompareEffect',
+    category: 'Lifecycle',
+    lastUpdated: 1789272086000,
+  },
+  {
     name: 'SSRWidthProvider',
     file: 'packages/core/useSSRWidth/index.tsx',
     pkg: 'core',
@@ -2296,6 +2304,15 @@ export const functions: FunctionInfo[] = [
     category: 'State',
     source: 'vueuse',
     lastUpdated: 1788960102000,
+  },
+  {
+    name: 'useShallowCompareEffect',
+    file: 'packages/shared/useShallowCompareEffect/index.tsx',
+    pkg: 'shared',
+    dir: 'useShallowCompareEffect',
+    category: 'Lifecycle',
+    source: 'react-use',
+    lastUpdated: 1789272086000,
   },
   {
     name: 'useShare',
@@ -4520,6 +4537,15 @@ export const pages: FunctionPageInfo[] = [
     category: 'State',
     description: 'reactive [SessionStorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage)',
     lastUpdated: 1788960102000,
+  },
+  {
+    name: 'useShallowCompareEffect',
+    pkg: 'shared',
+    doc: 'packages/shared/useShallowCompareEffect/index.md',
+    category: 'Lifecycle',
+    description:
+      "`useEffect` whose dependency list is compared by one-level (shallow) equality instead of reference identity — a React port of react-use's [`useShallowCompareEffect`](https://raw.githubusercontent.com/streamich/react-use/master/docs/useShallowCompareEffect.md) (docs page fetched; the rendered `https://streamich.github.io/react-use/?path=/story/lifecycle-useshallowcompareeffect--docs` page is unverified)",
+    lastUpdated: 1789272086000,
   },
   {
     name: 'useShare',
