@@ -6,25 +6,44 @@
 
 # reause
 
-**A React port of VueUse — continuously AI-mapped from the upstream implementation**
+**React hooks continuously AI-mapped from VueUse and other upstream libraries**
 
 [![Status: Experimental](https://img.shields.io/badge/status-experimental-orange)](https://github.com/hairyf/reause)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-> ✅ **Mapping complete**: the base architecture is a 1:1 mirror, and every VueUse composable is accounted for — either mirrored by a React hook, or recorded as intentionally impractical (Vue-only `ref`/reactivity APIs, decided per mapping issue).
-> The generated [function mapping table](meta/functions.md) tracks each one; §3.2 of [docs/upstream-monitoring.md](docs/upstream-monitoring.md) documents the coverage audit behind that claim.
+> ✅ **VueUse mapping complete**: the base architecture is a 1:1 mirror of VueUse, and every `@vueuse/*` composable is accounted for — either mirrored by a React hook, or recorded as intentionally impractical (Vue-only `ref`/reactivity APIs, decided per mapping issue).
+> The other sources (see [Sources](#sources)) are an open, growing set tracked per mapping issue — no completeness is claimed for them.
+> The generated [function mapping table](meta/functions.md) tracks each export with the source it came from; §3.2 of [docs/upstream-monitoring.md](docs/upstream-monitoring.md) documents the coverage audit behind the VueUse claim.
 
 </div>
 
 ## What is this?
 
-`reause` is an experimental React hooks library that aims to be a **1:1 port of [VueUse](https://vueuse.org)**:
+`reause` is an experimental React hooks library mapped from **several upstream sources**. [VueUse](https://vueuse.org) is the foundational one — it defines the package layout, the architecture and most of the surface — but it is not the only one:
 
-- The official [vueuse/vueuse](https://github.com/vueuse/vueuse) repository is referenced as a git submodule (`source/vueuse`) and serves as the single source of truth for mapping
-- The package structure mirrors VueUse 1:1, but every API is React-flavored (`useState` / `useEffect` / `useMemo` …)
-- AI continuously maps upstream composables to React hooks
+- The official [vueuse/vueuse](https://github.com/vueuse/vueuse) repository is referenced as a git submodule (`source/vueuse`) and is the source of truth for every port that names no other source
+- Each other source is pinned as its own read-only checkout under `source/*` and is the source of truth for the ports that name it; `react-spring` is the exception — a re-export with no checkout
+- The package structure mirrors VueUse 1:1 and is fixed, but every API is React-flavored (`useState` / `useEffect` / `useMemo` …)
+- AI continuously maps upstream implementations to React hooks, and each port records its upstream in a `Map from <source> \`<upstream-symbol>\`` JSDoc annotation
 
-See [packages/guide/architecture.md](packages/guide/architecture.md) for the full VueUse → reause architecture mapping.
+See [packages/guide/architecture.md](packages/guide/architecture.md) for the full source → reause architecture mapping.
+
+## Sources
+
+reause maps from six upstream sources. The `source` id in the table is the one the generated [function mapping table](meta/functions.md) records per export:
+
+| source         | upstream                                                                       | how it is ported                                                                                          |
+| -------------- | ------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------- |
+| `vueuse`       | [vueuse/vueuse](https://github.com/vueuse/vueuse)                              | adapted to React — naming conversions (`ref*` → `useState*`, `on*` → `use*`) and React return conventions |
+| `react-use`    | [streamich/react-use](https://github.com/streamich/react-use)                  | direct mirror — upstream names and return shapes kept                                                     |
+| `react-hookz`  | [react-hookz/web](https://github.com/react-hookz/web)                          | direct mirror                                                                                             |
+| `mantine`      | [mantinedev/mantine](https://github.com/mantinedev/mantine) (`@mantine/hooks`) | direct mirror, detached from `@mantine/core`                                                              |
+| `ahooks`       | [alibaba/hooks](https://github.com/alibaba/hooks)                              | direct mirror with documented renames                                                                     |
+| `react-spring` | `@react-spring/web`                                                            | **re-export only** — no pinned checkout, so no 1:1 mirror is claimed                                      |
+
+Five of the six sources are pinned as read-only submodule checkouts under `source/*` (`vueuse`, `react-use`, `react-hookz`, `mantine`, `ahooks`), and every port is checked against its own source's pin. A `source/usehooks` checkout is also mounted, but it has no ports yet and is not a registry source. **`react-spring` has no checkout**: its claim names a source with no path to verify, so the registry records it as `✅ re-exported` rather than as a hand-written port.
+
+Only `source/vueuse` is polled for upstream updates — the other checkouts are provenance-only ([docs/upstream-monitoring.md](docs/upstream-monitoring.md) §1). Per-source naming and return-value rules are in [AGENTS.md](https://github.com/hairyf/reause/blob/main/AGENTS.md) §1, and [`docs/mapping-issue-template.md`](https://github.com/hairyf/reause/blob/main/docs/mapping-issue-template.md) is the template for mapping decisions.
 
 ## Package structure (mirroring VueUse)
 
@@ -40,6 +59,8 @@ See [packages/guide/architecture.md](packages/guide/architecture.md) for the ful
 | `@vueuse/firebase`     | `@reause/firebase`     | ✅ completed |
 | `@vueuse/skills`       | `@reause/skills`       | ✅ completed |
 | `@vueuse/components`   | —                      | ⏳ TODO      |
+
+The layout above is fixed and still mirrors VueUse 1:1: hooks ported from the other sources are added to these **existing** packages, so there is no `@reause/react-use`-style package to install.
 
 ## Quick start
 
