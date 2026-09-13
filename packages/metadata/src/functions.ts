@@ -2288,6 +2288,15 @@ export const functions: FunctionInfo[] = [
     lastUpdated: 1789147565000,
   },
   {
+    name: 'useQueue',
+    file: 'packages/shared/useQueue/index.tsx',
+    pkg: 'shared',
+    dir: 'useQueue',
+    category: 'State',
+    source: 'react-use',
+    lastUpdated: 1789318112000,
+  },
+  {
     name: 'useRafFn',
     file: 'packages/core/useRafFn/index.tsx',
     pkg: 'core',
@@ -4677,6 +4686,14 @@ export const pages: FunctionPageInfo[] = [
     category: 'Browser',
     description: 'shorthand for a reactive query parameter in `window.location.search`',
     lastUpdated: 1789147565000,
+  },
+  {
+    name: 'useQueue',
+    pkg: 'shared',
+    doc: 'packages/shared/useQueue/index.md',
+    category: 'State',
+    description: "state hook that implements a simple FIFO queue — React port of react-use's `useQueue`",
+    lastUpdated: 1789318112000,
   },
   {
     name: 'useRafFn',

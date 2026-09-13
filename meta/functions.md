@@ -259,6 +259,7 @@
 | vueuse       | `useProjection`                   | packages/math/useProjection                     | `packages/math/useProjection/index.tsx`                   | ✅ ported                           |
 | vueuse       | `useQRCode`                       | packages/integrations/useQRCode                 | `packages/integrations/useQRCode/index.tsx`               | ✅ ported                           |
 | vueuse       | `useRouteQuery`                   | packages/router/useRouteQuery                   | `packages/core/useQuery/index.tsx`                        | ✅ ported                           |
+| react-use    | `useQueue`                        | src/useQueue.ts                                 | `packages/shared/useQueue/index.tsx`                      | ✅ ported                           |
 | vueuse       | `useRafFn`                        | packages/core/useRafFn                          | `packages/core/useRafFn/index.tsx`                        | ✅ ported                           |
 | react-use    | `useRafState`                     | src/useRafState.ts                              | `packages/shared/useRafState/index.tsx`                   | ✅ ported                           |
 | vueuse       | `useTemplateRefsList`             | packages/core/useTemplateRefsList               | `packages/core/useRefsList/index.tsx`                     | ✅ ported                           |
