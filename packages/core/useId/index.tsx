@@ -1,5 +1,5 @@
-import { isClient } from '@reause/shared'
-import { useEffect, useLayoutEffect, useId as useReactId, useRef, useState } from 'react'
+import { useIsomorphicLayoutEffect } from '@reause/shared'
+import { useId as useReactId, useRef, useState } from 'react'
 
 // Port of `randomId` from `@mantine/hooks`
 // (`source/mantine/packages/@mantine/hooks/src/utils/random-id/random-id.ts`) —
@@ -14,11 +14,10 @@ function randomId(prefix = 'mantine-'): string {
 // `useLayoutEffect` warns when a component renders on the server, so the
 // post-mount swap uses the effect variant there — upstream's
 // `useIsomorphicEffect`
-// (`source/mantine/packages/@mantine/hooks/src/use-isomorphic-effect/`).
-// The shared `useIsomorphicLayoutEffect` from this batch (#923) is not on this
-// base branch, so the environment check is the existing `isClient` from
-// `@reause/shared`, in the same local-alias idiom as `usePreferredColorScheme`.
-const useIsomorphicEffect = isClient ? useLayoutEffect : useEffect
+// (`source/mantine/packages/@mantine/hooks/src/use-isomorphic-effect/`). That
+// choice is the shared `useIsomorphicLayoutEffect` (#923), imported above
+// instead of aliased locally, so the isomorphic branch lives in exactly one
+// place (reference-chain rule).
 
 /**
  * React port of `@mantine/hooks`' `useId`.
@@ -75,7 +74,7 @@ export function useId(staticId?: string): string {
   const [uuid, setUuid] = useState(`mantine-${reactId.replace(/:/g, '')}`)
   const hasInitializedRef = useRef(false)
 
-  useIsomorphicEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     if (hasInitializedRef.current)
       return
     hasInitializedRef.current = true
