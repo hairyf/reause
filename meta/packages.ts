@@ -46,6 +46,7 @@ export const packages: PackageManifest[] = [
     addon: true,
     submodules: true,
     external: [
+      '@react-spring/web',
       'async-validator',
       'axios',
       'change-case',
@@ -61,6 +62,9 @@ export const packages: PackageManifest[] = [
       'node:http',
     ],
     globals: {
+      // @react-spring/web ships NO UMD build (v10 dist is ESM/CJS only), so unlike axios this is a
+      // conventional name a CDN consumer must provide rather than a published global.
+      '@react-spring/web': 'ReactSpring',
       'axios': 'axios',
       'universal-cookie': 'UniversalCookie',
       'qrcode': 'QRCode',

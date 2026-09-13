@@ -1830,6 +1830,15 @@ export const functions: FunctionInfo[] = [
     lastUpdated: 1789252819000,
   },
   {
+    name: 'useList',
+    file: 'packages/shared/useList/index.tsx',
+    pkg: 'shared',
+    dir: 'useList',
+    category: 'State',
+    source: 'react-use',
+    lastUpdated: 1789279795000,
+  },
+  {
     name: 'useListener',
     file: 'packages/shared/useListener/index.tsx',
     pkg: 'shared',
@@ -4188,6 +4197,15 @@ export const pages: FunctionPageInfo[] = [
     description:
       "returns a ref object whose `.current` always holds the latest value of the render that produced it — React port of react-use's [`useLatest`](https://github.com/streamich/react-use/blob/master/docs/useLatest.md) (upstream mapping files: `source/react-use/src/useLatest.ts`",
     lastUpdated: 1789252819000,
+  },
+  {
+    name: 'useList',
+    pkg: 'shared',
+    doc: 'packages/shared/useList/index.md',
+    category: 'State',
+    description:
+      "tracks an array and returns it with a stable set of immutable mutators — React port of react-use's `useList`",
+    lastUpdated: 1789279795000,
   },
   {
     name: 'useListener',
