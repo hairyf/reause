@@ -1,8 +1,16 @@
 /**
- * Upstream VueUse module paths — committed data (originally extracted from the
- * docs `Source` sections by the now-removed `scripts/unify-demo-layout.ts`).
- * Maps a docs page (pkg/module) to its VueUse source path in the `vueuse/vueuse`
- * repo, used for the auto-generated `## Source` links on function pages.
+ * Upstream module paths — committed data (originally extracted from the docs
+ * `Source` sections by the now-removed `scripts/unify-demo-layout.ts`, extended
+ * to every source by #974). Maps a docs page (pkg/module) to its pin-relative
+ * path inside *that page's own* upstream repository, used for the auto-generated
+ * `## Source` links on function pages.
+ *
+ * The repository a path belongs to is never assumed here: it comes from the
+ * provenance registry's `source` column (`packages/metadata/src/functions.ts`)
+ * through `upstreamSources` below, so the footer label follows the registry
+ * instead of being hard-coded. Paths keep each source's own keying — VueUse and
+ * react-use resolve to a file, react-hookz / mantine / ahooks to the module
+ * directory their pin defines (see `modulePer` in `scripts/update.ts`).
  */
 export const upstreamPaths: Record<string, string> = {
   'core/useAsync': 'packages/core/computedAsync/index.ts',
@@ -219,4 +227,77 @@ export const upstreamPaths: Record<string, string> = {
   'shared/useWatchWithFilter': 'packages/shared/watchWithFilter/index.ts',
   'shared/useWhenever': 'packages/shared/whenever/index.ts',
   'shared/utils': 'packages/shared/utils/index.test.ts',
+  // --- Non-VueUse sources (#974) -------------------------------------------
+  // The list above is VueUse-only, so a react-use / react-hookz / mantine /
+  // ahooks / react-spring page emitted no upstream link at all. These are the
+  // resolver's own paths (`meta/functions.md`), each verified against the pinned
+  // checkout; the source of a page — and so its footer label and repository —
+  // comes from the registry, never from this map.
+  // react-use (17)
+  'core/useAsyncFn': 'src/useAsyncFn.ts',
+  'shared/createMemo': 'src/factory/createMemo.ts',
+  'shared/createReducer': 'src/factory/createReducer.ts',
+  'shared/useDeepCompareEffect': 'src/useDeepCompareEffect.ts',
+  'shared/useEffectOnce': 'src/useEffectOnce.ts',
+  'shared/useError': 'src/useError.ts',
+  'shared/useIsomorphicLayoutEffect': 'src/useIsomorphicLayoutEffect.ts',
+  'shared/useLatest': 'src/useLatest.ts',
+  'shared/useList': 'src/useList.ts',
+  'shared/useLogger': 'src/useLogger.ts',
+  'shared/useMethods': 'src/useMethods.ts',
+  'shared/useMount': 'src/useMount.ts',
+  'shared/useRafState': 'src/useRafState.ts',
+  'shared/useShallowCompareEffect': 'src/useShallowCompareEffect.ts',
+  'shared/useUnmount': 'src/useUnmount.ts',
+  'shared/useUpdate': 'src/useUpdate.ts',
+  'shared/useUpdateEffect': 'src/useUpdateEffect.ts',
+  // react-hookz (2): `src/<name>/index.ts` modules.
+  'shared/useMap': 'src/useMap',
+  'shared/useSet': 'src/useSet',
+  // mantine (7): kebab-cased directories (or the package barrel, for `useId`).
+  'core/useCollapse': 'packages/@mantine/hooks/src/use-collapse',
+  'core/useFocusReturn': 'packages/@mantine/hooks/src/use-focus-return',
+  'core/useHotkeys': 'packages/@mantine/hooks/src/use-hotkeys',
+  'core/useId': 'packages/@mantine/hooks/src',
+  'core/useMask': 'packages/@mantine/hooks/src/use-mask',
+  'core/useSplitter': 'packages/@mantine/hooks/src/use-splitter',
+  'shared/useIsFirstRender': 'packages/@mantine/hooks/src/use-is-first-render',
+  // ahooks (7): `packages/hooks/src/<name>` modules.
+  'core/useClickAway': 'packages/hooks/src/useClickAway',
+  'core/useKeyPress': 'packages/hooks/src/useKeyPress',
+  'shared/useIntervalRafFn': 'packages/hooks/src/useRafInterval',
+  'shared/useSafeState': 'packages/hooks/src/useSafeState',
+  'shared/useTimeoutRafFn': 'packages/hooks/src/useRafTimeout',
+  'shared/useTrackedEffect': 'packages/hooks/src/useTrackedEffect',
+  'shared/useUnmountedRef': 'packages/hooks/src/useUnmountedRef',
+}
+
+/** One upstream source, as the `## Source` footer renders it. */
+export interface UpstreamSource {
+  /** Footer link label. */
+  label: string
+  /** Repository root the pinned checkout comes from. */
+  repo: string
+  /**
+   * Branch of the pinned checkout. Absent for a source with no pin — see
+   * `react-spring` — whose link then stops at the repository root rather than
+   * inventing a path that cannot be verified.
+   */
+  branch?: string
+}
+
+/**
+ * The upstream repositories reause ports from, keyed by the source id the
+ * provenance registry records (`scripts/update.ts`'s `SOURCES`). A source that
+ * is not listed here gets no footer link.
+ */
+export const upstreamSources: Record<string, UpstreamSource> = {
+  'vueuse': { label: 'VueUse', repo: 'https://github.com/vueuse/vueuse', branch: 'main' },
+  'react-use': { label: 'react-use', repo: 'https://github.com/streamich/react-use', branch: 'master' },
+  'react-hookz': { label: 'react-hookz', repo: 'https://github.com/react-hookz/web', branch: 'master' },
+  'mantine': { label: 'Mantine', repo: 'https://github.com/mantinedev/mantine', branch: 'master' },
+  'ahooks': { label: 'ahooks', repo: 'https://github.com/alibaba/hooks', branch: 'master' },
+  // No pinned checkout anywhere (`scripts/update.ts` registers it with no tree):
+  // the page re-exports `@react-spring/web`, so the link names that repository.
+  'react-spring': { label: 'react-spring', repo: 'https://github.com/pmndrs/react-spring' },
 }
