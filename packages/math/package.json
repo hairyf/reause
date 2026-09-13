@@ -1,7 +1,7 @@
 {
   "name": "@reause/math",
   "type": "module",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Math functions — React port of @vueuse/math (experimental, AI-mapped)",
   "license": "MIT",
   "homepage": "https://github.com/hairyf/reause#readme",

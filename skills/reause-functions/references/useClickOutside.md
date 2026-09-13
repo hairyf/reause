@@ -6,6 +6,8 @@ category: Sensors
 
 Listen for clicks outside of an element. Useful for modals or dropdowns.
 
+This is the VueUse-style option surface, kept side by side with [`useClickAway`](/core/useClickAway/) (the ahooks port) by design: `useClickAway` is the smaller hook — a `RefOrValue` target or an array of targets, one event name or an array of them, containment by `Element.contains`, no options and no return value — so reach for `useClickAway` when a plain outside click is all you need, and stay here when `ignore`, `capture`, `detectIframe`, a custom `window` or the returned `stop` function is the reason you are here.
+
 ## Usage
 
 ```tsx
