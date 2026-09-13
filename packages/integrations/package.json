@@ -29,6 +29,7 @@
     "./useNProgress": "./dist/useNProgress.js",
     "./useQRCode": "./dist/useQRCode.js",
     "./useSortable": "./dist/useSortable.js",
+    "./useSpring": "./dist/useSpring.js",
     "./package.json": "./package.json"
   },
   "main": "./dist/index.js",
