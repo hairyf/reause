@@ -1856,6 +1856,15 @@ export const functions: FunctionInfo[] = [
     lastUpdated: 1789147565000,
   },
   {
+    name: 'useMap',
+    file: 'packages/shared/useMap/index.tsx',
+    pkg: 'shared',
+    dir: 'useMap',
+    category: 'State',
+    source: 'react-hookz',
+    lastUpdated: 1789276266000,
+  },
+  {
     name: 'useMath',
     file: 'packages/math/useMath/index.tsx',
     pkg: 'math',
@@ -4175,6 +4184,14 @@ export const pages: FunctionPageInfo[] = [
     category: 'Sensors',
     description: 'reactive keys pressed state',
     lastUpdated: 1789147565000,
+  },
+  {
+    name: 'useMap',
+    pkg: 'shared',
+    doc: 'packages/shared/useMap/index.md',
+    category: 'State',
+    description: "a real `Map` whose mutations re-render — React port of react-hookz's `useMap`",
+    lastUpdated: 1789276266000,
   },
   {
     name: 'useMath',

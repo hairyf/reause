@@ -211,6 +211,7 @@
 | vueuse      | `useLocalStorage`                 | packages/core/useLocalStorage                 | `packages/core/useLocalStorage/index.tsx`                 | ✅ ported                           |
 | vueuse      | `onLongPress`                     | packages/core/onLongPress                     | `packages/core/useLongPress/index.tsx`                    | ✅ ported                           |
 | vueuse      | `useMagicKeys`                    | packages/core/useMagicKeys                    | `packages/core/useMagicKeys/index.tsx`                    | ✅ ported                           |
+| react-hookz | `useMap`                          | src/useMap                                    | `packages/shared/useMap/index.tsx`                        | ✅ ported                           |
 | vueuse      | `useMath`                         | packages/math/useMath                         | `packages/math/useMath/index.tsx`                         | ✅ ported                           |
 | vueuse      | `useMax`                          | packages/math/useMax                          | `packages/math/useMax/index.tsx`                          | ✅ ported                           |
 | vueuse      | `useMediaControls`                | packages/core/useMediaControls                | `packages/core/useMediaControls/index.tsx`                | ✅ ported                           |
