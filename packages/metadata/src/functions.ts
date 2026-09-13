@@ -1695,6 +1695,15 @@ export const functions: FunctionInfo[] = [
     lastUpdated: 1788999284000,
   },
   {
+    name: 'useIntervalRafFn',
+    file: 'packages/shared/useIntervalRafFn/index.tsx',
+    pkg: 'shared',
+    dir: 'useIntervalRafFn',
+    category: 'Animation',
+    source: 'ahooks',
+    lastUpdated: 1789277192000,
+  },
+  {
     name: 'useIpcRenderer',
     file: 'packages/electron/useIpcRenderer/index.tsx',
     pkg: 'electron',
@@ -4078,6 +4087,14 @@ export const pages: FunctionPageInfo[] = [
     category: 'Animation',
     description: 'wrapper for `setInterval` with controls',
     lastUpdated: 1788999284000,
+  },
+  {
+    name: 'useIntervalRafFn',
+    pkg: 'shared',
+    doc: 'packages/shared/useIntervalRafFn/index.md',
+    category: 'Animation',
+    description: 'fire a callback repeatedly on animation frames',
+    lastUpdated: 1789277192000,
   },
   {
     name: 'useIpcRenderer',

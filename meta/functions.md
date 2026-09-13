@@ -193,6 +193,7 @@
 | vueuse      | `useIntersectionObserver`         | packages/core/useIntersectionObserver           | `packages/core/useIntersectionObserver/index.tsx`         | ✅ ported                           |
 | vueuse      | `useInterval`                     | packages/shared/useInterval                     | `packages/shared/useInterval/index.tsx`                   | ✅ ported                           |
 | vueuse      | `useIntervalFn`                   | packages/shared/useIntervalFn                   | `packages/shared/useIntervalFn/index.tsx`                 | ✅ ported                           |
+| ahooks      | `useRafInterval`                  | packages/hooks/src/useRafInterval               | `packages/shared/useIntervalRafFn/index.tsx`              | ✅ ported                           |
 | vueuse      | `useIpcRenderer`                  | packages/electron/useIpcRenderer                | `packages/electron/useIpcRenderer/index.tsx`              | ✅ ported                           |
 | vueuse      | `useIpcRendererInvoke`            | packages/electron/useIpcRendererInvoke          | `packages/electron/useIpcRendererInvoke/index.tsx`        | ✅ ported                           |
 | vueuse      | `useIpcRendererOn`                | packages/electron/useIpcRendererOn              | `packages/electron/useIpcRendererOn/index.tsx`            | ✅ ported                           |
