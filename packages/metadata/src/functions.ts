@@ -1282,6 +1282,15 @@ export const functions: FunctionInfo[] = [
     lastUpdated: 1789147565000,
   },
   {
+    name: 'useEffectOnce',
+    file: 'packages/shared/useEffectOnce/index.tsx',
+    pkg: 'shared',
+    dir: 'useEffectOnce',
+    category: 'Lifecycle',
+    source: 'react-use',
+    lastUpdated: 1789257038000,
+  },
+  {
     name: 'useElementBounding',
     file: 'packages/core/useElementBounding/index.tsx',
     pkg: 'core',
@@ -1836,7 +1845,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useMount',
     category: 'Lifecycle',
     source: 'react-use',
-    lastUpdated: 1788946165000,
+    lastUpdated: 1789257038000,
   },
   {
     name: 'useMounted',
@@ -3571,6 +3580,14 @@ export const pages: FunctionPageInfo[] = [
     lastUpdated: 1789147565000,
   },
   {
+    name: 'useEffectOnce',
+    pkg: 'shared',
+    doc: 'packages/shared/useEffectOnce/index.md',
+    category: 'Lifecycle',
+    description: 'runs an effect once after the component mounts',
+    lastUpdated: 1789257038000,
+  },
+  {
     name: 'useElementBounding',
     pkg: 'core',
     doc: 'packages/core/useElementBounding/index.md',
@@ -4054,7 +4071,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/shared/useMount/index.md',
     category: 'Lifecycle',
     description: "runs a callback once after the component mounts — React port of react-use's `useMount`",
-    lastUpdated: 1788946165000,
+    lastUpdated: 1789257038000,
   },
   {
     name: 'useMounted',

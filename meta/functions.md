@@ -147,6 +147,7 @@
 | vueuse    | `useDraggable`                    | packages/core/useDraggable                    | `packages/core/useDraggable/index.tsx`                    | ✅ ported                           |
 | vueuse    | `useDrauu`                        | packages/integrations/useDrauu                | `packages/integrations/useDrauu/index.tsx`                | ✅ ported                           |
 | vueuse    | `useDropZone`                     | packages/core/useDropZone                     | `packages/core/useDropZone/index.tsx`                     | ✅ ported                           |
+| react-use | `useEffectOnce`                   | src/useEffectOnce.ts                          | `packages/shared/useEffectOnce/index.tsx`                 | ✅ ported                           |
 | vueuse    | `useElementBounding`              | packages/core/useElementBounding              | `packages/core/useElementBounding/index.tsx`              | ✅ ported                           |
 | vueuse    | `useElementByPoint`               | packages/core/useElementByPoint               | `packages/core/useElementByPoint/index.tsx`               | ✅ ported                           |
 | vueuse    | `useElementHover`                 | packages/core/useElementHover                 | `packages/core/useElementHover/index.tsx`                 | ✅ ported                           |
