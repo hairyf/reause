@@ -1964,6 +1964,15 @@ export const functions: FunctionInfo[] = [
     lastUpdated: 1789147565000,
   },
   {
+    name: 'useMethods',
+    file: 'packages/shared/useMethods/index.tsx',
+    pkg: 'shared',
+    dir: 'useMethods',
+    category: 'State',
+    source: 'react-use',
+    lastUpdated: 1789315101000,
+  },
+  {
     name: 'useMin',
     file: 'packages/math/useMin/index.tsx',
     pkg: 'math',
@@ -4373,6 +4382,15 @@ export const pages: FunctionPageInfo[] = [
     category: 'Browser',
     description: 'reactive Memory Info',
     lastUpdated: 1789147565000,
+  },
+  {
+    name: 'useMethods',
+    pkg: 'shared',
+    doc: 'packages/shared/useMethods/index.md',
+    category: 'State',
+    description:
+      '`useReducer` sugar — turn an object of pure state transitions into a state value plus one callable method per transition',
+    lastUpdated: 1789315101000,
   },
   {
     name: 'useMin',

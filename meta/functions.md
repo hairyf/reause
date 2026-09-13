@@ -223,6 +223,7 @@
 | vueuse       | `useMediaQuery`                   | packages/core/useMediaQuery                     | `packages/core/useMediaQuery/index.tsx`                   | ✅ ported                           |
 | vueuse       | `useMemoize`                      | packages/core/useMemoize                        | `packages/core/useMemoize/index.tsx`                      | ✅ ported                           |
 | vueuse       | `useMemory`                       | packages/core/useMemory                         | `packages/core/useMemory/index.tsx`                       | ✅ ported                           |
+| react-use    | `useMethods`                      | src/useMethods.ts                               | `packages/shared/useMethods/index.tsx`                    | ✅ ported                           |
 | vueuse       | `useMin`                          | packages/math/useMin                            | `packages/math/useMin/index.tsx`                          | ✅ ported                           |
 | react-use    | `useMount`                        | src/useMount.ts                                 | `packages/shared/useMount/index.tsx`                      | ✅ ported                           |
 | vueuse       | `useMounted`                      | packages/core/useMounted                        | `packages/core/useMounted/index.tsx`                      | ✅ ported                           |
