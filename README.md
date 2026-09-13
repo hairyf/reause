@@ -24,7 +24,7 @@
 - The official [vueuse/vueuse](https://github.com/vueuse/vueuse) repository is referenced as a git submodule (`source/vueuse`) and is the source of truth for every port that names no other source
 - Each other source is pinned as its own read-only checkout under `source/*` and is the source of truth for the ports that name it; `react-spring` is the exception — a re-export with no checkout
 - The package structure mirrors VueUse 1:1 and is fixed, but every API is React-flavored (`useState` / `useEffect` / `useMemo` …)
-- AI continuously maps upstream implementations to React hooks, and each port records its upstream in a `Map from <source> \`<upstream-symbol>\`` JSDoc annotation
+- AI continuously maps upstream implementations to React hooks, and each port records its upstream in a `` Map from <source> `<upstream-symbol>` `` JSDoc annotation
 
 See [packages/guide/architecture.md](packages/guide/architecture.md) for the full source → reause architecture mapping.
 
