@@ -53,6 +53,7 @@
     "@reause/math": "workspace:*",
     "@reause/metadata": "workspace:*",
     "@reause/shared": "workspace:*",
+    "@shikijs/vitepress-twoslash": "2.5.0",
     "@types/node": "^26.4.1",
     "@types/nprogress": "^0.2.3",
     "@types/qrcode": "^1.5.6",

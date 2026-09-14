@@ -1,45 +1,42 @@
 import type { HeadConfig, TransformContext } from 'vitepress'
 import type { FunctionPageInfo } from '../../packages/metadata/src/functions'
-import type { CommitInfo } from './plugins/changelog'
 import type { ContributorInfo } from './plugins/contributors'
 import { execSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
 import { resolve } from 'node:path'
+import { transformerTwoslash } from '@shikijs/vitepress-twoslash'
+import { createFileSystemTypesCache } from '@shikijs/vitepress-twoslash/cache-fs'
 import { withPwa } from '@vite-pwa/vitepress'
+import ts from 'typescript'
 import UnoCSSPostCSS from 'unocss/postcss'
 import { VitePWA } from 'vite-plugin-pwa'
 import { defineConfig } from 'vitepress'
 import { currentVersion, versions } from '../../meta/versions'
 import { categoryNames, functions, pages } from '../../packages/metadata/src/functions'
-import { ChangeLog } from './plugins/changelog'
+import { ChangeLog, getChangeLog } from './plugins/changelog'
 import { Contributors } from './plugins/contributors'
 import { MarkdownTransform } from './plugins/markdownTransform'
 import { PWAVirtualModule } from './plugins/pwa-virtual'
+import { FILE_IMPORTS, stripPopupImages } from './twoslash'
 
 /**
  * VitePress config for the reause docs site (docs root = `packages/`,
  * mirroring VueUse's `packages/.vitepress/config.ts`).
  */
 
-// Changelog data: last 50 commits (offline, deterministic).
-function getCommits(): CommitInfo[] {
-  try {
-    const raw = execSync('git log --pretty=format:%H%x09%s%x09%ad --date=short -50', { encoding: 'utf-8' })
-    return raw.split('\n').filter(Boolean).map((line) => {
-      const [sha, message, date] = line.split('\t')
-      return { sha, message, date }
-    })
-  }
-  catch {
-    return []
-  }
-}
-
-// Per-function contributors, derived from git history of the function file
+// Per-page contributors, derived from git history of the page's source file
 // (mirrors VueUse, which derives them from the function directory history).
+//
+// Keyed by page directory, not by export name: `Contributors.vue` receives the
+// page dir (`<Contributors name="${dir}" />`), and a page such as
+// `electron/_resolve` has no export sharing its name — keying by `fn.name` left
+// that page looking up a key nobody ever wrote. Several exports can share one
+// page dir (and therefore one source file), so each file is walked only once.
 function getFunctionContributors(): Record<string, ContributorInfo[]> {
   const result: Record<string, ContributorInfo[]> = {}
   for (const fn of functions) {
+    if (result[fn.dir] !== undefined)
+      continue
     try {
       const raw = execSync(`git log --pretty=format:%an%x09%ae --follow -- "${fn.file}"`, { encoding: 'utf-8' })
       const byEmail = new Map<string, { name: string, email: string, commits: number }>()
@@ -54,7 +51,7 @@ function getFunctionContributors(): Record<string, ContributorInfo[]> {
           byEmail.set(key, { name, email, commits: 1 })
         }
       }
-      result[fn.name] = [...byEmail.values()].map(a => ({
+      result[fn.dir] = [...byEmail.values()].map(a => ({
         name: a.name,
         avatar: `https://www.gravatar.com/avatar/${createHash('md5').update(a.email.trim().toLowerCase()).digest('hex')}?d=retro`,
         login: a.name.replace(/\s+/g, ''),
@@ -63,7 +60,7 @@ function getFunctionContributors(): Record<string, ContributorInfo[]> {
       }))
     }
     catch {
-      result[fn.name] = []
+      result[fn.dir] = []
     }
   }
   return result
@@ -218,6 +215,48 @@ export default withPwa(defineConfig({
     ['meta', { property: 'og:description', content: 'Reactive utilities for React — an experimental 1:1 AI-mapped port of VueUse' }],
   ],
   transformHead,
+  // Twoslash: code blocks are type-checked at build time, so readers get hover
+  // cards (types, signatures, JSDoc) on the docs site — mirrors VueUse's
+  // `markdown.codeTransformers` wiring, with the React-specific bits below.
+  //
+  // Only blocks whose meta carries `twoslash` are processed
+  // (`explicitTrigger`); `MarkdownTransform` adds that meta to every ts/tsx
+  // block and prepends `// @include: imports`, so authors keep writing plain
+  // ```tsx fences.
+  markdown: {
+    // Shiki resolves languages lazily, but hover cards are rendered *through*
+    // shiki while the markdown is transformed, and a popup fence in an
+    // unloaded language is a hard error. Third-party typings ship such fences
+    // (firebase's `@firebase/firestore` JSDoc uses ```javascript), so the
+    // languages our snippets reach through imports are preloaded here.
+    codeTransformers: [
+      transformerTwoslash({
+        twoslashOptions: {
+          compilerOptions: {
+            // Match tsconfig.json: snippets are .tsx with the automatic JSX
+            // runtime (`jsx: react-jsx`), and `@reause/*` resolves through the
+            // workspace package manifests, i.e. Bundler resolution.
+            jsx: ts.JsxEmit.ReactJSX,
+            moduleResolution: ts.ModuleResolutionKind.Bundler,
+          },
+          handbookOptions: {
+            // Docs snippets are intentionally partial (continuation examples,
+            // globals that only exist in a component, unresolved env vars), so
+            // compiler diagnostics are not rendered as errors.
+            noErrors: true,
+          },
+        },
+        includesMap: new Map([['imports', `// ---cut-start---\n${FILE_IMPORTS}\n// ---cut-end---`]]),
+        typesCache: createFileSystemTypesCache({
+          dir: resolve(__dirname, 'cache', 'twoslash'),
+        }),
+      }),
+      // Hover cards render third-party JSDoc, which references images by
+      // relative path (rxjs: `![](interval.png)`) — those would be resolved as
+      // page assets and break the production build.
+      stripPopupImages,
+    ],
+  },
   // Note: no @vitejs/plugin-react here — Vite's built-in esbuild transforms
   // .tsx with the automatic JSX runtime. React demos are mounted client-side
   // by the theme's DemoContainer component.
@@ -240,7 +279,7 @@ export default withPwa(defineConfig({
     // Cast: vitepress bundles its own vite copy, so its PluginOption type
     // differs structurally from the root vite types our plugins import.
     plugins: [
-      ChangeLog(getCommits()),
+      ChangeLog(getChangeLog()),
       Contributors(getFunctionContributors()),
       PWAVirtualModule(packageNames),
       MarkdownTransform(functions),

@@ -32,6 +32,13 @@ packages:
   - packages/*
   - playgrounds/*
 
+# `@shikijs/vitepress-twoslash@2.5.0` declares `"@shikijs/twoslash": ""`, an empty
+# range that resolves to shiki 4.x — a different major than the shiki 2.5.0 that
+# vitepress 1.6.4 bundles, and the transformer is handed shiki's own context.
+# Pin it to the matching 2.5.0 so the transformer and the renderer agree.
+overrides:
+  '@shikijs/twoslash': 2.5.0
+
 allowBuilds:
   '@firebase/util': true
   electron: true

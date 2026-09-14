@@ -9,6 +9,11 @@ import { findSourceFile, getTypeDefinitions, resetTypeCache } from './type-defin
  * React adaptation of VueUse's `packages/.vitepress/plugins/markdownTransform.ts`:
  * - backticked function names (`` `useToggle` ``) that match the registry are
  *   auto-linked to their docs page (`[\`useToggle\`](/core/useToggle)`);
+ * - every function page gets VueUse's `<FunctionInfo>` block right after its H1
+ *   (Category / Export Size / Package / Last Changed / Alias / Related), read
+ *   from the generated registry and `packages/export-size.json`;
+ * - `ts`/`tsx` blocks are switched on for twoslash (type-checked at build time,
+ *   with the reause imports injected) so the docs site shows type hovers;
  * - function pages get VueUse's auto-generated chrome injected at build time,
  *   so `index.md` files stay minimal and uniform: a `## Demo` block right
  *   after the description (demo on top), and a footer with `## Type
@@ -50,6 +55,86 @@ function collapsible(code: string): string {
   if (code.length <= 1000)
     return `\`\`\`ts\n${code}\n\`\`\``
   return `<details>\n<summary>Toggle</summary>\n\n\`\`\`ts\n${code}\n\`\`\`\n\n</details>`
+}
+
+/**
+ * Fenced blocks that get type-checked by twoslash. Mirrors VueUse's set (its
+ * `ts`/`typescript` handling): `tsx` is reause's example language, and `js`/`jsx`
+ * deliberately stay out — twoslash compiles a `js` block as plain JS, so a
+ * stray JSX fence there would fail the docs build instead of merely rendering
+ * badly. Such a block can opt in by writing `twoslash` in its own meta.
+ */
+const TWOSLASH_LANGS = 'typescript|tsx|ts'
+const TS_CODE_BLOCK_RE = new RegExp(`(^|\\n)\`\`\`(${TWOSLASH_LANGS})([^\\n]*)\\n([\\s\\S]*?)\\n\`\`\`(?=\\n|$)`, 'g')
+
+/** Line-highlight-only meta, e.g. `{5}` or `{1,3-5}` (mirrors VueUse). */
+const reLineHighlightMeta = /^\{[\d\-,]*\}$/
+
+/**
+ * Replaces the given meta string with a default "twoslash" if it is empty or modifies it based on certain conditions.
+ *
+ * @param meta - The meta string to be processed.
+ * @returns The processed meta string.
+ *
+ * If the meta string is empty or only contains whitespace, it returns "twoslash".
+ * If the meta string contains "no-twoslash" (case insensitive), it removes "no-twoslash" and returns the remaining string.
+ * If the remaining string is empty after removing "no-twoslash", it returns an empty string.
+ * If the meta string matches the `reLineHighlightMeta` regex, it appends "twoslash" to the meta string.
+ * Otherwise, it returns the trimmed meta string.
+ */
+function replaceToDefaultTwoslashMeta(meta: string) {
+  const trimmed = meta.trim()
+  if (!trimmed) {
+    return 'twoslash'
+  }
+  const hasNoTwoslash = /no-twoslash/i.test(trimmed)
+  if (hasNoTwoslash) {
+    const leftover = trimmed.replace(/no-twoslash/i, '').trim()
+    if (!leftover) {
+      return ''
+    }
+    return leftover
+  }
+  if (reLineHighlightMeta.test(trimmed)) {
+    return `${trimmed} twoslash`
+  }
+  return trimmed
+}
+
+/** Whether a resolved meta asks the twoslash transformer to run. */
+function isMetaTwoslash(meta: string) {
+  return meta.includes('twoslash') && !meta.includes('no-twoslash')
+}
+
+/**
+ * Make every `ts`/`tsx`/`typescript` block on a page type-checked by twoslash
+ * (mirrors VueUse's `replaceToDefaultTwoslashMeta` + `// @include: imports`
+ * pass, applied to the whole page instead of only the function-page branch):
+ *
+ * - the fence meta defaults to `twoslash` when it is empty, keeps line
+ *   highlights (`{5}` → `{5} twoslash`) and is left alone otherwise, so
+ *   `no-twoslash` still opts a block out;
+ * - twoslash-checked blocks get `// @include: imports` prepended, which expands
+ *   to the `@reause/*` hook imports (see `packages/.vitepress/twoslash.ts`)
+ *   inside a `// ---cut-*---` region, i.e. the injected lines are never
+ *   rendered. That is what lets a continuation snippet like
+ *   `const { x, y } = useMouse()` hover as the real signature instead of `any`.
+ *
+ * Runs last, so the auto-generated `## Type Declarations` block is covered too
+ * (hovering a type there prints its definition, as on the VueUse site).
+ */
+function withTwoslash(markdown: string): string {
+  return markdown.replace(
+    TS_CODE_BLOCK_RE,
+    (raw, lead: string, lang: string, meta: string, snippet: string) => {
+      const resolved = replaceToDefaultTwoslashMeta(meta)
+      const body = isMetaTwoslash(resolved)
+        ? `// @include: imports\n${snippet}`
+        : snippet
+      const fenceMeta = resolved ? ` ${resolved}` : ''
+      return `${lead}\`\`\`${lang}${fenceMeta}\n${body}\n\`\`\``
+    },
+  )
 }
 
 /**
@@ -113,10 +198,18 @@ export function MarkdownTransform(functions: FunctionRef[]): Plugin {
       const lines = code.split('\n')
 
       // Linkify backticked function names — outside fenced code blocks and raw
-      // HTML, and skipping tokens already inside a markdown link label.
+      // HTML, and skipping tokens already inside a markdown link label. The
+      // fence state is tracked, not just the fence lines: a template literal
+      // such as `` `useToggle` `` inside a snippet must stay code, otherwise the
+      // injected link would be compiled by twoslash as TypeScript.
+      let inFence = false
       const linked = lines.map((line) => {
         const trimmed = line.trimStart()
-        if (trimmed.startsWith('```') || trimmed.startsWith('<'))
+        if (trimmed.startsWith('```')) {
+          inFence = !inFence
+          return line
+        }
+        if (inFence || trimmed.startsWith('<'))
           return line
         return line.replace(/`([\w-]+)`/g, (raw, name) => {
           if (line.includes(`[\`${name}\`]`))
@@ -127,12 +220,20 @@ export function MarkdownTransform(functions: FunctionRef[]): Plugin {
       }).join('\n')
 
       if (!page)
-        return linked
+        return withTwoslash(linked)
 
       const [, pkg, dir] = page
 
+      // --- Header: the VueUse info block, right after the H1 ----------------
+      // Category / Export Size / Package / Last Changed / Alias / Related, all
+      // read from the generated registry by the component, which upstream
+      // injects at this same spot. Anchored on the page's H1, which
+      // docs/writing-docs.md requires on every hook page, so a `#` inside a code
+      // block can never win the match.
+      const info = `<FunctionInfo pkg="${pkg}" dir="${dir}" />`
+      let out = linked.replace(/^# .+$/m, match => `${match}\n\n${info}`)
+
       // --- Header: demo on top, right after the description/notes -----------
-      let out = linked
       const hasDemo = existsSync(`packages/${pkg}/${dir}/demo.tsx`)
       if (hasDemo) {
         const header = `\n## Demo\n\n<DemoContainer name="${dir}" />\n\n`
@@ -155,8 +256,17 @@ export function MarkdownTransform(functions: FunctionRef[]): Plugin {
       const links = sourceLinks(pkg, dir, sourceOfPage.get(`${pkg}/${dir}`))
       if (links)
         footer.push('## Source', '', links, '')
-      footer.push(`<Contributors name="${dir}" />`)
-      return `${out.trimEnd()}\n\n${footer.join('\n')}\n`
+      // VueUse emits a `## Contributors` section around the component, so the
+      // avatars sit under a heading and the section shows up in the page
+      // outline. Emitted unconditionally to mirror upstream; the component
+      // itself renders nothing when a page has no recorded contributors.
+      footer.push('## Contributors', '', `<Contributors name="${dir}" />`)
+      // VueUse's page footer ends with the changelog timeline, fed by the
+      // `/virtual-changelog` module (`plugins/changelog.ts`). Emitted
+      // unconditionally like upstream: the component renders
+      // "No recent changes" when the page has no recorded commits.
+      footer.push('## Changelog', '', `<Changelog dir="${dir}" />`)
+      return withTwoslash(`${out.trimEnd()}\n\n${footer.join('\n')}\n`)
     },
   }
 }
