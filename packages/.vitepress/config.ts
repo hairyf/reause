@@ -17,7 +17,7 @@ import { ChangeLog, getChangeLog } from './plugins/changelog'
 import { Contributors } from './plugins/contributors'
 import { MarkdownTransform } from './plugins/markdownTransform'
 import { PWAVirtualModule } from './plugins/pwa-virtual'
-import { stripPopupImages, TWOSLASH_PATHS } from './twoslash'
+import { stripPopupImages, TWOSLASH_CACHE_DIR, TWOSLASH_PATHS } from './twoslash'
 
 /**
  * VitePress config for the reause docs site (docs root = `packages/`,
@@ -257,7 +257,9 @@ export default withPwa(defineConfig({
           },
         },
         typesCache: createFileSystemTypesCache({
-          dir: resolve(__dirname, 'cache', 'twoslash'),
+          // Pre-warmed by `scripts/warm-twoslash.ts` — see that file for why a
+          // cold cache does not fit in Netlify's build memory.
+          dir: resolve(__dirname, TWOSLASH_CACHE_DIR),
         }),
       }),
       // Hover cards render third-party JSDoc, which references images by

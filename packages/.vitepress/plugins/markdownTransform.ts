@@ -53,11 +53,20 @@ function pageOf(fn: FunctionRef): string {
     .replace(/\/index\.tsx?$/, '')
 }
 
-/** Wrap a long code block in a collapsible <details> (mirrors VueUse). */
+/**
+ * Wrap a long code block in a collapsible <details> (mirrors VueUse).
+ *
+ * Emits `no-twoslash`, keeping the generated type dump out of the twoslash pass
+ * (`resolveTwoslashMeta` strips the marker, so it renders as a plain `ts`
+ * fence). It is the largest type graph on every function page and there is one
+ * per page, making it the most expensive block to type-check and render — and
+ * the docs build has to fit Netlify's 8 GiB build container, so twoslash is
+ * reserved for the hand-written example blocks readers hover.
+ */
 function collapsible(code: string): string {
   if (code.length <= 1000)
-    return `\`\`\`ts\n${code}\n\`\`\``
-  return `<details>\n<summary>Toggle</summary>\n\n\`\`\`ts\n${code}\n\`\`\`\n\n</details>`
+    return `\`\`\`ts no-twoslash\n${code}\n\`\`\``
+  return `<details>\n<summary>Toggle</summary>\n\n\`\`\`ts no-twoslash\n${code}\n\`\`\`\n\n</details>`
 }
 
 /**
@@ -152,8 +161,9 @@ function twoslashImports(snippet: string, modules: Map<string, string>, nameRe: 
  *   (`twoslashImports`), which is what lets a continuation snippet like
  *   `const { x, y } = useMouse()` hover as the real signature instead of `any`.
  *
- * Runs last, so the auto-generated `## Type Declarations` block is covered too
- * (hovering a type there prints its definition, as on the VueUse site).
+ * Runs last over the whole page, so it also covers the auto-generated sections —
+ * except the `## Type Declarations` dump, which opts out with `no-twoslash`
+ * (see `collapsible`) because it is the most expensive block per page.
  */
 function withTwoslash(markdown: string, modules: Map<string, string>): string {
   const names = [...modules.keys()].sort((a, b) => b.length - a.length)

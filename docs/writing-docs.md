@@ -88,6 +88,8 @@ import { useXxx } from '@reause/core'
 文档站与 VueUse 一样带 twoslash：悬停变量/函数会弹出真实类型与 JSDoc。
 
 - 围栏**不需要**写 `twoslash`：`ts` / `tsx` / `typescript` 块由 `markdownTransform.ts` 在构建期自动处理。
+- **只有手写示例块参与**：自动生成的 `## Type Declarations`（`collapsible()`）显式带 `no-twoslash` 退出。它是每页最大的类型图、且有 285 个，而文档构建必须塞进 Netlify 的 8 GiB 构建容器（上游未修问题 [shikijs/shiki#796](https://github.com/shikijs/shiki/issues/796)）——所以**类型声明区里的类型没有悬停卡片**，这是为了让示例块的悬停保住。
+- `docs:build` 先用 `scripts/warm-twoslash.ts` 预热 twoslash types cache（独立进程，986 块约 1.1 GB / 51 s）。缓存命中会跳过 TS 编译：实测 300 块 cold 983MB/20s → warm 362MB/4s，输出一致。缓存目录 `packages/.vitepress/cache/twoslash` 是 gitignore 的，所以每次 CI 都要靠这一步预热。
 - 注入的是**该块真正引用到的 hook**：`markdownTransform.ts` 拿 registry 匹配块里的标识符，逐个生成 `import { useMouse } from '@reause/core/useMouse'`，再由 `TWOSLASH_PATHS`（`config.ts` 里 twoslash 的 `paths`）解析到该 hook 的**源码模块**。注入内容被 `// ---cut-*---` 裁掉，读者看不到；也正因为注入了 hook 名，不写 import 的 `const { x, y } = useMouse()` 才能悬停出真实签名。
 - **为什么按块注入，而不是像 VueUse 那样注入一个静态列表**：VueUse 的列表只有 `vue` 一个模块；reause 的 hook 分散在七个包里，而每个包只产出单个 `dist/index.d.ts`（`@reause/core/useMouse` 这类深路径不存在），所以任何 barrel import（`import ... from '@reause/core'`）都会把整包的**全部类型图 + 第三方类型**（firebase、rxjs、axios、electron…）拉进这个块的 TS program。把 registry 全量注入 ~690 个块，会让 `docs:build` 在 Netlify 上堆溢出（`--max-old-space-size=8192` 也不够）；按块注入后，一个块的 program 大致只有「它引用的那个 hook + react」，与 VueUse 的量级相当。
 - 注入只覆盖 registry 里的 hook；工具函数（`unrefElement`、`toValue`…）和**类型**（`UseXxxOptions` 等）仍要自己写 import。

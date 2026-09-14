@@ -84,6 +84,14 @@ export const TWOSLASH_PATHS: Record<string, string[]> = Object.fromEntries(
   PACKAGES.map(pkg => [`@reause/${pkg}/*`, [`./packages/${pkg}/*`]]),
 )
 
+/**
+ * Twoslash types cache directory, relative to `packages/.vitepress`. Shared by
+ * `config.ts` (which reads/writes it) and `scripts/warm-twoslash.ts` (which
+ * pre-populates it), and gitignored — CI has to pre-warm it, because a cold
+ * cache is what makes this build exhaust Netlify's 8 GiB.
+ */
+export const TWOSLASH_CACHE_DIR = 'cache/twoslash'
+
 /** Each hover/error/completion card is emitted as a FloatingVue popper template. */
 const POPPER_RE = /<template v-slot:popper[^>]*>[\s\S]*?<\/template>/g
 
