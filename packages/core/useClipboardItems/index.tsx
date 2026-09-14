@@ -1,5 +1,5 @@
 import { useTimeoutFn } from '@reause/shared'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useSupported } from '../useSupported'
 
 export interface UseClipboardItemsOptions<Source> {
@@ -31,24 +31,13 @@ export interface UseClipboardItemsOptions<Source> {
   navigator?: Navigator
 }
 
-export interface UseClipboardItemsReturn<Optional> {
-  /**
-   * `true` when the resolved navigator exposes the Clipboard API (`'clipboard' in navigator`).
-   * Resolved in a mount effect, so it stays `false` during the first render and on the server
-   * (SSR-safe).
-   */
-  isSupported: boolean
+export type UseClipboardItemsReturn<Optional> = readonly [
   /**
    * The clipboard items currently read from the system clipboard. Updated by a successful `copy`,
    * by a manual `read()` call, and automatically when `read` is enabled and a `copy` / `cut` event
    * fires.
    */
-  content: ClipboardItems
-  /**
-   * Whether the last `copy` call succeeded. Resets to `false` after `copiedDuring` milliseconds via
-   * a timeout.
-   */
-  copied: boolean
+  content: ClipboardItems,
   /**
    * Asynchronously writes `content` to the system clipboard. When the `source` option is provided
    * it may be called without arguments; it is a no-op (resolves without writing) when the Clipboard
@@ -60,12 +49,25 @@ export interface UseClipboardItemsReturn<Optional> {
    */
   copy: Optional extends true
     ? (content?: ClipboardItems) => Promise<void>
-    : (content: ClipboardItems) => Promise<void>
-  /**
-   * Manually reads the current clipboard content into `content`.
-   */
-  read: () => void
-}
+    : (content: ClipboardItems) => Promise<void>,
+  controls: {
+    /**
+     * Whether the last `copy` call succeeded. Resets to `false` after `copiedDuring` milliseconds via
+     * a timeout.
+     */
+    copied: boolean
+    /**
+     * `true` when the resolved navigator exposes the Clipboard API (`'clipboard' in navigator`).
+     * Resolved in a mount effect, so it stays `false` during the first render and on the server
+     * (SSR-safe).
+     */
+    isSupported: boolean
+    /**
+     * Manually reads the current clipboard content into `content`.
+     */
+    read: () => void
+  },
+]
 
 /**
  * Map from @vueuse/core `useClipboardItems`
@@ -78,7 +80,7 @@ export interface UseClipboardItemsReturn<Optional> {
  *   }),
  * ]
  *
- * const { isSupported, content, copy, copied } = useClipboardItems({ source })
+ * const [content, copy, { copied, isSupported }] = useClipboardItems({ source })
  */
 export function useClipboardItems(options?: UseClipboardItemsOptions<undefined>): UseClipboardItemsReturn<false>
 export function useClipboardItems(options: UseClipboardItemsOptions<ClipboardItems>): UseClipboardItemsReturn<true>
@@ -152,5 +154,8 @@ export function useClipboardItems(options: UseClipboardItemsOptions<ClipboardIte
     }
   }, [start])
 
-  return { isSupported, content, copied, copy, read: updateContent }
+  // stable controls object — new identity only when its members change
+  const controls = useMemo(() => ({ copied, isSupported, read: updateContent }), [copied, isSupported, updateContent])
+
+  return [content, copy, controls]
 }

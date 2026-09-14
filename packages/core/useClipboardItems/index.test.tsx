@@ -1,4 +1,5 @@
-import { afterEach, expect, it, vi } from 'vitest'
+import type { UseClipboardItemsReturn } from '../useClipboardItems'
+import { afterEach, expect, expectTypeOf, it, vi } from 'vitest'
 import { render, renderHook } from 'vitest-browser-react'
 import { useClipboardItems } from '../useClipboardItems'
 
@@ -39,24 +40,24 @@ it('reports support matching the resolved navigator', async () => {
   const isSupportedInEnv = typeof navigator !== 'undefined' && 'clipboard' in navigator
   const { result } = await renderHook(() => useClipboardItems())
 
-  await expect.poll(() => result.current.isSupported).toBe(isSupportedInEnv)
+  await expect.poll(() => result.current[2].isSupported).toBe(isSupportedInEnv)
 })
 
 it('copy() writes the items, updates content and toggles copied', async () => {
   const { writeSpy } = installClipboard()
   const { result, act } = await renderHook(() => useClipboardItems())
 
-  await expect.poll(() => result.current.isSupported).toBe(true)
+  await expect.poll(() => result.current[2].isSupported).toBe(true)
 
   const items = createItems('hello')
   await act(async () => {
-    await result.current.copy(items)
+    await result.current[1](items)
   })
 
   expect(writeSpy).toHaveBeenCalledTimes(1)
   expect(writeSpy).toHaveBeenCalledWith(items)
-  expect(result.current.copied).toBe(true)
-  expect(result.current.content).toEqual(items)
+  expect(result.current[2].copied).toBe(true)
+  expect(result.current[0]).toEqual(items)
 })
 
 it('copy() falls back to the source option', async () => {
@@ -64,14 +65,14 @@ it('copy() falls back to the source option', async () => {
   const source = createItems('from source')
   const { result, act } = await renderHook(() => useClipboardItems({ source }))
 
-  await expect.poll(() => result.current.isSupported).toBe(true)
+  await expect.poll(() => result.current[2].isSupported).toBe(true)
 
   await act(async () => {
-    await result.current.copy()
+    await result.current[1]()
   })
 
   expect(writeSpy).toHaveBeenCalledWith(source)
-  expect(result.current.content).toEqual(source)
+  expect(result.current[0]).toEqual(source)
 })
 
 it('copy() reads the latest source at call time', async () => {
@@ -82,13 +83,13 @@ it('copy() reads the latest source at call time', async () => {
   let latest = createItems('stale')
   const { result, act, rerender } = await renderHook(() => useClipboardItems({ source: latest }))
 
-  await expect.poll(() => result.current.isSupported).toBe(true)
+  await expect.poll(() => result.current[2].isSupported).toBe(true)
 
   latest = source
   await rerender()
 
   await act(async () => {
-    await result.current.copy()
+    await result.current[1]()
   })
 
   expect(writeSpy).toHaveBeenCalledWith(source)
@@ -99,12 +100,12 @@ it('copy() rejects and keeps copied false when the write fails', async () => {
   writeSpy.mockRejectedValueOnce(new Error('write denied'))
   const { result, act } = await renderHook(() => useClipboardItems())
 
-  await expect.poll(() => result.current.isSupported).toBe(true)
+  await expect.poll(() => result.current[2].isSupported).toBe(true)
 
   let error: unknown
   await act(async () => {
     try {
-      await result.current.copy(createItems('hello'))
+      await result.current[1](createItems('hello'))
     }
     catch (e) {
       error = e
@@ -112,24 +113,24 @@ it('copy() rejects and keeps copied false when the write fails', async () => {
   })
 
   expect(error).toBeInstanceOf(Error)
-  expect(result.current.copied).toBe(false)
-  expect(result.current.content).toEqual([])
+  expect(result.current[2].copied).toBe(false)
+  expect(result.current[0]).toEqual([])
 })
 
 it('resets copied to false after copiedDuring', async () => {
   installClipboard()
   const { result, act } = await renderHook(() => useClipboardItems({ copiedDuring: 50 }))
 
-  await expect.poll(() => result.current.isSupported).toBe(true)
+  await expect.poll(() => result.current[2].isSupported).toBe(true)
 
   const items = createItems('hello')
   await act(async () => {
-    await result.current.copy(items)
+    await result.current[1](items)
   })
-  expect(result.current.copied).toBe(true)
+  expect(result.current[2].copied).toBe(true)
 
-  await expect.poll(() => result.current.copied).toBe(false)
-  expect(result.current.content).toEqual(items)
+  await expect.poll(() => result.current[2].copied).toBe(false)
+  expect(result.current[0]).toEqual(items)
 })
 
 it('read() pulls the clipboard items into content', async () => {
@@ -137,13 +138,13 @@ it('read() pulls the clipboard items into content', async () => {
   const { readSpy } = installClipboard(items)
   const { result, act } = await renderHook(() => useClipboardItems())
 
-  await expect.poll(() => result.current.isSupported).toBe(true)
+  await expect.poll(() => result.current[2].isSupported).toBe(true)
 
   await act(async () => {
-    result.current.read()
+    result.current[2].read()
   })
 
-  await expect.poll(() => result.current.content).toEqual(items)
+  await expect.poll(() => result.current[0]).toEqual(items)
   expect(readSpy).toHaveBeenCalledTimes(1)
 })
 
@@ -152,18 +153,18 @@ it('listens for copy/cut events and refreshes content when read is enabled', asy
   const { readSpy } = installClipboard(items)
   const { result, act } = await renderHook(() => useClipboardItems({ read: true }))
 
-  await expect.poll(() => result.current.isSupported).toBe(true)
+  await expect.poll(() => result.current[2].isSupported).toBe(true)
 
   await act(async () => {
     window.dispatchEvent(new Event('copy'))
   })
-  await expect.poll(() => result.current.content).toEqual(items)
+  await expect.poll(() => result.current[0]).toEqual(items)
   expect(readSpy).toHaveBeenCalledTimes(1)
 
   await act(async () => {
     window.dispatchEvent(new Event('cut'))
   })
-  await expect.poll(() => result.current.content).toEqual(items)
+  await expect.poll(() => result.current[0]).toEqual(items)
   expect(readSpy).toHaveBeenCalledTimes(2)
 })
 
@@ -177,7 +178,7 @@ it('re-binds the copy/cut listeners when `read` toggles after mount', async () =
     { initialProps: { read: false } },
   )
 
-  await expect.poll(() => result.current.isSupported).toBe(true)
+  await expect.poll(() => result.current[2].isSupported).toBe(true)
 
   // `read: false` — no listener is bound
   window.dispatchEvent(new Event('copy'))
@@ -189,7 +190,7 @@ it('re-binds the copy/cut listeners when `read` toggles after mount', async () =
     window.dispatchEvent(new Event('copy'))
   })
   await expect.poll(() => readSpy).toHaveBeenCalledTimes(1)
-  await expect.poll(() => result.current.content).toEqual(items)
+  await expect.poll(() => result.current[0]).toEqual(items)
 
   // toggling `read` back off removes them again
   await rerender({ read: false })
@@ -205,18 +206,18 @@ it('copy() and read() no-op when the Clipboard API is unsupported', async () => 
       Reflect.deleteProperty(Navigator.prototype, 'clipboard')
 
     const { result, act } = await renderHook(() => useClipboardItems())
-    await expect.poll(() => result.current.isSupported).toBe(false)
+    await expect.poll(() => result.current[2].isSupported).toBe(false)
 
     await act(async () => {
-      await result.current.copy(createItems('hello'))
+      await result.current[1](createItems('hello'))
     })
-    expect(result.current.copied).toBe(false)
-    expect(result.current.content).toEqual([])
+    expect(result.current[2].copied).toBe(false)
+    expect(result.current[0]).toEqual([])
 
     await act(async () => {
-      result.current.read()
+      result.current[2].read()
     })
-    expect(result.current.content).toEqual([])
+    expect(result.current[0]).toEqual([])
   }
   finally {
     if (descriptor)
@@ -230,7 +231,7 @@ it('keeps SSR-safe defaults during render and resolves in a mount effect', async
   const values: Array<{ isSupported: boolean, content: ClipboardItems, copied: boolean }> = []
 
   function Probe() {
-    const { isSupported, content, copied } = useClipboardItems()
+    const [content, , { isSupported, copied }] = useClipboardItems()
     values.push({ isSupported, content, copied })
 
     return <div>{isSupported ? 'supported' : 'unsupported'}</div>
@@ -246,4 +247,34 @@ it('keeps SSR-safe defaults during render and resolves in a mount effect', async
   // the mount effect probes the Clipboard API and re-renders
   await expect.element(screen.getByText('supported')).toBeVisible()
   expect(values[values.length - 1].isSupported).toBe(true)
+})
+
+it('returns a React tuple [content, copy, { copied, isSupported, read }]', async () => {
+  installClipboard()
+  const { result } = await renderHook(() => useClipboardItems())
+
+  expectTypeOf(result.current).toEqualTypeOf<UseClipboardItemsReturn<false>>()
+  expectTypeOf(result.current[0]).toEqualTypeOf<ClipboardItems>()
+  expectTypeOf(result.current[1]).toEqualTypeOf<(content: ClipboardItems) => Promise<void>>()
+  expectTypeOf(result.current[2].copied).toEqualTypeOf<boolean>()
+  expectTypeOf(result.current[2].isSupported).toEqualTypeOf<boolean>()
+  expectTypeOf(result.current[2].read).toEqualTypeOf<() => void>()
+
+  expect(Array.isArray(result.current)).toBe(true)
+  expect(result.current).toHaveLength(3)
+  expect(result.current[0]).toEqual([])
+  expect(result.current[1]).toBeTypeOf('function')
+  expect(result.current[2].copied).toBe(false)
+  expect(result.current[2].read).toBeTypeOf('function')
+})
+
+it('keeps the controls object identity while its members are unchanged', async () => {
+  installClipboard()
+  const { result, rerender } = await renderHook(() => useClipboardItems())
+  await expect.poll(() => result.current[2].isSupported).toBe(true)
+
+  const first = result.current[2]
+  await rerender()
+
+  expect(result.current[2]).toBe(first)
 })

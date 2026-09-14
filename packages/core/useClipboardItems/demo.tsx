@@ -5,7 +5,7 @@ const mime = 'text/plain'
 
 export default function UseClipboardItemsDemo() {
   const [input, setInput] = useState('')
-  const { content, isSupported, copy, read } = useClipboardItems()
+  const [content, copy, { isSupported, read }] = useClipboardItems()
   const [computedText, setComputedText] = useState('')
   const [computedMimeType, setComputedMimeType] = useState('')
   const permissionRead = usePermission('clipboard-read')

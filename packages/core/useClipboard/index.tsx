@@ -1,5 +1,5 @@
 import { useTimeoutFn } from '@reause/shared'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { usePermission } from '../usePermission'
 import { useSupported } from '../useSupported'
 
@@ -38,26 +38,12 @@ export interface UseClipboardOptions<Source> {
 
 type ClipboardValue = string | (() => Promise<string | undefined>)
 
-export interface UseClipboardReturn<Optional> {
-  /**
-   * `true` when the resolved navigator exposes `clipboard` (native Clipboard API) or `legacy: true`
-   * opts into the `document.execCommand` fallback. Resolved in a mount effect, so it stays `false`
-   * during the first render and on the server (SSR-safe).
-   */
-  isSupported: boolean
+export type UseClipboardReturn<Optional> = readonly [
   /**
    * Current clipboard text — updated by `copy` and, when `read: true`, by `copy`/`cut` events on
    * `window`.
    */
-  text: string
-  /**
-   * `true` after a successful copy, auto-resets to `false` after `copiedDuring` milliseconds.
-   */
-  copied: boolean
-  /**
-   * `true` while a `copy` call is in flight.
-   */
-  copyPending: boolean
+  text: string,
   /**
    * Writes to the clipboard. Resolves when the write completes — through the native Async Clipboard
    * API when available, falling back to `document.execCommand('copy')` otherwise. Accepts a string
@@ -66,8 +52,24 @@ export interface UseClipboardReturn<Optional> {
    */
   copy: Optional extends true
     ? (text?: ClipboardValue) => Promise<void>
-    : (text: ClipboardValue) => Promise<void>
-}
+    : (text: ClipboardValue) => Promise<void>,
+  controls: {
+    /**
+     * `true` after a successful copy, auto-resets to `false` after `copiedDuring` milliseconds.
+     */
+    copied: boolean
+    /**
+     * `true` when the resolved navigator exposes `clipboard` (native Clipboard API) or `legacy: true`
+     * opts into the `document.execCommand` fallback. Resolved in a mount effect, so it stays `false`
+     * during the first render and on the server (SSR-safe).
+     */
+    isSupported: boolean
+    /**
+     * `true` while a `copy` call is in flight.
+     */
+    copyPending: boolean
+  },
+]
 
 function isAllowed(status: PermissionState | undefined) {
   return status === 'granted' || status === 'prompt'
@@ -110,7 +112,7 @@ function createClipboardItem(
  * (`source/vueuse/packages/core/useClipboard/`).
  *
  * @example
- * const { text, copy, copied, isSupported } = useClipboard({ source: 'Hello' })
+ * const [text, copy, { copied, isSupported }] = useClipboard({ source: 'Hello' })
  *
  * copy('Hello') // writes to the clipboard; `copied` auto-resets after 1.5s
  */
@@ -219,11 +221,8 @@ export function useClipboard(options: UseClipboardOptions<string | undefined> = 
     }
   }, [resetCopiedTimer])
 
-  return {
-    isSupported,
-    text,
-    copied,
-    copyPending,
-    copy,
-  }
+  // stable controls object — new identity only when its members change
+  const controls = useMemo(() => ({ copied, isSupported, copyPending }), [copied, isSupported, copyPending])
+
+  return [text, copy, controls]
 }
