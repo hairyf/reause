@@ -1,6 +1,5 @@
-import type { DependencyList } from 'react'
-import { deepEqual, useLatest } from '@reause/shared'
-import { useCallback, useRef, useState } from 'react'
+import { useLatest } from '@reause/shared'
+import { useRef, useState } from 'react'
 import { useMounted } from '../useMounted'
 
 /**
@@ -64,80 +63,40 @@ export type AsyncFnReturn<T extends FunctionReturningPromise = FunctionReturning
 ]
 
 /**
- * reause-only options — an owner-requested, strictly opt-in extension to upstream's positional
- * signature.
- */
-export interface UseAsyncFnOptions {
-  /**
-   * Compare `deps` structurally (`@reause/shared`'s `deepEqual`, covering arrays, plain objects,
-   * `Date`, `RegExp`, `Map` and `Set`) instead of element-wise reference equality.
-   *
-   * The default is `false`: reference-based comparison is kept so upstream react-use behaviour is
-   * unchanged, and `deep: true` is always the caller's explicit choice.
-   *
-   * @default false
-   */
-  deep?: boolean
-}
-
-/**
- * Whether two dependency lists are "the same" for memoisation purposes.
- *
- * Without `deep` this is React's own comparison — equal length plus element-wise `Object.is` — so
- * the default stays reference-based. With `deep: true` every element is compared structurally
- * instead.
- */
-function depsEqual(prev: DependencyList, next: DependencyList, deep: boolean): boolean {
-  if (prev === next)
-    return true
-  if (prev.length !== next.length)
-    return false
-  return prev.every((value, index) =>
-    deep ? deepEqual(value, next[index]) : Object.is(value, next[index]),
-  )
-}
-
-/**
  * Map from react-use `useAsyncFn`
  * (`source/react-use/src/useAsyncFn.ts`).
+ *
+ * Deviation from upstream: `deps` is not supported, and the reause-only
+ * `options.deep` extension that once replaced it is gone as well — the hook
+ * takes only `fn` and an optional `initialState`. The callback is therefore a
+ * fresh function on every render rather than a memoised one: it always reads
+ * the latest `fn` and state, at the cost of a new identity per render, so it
+ * must not be used as a dependency of `useMemo` / `useCallback` / `useEffect`.
  *
  * @example
  * const [state, doFetch] = useAsyncFn(async (id: string) => {
  *   const response = await fetch(`/api/item/${id}`)
  *   return response.json()
- * }, [])
+ * })
  *
  * // state: { loading: true } | { loading: false, value } | { loading: false, error }
  * const value = await doFetch('42') // the raw promise is returned
  *
  * @example
- * // opt-in deep comparison — an equal-but-new `filters` object keeps the
- * // callback (and therefore does not invalidate memos that depend on it)
- * const [state, search] = useAsyncFn(
- *   async () => query(filters),
- *   [filters],
- *   { loading: false },
- *   { deep: true },
- * )
+ * // the state before the first call can be seeded
+ * const [state, search] = useAsyncFn(async () => query(filters), { loading: false })
  *
  * @param fn The async function (or promise-returning function) to wrap.
- * @param deps Dependency list deciding the callback's identity. Defaults to
- * `[]` (the callback is created once).
  * @param initialState The state before the first call. Defaults to
  * `{ loading: false }` (upstream default).
- * @param options reause-only options; `deep` opts into structural `deps`
- * comparison. Omit it for exact upstream behaviour.
  * @returns The `[state, callback]` tuple — `state` is the `AsyncState` union
- * and `callback` the memoised async wrapper that also returns the raw promise.
+ * and `callback` the async wrapper that also returns the raw promise.
  * @see https://github.com/streamich/react-use/blob/master/docs/useAsyncFn.md
  */
 export function useAsyncFn<T extends FunctionReturningPromise>(
   fn: T,
-  deps: DependencyList = [],
   initialState: StateFromFunctionReturningPromise<T> = { loading: false },
-  options: UseAsyncFnOptions = {},
 ): AsyncFnReturn<T> {
-  const { deep = false } = options
   const lastCallId = useRef(0)
   const isMounted = useMounted()
   // `useMounted()` returns the mounted boolean of the render that called it;
@@ -146,17 +105,7 @@ export function useAsyncFn<T extends FunctionReturningPromise>(
   // getter that reads its ref in the same way).
   const isMountedRef = useLatest(isMounted)
   const [state, set] = useState<StateFromFunctionReturningPromise<T>>(initialState)
-
-  // `deps` decides the callback identity. `stableDeps` keeps the previous array
-  // whenever `depsEqual` says "unchanged", so `useCallback` sees the same array
-  // identity and returns the same callback — with `deep: true` that also covers
-  // equal-but-new references.
-  const stableDepsRef = useRef<DependencyList>(deps)
-  if (!depsEqual(stableDepsRef.current, deps, deep))
-    stableDepsRef.current = deps
-  const stableDeps = stableDepsRef.current
-
-  const callback = useCallback((...args: Parameters<T>): ReturnType<T> => {
+  const callback = (...args: Parameters<T>): ReturnType<T> => {
     const callId = ++lastCallId.current
 
     if (!state.loading)
@@ -177,7 +126,7 @@ export function useAsyncFn<T extends FunctionReturningPromise>(
         return error
       },
     ) as ReturnType<T>
-  }, stableDeps)
+  }
 
   return [state, callback as unknown as T]
 }
