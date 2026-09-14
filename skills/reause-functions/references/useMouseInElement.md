@@ -108,7 +108,7 @@ export interface UseMouseInElementReturn {
  * const { x, y, elementX, elementY, isOutside } = useMouseInElement(target)
  */
 export declare function useMouseInElement(
-  target?: RefOrValue<HTMLElement | null | undefined>,
+  target?: RefObject<HTMLElement | null | undefined>,
   options?: MouseInElementOptions,
 ): UseMouseInElementReturn
 ```

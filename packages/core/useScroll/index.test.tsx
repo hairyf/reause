@@ -34,14 +34,14 @@ describe('useScroll', () => {
   })
 
   it('should have default x and y', async () => {
-    const { result } = await renderHook(() => useScroll(window))
+    const { result } = await renderHook(() => useScroll({ current: window }))
 
     expect(result.current.x).toBe(0)
     expect(result.current.y).toBe(0)
   })
 
   it('should have right default values', async () => {
-    const { result } = await renderHook(() => useScroll(window))
+    const { result } = await renderHook(() => useScroll({ current: window }))
 
     expect(result.current.x).toBe(0)
     expect(result.current.y).toBe(0)
@@ -64,7 +64,7 @@ describe('useScroll', () => {
   })
 
   it('should expose setters that scroll the element', async () => {
-    const { result, act } = await renderHook(() => useScroll(window))
+    const { result, act } = await renderHook(() => useScroll({ current: window }))
 
     // the window is not scrollable in the test viewport, so the position
     // stays clamped at 0 — the setters must at least not throw and stay
@@ -252,7 +252,7 @@ async function scrollListenerFor(throttle: number, onScroll: (e: Event) => void)
   el.style.overflow = 'auto'
   el.innerHTML = '<div style="width: 200px; height: 200px;"></div>'
   const addSpy = vi.spyOn(el, 'addEventListener')
-  const hook = await renderHook(() => useScroll(el, { throttle, onScroll }))
+  const hook = await renderHook(() => useScroll({ current: el }, { throttle, onScroll }))
   const scrollCall = addSpy.mock.calls.find(([type]) => type === 'scroll')
   addSpy.mockRestore()
   return {
@@ -306,7 +306,7 @@ describe('useScroll cleanup on unmount', () => {
     const disconnectSpy = vi.spyOn(MutationObserver.prototype, 'disconnect')
     const onScroll = vi.fn()
 
-    const { act, unmount } = await renderHook(() => useScroll(el, { observe: true, onScroll }))
+    const { act, unmount } = await renderHook(() => useScroll({ current: el }, { observe: true, onScroll }))
 
     // both listeners are registered exactly once
     expect(addSpy.mock.calls.filter(([type]) => type === 'scroll')).toHaveLength(1)

@@ -1,6 +1,4 @@
-import type { RefOrValue } from '../index'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { toValue } from '../utils'
 
 export interface UseTimeoutOptions<Controls extends boolean = false> {
   /**
@@ -47,27 +45,23 @@ export interface UseTimeoutReturn {
 }
 
 /**
- * React port of VueUse's `useTimeout`.
- *
  * Map from @vueuse/shared `useTimeout`
- * Mapping: upstream `useTimeout` wraps `useTimeoutFn` and derives
- * `ready` as `!isPending`; since `useTimeoutFn` is mapped in its own module,
- * this port inlines the timer logic to stay self-contained — `ref` →
- * `useState` for `isPending`, `ready` derived as `!isPending` like upstream,
- * the setup-time `start()` (immediate) becomes an empty-dependency `useEffect`
- * on mount, and `tryOnScopeDispose(stop)` becomes the effect cleanup.
- * `interval` accepts a number or a React ref (upstream: `RefOrValue<number>`);
- * `start` / `stop` are stable `useCallback`s.
+ * Mapping: upstream `useTimeout` wraps `useTimeoutFn` and derives `ready` as `!isPending`; since
+ * `useTimeoutFn` is mapped in its own module, this port inlines the timer logic to stay
+ * self-contained — `ref` → `useState` for `isPending`, `ready` derived as `!isPending` like
+ * upstream, the setup-time `start()` (immediate) becomes an empty-dependency `useEffect` on mount,
+ * and `tryOnScopeDispose(stop)` becomes the effect cleanup. `interval` is a plain number; `start` /
+ * `stop` are stable `useCallback`s.
  *
  * @example
  * const ready = useTimeout(1000) // boolean, becomes true after 1s
  *
  * const { ready, start, stop } = useTimeout(1000, { controls: true })
  */
-export function useTimeout(interval?: RefOrValue<number>, options?: UseTimeoutOptions<false>): boolean
-export function useTimeout(interval: RefOrValue<number>, options: UseTimeoutOptions<true>): UseTimeoutReturn
+export function useTimeout(interval?: number, options?: UseTimeoutOptions<false>): boolean
+export function useTimeout(interval: number, options: UseTimeoutOptions<true>): UseTimeoutReturn
 export function useTimeout(
-  interval: RefOrValue<number> = 1000,
+  interval: number = 1000,
   options: UseTimeoutOptions<boolean> = {},
 ): boolean | UseTimeoutReturn {
   const {
@@ -106,7 +100,7 @@ export function useTimeout(
       timerRef.current = null
     }
     setIsPending(true)
-    const delay = toValue(intervalRef.current)
+    const delay = intervalRef.current
     timerRef.current = setTimeout(() => {
       timerRef.current = null
       setIsPending(false)

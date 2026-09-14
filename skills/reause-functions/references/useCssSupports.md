@@ -92,7 +92,7 @@ export interface UseCssSupportsReturn {
  *   `{ isSupported }`, so components re-render whenever the resolved inputs
  *   change and the support result is recomputed;
  * - `property` / `value` / `conditionText` accept a plain string or a ref-like
- *   `{ current }` object (upstream `RefOrValue`); they are
+ *   `{ current }` object (upstream `MaybeRefOrGetter`); they are
  *   re-resolved on every render and `CSS.supports` is re-evaluated in an
  *   effect whenever a resolved input changes;
  * - the upstream `useMounted` gate is implicit: the evaluation lives in the
@@ -114,12 +114,12 @@ export interface UseCssSupportsReturn {
  * const { isSupported: flexbox } = useCssSupports('display: flex')
  */
 export declare function useCssSupports(
-  property: RefOrValue<string>,
-  value: RefOrValue<string>,
+  property: string,
+  value: string,
   options?: UseCssSupportsOptions,
 ): UseCssSupportsReturn
 export declare function useCssSupports(
-  conditionText: RefOrValue<string>,
+  conditionText: string,
   options?: UseCssSupportsOptions,
 ): UseCssSupportsReturn
 ```

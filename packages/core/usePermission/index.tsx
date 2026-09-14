@@ -30,10 +30,10 @@ export interface UsePermissionOptions<Controls extends boolean = false> {
    */
   controls?: Controls
   /**
-   * Specify a custom `navigator` instance (upstream `ConfigurableNavigator`),
-   * e.g. when the Permissions API should be queried against an iframe or a
-   * testing environment instead of the global `navigator`. Defaults to the
-   * global `navigator`; substitution only happens for `undefined`.
+   * Specify a custom `navigator` instance (upstream `ConfigurableNavigator`), e.g. when the
+   * Permissions API should be queried against an iframe or a testing environment instead of the
+   * global `navigator`. Defaults to the global `navigator`; substitution only happens for
+   * `undefined`.
    */
   navigator?: Navigator
 }
@@ -47,12 +47,10 @@ export interface UsePermissionReturnWithControls {
 }
 
 /**
- * React port of VueUse's `usePermission`.
- *
  * Map from @vueuse/core `usePermission`
  * (`source/vueuse/packages/core/usePermission/`). Reactive
- * [Permissions API](https://developer.mozilla.org/en-US/docs/Web/API/Permissions_API)
- * state as a plain string — `'granted' | 'denied' | 'prompt'`.
+ * [Permissions API](https://developer.mozilla.org/en-US/docs/Web/API/Permissions_API) state as a
+ * plain string — `'granted' | 'denied' | 'prompt'`.
  *
  * React divergences:
  * - the `ShallowRef<PermissionState | undefined>` return becomes a plain
@@ -63,10 +61,8 @@ export interface UsePermissionReturnWithControls {
  *   setup) and re-queries when the descriptor changes; the descriptor is
  *   serialized for change detection, so inline object literals are safe and
  *   descriptor objects don't need a stable identity;
- * - the `change` listener attaches to the resolved `PermissionStatus` and is
- *   removed on unmount and when the descriptor changes; an in-flight query
- *   that resolves after unmount is ignored (no listener re-attach, no state
- *   update);
+ * - the `change` listener attaches to the resolved `PermissionStatus`; an in-flight query that
+ * resolves after unmount is ignored (no listener re-attach, no state update);
  * - `navigator` is a read-only option that defaults to the global
  *   `navigator` (upstream `ConfigurableNavigator`) — pass a custom instance
  *   to query the Permissions API against another environment;

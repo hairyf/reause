@@ -3,8 +3,8 @@ import { useEffect, useRef } from 'react'
 import { BehaviorSubject, from } from 'rxjs'
 
 /**
- * Observable-like: an object or function exposing a `subscribe` method (an
- * rxjs `Observable`, `Subject`, `BehaviorSubject`, ...).
+ * Observable-like: an object or function exposing a `subscribe` method (an rxjs `Observable`,
+ * `Subject`, `BehaviorSubject`...).
  */
 function isObservableLike(value: unknown): boolean {
   return value !== null
@@ -22,16 +22,14 @@ function isPromiseLike(value: unknown): boolean {
 }
 
 /**
- * Create an [`Observable`](https://rxjs.dev/guide/observable) from either an
- * rxjs `ObservableInput` (forwarded to RxJS's
- * [`from()`](https://rxjs.dev/api/index/function/from) unchanged) or a plain
+ * Create an [`Observable`](https://rxjs.dev/guide/observable) from either an rxjs `ObservableInput`
+ * (forwarded to RxJS's [`from()`](https://rxjs.dev/api/index/function/from) unchanged) or a plain
  * value that re-emits whenever it changes across renders.
  *
  * Map from @vueuse/rxjs `from`
  * (`source/vueuse/packages/rxjs/from/`): upstream branches on Vue's `isRef`
  * and `watch`es the ref; React has no reactive refs, so the port branches on
- * observable-/promise-likeness and pushes plain values through an internal
- * effect instead.
+ * observable-/promise-likeness and pushes plain values through an internal effect instead.
  *
  * Branch discriminator (runtime):
  * - a value with a `subscribe` function (Observable-like) or a `then` function
@@ -52,7 +50,7 @@ function isPromiseLike(value: unknown): boolean {
  *   `deep` / `flush` are not mapped — handle extra control at the call site
  *   with rxjs operators or effect dependencies.
  * - the value source is a plain `T` only — never a getter, `State<T>` or
- *   `RefOrValue` (AGENTS.md §2).
+ *   `MaybeRefOrGetter` (AGENTS.md §2).
  * - on unmount the subject is completed: subscriptions stop and no further
  *   emissions are delivered. In dev, React StrictMode remounts effects and
  *   runs that cleanup, which completes the subject; the mount effect detects

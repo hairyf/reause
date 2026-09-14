@@ -147,7 +147,7 @@ export interface UseInfiniteScrollReturn {
  * reset()
  */
 export declare function useInfiniteScroll<T extends InfiniteScrollElement>(
-  element: RefOrValue<T>,
+  element: RefObject<T | null>,
   onLoadMore: (state: UseScrollReturn) => Awaitable<void>,
   options?: UseInfiniteScrollOptions<T>,
 ): UseInfiniteScrollReturn

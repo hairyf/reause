@@ -21,7 +21,7 @@ useEffect(() => {
   return () => window.removeEventListener('resize', throttledFn)
 }, [throttledFn])
 // note: returned fn is referentially stable so effects don't re-subscribe;
-// ms accepts a number or a ref-like `{ current: number }` object, re-read on
+// ms is a plain number, re-read on
 // every call
 ```
 
@@ -50,8 +50,8 @@ export type PromisifyFn<T extends FunctionArgs> = (
  * across renders — safe to add/remove in effects; the latest `fn` / `ms` /
  * `trailing` / `leading` / `rejectOnCancel` are mirrored into refs so every
  * call sees fresh values (upstream captures the flags once, at filter
- * creation). `ms` accepts a number or a ref-like `{ current: number }`
- * (upstream: `RefOrValue<number>`) and is re-read on every call. The
+ * creation). `ms` is a plain number, re-read on every call (upstream:
+ * `MaybeRefOrGetter<number>`). The
  * throttle filter logic is inlined (upstream: `utils/filters.ts`
  * `throttleFilter` — leading/trailing timestamps with a trailing invoke on
  * window end). The wrapper is cleaned up on unmount: any pending trailing
@@ -78,7 +78,7 @@ export type PromisifyFn<T extends FunctionArgs> = (
  */
 export declare function useThrottleFn<T extends FunctionArgs>(
   fn: T,
-  ms?: RefOrValue<number>,
+  ms?: number,
   trailing?: boolean,
   leading?: boolean,
   rejectOnCancel?: boolean,

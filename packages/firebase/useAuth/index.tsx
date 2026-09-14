@@ -11,27 +11,26 @@ export interface UseAuthOptions {
 }
 
 /**
- * Result object of `useAuth` — the plain-value counterpart of upstream's
- * `{ isAuthenticated, user }` refs, plus the `loading` and `error` states.
+ * Result object of `useAuth` — the plain-value counterpart of upstream's `{ isAuthenticated, user
+ * }` refs, plus the `loading` and `error` states.
  */
 export interface UseAuthReturn {
   /**
-   * Whether a user is currently authenticated (upstream's `isAuthenticated`
-   * computed): `true` whenever `user` is not `null`.
+   * Whether a user is currently authenticated (upstream's `isAuthenticated` computed): `true`
+   * whenever `user` is not `null`.
    */
   isAuthenticated: boolean
 
   /**
-   * The current Firebase user, or `null` if not authenticated (upstream's
-   * `user` ref). Seeded from `auth.currentUser` and kept in sync by
-   * `onIdTokenChanged`.
+   * The current Firebase user, or `null` if not authenticated (upstream's `user` ref). Seeded from
+   * `auth.currentUser` and kept in sync by `onIdTokenChanged`.
    */
   user: User | null
 
   /**
-   * Whether the auth state is still being resolved: `true` on the first render
-   * and until `onIdTokenChanged` reports the current state (or the subscription
-   * fails), then `false` — including when the reported state is signed out.
+   * Whether the auth state is still being resolved: `true` on the first render and until
+   * `onIdTokenChanged` reports the current state (or the subscription fails), then `false` —
+   * including when the reported state is signed out.
    */
   loading: boolean
 
@@ -46,11 +45,11 @@ export interface UseAuthReturn {
  *
  * Map from @vueuse/firebase/useAuth
  * (`source/vueuse/packages/firebase/useAuth/`). Reactive
- * [Firebase Auth](https://firebase.google.com/docs/auth) binding — it exposes
- * the current `user` and an `isAuthenticated` flag, so a component can react to
- * sign-in, sign-out and ID-token refresh events.
+ * [Firebase Auth](https://firebase.google.com/docs/auth) binding — it exposes the current `user`
+ * and an `isAuthenticated` flag, so a component can react to sign-in, sign-out and ID-token refresh
+ * events.
  *
- * Adjustment for React:
+ * React divergences:
  * - the `Auth` instance stays the first argument (`useAuth(auth)`), but the
  *   return is a plain object `{ isAuthenticated, user, loading, error }` — the
  *   values are read during render instead of being Vue refs (`ComputedRef`

@@ -4,11 +4,9 @@ import { createContext, useCallback, useContext, useMemo, useState } from 'react
 
 export interface SSRWidthProviderProps {
   /**
-   * The viewport width that descendants render against while there is no
-   * `window` to measure (server-side rendering and the first client render).
+   * The viewport width that descendants render against while there is no `window` to measure
+   * (server-side rendering and the first client render).
    *
-   * Mirrors upstream's `provideSSRWidth(width: number | null)`: any value that
-   * is not a number — `null` or an omitted prop — means "no simulated width",
    * so `useSSRWidth()` reads back `undefined`.
    *
    * @default undefined
@@ -17,8 +15,8 @@ export interface SSRWidthProviderProps {
 }
 
 /**
- * The value carried by `SSRWidthContext`: the current width plus the writer
- * exposed through `useSSRWidth()`.
+ * The value carried by `SSRWidthContext`: the current width plus the writer exposed through
+ * `useSSRWidth()`.
  */
 interface SSRWidthContextValue {
   width: number | undefined
@@ -28,9 +26,8 @@ interface SSRWidthContextValue {
 const SSRWidthContext = createContext<SSRWidthContextValue | undefined>(undefined)
 
 /**
- * `provideSSRWidth(null)` semantics: anything that is not a number clears the
- * simulated width, so readers see `undefined` (upstream:
- * `typeof ssrWidth === 'number' ? ssrWidth : undefined`).
+ * `provideSSRWidth(null)` semantics: anything that is not a number clears the simulated width, so
+ * readers see `undefined`.
  */
 function normalizeWidth(width: number | null | undefined): number | undefined {
   return typeof width === 'number' ? width : undefined
@@ -41,9 +38,8 @@ function normalizeWidth(width: number | null | undefined): number | undefined {
  *
  * Map from @vueuse/core `provideSSRWidth`
  * (`source/vueuse/packages/core/useSSRWidth/`). This is the providing half of
- * upstream's `provideSSRWidth` / `useSSRWidth` pair: render it above the
- * subtree that needs the width and every `useSSRWidth()` below it reads the
- * same value.
+ * upstream's `provideSSRWidth` / `useSSRWidth` pair: render it above the subtree that needs the
+ * width and every `useSSRWidth()` below it reads the same value.
  *
  * React divergences:
  * - upstream's `provideSSRWidth(width, app?)` — either `app.provide()` on the
@@ -111,12 +107,9 @@ export type UseSSRWidthReturn = [
  *
  * Map from @vueuse/core `useSSRWidth`
  * (`source/vueuse/packages/core/useSSRWidth/`). Used to set a global viewport
- * width which will be used when rendering SSR components that rely on the
- * viewport width like `useMediaQuery` or `useBreakpoints`. The value comes
- * from the nearest `SSRWidthProvider` above the calling component.
- *
- * Return tuple follows this repo's React idiom (upstream returns a plain
- * `number | undefined`): `const [width, setWidth] = useSSRWidth()`.
+ * width which will be used when rendering SSR components that rely on the viewport width like
+ * `useMediaQuery` or `useBreakpoints`. The value comes from the nearest `SSRWidthProvider` above
+ * the calling component.
  *
  * React divergences:
  * - upstream's `useSSRWidth()` only injects a value; here the same call also

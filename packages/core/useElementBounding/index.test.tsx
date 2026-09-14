@@ -1,6 +1,16 @@
+import type { RefObject } from 'react'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { renderHook } from 'vitest-browser-react'
 import { useElementBounding } from '../useElementBounding'
+
+/**
+ * The hook binds DOM targets to React refs only — a plain element, a getter or
+ * a callback ref is not accepted, so every test wraps its element in a
+ * `{ current }` holder.
+ */
+function refOf<T>(value: T | null): RefObject<T | null> {
+  return { current: value }
+}
 
 interface BoundingSnapshot {
   height: number
@@ -62,7 +72,7 @@ describe('useElementBounding', () => {
 
   it('should return width and height of element', async () => {
     const el = createElement()
-    const { result, unmount } = await renderHook(() => useElementBounding(el))
+    const { result, unmount } = await renderHook(() => useElementBounding(refOf(el)))
 
     expect(snapshot(result)).toEqual({
       height: 50,
@@ -80,7 +90,7 @@ describe('useElementBounding', () => {
 
   it('should have reactive values', async () => {
     const el = createElement()
-    const { result, unmount } = await renderHook(() => useElementBounding(el))
+    const { result, unmount } = await renderHook(() => useElementBounding(refOf(el)))
 
     expect(result.current.width).toBe(200)
 
@@ -110,7 +120,7 @@ describe('useElementBounding', () => {
     el.style.width = '400px'
     el.style.height = '50px'
     el.style.padding = '123px'
-    const { result, unmount } = await renderHook(() => useElementBounding(el))
+    const { result, unmount } = await renderHook(() => useElementBounding(refOf(el)))
 
     // `box-sizing` defaults to `content-box`, so the border-box (what
     // `getBoundingClientRect` reports) is 400 + 123*2 = 646 wide and
@@ -131,7 +141,7 @@ describe('useElementBounding', () => {
 
   it('should reset values to 0 if el is unmounted', async () => {
     const el = createElement()
-    const ref: { current: HTMLDivElement | null } = { current: el }
+    const ref = refOf<HTMLDivElement>(el)
     const { result, rerender, unmount } = await renderHook(() => useElementBounding(ref))
 
     expect(result.current.width).toBe(200)
@@ -147,7 +157,7 @@ describe('useElementBounding', () => {
 
   it('should not reset values to 0 if el is unmounted with options.reset set to false', async () => {
     const el = createElement()
-    const ref: { current: HTMLDivElement | null } = { current: el }
+    const ref = refOf<HTMLDivElement>(el)
     const { result, rerender, unmount } = await renderHook(() =>
       useElementBounding(ref, { reset: false }),
     )
@@ -170,7 +180,7 @@ describe('useElementBounding', () => {
     // is measured on mount, and there is no element to observe yet, so the
     // values stay deterministically 0 (upstream asserts the same right after
     // render, before the async observer deliveries).
-    const ref: { current: HTMLDivElement | null } = { current: null }
+    const ref = refOf<HTMLDivElement>(null)
     const { result, rerender, act, unmount } = await renderHook(() =>
       useElementBounding(ref, { immediate: false }),
     )

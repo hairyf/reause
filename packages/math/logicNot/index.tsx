@@ -3,13 +3,11 @@
  *
  * Map from @vueuse/math `logicNot`
  * (`source/vueuse/packages/math/logicNot/`). Upstream wraps the evaluation in
- * `computed(() => ...)` and returns a `ComputedRef<boolean>`; the reause
- * version is a pure function that evaluates the plain argument and returns a
- * plain `boolean` on each call — there is no reactivity, so re-renders (or
- * effects) drive re-evaluation (SSR-safe).
+ * `computed(() =>...)` and returns a `ComputedRef<boolean>`; the reause version is a pure function
+ * that evaluates the plain argument and returns a plain `boolean` on each call — there is no
+ * reactivity, so re-renders (or effects) drive re-evaluation (SSR-safe).
  *
- * React divergence: the argument is a plain value, not upstream's
- * `MaybeRefOrGetter<any>`.
+ * React divergence: the argument is a plain value, not upstream's `MaybeRefOrGetter<any>`.
  *
  * @__NO_SIDE_EFFECTS__
  *

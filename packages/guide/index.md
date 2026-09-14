@@ -5,7 +5,7 @@ API (`useState` / `useEffect` / `useCallback` / `useMemo`). We assume you are
 already familiar with the basic ideas of [React Hooks](https://react.dev/reference/react)
 before you continue.
 
-It is a React hooks library mapped from **six upstream sources**, with
+It is a React hooks library mapped from **five upstream sources**, with
 [VueUse](https://vueuse.org) as the foundational one: the VueUse mirror is
 complete modulo documented carve-outs — each `@vueuse/*` composable is either
 mapped to a React hook with the same options and return shape, adapted to the
@@ -30,18 +30,17 @@ terms (see [Sources](#sources) below).
 
 ## Sources
 
-reause maps from six upstream sources; the `source` id is the one the generated [function registry](/functions) records per export:
+reause maps from five upstream sources; the `source` id is the one the generated [function registry](/functions) records per export:
 
-| source         | upstream                                                                       | how it is ported                                                                                          |
-| -------------- | ------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------- |
-| `vueuse`       | [vueuse/vueuse](https://github.com/vueuse/vueuse)                              | adapted to React — naming conversions (`ref*` → `useState*`, `on*` → `use*`) and React return conventions |
-| `react-use`    | [streamich/react-use](https://github.com/streamich/react-use)                  | direct mirror — upstream names and return shapes kept                                                     |
-| `react-hookz`  | [react-hookz/web](https://github.com/react-hookz/web)                          | direct mirror                                                                                             |
-| `mantine`      | [mantinedev/mantine](https://github.com/mantinedev/mantine) (`@mantine/hooks`) | direct mirror, detached from `@mantine/core`                                                              |
-| `ahooks`       | [alibaba/hooks](https://github.com/alibaba/hooks)                              | direct mirror with documented renames                                                                     |
-| `react-spring` | `@react-spring/web`                                                            | **re-export only** — no pinned checkout, so no 1:1 mirror is claimed                                      |
+| source        | upstream                                                                       | how it is ported                                                                                          |
+| ------------- | ------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------- |
+| `vueuse`      | [vueuse/vueuse](https://github.com/vueuse/vueuse)                              | adapted to React — naming conversions (`ref*` → `useState*`, `on*` → `use*`) and React return conventions |
+| `react-use`   | [streamich/react-use](https://github.com/streamich/react-use)                  | direct mirror — upstream names and return shapes kept                                                     |
+| `react-hookz` | [react-hookz/web](https://github.com/react-hookz/web)                          | direct mirror                                                                                             |
+| `mantine`     | [mantinedev/mantine](https://github.com/mantinedev/mantine) (`@mantine/hooks`) | direct mirror, detached from `@mantine/core`                                                              |
+| `ahooks`      | [alibaba/hooks](https://github.com/alibaba/hooks)                              | direct mirror with documented renames                                                                     |
 
-Five of the six sources are pinned as read-only checkouts under `source/*` (`vueuse`, `react-use`, `react-hookz`, `mantine`, `ahooks`), and each port is checked against its own source's pin. **`react-spring` is not a port**: `@react-spring/web` has no pinned checkout, so `useSpring` re-exports it and the registry marks it `✅ re-exported` — no 1:1 mirror is claimed for it. Only `source/vueuse` is polled for upstream updates; the other checkouts are provenance-only ([docs/upstream-monitoring.md](https://github.com/hairyf/reause/blob/main/docs/upstream-monitoring.md) §1).
+All five sources are pinned as read-only checkouts under `source/*` (`vueuse`, `react-use`, `react-hookz`, `mantine`, `ahooks`), and each port is checked against its own source's pin. Only `source/vueuse` is polled for upstream updates; the other checkouts are provenance-only ([docs/upstream-monitoring.md](https://github.com/hairyf/reause/blob/main/docs/upstream-monitoring.md) §1).
 
 Per-source naming and return-value rules are in [AGENTS.md](https://github.com/hairyf/reause/blob/main/AGENTS.md) §1.
 

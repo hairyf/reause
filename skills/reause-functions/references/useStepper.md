@@ -139,7 +139,7 @@ export type UseStepperReturn<StepName, Steps, Step> = readonly [
  *   refs/computeds become plain values and its functions become stable
  *   callbacks (identity never changes, always reading the latest `steps`
  *   and `index`);
- * - upstream's `RefOrValue<T[]>` steps argument becomes a plain `T[]` — pass a
+ * - upstream's `MaybeRefOrGetter<T[]>` steps argument becomes a plain `T[]` — pass a
  *   new array to react to steps changes; only `index` is stateful
  *   (`useState`), every other member (`current`, `next`, `previous`,
  *   `isFirst`, `isLast`, `stepNames`) is recomputed from the latest `steps`

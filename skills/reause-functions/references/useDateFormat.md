@@ -114,7 +114,7 @@ export interface UseDateFormatOptions {
 /**
  * Unwrap the house input convention — a plain value, a ref-like `{ current }`
  * or a getter function (house replacement for Vue's `toValue` /
- * `RefOrValue<T>`).
+ * `MaybeRefOrGetter<T>`).
  */
 export declare function formatDate(
   date: Date,

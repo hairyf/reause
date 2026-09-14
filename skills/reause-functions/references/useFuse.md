@@ -65,7 +65,7 @@ const [search, setSearch] = useState('Jhon D')
 const { results } = useFuse(search, data) // setSearch('Peter') recomputes on the next render
 ```
 
-`options` stays `RefOrValue` (a config object, not a value source).
+`options` is a plain config object (a format/config knob, not a value source).
 
 Mutating the `data` array in place is not detected (upstream's deep watcher was) — pass a new array
 reference when the collection changes.
@@ -138,7 +138,7 @@ export interface UseFuseReturn<DataItem> {
  * (`source/vueuse/packages/integrations/useFuse/`), a reactive wrapper around
  * a `Fuse` instance. `search` and `data` are the hook's **read-only value
  * sources** and take plain values (`string` and `readonly DataItem[]`; upstream:
- * `MaybeRefOrGetter`). `options` stays `RefOrValue` (a config object, upstream
+ * `MaybeRefOrGetter`). `options` is a plain config object (upstream
  * `MaybeRefOrGetter`).
  *
  * Adjustment for React:
@@ -177,6 +177,6 @@ export interface UseFuseReturn<DataItem> {
 export declare function useFuse<DataItem>(
   search: string,
   data: readonly DataItem[],
-  options?: RefOrValue<UseFuseOptions<DataItem>>,
+  options?: UseFuseOptions<DataItem>,
 ): UseFuseReturn<DataItem>
 ```

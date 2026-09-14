@@ -70,7 +70,7 @@ useKeyStroke('A', (e) => {
 ### Ignore Repeated Events
 
 The callback will trigger only once when pressing `A` and **holding down**. The `dedupe` option can also
-be a ref-like `{ current }` object — it is read on every received event.
+be a plain boolean — it is read on every received event.
 
 ```tsx
 useKeyStroke('A', (e) => {

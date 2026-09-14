@@ -1,6 +1,7 @@
 import type { ElementTarget, TargetElement, UseResizeObserverOptions } from '../useResizeObserver'
-import { toArray, toValue } from '@reause/shared'
+import { toArray } from '@reause/shared'
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { unrefElement } from '../unrefElement'
 import { useResizeObserver } from '../useResizeObserver'
 
 export interface ElementSize {
@@ -22,31 +23,25 @@ export interface UseElementSizeReturn {
  *
  * Map from @vueuse/core `useElementSize`
  * (`source/vueuse/packages/core/useElementSize/`), which observes the target
- * element with a platform `ResizeObserver` and reports the size of the box
- * selected by the `box` option (`border-box`, `content-box` or
- * `device-pixel-content-box`), falling back to `getBoundingClientRect` for SVG
- * elements and to `contentRect` when the box sizes are unavailable.
+ * element with a platform `ResizeObserver` and reports the size of the box selected by the `box`
+ * option (`border-box`, `content-box` or `device-pixel-content-box`), falling back to
+ * `getBoundingClientRect` for SVG elements and to `contentRect` when the box sizes are unavailable.
  *
  * React divergences:
- * - `width`/`height` are plain `number` state (upstream: `ShallowRef`s), so
- *   the return value is `{ width, height, stop }` — an object mirror, not a
- *   tuple;
+ * - `width`/`height` are plain `number` state, so the return value is `{ width, height, stop }` —
+ * an object mirror, not a tuple;
  * - the upstream `tryOnMounted` prefill (from `offsetWidth`/`offsetHeight`,
  *   with padding/border subtracted for `content-box`) becomes a mount-only
  *   effect, so the size is correct before the first async observer delivery;
- * - the upstream `watch(() => unrefElement(target), ...)` (reset the size to
- *   `initialSize`, or `0` when detached, whenever the resolved target element
- *   changes) becomes an effect that re-resolves the target after every render
- *   and resets only when the resolved element actually changed;
+ * - the upstream `watch(() => unrefElement(target)...)` (reset the size to `initialSize`, or `0`
+ * when detached, whenever the resolved target element changes) becomes an effect that re-resolves
+ * the target after every render and resets only when the resolved element actually changed;
  * - `stop()` is referentially stable, disconnects the observer and disables
  *   the target-change reset;
- * - the `window` option mirrors upstream's `{ window = defaultWindow }`
- *   destructure: an explicit `window: null` stays null and disables the
- *   SVG-rect branch and the content-box computed-style prefill (both gated on
- *   a truthy window), falling back to `contentRect` / plain `offsetWidth`.
+ * - the `window` option, falling back to `contentRect` / plain `offsetWidth`.
  *
- * SSR-safe: nothing touches `window` during render — the observer, the prefill
- * and the reset all happen in effects.
+ * SSR-safe: nothing touches `window` during render — the observer, the prefill and the reset all
+ * happen in effects.
  *
  * @example
  * const el = useRef<HTMLTextAreaElement | null>(null)
@@ -89,8 +84,8 @@ export function useElementSize(
       // — keyed off the resolved target, not `entry.target`, so a stale
       // delivery from a previous target after a switch doesn't take the
       // SVG branch.
-      if (win && toValue(targetRef.current)?.namespaceURI?.includes('svg')) {
-        const $elem = toValue(targetRef.current)
+      if (win && unrefElement(targetRef.current)?.namespaceURI?.includes('svg')) {
+        const $elem = unrefElement(targetRef.current)
         if ($elem) {
           const rect = $elem.getBoundingClientRect()
           setWidth(rect.width)
@@ -114,7 +109,7 @@ export function useElementSize(
   // Mount-time prefill (upstream: `tryOnMounted`) — measure synchronously so
   // the size is correct before the first async ResizeObserver delivery.
   useEffect(() => {
-    const ele = toValue(targetRef.current)
+    const ele = unrefElement(targetRef.current)
     if (ele && 'offsetWidth' in ele) {
       if (box === 'content-box' && win) {
         const cs = win.getComputedStyle(ele)
@@ -148,7 +143,7 @@ export function useElementSize(
     if (stoppedRef.current)
       return
 
-    const ele = toValue(targetRef.current)
+    const ele = unrefElement(targetRef.current)
     if (firstRunRef.current) {
       firstRunRef.current = false
       previousElementRef.current = ele

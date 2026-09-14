@@ -1,16 +1,13 @@
-import type { RefOrValue } from '../index'
 import { useEffect, useMemo, useRef } from 'react'
 import { noop } from '../index'
-import { toValue } from '../utils'
 
 export type FunctionArgs<Args extends any[] = any[], Return = unknown> = (...args: Args) => Return
 
 export interface DebounceFilterOptions {
   /**
-   * The maximum time allowed to be delayed before it's invoked.
-   * In milliseconds.
+   * The maximum time allowed to be delayed before it's invoked. In milliseconds.
    */
-  maxWait?: RefOrValue<number>
+  maxWait?: number
 
   /**
    * Whether to reject the last call if it's been cancelled.
@@ -23,8 +20,8 @@ export interface DebounceFilterOptions {
 export interface UseDebounceFnReturn<T extends FunctionArgs> {
   (...args: Parameters<T>): Promise<Awaited<ReturnType<T>>>
   /**
-   * Cancel the pending invocation — the outstanding promise settles
-   * (resolves, or rejects with `rejectOnCancel`) without calling `fn`.
+   * Cancel the pending invocation — the outstanding promise settles (resolves, or rejects with
+   * `rejectOnCancel`) without calling `fn`.
    */
   cancel: () => void
   /**
@@ -34,9 +31,8 @@ export interface UseDebounceFnReturn<T extends FunctionArgs> {
   /**
    * `true` while a call is waiting to be invoked.
    *
-   * Note: unlike upstream's reactive readonly ref, this is a plain
-   * (non-reactive) getter — read it imperatively, it does not trigger
-   * re-renders.
+   * Note: unlike upstream's reactive readonly ref, this is a plain (non-reactive) getter — read it
+   * imperatively, it does not trigger re-renders.
    */
   readonly isPending: boolean
 }
@@ -45,19 +41,15 @@ export interface UseDebounceFnReturn<T extends FunctionArgs> {
  * Debounce execution of a function — React port of VueUse's `useDebounceFn`.
  *
  * Map from @vueuse/shared `useDebounceFn`
- * Mapping: upstream builds `createFilterWrapper(debounceFilter(ms, options), fn)`
- * so every call returns a promise and the wrapper carries `cancel` / `flush` /
- * `isPending`. This port builds the same wrapper once (`useMemo`) so its
- * identity is stable across renders; the latest `fn` / `ms` / `options` are
- * mirrored into refs so every call sees fresh values. `ms` accepts a number or
- * a ref-like `{ current }` (upstream: `RefOrValue<number>`) and is re-read on
- * every call. `isPending` becomes a non-reactive getter (React has no reactive
- * refs); promise settlement mirrors upstream — a regular debounce resolves
- * with the result, a superseded/canceled call settles with `undefined` (or
- * rejects with `rejectOnCancel`), and the `maxWait` trailing edge runs the
- * latest invocation but settles the pending promise without its result.
- * Pending timers are cleared when the component unmounts (upstream leaves
- * disposal to the effect scope).
+ * Mapping: upstream builds `createFilterWrapper(debounceFilter(ms, options), fn)` so every call
+ * returns a promise and the wrapper carries `cancel` / `flush` / `isPending`. This port builds the
+ * same wrapper once (`useMemo`) so its identity is stable across renders; the latest `fn` / `ms` /
+ * `options` are mirrored into refs so every call sees fresh values. `ms` is a plain number, re-read
+ * on every call. `isPending` becomes a non-reactive getter (React has no reactive refs); promise
+ * settlement, a superseded/canceled call settles with `undefined` (or rejects with
+ * `rejectOnCancel`), and the `maxWait` trailing edge runs the latest invocation but settles the
+ * pending promise without its result. Pending timers are cleared when the component unmounts
+ * (upstream leaves disposal to the effect scope).
  *
  * @example
  * const debouncedFn = useDebounceFn(() => { ... }, 1000)
@@ -67,7 +59,7 @@ export interface UseDebounceFnReturn<T extends FunctionArgs> {
  */
 export function useDebounceFn<T extends FunctionArgs>(
   fn: T,
-  ms: RefOrValue<number> = 200,
+  ms: number = 200,
   options: DebounceFilterOptions = {},
 ): UseDebounceFnReturn<T> {
   // keep the latest fn / ms / options in refs so the debounced wrapper
@@ -113,8 +105,8 @@ export function useDebounceFn<T extends FunctionArgs>(
     }
 
     const handler = (invoke: () => unknown): Promise<unknown> => {
-      const duration = toValue(msRef.current)
-      const maxDuration = toValue(optionsRef.current.maxWait)
+      const duration = msRef.current
+      const maxDuration = optionsRef.current.maxWait
 
       // a newer call supersedes the pending one — settle its promise
       // without invoking (upstream: `_clearTimeout` → `lastRejector`);

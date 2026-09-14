@@ -47,7 +47,7 @@ export interface UseRafFnOptions extends ConfigurableWindow {
    *
    * @default null
    */
-  fpsLimit?: RefOrValue<number | null>
+  fpsLimit?: number | null
   /**
    * After the requestAnimationFrame loop executed once, it will be automatically stopped.
    *
@@ -92,12 +92,11 @@ export interface UseRafFnReturn {
  * - `fn`, `fpsLimit`, `once` and `window` are read through refs on every
  *   frame instead of from the setup closure, so the running loop always sees
  *   the latest values (upstream recomputes on watchers);
- * - `fpsLimit` is a `RefOrValue` resolved with `toValue` per frame
- *   (upstream: `MaybeRefOrGetter` + `computed`), so a React ref-like
- *   `{ current }` limit updates live without re-running the hook. The
- *   upstream getter form (`() => number | null`) is deliberately not part of
- *   `RefOrValue` — zero-argument getters were removed repo-wide (#462/#490) —
- *   so it is rejected at the type level.
+ * - `fpsLimit` is a plain `number | null`, read per frame
+ *   (upstream: `MaybeRefOrGetter` + `computed`). The
+ *   upstream getter form (`() => number | null`) and a React ref are
+ *   deliberately not accepted — zero-argument getters were removed repo-wide
+ *   (#462/#490) — so they are rejected at the type level.
  *
  * @example
  * const { pause, resume } = useRafFn(() => setCount(c => c + 1))

@@ -10,8 +10,7 @@ describe('useStateDefault', () => {
   })
 
   it('shows the default value when the source is undefined', async () => {
-    const raw = { current: undefined as string | undefined }
-    const { result } = await renderHook(() => useStateDefault(raw, 'default'))
+    const { result } = await renderHook(() => useStateDefault(undefined as string | undefined, 'default'))
 
     const [value, setValue] = result.current
     expect(value).toBe('default')
@@ -19,70 +18,73 @@ describe('useStateDefault', () => {
   })
 
   it('shows the default value when the source is null', async () => {
-    const raw = { current: null as string | null }
-    const { result } = await renderHook(() => useStateDefault(raw, 'default'))
+    const { result } = await renderHook(() => useStateDefault(null as string | null, 'default'))
 
     expect(result.current[0]).toBe('default')
   })
 
   it('shows the source value when it is set', async () => {
-    const raw = { current: 'hello' as string | null }
-    const { result } = await renderHook(() => useStateDefault(raw, 'default'))
+    const { result } = await renderHook(() => useStateDefault('hello' as string | null, 'default'))
 
     expect(result.current[0]).toBe('hello')
   })
 
   it('shows the source value when it is falsy but not nullish', async () => {
-    const raw = { current: '' as string | null }
-    const { result } = await renderHook(() => useStateDefault(raw, 'default'))
+    const { result } = await renderHook(() => useStateDefault('' as string | null, 'default'))
 
     expect(result.current[0]).toBe('')
   })
 
-  it('updates the value and writes through to the source', async () => {
-    const raw = { current: undefined as string | undefined }
-    const { result, act } = await renderHook(() => useStateDefault(raw, 'default'))
+  it('updates the value and writes through to the tuple source', async () => {
+    const { result, act } = await renderHook(() => {
+      const [raw, setRaw] = useState<string | null | undefined>(undefined)
+      return { state: useStateDefault([raw, setRaw], 'default'), raw }
+    })
 
-    expect(result.current[0]).toBe('default')
+    expect(result.current.state[0]).toBe('default')
 
     await act(async () => {
-      result.current[1]('hello')
+      result.current.state[1]('hello')
     })
-    expect(result.current[0]).toBe('hello')
-    expect(raw.current).toBe('hello')
+    expect(result.current.state[0]).toBe('hello')
+    expect(result.current.raw).toBe('hello')
   })
 
   it('falls back to the default when set to undefined or null', async () => {
-    const raw = { current: undefined as string | undefined }
-    const { result, act } = await renderHook(() => useStateDefault(raw, 'default'))
+    const { result, act } = await renderHook(() => {
+      const [raw, setRaw] = useState<string | null | undefined>(undefined)
+      return { state: useStateDefault([raw, setRaw], 'default'), raw }
+    })
 
     await act(async () => {
-      result.current[1]('hello')
+      result.current.state[1]('hello')
     })
-    expect(result.current[0]).toBe('hello')
+    expect(result.current.state[0]).toBe('hello')
 
     await act(async () => {
-      result.current[1](undefined)
+      result.current.state[1](undefined)
     })
-    expect(result.current[0]).toBe('default')
-    expect(raw.current).toBeUndefined()
+    expect(result.current.state[0]).toBe('default')
+    expect(result.current.raw).toBeUndefined()
 
     await act(async () => {
-      result.current[1](null)
+      result.current.state[1](null)
     })
-    expect(result.current[0]).toBe('default')
-    expect(raw.current).toBeNull()
+    expect(result.current.state[0]).toBe('default')
+    expect(result.current.raw).toBeNull()
   })
 
   it('accepts an updater function from setValue', async () => {
-    const raw = { current: 0 as number | null }
-    const { result, act } = await renderHook(() => useStateDefault(raw, 0))
+    const { result, act } = await renderHook(() => {
+      const [raw, setRaw] = useState<number | null | undefined>(0)
+      return { state: useStateDefault([raw, setRaw], 0), raw }
+    })
 
     await act(async () => {
-      result.current[1](current => (current ?? 0) + 1)
+      result.current.state[1](current => (current ?? 0) + 1)
     })
-    expect(result.current[0]).toBe(1)
-    expect(raw.current).toBe(1)
+    expect(result.current.state[0]).toBe(1)
+    expect(result.current.raw).toBe(1)
   })
 
   it('resolves plain values for the source input', async () => {
@@ -91,30 +93,31 @@ describe('useStateDefault', () => {
     expect(result.current[0]).toBe('initial')
 
     // a plain-value source is read-only — setValue cannot write back to it, so
-    // `value` keeps deriving from the source (upstream derives from the ref it
-    // receives; only ref-like sources support the write-through)
+    // `value` keeps deriving from the source (only a `[value, setter]` tuple
+    // or a `{ value, onChange }` pair supports the write-through)
     await act(async () => {
       result.current[1]('set')
     })
     expect(result.current[0]).toBe('initial')
   })
 
-  it('reflects external writes to the ref-like source on re-render', async () => {
-    const raw = { current: undefined as string | undefined }
-    const { result, rerender } = await renderHook(() => useStateDefault(raw, 'default'))
+  it('reflects external writes to the tuple source on re-render', async () => {
+    const { result, act } = await renderHook(() => {
+      const [raw, setRaw] = useState<string | null | undefined>(undefined)
+      return { state: useStateDefault([raw, setRaw], 'default'), setRaw }
+    })
 
-    expect(result.current[0]).toBe('default')
+    expect(result.current.state[0]).toBe('default')
 
-    raw.current = 'from outside'
-    await rerender()
-    expect(result.current[0]).toBe('from outside')
+    await act(async () => {
+      result.current.setRaw('from outside')
+    })
+    expect(result.current.state[0]).toBe('from outside')
   })
 
   it('is SSR safe — renderToString produces the default value without effects', async () => {
-    const raw = { current: undefined as string | undefined }
-
     function SSRStateDefault() {
-      const [value] = useStateDefault(raw, 'default')
+      const [value] = useStateDefault(undefined as string | undefined, 'default')
       return <div>{value}</div>
     }
 
@@ -166,10 +169,9 @@ describe('useStateDefault', () => {
 })
 
 describe('useStateDefault (component)', () => {
-  const raw: { current: string | undefined } = { current: undefined }
-
   function UseStateDefaultDemo() {
-    const [value, setValue] = useStateDefault(raw, 'default')
+    const [raw, setRaw] = useState<string | null | undefined>(undefined)
+    const [value, setValue] = useStateDefault([raw, setRaw], 'default')
 
     return (
       <div>
@@ -179,6 +181,11 @@ describe('useStateDefault (component)', () => {
           Value:
           {' '}
           {value}
+        </p>
+        <p>
+          Raw:
+          {' '}
+          {String(raw)}
         </p>
       </div>
     )
@@ -190,13 +197,14 @@ describe('useStateDefault (component)', () => {
     const clear = screen.getByRole('button', { name: 'Clear' })
 
     await expect.element(screen.getByText('Value: default')).toBeVisible()
+    await expect.element(screen.getByText('Raw: undefined')).toBeVisible()
 
     await setHello.click()
     await expect.element(screen.getByText('Value: hello')).toBeVisible()
-    expect(raw.current).toBe('hello')
+    await expect.element(screen.getByText('Raw: hello')).toBeVisible()
 
     await clear.click()
     await expect.element(screen.getByText('Value: default')).toBeVisible()
-    expect(raw.current).toBeUndefined()
+    await expect.element(screen.getByText('Raw: undefined')).toBeVisible()
   })
 })

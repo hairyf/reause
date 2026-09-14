@@ -120,12 +120,10 @@ export interface UseDrauuReturn {
 }
 /** Accepted DOM target kinds — mirrors upstream's `MaybeElement`. */
 type MaybeElement = HTMLElement | SVGElement | null | undefined
-/** A plain element or a React ref-like object (`{ current }`) — upstream `MaybeElementRef`. */
-type MaybeElementRef =
-  | MaybeElement
-  | {
-      readonly current: MaybeElement
-    }
+/** A React ref object holding the element — upstream `MaybeElementRef`. */
+interface MaybeElementRef {
+  readonly current: MaybeElement
+}
 /** Drauu target (upstream `MaybeComputedElementRef`, without its getter branch). */
 type DrauuTarget = MaybeElementRef
 /**

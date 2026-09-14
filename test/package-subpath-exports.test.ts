@@ -5,13 +5,13 @@ import { packages } from '../meta/packages'
 
 // Regression guard for hairyf/reause#998.
 //
-// `packages/integrations/package.json` omitted `"./useSpring"` while every other
-// hook in that package had an explicit entry, so `@reause/integrations/useSpring`
-// was broken for consumers even though `dist/useSpring.js` was built and published.
+// `packages/integrations/package.json` omitted one page's explicit subpath entry
+// while every other hook in that package had one, so `@reause/integrations/<page>`
+// was broken for consumers even though `dist/<page>.js` was built and published.
 //
 // The failure mode is silent and easy to re-create: `"./*": "./dist/*"` DOES match
-// the extensionless subpath, but it maps it to `dist/useSpring` — no extension —
-// while the build only ever emits `dist/useSpring.js`. Resolution therefore
+// the extensionless subpath, but it maps it to `dist/<page>` — no extension —
+// while the build only ever emits `dist/<page>.js`. Resolution therefore
 // "succeeds" and the consumer gets `ERR_MODULE_NOT_FOUND` at import time. Nothing
 // in the repo catches that until a consumer hits it, which is why this is asserted
 // structurally instead of being left to review.

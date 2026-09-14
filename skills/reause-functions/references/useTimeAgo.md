@@ -132,7 +132,7 @@ export declare function formatTimeAgo<
  * - upstream `controls: true` variant (`Pausable` pause/resume) is not
  *   ported, so `UseTimeAgoOptions` drops the `Controls` boolean generic and
  *   `UseTimeAgoReturn` is not ported (plain string return).
- * - upstream `RefOrValue<Date | number | string>` → plain
+ * - upstream `MaybeRefOrGetter<Date | number | string>` → plain
  *   `Date | number | string`.
  * - the non-reactive `formatTimeAgo` helper is mirrored 1:1.
  *

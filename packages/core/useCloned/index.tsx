@@ -1,6 +1,6 @@
 import type { State } from '@reause/shared'
 import type { Dispatch, SetStateAction } from 'react'
-import { deepClone, deepEqual, isRefLike, toValue } from '@reause/shared'
+import { deepClone, deepEqual, toValue } from '@reause/shared'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 export interface UseClonedOptions<T = any> {
@@ -19,9 +19,8 @@ export interface UseClonedOptions<T = any> {
   manual?: boolean
 
   /**
-   * Track changes inside the source value, not only reference replacements
-   * (upstream: watch option `deep`). When `false`, a new reference is needed
-   * to re-sync — in-place mutations are ignored.
+   * Track changes inside the source value, not only reference replacements. When `false`, a new
+   * reference is needed to re-sync — in-place mutations are ignored.
    *
    * @default true
    */
@@ -41,9 +40,9 @@ export type UseClonedReturn<T> = readonly [
    */
   cloned: T,
   /**
-   * Replace the clone state with the React immutable-update protocol:
-   * `setCloned(next)` or `setCloned(prev => next)`. It does not re-sync from
-   * the source — use `controls.sync()` for that.
+   * Replace the clone state with the React immutable-update protocol: `setCloned(next)` or
+   * `setCloned(prev => next)`. It does not re-sync from the source — use `controls.sync()` for
+   * that.
    */
   setCloned: Dispatch<SetStateAction<T>>,
   controls: {
@@ -65,15 +64,14 @@ export function cloneFnJSON<T>(source: T): T {
 }
 
 /**
- * Whether a `State<T>` source is reactive — ref-like objects, getters,
- * `[value, setter]` tuples and `{ value, onChange }` pairs can all change
- * without the caller passing a new plain value. A plain value is static for
- * the lifetime of the hook unless the caller re-renders with a new one.
+ * Whether a `State<T>` source is reactive — getters, `[value, setter]` tuples and `{ value,
+ * onChange }` pairs can all change without the caller passing a new plain value. A plain value is
+ * static for the lifetime of the hook unless the caller re-renders with a new one; a React ref is
+ * **not** a state source (it is a DOM handle, read with `unrefElement` in DOM hooks), so a `{
+ * current }` object is treated as an ordinary plain value.
  */
 function isReactiveState<T>(source: State<T>): boolean {
   if (typeof source === 'function')
-    return true
-  if (isRefLike(source as object))
     return true
   if (Array.isArray(source) && source.length === 2 && typeof source[1] === 'function')
     return true
@@ -87,19 +85,16 @@ function isReactiveState<T>(source: State<T>): boolean {
 }
 
 /**
- * React port of VueUse's `useCloned`.
- *
  * Map from @vueuse/core `useCloned`
  * (`source/vueuse/packages/core/useCloned/`). Returns a deep clone of the
- * source as React state. The clone follows the source automatically: it
- * re-syncs whenever the resolved source changes, unless `manual` is set.
+ * source as React state. The clone follows the source automatically: it re-syncs whenever the
+ * resolved source changes, unless `manual` is set.
  *
- * `source` accepts a React `State<T>` — a plain value, a getter
- * (`() => value`), a React ref (`{ current }`), a `[value, setter]` tuple, or
- * a `{ value, onChange }` pair. The tuple and `{ value, onChange }` forms are
- * the React state protocol and have no upstream equivalent (upstream takes
- * `MaybeRefOrGetter<T>` — `T | Ref<T> | (() => T)`); every form is resolved
- * through `toValue`.
+ * `source` accepts a React `State<T>` — a plain value, a getter (`() => value`), a `[value,
+ * setter]` tuple, or a `{ value, onChange }` pair. React refs are not accepted: a ref is a DOM
+ * handle, read with `unrefElement` in DOM hooks, never a state source. The tuple and `{ value,
+ * onChange }` forms are the React state protocol and have no upstream equivalent (upstream takes
+ * `MaybeRefOrGetter<T>` — `T | Ref<T> | (() => T)`); every form is resolved through `toValue`.
  *
  * React divergences:
  * - the return is a React tuple `[cloned, setCloned, { isModified, sync }]`
@@ -111,11 +106,10 @@ function isReactiveState<T>(source: State<T>): boolean {
  *   synced source (`deepEqual` for `deep: true`, `Object.is` for
  *   `deep: false`). The `controls` object keeps a stable identity while
  *   `isModified` and `sync` are unchanged;
- * - `setCloned` is the idiomatic way to edit the clone. In-place mutation of
- *   `cloned` is still detected on the next render as a legacy fallback
- *   (structural comparison — upstream: `watch(cloned, ..., { deep: true })`),
- *   flipping `isModified` to `true`; `sync()` re-clones from the source and
- *   resets it;
+ * - `setCloned` is the idiomatic way to edit the clone. In-place mutation of `cloned` is still
+ * detected on the next render as a legacy fallback (structural comparison — upstream:
+ * `watch(cloned..., { deep: true })`), flipping `isModified` to `true`; `sync()` re-clones from the
+ * source and resets it;
  * - the source watcher becomes an effect comparing the resolved source
  *   against an isolated snapshot of the last synced source on every render:
  *   `deep: true` re-syncs on structural change, `deep: false` only when the
@@ -125,8 +119,8 @@ function isReactiveState<T>(source: State<T>): boolean {
  * - `immediate: false` skips the initial sync and `cloned` starts as `{}`
  *   (upstream initializes the clone ref to `{}` and lets the watch fill it);
  * - Vue watch options with no React equivalent are omitted (`flush`,
- *   `onTrack`, `onTrigger`). Ref-like sources should hold a stable reference
- *   — with `deep: false` a new object in `.current` re-syncs on every render.
+ *   `onTrack`, `onTrigger`). A getter source should return a stable reference
+ *   — with `deep: false` a new object per call re-syncs on every render.
  *
  * @example
  * const [cloned, setCloned, { isModified, sync }] = useCloned(original)

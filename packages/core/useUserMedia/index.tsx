@@ -1,8 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 /**
- * Specify a custom `navigator` instance, e.g. working with iframes or in
- * testing environments.
+ * Specify a custom `navigator` instance, e.g. working with iframes or in testing environments.
  */
 export interface ConfigurableNavigator {
   navigator?: Navigator
@@ -13,21 +12,19 @@ export interface ConfigurableNavigator {
  */
 export interface UseUserMediaOptions extends ConfigurableNavigator {
   /**
-   * If the stream is enabled. With an initial `true` the stream is acquired
-   * automatically once mounted (and supported).
+   * If the stream is enabled. With an initial `true` the stream is acquired automatically once
+   * mounted (and supported).
    * @default false
    */
   enabled?: boolean
   /**
-   * Recreate the stream when the `constraints` option changed while
-   * streaming.
+   * Recreate the stream when the `constraints` option changed while streaming.
    * @default true
    */
   autoSwitch?: boolean
   /**
-   * MediaStreamConstraints to be applied to the requested MediaStream.
-   * When provided, its `video`/`audio` members are passed to
-   * `getUserMedia` as-is.
+   * MediaStreamConstraints to be applied to the requested MediaStream. When provided, its
+   * `video`/`audio` members are passed to `getUserMedia` as-is.
    * @default {}
    */
   constraints?: MediaStreamConstraints
@@ -48,13 +45,10 @@ export interface UseUserMediaReturn {
 }
 
 /**
- * React port of VueUse's `useUserMedia`.
- *
  * Map from @vueuse/core `useUserMedia`
  * (`source/vueuse/packages/core/useUserMedia/`), which wraps
- * `mediaDevices.getUserMedia` into a stream ref with `start`/`stop`/
- * `restart` controls and an `enabled` flag whose watcher auto-starts and
- * auto-stops the stream.
+ * `mediaDevices.getUserMedia` into a stream ref with `start`/`stop`/ `restart` controls and an
+ * `enabled` flag whose watcher auto-starts and auto-stops the stream.
  *
  * React divergences:
  * - the Vue `stream`/`enabled`/`isSupported` refs become plain state values;

@@ -4,6 +4,15 @@ import { renderHook } from 'vitest-browser-react'
 import { useMutationObserver } from '../useMutationObserver'
 
 /**
+ * The hook binds DOM targets to React refs only — a plain element, a getter or
+ * a callback ref is not accepted, so every test wraps its element in a
+ * `{ current }` holder.
+ */
+function refOf<T>(value: T | null): RefObject<T | null> {
+  return { current: value }
+}
+
+/**
  * MutationObserver delivers records asynchronously on a microtask; waiting on
  * a macrotask guarantees the queue was drained first.
  */
@@ -19,6 +28,14 @@ describe('useMutationObserver', () => {
   it('accepts an array of element refs as target', () => {
     expectTypeOf<RefObject<HTMLElement | null>[]>()
       .toExtend<Parameters<typeof useMutationObserver>[0]>()
+    // a plain element is deliberately rejected — refs are the only DOM target
+    expectTypeOf<HTMLDivElement>()
+      .not
+      .toMatchTypeOf<Parameters<typeof useMutationObserver>[0]>()
+    // the callback form of React's `Ref<T>` is rejected too
+    expectTypeOf<(instance: HTMLElement | null) => void>()
+      .not
+      .toMatchTypeOf<Parameters<typeof useMutationObserver>[0]>()
   })
 
   it('should work with attributes', async () => {
@@ -27,7 +44,7 @@ describe('useMutationObserver', () => {
     const target = document.createElement('div')
     target.setAttribute('id', 'header')
 
-    const { unmount } = await renderHook(() => useMutationObserver(target, cb, {
+    const { unmount } = await renderHook(() => useMutationObserver(refOf(target), cb, {
       attributes: true,
     }))
 
@@ -50,7 +67,7 @@ describe('useMutationObserver', () => {
 
     const cb = vi.fn()
 
-    const { unmount } = await renderHook(() => useMutationObserver(target, cb, {
+    const { unmount } = await renderHook(() => useMutationObserver(refOf(target), cb, {
       childList: true,
     }))
 
@@ -65,7 +82,7 @@ describe('useMutationObserver', () => {
     const target = document.createElement('div')
     const cb = vi.fn()
 
-    const { unmount } = await renderHook(() => useMutationObserver(target, cb, {
+    const { unmount } = await renderHook(() => useMutationObserver(refOf(target), cb, {
       subtree: true,
       childList: true,
     }))
@@ -88,7 +105,7 @@ describe('useMutationObserver', () => {
     const cb = vi.fn()
     const { unmount } = await renderHook(() =>
       // @ts-expect-error — upstream accepts Text nodes even though the type says TargetElement
-      useMutationObserver(target, cb, {
+      useMutationObserver(refOf(target), cb, {
         characterData: true,
       }),
     )
@@ -108,7 +125,7 @@ describe('useMutationObserver', () => {
     const target = document.createElement('div')
     const cb = vi.fn()
 
-    const { unmount } = await renderHook(() => useMutationObserver(target, cb, {
+    const { unmount } = await renderHook(() => useMutationObserver(refOf(target), cb, {
       attributes: true,
       attributeFilter: ['id'],
     }))
@@ -128,7 +145,7 @@ describe('useMutationObserver', () => {
     const target = document.createElement('div')
     const cb = vi.fn()
 
-    const { unmount } = await renderHook(() => useMutationObserver(target, cb, {
+    const { unmount } = await renderHook(() => useMutationObserver(refOf(target), cb, {
       attributes: true,
       attributeOldValue: true,
     }))
@@ -155,7 +172,7 @@ describe('useMutationObserver', () => {
     const cb = vi.fn()
     const { unmount } = await renderHook(() =>
       // @ts-expect-error — upstream accepts Text nodes even though the type says TargetElement
-      useMutationObserver(target, cb, {
+      useMutationObserver(refOf(target), cb, {
         characterData: true,
         characterDataOldValue: true,
       }),
@@ -182,7 +199,7 @@ describe('useMutationObserver', () => {
     const target = document.createElement('div')
     const cb = vi.fn()
 
-    const { result, unmount } = await renderHook(() => useMutationObserver(target, cb, {
+    const { result, unmount } = await renderHook(() => useMutationObserver(refOf(target), cb, {
       attributes: true,
     }))
 
@@ -202,7 +219,7 @@ describe('useMutationObserver', () => {
     const target = document.createElement('div')
     const cb = vi.fn()
 
-    const { result, unmount } = await renderHook(() => useMutationObserver(target, cb, {
+    const { result, unmount } = await renderHook(() => useMutationObserver(refOf(target), cb, {
       attributes: true,
     }))
 
@@ -222,8 +239,8 @@ describe('useMutationObserver', () => {
   })
 
   it('should work with multiple targets', async () => {
-    const headerElement: { current: HTMLDivElement | null } = { current: document.createElement('div') }
-    const footerElement: { current: HTMLDivElement | null } = { current: document.createElement('div') }
+    const headerElement = refOf<HTMLDivElement>(document.createElement('div'))
+    const footerElement = refOf<HTMLDivElement>(document.createElement('div'))
     const targetRefs = [headerElement, footerElement]
     const cb = vi.fn()
 
@@ -268,11 +285,11 @@ describe('useMutationObserver', () => {
   })
 
   it('should not build an observer while the target ref is empty', async () => {
-    const element: { current: HTMLDivElement | null } = { current: null }
+    const element = refOf<HTMLDivElement>(null)
     const cb = vi.fn()
 
     const { rerender, result, unmount } = await renderHook(
-      (props?: { target: { current: HTMLDivElement | null } }) =>
+      (props?: { target: RefObject<HTMLDivElement | null> }) =>
         useMutationObserver(props?.target ?? element, cb, {
           attributes: true,
         }),
@@ -297,7 +314,7 @@ describe('useMutationObserver', () => {
 
     const { rerender, unmount } = await renderHook(
       (props?: { callback: Parameters<typeof useMutationObserver>[1] }) =>
-        useMutationObserver(target, props?.callback ?? first, {
+        useMutationObserver(refOf(target), props?.callback ?? first, {
           attributes: true,
         }),
       { initialProps: { callback: first } },

@@ -1,5 +1,4 @@
-import type { RefOrValue } from '@reause/shared'
-import { toValue, useTimeoutFn } from '@reause/shared'
+import { useTimeoutFn } from '@reause/shared'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useSupported } from '../useSupported'
 
@@ -24,10 +23,9 @@ export interface UseClipboardItemsOptions<Source> {
   copiedDuring?: number
 
   /**
-   * Specify a custom `navigator` instance, e.g. working with iframes or in
-   * testing environments. Declared inline instead of composing a shared
-   * `ConfigurableNavigator` type because other core hooks export a same-named
-   * type — `export *` in `index.ts` would collide (TS2308), so like
+   * Specify a custom `navigator` instance, e.g. working with iframes or in testing environments.
+   * Declared inline instead of composing a shared `ConfigurableNavigator` type because other core
+   * hooks export a same-named type — `export *` in `index.ts` would collide (TS2308), so like
    * `useGamepad` this module declares the member directly.
    */
   navigator?: Navigator
@@ -35,32 +33,30 @@ export interface UseClipboardItemsOptions<Source> {
 
 export interface UseClipboardItemsReturn<Optional> {
   /**
-   * `true` when the resolved navigator exposes the Clipboard API
-   * (`'clipboard' in navigator`). Resolved in a mount effect, so it stays
-   * `false` during the first render and on the server (SSR-safe).
+   * `true` when the resolved navigator exposes the Clipboard API (`'clipboard' in navigator`).
+   * Resolved in a mount effect, so it stays `false` during the first render and on the server
+   * (SSR-safe).
    */
   isSupported: boolean
   /**
-   * The clipboard items currently read from the system clipboard. Updated by
-   * a successful `copy`, by a manual `read()` call, and automatically when
-   * `read` is enabled and a `copy` / `cut` event fires.
+   * The clipboard items currently read from the system clipboard. Updated by a successful `copy`,
+   * by a manual `read()` call, and automatically when `read` is enabled and a `copy` / `cut` event
+   * fires.
    */
   content: ClipboardItems
   /**
-   * Whether the last `copy` call succeeded. Resets to `false` after
-   * `copiedDuring` milliseconds via a timeout.
+   * Whether the last `copy` call succeeded. Resets to `false` after `copiedDuring` milliseconds via
+   * a timeout.
    */
   copied: boolean
   /**
-   * Asynchronously writes `content` to the system clipboard. When the
-   * `source` option is provided it may be called without arguments; it is a
-   * no-op (resolves without writing) when the Clipboard API is unsupported
-   * or when no value is available.
+   * Asynchronously writes `content` to the system clipboard. When the `source` option is provided
+   * it may be called without arguments; it is a no-op (resolves without writing) when the Clipboard
+   * API is unsupported or when no value is available.
    *
-   * The parameter is named `content` — upstream names it `text`
-   * (`copy: (text: ClipboardItems) => Promise<void>`). Same type and
-   * semantics; `content` matches the returned `content` value and avoids
-   * confusion with `useClipboard`'s text-only `text`.
+   * The parameter is named `content` — upstream names it `text` (`copy: (text: ClipboardItems) =>
+   * Promise<void>`). Same type and semantics; `content` matches the returned `content` value and
+   * avoids confusion with `useClipboard`'s text-only `text`.
    */
   copy: Optional extends true
     ? (content?: ClipboardItems) => Promise<void>
@@ -76,9 +72,8 @@ export interface UseClipboardItemsReturn<Optional> {
  *
  * Map from @vueuse/core `useClipboardItems`
  * (`source/vueuse/packages/core/useClipboardItems/`). Provides the ability
- * to respond to clipboard commands (cut, copy and paste) as well as to
- * asynchronously read from and write to the system clipboard. Access to the
- * contents of the clipboard is gated behind the
+ * to respond to clipboard commands (cut, copy and paste) as well as to asynchronously read from and
+ * write to the system clipboard. Access to the contents of the clipboard is gated behind the
  * [Permissions API](https://developer.mozilla.org/en-US/docs/Web/API/Permissions_API).
  *
  * React divergences:
@@ -93,11 +88,11 @@ export interface UseClipboardItemsReturn<Optional> {
  *   after mount re-binds or removes them (strictly more reactive than
  *   upstream's freeze-in), and removes them on unmount;
  * - `copy` is a stable callback that resolves the `source` option at call
- *   time through `toValue` (React has no reactive refs), writes no-op when
+ *   time (a plain value; upstream accepts a ref), writes no-op when
  *   the API is unsupported or no value is available, and sets `content` +
  *   `copied` after a successful write;
- * - the `copiedDuring` reset timer composes `@reause/shared` `useTimeoutFn`
- *   with `immediate: false`, and the pending timer is cleared on unmount.
+ * - the `copiedDuring` reset timer composes `@reause/shared` `useTimeoutFn` with `immediate:
+ * false`, and the pending timer.
  *
  * @example
  * const source = [
@@ -109,8 +104,8 @@ export interface UseClipboardItemsReturn<Optional> {
  * const { isSupported, content, copy, copied } = useClipboardItems({ source })
  */
 export function useClipboardItems(options?: UseClipboardItemsOptions<undefined>): UseClipboardItemsReturn<false>
-export function useClipboardItems(options: UseClipboardItemsOptions<RefOrValue<ClipboardItems>>): UseClipboardItemsReturn<true>
-export function useClipboardItems(options: UseClipboardItemsOptions<RefOrValue<ClipboardItems> | undefined> = {}): UseClipboardItemsReturn<boolean> {
+export function useClipboardItems(options: UseClipboardItemsOptions<ClipboardItems>): UseClipboardItemsReturn<true>
+export function useClipboardItems(options: UseClipboardItemsOptions<ClipboardItems | undefined> = {}): UseClipboardItemsReturn<boolean> {
   const {
     navigator: customNavigator,
     read = false,
@@ -123,7 +118,7 @@ export function useClipboardItems(options: UseClipboardItemsOptions<RefOrValue<C
   // reactive refs — upstream destructures these once at setup)
   const navigatorRef = useRef<Navigator | undefined>(undefined)
   navigatorRef.current = customNavigator ?? (typeof navigator === 'undefined' ? undefined : navigator)
-  const sourceRef = useRef<RefOrValue<ClipboardItems> | undefined>(source)
+  const sourceRef = useRef<ClipboardItems | undefined>(source)
   sourceRef.current = source
 
   const isSupported = useSupported(() => {
@@ -170,7 +165,7 @@ export function useClipboardItems(options: UseClipboardItemsOptions<RefOrValue<C
   }, [read, isSupported, updateContent])
 
   const copy = useCallback(async (value?: ClipboardItems) => {
-    const resolved = value === undefined ? toValue(sourceRef.current) : value
+    const resolved = value === undefined ? sourceRef.current : value
     const nav = navigatorRef.current
     if (nav && 'clipboard' in nav && resolved != null) {
       await nav.clipboard.write(resolved)

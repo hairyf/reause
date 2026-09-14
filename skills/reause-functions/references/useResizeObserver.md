@@ -31,15 +31,16 @@ useResizeObserver(el, (entries) => {
  */
 export type TargetElement = HTMLElement | SVGElement | undefined | null
 /**
- * A plain element or a React ref object — the React-native replacement for
- * upstream's `ElementTarget` (in Vue semantics a `{ current }` union). React
- * refs hold DOM nodes directly, so only a `RefObject` is accepted; React's
- * `Ref<T>` also unions the callback form (`RefCallback<T>`), which cannot be
- * read synchronously and would be *invoked* by `toValue` instead of resolved,
- * so it is deliberately excluded here.
+ * A React ref object holding an element — the React-native replacement for
+ * upstream's `ElementTarget` (in Vue semantics a `MaybeRef`, i.e. a value or
+ * a `{ current }` union). reause binds DOM hooks to refs only: a plain element
+ * is not accepted, so callers hold the element in a `useRef` and the hook
+ * reads it with `unrefElement`. React's `Ref<T>` also unions the callback form
+ * (`RefCallback<T>`), which cannot be read synchronously, so it is deliberately
+ * excluded here.
  */
 export type ElementTarget<T extends TargetElement = TargetElement> =
-  T | RefObject<T | null>
+  RefObject<T | null>
 /**
  * A single target or an array of targets — mirrors upstream's
  * `ElementTargetOrArray`.

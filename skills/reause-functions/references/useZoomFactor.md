@@ -75,7 +75,7 @@ export type ZoomFactorSetter = (value: number) => void
  *   so it can be read from `window.require('electron').webFrame`;
  * - `useZoomFactor()` reads the current factor from `getZoomFactor()`, while
  *   `useZoomFactor(2)` / `useZoomFactor(webFrame, 2)` apply the factor given
- *   as a plain number or a React ref.
+ *   as a plain number (upstream accepts a ref).
  *
  * @see https://www.electronjs.org/docs/api/web-frame#webframesetzoomfactorfactor
  * @see https://vueuse.org/useZoomFactor
@@ -91,10 +91,10 @@ export type ZoomFactorSetter = (value: number) => void
  * @__NO_SIDE_EFFECTS__
  */
 export declare function useZoomFactor(
-  factor?: RefOrValue<number>,
+  factor?: number,
 ): [number, ZoomFactorSetter]
 export declare function useZoomFactor(
   webFrame: WebFrame,
-  factor?: RefOrValue<number>,
+  factor?: number,
 ): [number, ZoomFactorSetter]
 ```

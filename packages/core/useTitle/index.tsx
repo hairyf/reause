@@ -3,8 +3,7 @@ import { useEffect, useRef, useState } from 'react'
 
 export interface UseTitleOptionsBase {
   /**
-   * Specify a custom `document` instance, e.g. working with iframes or in
-   * testing environments.
+   * Specify a custom `document` instance, e.g. working with iframes or in testing environments.
    */
   document?: Document | null
   /**
@@ -21,8 +20,8 @@ export interface UseTitleOptionsBase {
 export type UseTitleOptions = UseTitleOptionsBase & (
   | {
     /**
-     * Observe `document.title` changes using a MutationObserver.
-     * Cannot be used together with `titleTemplate` option.
+     * Observe `document.title` changes using a MutationObserver. Cannot be used together with
+     * `titleTemplate` option.
      *
      * @default false
      */
@@ -30,8 +29,8 @@ export type UseTitleOptions = UseTitleOptionsBase & (
   }
   | {
     /**
-     * The template string to parse the title (e.g., '%s | My Website')
-     * Cannot be used together with `observe` option.
+     * The template string to parse the title (e.g., '%s | My Website') Cannot be used together with
+     * `observe` option.
      *
      * @default '%s'
      */
@@ -45,10 +44,9 @@ export type UseTitleReturn = [
 ]
 
 /**
- * Resolve the `document` to work against: an explicitly provided option wins
- * (`null` opts out entirely, mirroring upstream's `ConfigurableDocument`),
- * otherwise the global `document` on the client. Never called during render,
- * so the hook stays safe to use on the server.
+ * Resolve the `document` to work against: an explicitly provided option wins (`null` opts out
+ * entirely, mirroring upstream's `ConfigurableDocument`), otherwise the global `document` on the
+ * client. Never called during render, so the hook stays safe to use on the server.
  */
 function resolveDocument(doc: Document | null | undefined): Document | undefined {
   if (doc !== undefined)
@@ -57,8 +55,8 @@ function resolveDocument(doc: Document | null | undefined): Document | undefined
 }
 
 /**
- * Apply the `titleTemplate` option: a function is called with the raw title,
- * a string replaces every `%s` placeholder (upstream default `'%s'`).
+ * Apply the `titleTemplate` option: a function is called with the raw title, a string replaces
+ * every `%s` placeholder (upstream default `'%s'`).
  */
 function formatTitle(raw: string, template: string | ((title: string) => string) | undefined): string {
   const resolved = template || '%s'
@@ -68,24 +66,17 @@ function formatTitle(raw: string, template: string | ((title: string) => string)
 }
 
 /**
- * Read the `titleTemplate` option out of the `observe`|`titleTemplate` union
- * (upstream discriminates with `'titleTemplate' in options`).
+ * Read the `titleTemplate` option out of the `observe`|`titleTemplate` union (upstream
+ * discriminates with `'titleTemplate' in options`).
  */
 function readTitleTemplate(options: UseTitleOptions): string | ((title: string) => string) | undefined {
   return 'titleTemplate' in options ? options.titleTemplate : undefined
 }
 
 /**
- * React port of VueUse's `useTitle`.
- *
  * Map from @vueuse/core `useTitle`
  * (`source/vueuse/packages/core/useTitle/`). Reactive document title: keeps
- * the document title in component state and writes it back to
- * `document.title` on change.
- *
- * Return tuple follows this repo's React idiom:
- * `const [title, setTitle] = useTitle()` (upstream returns a single Vue ref
- * — a readonly `ComputedRef` when the source is a ref).
+ * the document title in component state and writes it back to `document.title` on change.
  *
  * React divergences:
  * - upstream adopts the current title synchronously at setup
@@ -99,10 +90,9 @@ function readTitleTemplate(options: UseTitleOptions): string | ((title: string) 
  * - a plain `newTitle` argument is re-synced when it changes across renders
  *   (React has no reactive refs; upstream only propagates ref sources
  *   and then returns a readonly computed — here the setter stays writable);
- * - `observe` registers a raw `MutationObserver` on the `<title>` element in
- *   an effect (upstream composes `useMutationObserver`); as upstream it is
- *   ignored when `titleTemplate` is set, and the options keep upstream's
- *   `observe`|`titleTemplate` union type.
+ * - `observe` registers a raw `MutationObserver` on the `<title>` element in an effect; as upstream
+ * it is ignored when `titleTemplate` is set, and the options keep upstream's
+ * `observe`|`titleTemplate` union type.
  *
  * It's not SSR compatible: your value will be applied only on client-side.
  *

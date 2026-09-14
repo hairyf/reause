@@ -1,3 +1,4 @@
+import type { RefObject } from 'react'
 import { renderToString } from 'react-dom/server'
 import { afterEach, describe, expect, it } from 'vitest'
 import { render, renderHook } from 'vitest-browser-react'
@@ -277,8 +278,9 @@ describe('useMouse', () => {
   it('attaches its listeners to a custom target element', async () => {
     const element = document.createElement('div')
     document.body.appendChild(element)
+    const targetRef = { current: element }
 
-    const { result, act, unmount } = await renderHook(() => useMouse({ target: element }))
+    const { result, act, unmount } = await renderHook(() => useMouse({ target: targetRef }))
 
     await act(() => {
       element.dispatchEvent(createMouseEvent('mousemove', { clientX: 55, clientY: 66 }))
@@ -290,7 +292,7 @@ describe('useMouse', () => {
     element.remove()
   })
 
-  it('resolves a ref-like target at bind time, after it is populated', async () => {
+  it('resolves a ref target at bind time, after it is populated', async () => {
     const element = document.createElement('div')
     document.body.appendChild(element)
     const targetRef: { current: EventTarget | null } = { current: null }
@@ -326,8 +328,8 @@ describe('useMouse', () => {
     document.body.append(first, second)
 
     const { result, act, rerender, unmount } = await renderHook(
-      (props?: { target?: EventTarget }) => useMouse(props),
-      { initialProps: { target: first } },
+      (props?: { target?: RefObject<EventTarget | null | undefined> }) => useMouse(props),
+      { initialProps: { target: { current: first } } },
     )
 
     await act(() => {
@@ -335,7 +337,7 @@ describe('useMouse', () => {
     })
     expect(result.current.x).toBe(1)
 
-    await rerender({ target: second })
+    await rerender({ target: { current: second } })
 
     await act(() => {
       first.dispatchEvent(createMouseEvent('mousemove', { clientX: 33, clientY: 34 }))

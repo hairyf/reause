@@ -70,7 +70,7 @@ useKeyStroke('A', (e) => {
 ### Ignore Repeated Events
 
 The callback will trigger only once when pressing `A` and **holding down**. The `dedupe` option can also
-be a ref-like `{ current }` object — it is read on every received event.
+be a plain boolean — it is read on every received event.
 
 ```tsx
 useKeyStroke('A', (e) => {
@@ -122,12 +122,12 @@ export interface UseKeyStrokeOptions {
    */
   eventName?: KeyStrokeEventName
   /**
-   * Event target to listen on. A plain element or a ref-like `{ current }`
-   * object (`RefOrValue`).
+   * Event target to listen on, as a React ref object (`RefObject`) holding the
+   * target.
    *
    * @default window
    */
-  target?: RefOrValue<EventTarget | null | undefined>
+  target?: RefObject<EventTarget | null | undefined>
   /**
    * Set to `true` to use a passive event listener.
    *
@@ -139,7 +139,7 @@ export interface UseKeyStrokeOptions {
    *
    * @default false
    */
-  dedupe?: RefOrValue<boolean>
+  dedupe?: boolean
 }
 /**
  * Listen for keyboard keystrokes. By default, listens on `keydown` events on `window`.

@@ -20,13 +20,13 @@ describe('useFocus', () => {
   })
 
   it('should initialize properly', async () => {
-    const { result } = await renderHook(() => useFocus(target))
+    const { result } = await renderHook(() => useFocus({ current: target }))
 
     expect(result.current[0]).toBeFalsy()
   })
 
   it('reflects focus/blur events in element 0 of the tuple', async () => {
-    const { result, act } = await renderHook(() => useFocus(target))
+    const { result, act } = await renderHook(() => useFocus({ current: target }))
 
     expect(result.current[0]).toBeFalsy()
 
@@ -42,7 +42,7 @@ describe('useFocus', () => {
   })
 
   it('setFocused(true) focuses the target and setFocused(false) blurs it', async () => {
-    const { result, act } = await renderHook(() => useFocus(target))
+    const { result, act } = await renderHook(() => useFocus({ current: target }))
 
     expect(document.activeElement).not.toBe(target)
 
@@ -60,7 +60,7 @@ describe('useFocus', () => {
   })
 
   it('setFocused accepts a functional updater', async () => {
-    const { result, act } = await renderHook(() => useFocus(target))
+    const { result, act } = await renderHook(() => useFocus({ current: target }))
 
     await act(() => {
       result.current[1](prev => !prev)
@@ -76,7 +76,7 @@ describe('useFocus', () => {
   })
 
   it('should only focus when :focus-visible matches with focusVisible=true', async () => {
-    const { result, act } = await renderHook(() => useFocus(target, { focusVisible: true }))
+    const { result, act } = await renderHook(() => useFocus({ current: target }, { focusVisible: true }))
 
     await act(async () => {
       await userEvent.tab()
@@ -108,7 +108,7 @@ describe('useFocus', () => {
 
   describe('when target is missing', () => {
     it('should initialize properly', async () => {
-      const { result } = await renderHook(() => useFocus(null))
+      const { result } = await renderHook(() => useFocus({ current: null }))
 
       expect(result.current[0]).toBeFalsy()
     })
@@ -116,7 +116,7 @@ describe('useFocus', () => {
 
   describe('when initialValue=true passed in', () => {
     it('should initialize focus', async () => {
-      const { result } = await renderHook(() => useFocus(target, { initialValue: true }))
+      const { result } = await renderHook(() => useFocus({ current: target }, { initialValue: true }))
 
       expect(document.activeElement).toBe(target)
       expect(result.current[0]).toBeTruthy()
@@ -128,7 +128,7 @@ describe('useFocus', () => {
     svg.setAttribute('tabindex', '0')
     document.body.appendChild(svg)
 
-    const { result, act } = await renderHook(() => useFocus(svg as unknown as SVGElement))
+    const { result, act } = await renderHook(() => useFocus({ current: svg as unknown as SVGElement }))
 
     expect(result.current[0]).toBeFalsy()
 
@@ -144,7 +144,7 @@ describe('useFocus', () => {
   })
 
   it('returns a React tuple [isFocused, setFocused]', async () => {
-    const { result } = await renderHook(() => useFocus(target))
+    const { result } = await renderHook(() => useFocus({ current: target }))
 
     expectTypeOf(result.current).toEqualTypeOf<UseFocusReturn>()
     expectTypeOf(result.current).toEqualTypeOf<

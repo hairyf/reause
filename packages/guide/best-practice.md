@@ -75,8 +75,9 @@ has no reactive refs: state lives in `useState`, and refs are plain mutable
 - **read-only value sources** (e.g. `useTitle`'s title, `useFetch`'s url)
   accept plain values. Pass a state value directly; the hook re-syncs when it
   changes across renders;
-- **DOM hooks** (e.g. `useEventListener`, `useInfiniteScroll`) accept a plain
-  element or a React ref (`RefOrValue<T>`) so you can bind a `useRef` target.
+- **DOM hooks** (e.g. `useEventListener`, `useInfiniteScroll`) accept a React
+  ref (`RefObject<T | null>`) so you can bind a `useRef` target; the hook
+  reads the element with `unrefElement`.
 
 Take `useTitle` as an example. It helps you get and set the current page's
 `document.title` property:

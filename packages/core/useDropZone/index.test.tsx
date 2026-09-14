@@ -23,7 +23,7 @@ describe('useDropZone', () => {
   })
 
   it('should initialize isOverDropZone as false', async () => {
-    const { result } = await renderHook(() => useDropZone(null))
+    const { result } = await renderHook(() => useDropZone({ current: null }))
 
     expect(result.current.isOverDropZone).toBe(false)
     expect(result.current.files).toBeNull()
@@ -34,7 +34,7 @@ describe('useDropZone', () => {
 
   it('should set isOverDropZone true on dragenter and false on dragleave', async () => {
     const el = createDropZone()
-    const { result, act } = await renderHook(() => useDropZone(el))
+    const { result, act } = await renderHook(() => useDropZone({ current: el }))
 
     expect(result.current.isOverDropZone).toBe(false)
 
@@ -54,7 +54,7 @@ describe('useDropZone', () => {
     const file = new File(['content'], 'file.txt', { type: 'text/plain' })
     const onDrop = vi.fn()
 
-    const { result, act } = await renderHook(() => useDropZone(el, { onDrop }))
+    const { result, act } = await renderHook(() => useDropZone({ current: el }, { onDrop }))
 
     const dt = new DataTransfer()
     dt.items.add(file)
@@ -77,7 +77,7 @@ describe('useDropZone', () => {
     const el = createDropZone()
     const file = new File(['content'], 'file.txt', { type: 'text/plain' })
 
-    const { result, act } = await renderHook(() => useDropZone(el))
+    const { result, act } = await renderHook(() => useDropZone({ current: el }))
 
     expect(result.current.files).toBeNull()
 
@@ -96,7 +96,7 @@ describe('useDropZone', () => {
     const file = new File(['content'], 'file.txt', { type: 'text/plain' })
     const onDrop = vi.fn()
 
-    const { act } = await renderHook(() => useDropZone(el, onDrop))
+    const { act } = await renderHook(() => useDropZone({ current: el }, onDrop))
 
     const dt = new DataTransfer()
     dt.items.add(file)
@@ -111,7 +111,7 @@ describe('useDropZone', () => {
 
   it('should keep isOverDropZone false when the data types are not allowed', async () => {
     const el = createDropZone()
-    const { result, act } = await renderHook(() => useDropZone(el, { dataTypes: ['image/png'] }))
+    const { result, act } = await renderHook(() => useDropZone({ current: el }, { dataTypes: ['image/png'] }))
 
     const dt = new DataTransfer()
     dt.items.add(new File(['x'], 'file.txt', { type: 'text/plain' }))
@@ -141,7 +141,7 @@ describe('useDropZone', () => {
     const checkValidity = vi.fn(() => true)
     const onDrop = vi.fn()
 
-    const { act } = await renderHook(() => useDropZone(el, { dataTypes: ['image/png'], checkValidity, onDrop }))
+    const { act } = await renderHook(() => useDropZone({ current: el }, { dataTypes: ['image/png'], checkValidity, onDrop }))
 
     const dt = new DataTransfer()
     dt.items.add(new File(['x'], 'file.txt', { type: 'text/plain' }))
@@ -160,7 +160,7 @@ describe('useDropZone', () => {
     const calls: Array<File[] | null> = []
 
     const { unmount, act } = await renderHook(() => {
-      const dropZone = useDropZone(el)
+      const dropZone = useDropZone({ current: el })
       useListener(dropZone.onDrop, (files) => {
         calls.push(files)
       })
@@ -189,7 +189,7 @@ describe('useDropZone', () => {
     const enter = vi.fn()
     const leave = vi.fn()
 
-    const { result, act } = await renderHook(() => useDropZone(el))
+    const { result, act } = await renderHook(() => useDropZone({ current: el }))
 
     const enterHandle = result.current.onDragEnter(enter)
     const leaveHandle = result.current.onDragLeave(leave)

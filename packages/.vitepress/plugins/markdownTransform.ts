@@ -60,9 +60,9 @@ function collapsible(code: string): string {
  * repository: the *source id* comes from the provenance registry (whose
  * `source` column `scripts/update.ts` resolves), and the pin-relative *path*
  * from `upstreamPaths`. The label and repository therefore follow whatever
- * source the registry records, so a react-use, ahooks, mantine, react-hookz or
- * react-spring page links its own upstream instead of emitting nothing — and
- * never a mislabelled VueUse link.
+ * source the registry records, so a react-use, ahooks, mantine or react-hookz
+ * page links its own upstream instead of emitting nothing — and never a
+ * mislabelled VueUse link.
  */
 function sourceLinks(pkg: string, dir: string, source?: string): string {
   // hooks live co-located with their docs: packages/<pkg>/<dir>/index.tsx
@@ -77,10 +77,10 @@ function sourceLinks(pkg: string, dir: string, source?: string): string {
     links.push(`[Source](${REPO}/blob/main/${src})`)
   if (existsSync(demo))
     links.push(`[Demo](${REPO}/blob/main/${demo})`)
-  // A source with a pin links the module it pins; a re-export-only source
-  // (`react-spring`) has no checkout, so its link stops at the repository root
-  // rather than inventing a path that cannot be verified. A pin whose module the
-  // resolver could not locate stays linkless.
+  // A source with a pin links the module it pins; a source entry that carries
+  // no branch has no checkout to point into, so its link stops at the
+  // repository root rather than inventing a path that cannot be verified. A pin
+  // whose module the resolver could not locate stays linkless.
   if (upstream) {
     const url = upstream.branch
       ? (path && `${upstream.repo}/blob/${upstream.branch}/${path}`)

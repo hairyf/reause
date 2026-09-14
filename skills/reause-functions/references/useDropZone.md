@@ -60,8 +60,7 @@ export interface UseDropZoneOptions {
    * Allowed data types, if not set, all data types are allowed.
    * Also can be a function to check the data types.
    */
-  dataTypes?:
-    RefOrValue<readonly string[]> | ((types: readonly string[]) => boolean)
+  dataTypes?: readonly string[] | ((types: readonly string[]) => boolean)
   /**
    * Similar to dataTypes, but exposes the DataTransferItemList for custom validation.
    * If provided, this function takes precedence over dataTypes.
@@ -86,11 +85,11 @@ export interface UseDropZoneOptions {
   /**
    * Allow multiple files to be dropped. Defaults to true.
    */
-  multiple?: RefOrValue<boolean>
+  multiple?: boolean
   /**
    * Prevent default behavior for unhandled events. Defaults to false.
    */
-  preventDefaultForUnhandled?: RefOrValue<boolean>
+  preventDefaultForUnhandled?: boolean
 }
 export interface UseDropZoneReturn {
   /**
@@ -159,7 +158,7 @@ export interface UseDropZoneReturn {
  * })
  */
 export declare function useDropZone(
-  target: RefOrValue<HTMLElement | Document | null | undefined>,
+  target: RefObject<HTMLElement | Document | null | undefined>,
   options?: UseDropZoneOptions | UseDropZoneOptions["onDrop"],
 ): UseDropZoneReturn
 ```

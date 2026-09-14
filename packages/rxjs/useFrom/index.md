@@ -66,7 +66,7 @@ useSubscription(count$.subscribe((value) => {
 }))
 ```
 
-Only plain values are accepted — never a getter, `State<T>` or `RefOrValue`.
+Only plain values are accepted — never a getter, `State<T>` or a React ref.
 
 ## React divergences from upstream
 

@@ -1,13 +1,12 @@
-import type { ConfigurableWindow, RefOrValue } from '@reause/shared'
-import { toValue } from '@reause/shared'
+import type { ConfigurableWindow } from '@reause/shared'
+import type { RefObject } from 'react'
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { unrefElement } from '../unrefElement'
 
 /**
- * Default `MutationObserverInit` used when `observeMutation` is enabled as a
- * plain boolean — mirrors upstream's
- * `{ childList: true, subtree: true, characterData: true }`. Module-level so
- * the identity is stable across renders (the observer effect reconciles
- * against it).
+ * Default `MutationObserverInit` used when `observeMutation` is enabled as a plain boolean —
+ * mirrors upstream's `{ childList: true, subtree: true, characterData: true }`. Module-level so the
+ * identity is stable across renders (the observer effect reconciles against it).
  */
 const DEFAULT_MUTATION_OPTIONS: MutationObserverInit = {
   childList: true,
@@ -16,16 +15,14 @@ const DEFAULT_MUTATION_OPTIONS: MutationObserverInit = {
 }
 
 /**
- * Options for `useElementOverflow`: `observeMutation` optionally turns on a
- * `MutationObserver` (with a custom `MutationObserverInit`), `onUpdated` is
- * called whenever an observer fires, and `window` allows a custom `window`
- * instance, e.g. working with iframes or in testing environments.
+ * Options for `useElementOverflow`: `observeMutation` optionally turns on a `MutationObserver`
+ * (with a custom `MutationObserverInit`), `onUpdated` is called whenever an observer fires, and
+ * `window` allows a custom `window` instance, e.g. working with iframes or in testing environments.
  */
 export interface UseElementOverflowOptions extends ConfigurableWindow {
   /**
-   * Use MutationObserver to observe the target and its children. Captured once
-   * on mount — later changes are ignored (upstream destructures it once at
-   * setup too).
+   * Use MutationObserver to observe the target and its children. Captured once on mount — later
+   * changes are ignored (upstream destructures it once at setup too).
    *
    * @default false
    */
@@ -37,9 +34,9 @@ export interface UseElementOverflowOptions extends ConfigurableWindow {
 }
 
 /**
- * Return of `useElementOverflow`. Upstream exposes `shallowReadonly` refs for
- * the overflow flags; the React port exposes plain `boolean` state. `stop` and
- * `update` match the upstream member structure.
+ * Return of `useElementOverflow`. Upstream exposes `shallowReadonly` refs for the overflow flags;
+ * the React port exposes plain `boolean` state. `stop` and `update` match the upstream member
+ * structure.
  */
 export interface UseElementOverflowReturn {
   /**
@@ -51,8 +48,7 @@ export interface UseElementOverflowReturn {
    */
   isYOverflowed: boolean
   /**
-   * Stop observing. Disconnects the observers; the hook does not restart after
-   * `stop()`.
+   * Stop observing. Disconnects the observers; the hook does not restart after `stop()`.
    */
   stop: () => void
   /**
@@ -62,24 +58,18 @@ export interface UseElementOverflowReturn {
 }
 
 /**
- * Reactive element's overflow state — React port of VueUse's
- * `useElementOverflow`.
+ * Reactive element's overflow state — React port of VueUse's `useElementOverflow`.
  *
  * Map from @vueuse/core `useElementOverflow`
  * (`source/vueuse/packages/core/useElementOverflow/`). Tracks whether an
  * element's content overflows its box in the x/y directions by comparing
- * `scrollWidth`/`scrollHeight` against `offsetWidth`/`offsetHeight` whenever
- * the element or its children resize (upstream: `useResizeObserver`) and,
- * with `observeMutation`, whenever its DOM content mutates (upstream:
- * `useMutationObserver`).
+ * `scrollWidth`/`scrollHeight` against `offsetWidth`/`offsetHeight` whenever the element or its
+ * children resize and, with `observeMutation`, whenever its DOM content mutates.
  *
  * React divergences:
- * - the Vue `shallowRef`/`shallowReadonly` overflow flags become plain
- *   `boolean` state read off the returned object; `stop`/`update` keep the
- *   upstream member structure;
- * - `target` accepts an element or a React ref object (`{ current }`) —
- *   the React analog of upstream's
- *   `ElementTarget`. SVG elements are ignored;
+ * - `stop`/`update` keep the upstream member structure;
+ * - `target` accepts a React ref object (`RefObject`) holding the element; a plain element, a
+ * getter and a callback ref are not accepted. SVG elements are ignored;
  * - upstream's `useResizeObserver`/`useMutationObserver` composition becomes a
  *   self-contained observer effect that re-resolves the target plus its
  *   `HTMLElement` children after every render and reconciles the observers —
@@ -94,8 +84,8 @@ export interface UseElementOverflowReturn {
  * - SSR-safe: nothing touches `window` during render, and `update()` no-ops
  *   without an element or a window.
  *
- * @param target - element or React ref object (`{ current }`) returning
- *   the element to watch for overflow
+ * @param target - React ref object (`RefObject`) holding the element to
+ *   watch for overflow, resolved with the shared `unrefElement`
  * @param option - `observeMutation` (default `false`, or a
  *   `MutationObserverInit` object) and `onUpdated`, plus a custom `window`
  *   instance
@@ -104,7 +94,7 @@ export interface UseElementOverflowReturn {
  * const { isXOverflowed } = useElementOverflow(el)
  */
 export function useElementOverflow(
-  target: RefOrValue<HTMLElement | SVGElement | null | undefined>,
+  target: RefObject<Element | null | undefined>,
   option: UseElementOverflowOptions = {},
 ): UseElementOverflowReturn {
   // Latest-value refs synced each render, so the observer effect always
@@ -127,8 +117,8 @@ export function useElementOverflow(
 
   // upstream `targetEl` computed: resolve the target, ignoring SVG elements
   const resolveTargetElement = useCallback((): HTMLElement | undefined => {
-    const el = toValue(targetRef.current)
-    if (!el || el instanceof SVGElement)
+    const el = unrefElement(targetRef.current)
+    if (!el || !(el instanceof HTMLElement))
       return undefined
     return el
   }, [])

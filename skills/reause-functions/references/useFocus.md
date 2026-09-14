@@ -150,7 +150,7 @@ export type UseFocusReturn = readonly [
  * setFocused(false) // blur the input
  */
 export declare function useFocus(
-  target: RefOrValue<HTMLElement | SVGElement | null | undefined>,
+  target: RefObject<HTMLElement | SVGElement | null | undefined>,
   options?: UseFocusOptions,
 ): UseFocusReturn
 ```

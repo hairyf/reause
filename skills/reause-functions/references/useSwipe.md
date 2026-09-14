@@ -24,7 +24,7 @@ function Demo() {
 }
 ```
 
-`target` accepts the element itself or a ref-like `{ current }` object — bind it to the element you
+`target` is a React ref object (`RefObject`) holding the element — bind it to the element you
 want to listen on (a `useRef` that is not attached to any node listens to nothing). The resolved
 element is re-read after every commit, so a ref that is still `null` while rendering binds as soon
 as React attaches the element.
@@ -118,7 +118,7 @@ export interface UseSwipeReturn {
  *   self-contained `useEffect` (upstream composes `useEventListener`) and are
  *   removed on unmount;
  * - `target` accepts an element or a ref-like `{ current }` object
- *   (React equivalent of `RefOrValue`). The resolved element is re-read after
+ *   (React equivalent of `MaybeRefOrGetter`). The resolved element is re-read after
  *   every commit and the listeners re-bind when it changes, so a `useRef`
  *   target that is `null` during first render still binds once React attaches
  *   the element. A `ref.current` write that causes no re-render cannot be
@@ -146,7 +146,7 @@ export interface UseSwipeReturn {
  * })
  */
 export declare function useSwipe(
-  target: RefOrValue<EventTarget | null | undefined>,
+  target: RefObject<EventTarget | null | undefined>,
   options?: UseSwipeOptions,
 ): UseSwipeReturn
 ```

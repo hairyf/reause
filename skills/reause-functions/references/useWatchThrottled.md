@@ -23,12 +23,12 @@ useWatchThrottled(
 
 ### Options
 
-| Option      | Type                 | Default | Description                                                              |
-| ----------- | -------------------- | ------- | ------------------------------------------------------------------------ |
-| `throttle`  | `RefOrValue<number>` | `0`     | Throttle interval in ms (can be reactive)                                |
-| `trailing`  | `boolean`            | `true`  | Invoke on the trailing edge                                              |
-| `leading`   | `boolean`            | `true`  | Invoke on the leading edge                                               |
-| `immediate` | `boolean`            | `false` | Fire the callback once on mount with the current value (still throttled) |
+| Option      | Type      | Default | Description                                                              |
+| ----------- | --------- | ------- | ------------------------------------------------------------------------ |
+| `throttle`  | `number`  | `0`     | Throttle interval in ms                                                  |
+| `trailing`  | `boolean` | `true`  | Invoke on the trailing edge                                              |
+| `leading`   | `boolean` | `true`  | Invoke on the leading edge                                               |
+| `immediate` | `boolean` | `false` | Fire the callback once on mount with the current value (still throttled) |
 
 ### Leading and Trailing
 
@@ -65,12 +65,12 @@ useWatchThrottled(input, () => console.log('changed!'), { immediate: true })
 ```ts
 export interface UseWatchThrottledOptions {
   /**
-   * Throttle interval in milliseconds. Accepts a plain number or a ref-like
-   * `{ current }` — re-read on every source change.
+   * Throttle interval in milliseconds — a plain number, re-read on every
+   * source change.
    *
    * @default 0
    */
-  throttle?: RefOrValue<number>
+  throttle?: number
   /**
    * Invoke the callback on the trailing edge of the throttle window.
    *

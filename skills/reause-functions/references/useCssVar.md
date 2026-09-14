@@ -72,8 +72,8 @@ export interface UseCssVarOptions extends ConfigurableWindow {
   observe?: boolean
 }
 /**
- * Elements accepted as the CSS variable target — a plain element or a ref-like
- * `{ current }` object (a React ref; upstream: `ElementRef`).
+ * Elements accepted as the CSS variable target — a React ref object holding the
+ * element (upstream: `ElementRef`).
  */
 export type UseCssVarElement = HTMLElement | SVGElement | null | undefined
 /**
@@ -104,10 +104,9 @@ export type UseCssVarReturn = [
  *   changes (removing the previous key from the previous element first, as
  *   upstream's watcher does), and the write effect applies the state back to
  *   the element whenever the value or target changes;
- * - the prop is resolved with `toValue` on every render, so a plain string or a
- *   ref-like `{ current }` object are both accepted, and a key
+ * - the prop is a plain value read on every render, so a key
  *   change is picked up on the next render (upstream re-fires its watcher via
- *   reactive refs);
+ *   reactive refs); the target is a `RefObject` resolved with `unrefElement`;
  * - the optional MutationObserver (upstream composes `useMutationObserver`
  *   with `{ attributeFilter: ['style', 'class'] }`) is a self-contained
  *   observer inside an effect, disconnected on unmount — like upstream it only
@@ -125,8 +124,8 @@ export type UseCssVarReturn = [
  * setColor('#df8543') // writes style="--color: #df8543" on the element
  */
 export declare function useCssVar(
-  prop: RefOrValue<string | null | undefined>,
-  target?: RefOrValue<UseCssVarElement>,
+  prop: string | null | undefined,
+  target?: RefObject<UseCssVarElement | null>,
   options?: UseCssVarOptions,
 ): UseCssVarReturn
 ```

@@ -100,7 +100,7 @@ export interface UseParallaxReturn {
  * const { tilt, roll, source } = useParallax(container)
  */
 export declare function useParallax(
-  target: RefOrValue<HTMLElement | null | undefined>,
+  target: RefObject<HTMLElement | null | undefined>,
   options?: UseParallaxOptions,
 ): UseParallaxReturn
 ```

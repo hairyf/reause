@@ -60,7 +60,7 @@ describe('useDrauu', () => {
 
   it('should create the drauu instance for a real <svg> element and unmount it on unmount', async () => {
     const svg = createSvg()
-    const { result, unmount } = await renderHook(() => useDrauu(svg))
+    const { result, unmount } = await renderHook(() => useDrauu({ current: svg }))
 
     const instance = result.current.drauuInstance
     expect(instance).toBeDefined()
@@ -91,7 +91,7 @@ describe('useDrauu', () => {
   })
 
   it('should stay undefined for a null target and no-op safely', async () => {
-    const { result, act } = await renderHook(() => useDrauu(null))
+    const { result, act } = await renderHook(() => useDrauu({ current: null }))
 
     expect(result.current.drauuInstance).toBeUndefined()
     expect(typeof result.current.setBrush).toBe('function')
@@ -112,14 +112,14 @@ describe('useDrauu', () => {
 
   it('should ignore a non-svg element target (upstream SVGSVGElement guard)', async () => {
     const div = document.createElement('div')
-    const { result } = await renderHook(() => useDrauu(div))
+    const { result } = await renderHook(() => useDrauu({ current: div }))
 
     expect(result.current.drauuInstance).toBeUndefined()
   })
 
   it('should merge the default brush with user options and hand it to the instance', async () => {
     const svg = createSvg()
-    const { result } = await renderHook(() => useDrauu(svg, { brush: { color: 'red', size: 5 } }))
+    const { result } = await renderHook(() => useDrauu({ current: svg }, { brush: { color: 'red', size: 5 } }))
 
     expect(result.current.brush).toEqual({
       color: 'red',
@@ -140,7 +140,7 @@ describe('useDrauu', () => {
 
   it('should forward non-brush options to the drauu instance', async () => {
     const svg = createSvg()
-    const { result } = await renderHook(() => useDrauu(svg, {
+    const { result } = await renderHook(() => useDrauu({ current: svg }, {
       coordinateTransform: false,
       coordinateScale: 2,
     }))
@@ -152,14 +152,14 @@ describe('useDrauu', () => {
 
   it('should apply the brush mode option to the drauu model', async () => {
     const svg = createSvg()
-    const { result } = await renderHook(() => useDrauu(svg, { brush: { color: 'black', size: 3, mode: 'line' } }))
+    const { result } = await renderHook(() => useDrauu({ current: svg }, { brush: { color: 'black', size: 3, mode: 'line' } }))
 
     expect(result.current.drauuInstance!.mode).toBe('line')
   })
 
   it('should load an svg string and dump it back', async () => {
     const svg = createSvg()
-    const { result, act } = await renderHook(() => useDrauu(svg))
+    const { result, act } = await renderHook(() => useDrauu({ current: svg }))
 
     await act(() => {
       result.current.load('<path d="M 0 0 L 10 10" stroke="red" fill="none" />')
@@ -170,7 +170,7 @@ describe('useDrauu', () => {
 
   it('should round-trip dump -> clear -> load', async () => {
     const svg = createSvg()
-    const { result, act } = await renderHook(() => useDrauu(svg))
+    const { result, act } = await renderHook(() => useDrauu({ current: svg }))
 
     await act(() => drawStroke(svg))
     const dumped = result.current.dump()!
@@ -185,7 +185,7 @@ describe('useDrauu', () => {
 
   it('should clear the canvas and the operation stack', async () => {
     const svg = createSvg()
-    const { result, act } = await renderHook(() => useDrauu(svg))
+    const { result, act } = await renderHook(() => useDrauu({ current: svg }))
 
     await act(() => drawStroke(svg))
     expect(result.current.dump()).not.toBe('')
@@ -199,7 +199,7 @@ describe('useDrauu', () => {
 
   it('should undo and redo, keeping canUndo / canRedo in sync', async () => {
     const svg = createSvg()
-    const { result, act } = await renderHook(() => useDrauu(svg))
+    const { result, act } = await renderHook(() => useDrauu({ current: svg }))
 
     expect(result.current.canUndo).toBe(false)
     expect(result.current.canRedo).toBe(false)
@@ -230,7 +230,7 @@ describe('useDrauu', () => {
 
   it('should cancel the stroke in progress', async () => {
     const svg = createSvg()
-    const { result, act } = await renderHook(() => useDrauu(svg))
+    const { result, act } = await renderHook(() => useDrauu({ current: svg }))
 
     await act(() => beginStroke(svg))
     expect(svg.querySelectorAll('path')).toHaveLength(1)
@@ -241,7 +241,7 @@ describe('useDrauu', () => {
 
   it('should update both the returned brush and the instance through setBrush', async () => {
     const svg = createSvg()
-    const { result, act } = await renderHook(() => useDrauu(svg))
+    const { result, act } = await renderHook(() => useDrauu({ current: svg }))
     const instance = result.current.drauuInstance!
 
     await act(() => {
@@ -262,7 +262,7 @@ describe('useDrauu', () => {
 
   it('should accept the React functional updater in setBrush', async () => {
     const svg = createSvg()
-    const { result, act } = await renderHook(() => useDrauu(svg))
+    const { result, act } = await renderHook(() => useDrauu({ current: svg }))
     const instance = result.current.drauuInstance!
 
     await act(() => {
@@ -284,7 +284,7 @@ describe('useDrauu', () => {
   })
 
   it('should update the returned brush with no mounted instance', async () => {
-    const { result, act } = await renderHook(() => useDrauu(null))
+    const { result, act } = await renderHook(() => useDrauu({ current: null }))
 
     expect(result.current.drauuInstance).toBeUndefined()
 
@@ -298,7 +298,7 @@ describe('useDrauu', () => {
 
   it('should return one object with the paired setBrush and every upstream member', async () => {
     const svg = createSvg()
-    const { result } = await renderHook(() => useDrauu(svg))
+    const { result } = await renderHook(() => useDrauu({ current: svg }))
 
     // return-shape rule 5: a single object, every caller-writable value paired
     // with its setter (`brush` / `setBrush`) plus the upstream methods and the
@@ -327,7 +327,7 @@ describe('useDrauu', () => {
 
   it('should fire each on* registrar and stop it with off()', async () => {
     const svg = createSvg()
-    const { result, act } = await renderHook(() => useDrauu(svg))
+    const { result, act } = await renderHook(() => useDrauu({ current: svg }))
 
     const onChanged = vi.fn()
     const onCommitted = vi.fn()
@@ -391,7 +391,7 @@ describe('useDrauu', () => {
 
     let captured: UseDrauuReturn | undefined
     const { act } = await renderHook(() => {
-      captured = useDrauu(svg)
+      captured = useDrauu({ current: svg })
       return captured
     })
 

@@ -150,7 +150,7 @@ export interface UseImageReturn {
  *   `currentSrc` of the last successfully loaded image (upstream's `state`
  *   holds the loaded element itself), and `executeImmediate` is dropped in
  *   favor of `execute(0)`;
- * - `options` is a plain object (upstream `RefOrValue<UseImageOptions>`)
+ * - `options` is a plain object (upstream `MaybeRefOrGetter<UseImageOptions>`)
  *   — pass a new options object to load a different image. The mount effect is
  *   keyed on a stable `JSON.stringify` of the options, mirroring upstream's
  *   deep `watch`, so changing any attribute reloads the image;

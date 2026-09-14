@@ -1,7 +1,7 @@
-import type { RefOrValue } from '@reause/shared'
+import type { RefObject } from 'react'
 import type { UseScrollOptions, UseScrollReturn } from '../useScroll'
-import { toValue } from '@reause/shared'
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { unrefElement } from '../unrefElement'
 import { useElementVisibility } from '../useElementVisibility'
 import { useScroll } from '../useScroll'
 
@@ -14,10 +14,9 @@ type Awaitable<T> = T | Promise<T>
 const defaultCanLoadMore = () => true
 
 /**
- * Resolve a scroll target down to an element that can be observed by an
- * `IntersectionObserver` — the React equivalent of upstream's `resolveElement`
- * (`_resolve-element.ts`): `Window` and `Document` are reduced to their
- * `documentElement` because they cannot be observed directly.
+ * Resolve a scroll target down to an element that can be observed by an `IntersectionObserver`
+ * (`_resolve-element.ts`): `Window` and `Document` are reduced to their `documentElement` because
+ * they cannot be observed directly.
  */
 function resolveObservedElement(
   el: InfiniteScrollElement,
@@ -52,9 +51,8 @@ export interface UseInfiniteScrollOptions<T extends InfiniteScrollElement = Infi
   interval?: number
 
   /**
-   * A function that determines whether more content can be loaded for a specific element.
-   * Should return `true` if loading more content is allowed for the given element,
-   * and `false` otherwise.
+   * A function that determines whether more content can be loaded for a specific element. Should
+   * return `true` if loading more content is allowed for the given element, and `false` otherwise.
    */
   canLoadMore?: (el: T) => boolean
 }
@@ -69,43 +67,31 @@ export interface UseInfiniteScrollReturn {
  *
  * Map from @vueuse/core `useInfiniteScroll`
  * (`source/vueuse/packages/core/useInfiniteScroll/`): calls `onLoadMore`
- * whenever the element is scrolled to the requested edge (within `distance`
- * pixels), is visible in the viewport and `canLoadMore` allows it. The scroll
- * edge detection comes from `useScroll` (the `distance` is folded into the
- * `offset` option of the direction being listened to) and visibility from
- * `useElementVisibility` (`Window` / `Document` targets cannot be observed by
- * an `IntersectionObserver`, so they are reduced to their `documentElement`,
- * mirroring upstream's `resolveElement`).
+ * whenever the element is scrolled to the requested edge (within `distance` pixels), is visible in
+ * the viewport and `canLoadMore` allows it. The scroll edge detection comes from `useScroll` (the
+ * `distance` is folded into the `offset` option of the direction being listened to) and visibility
+ * from `useElementVisibility` (`Window` / `Document` targets cannot be observed by an
+ * `IntersectionObserver`, so they are reduced to their `documentElement`, mirroring upstream's
+ * `resolveElement`).
  *
- * React divergences from upstream:
- *
- * 1. Upstream returns `{ isLoading: ComputedRef<boolean>, reset }` where the
- *    composable is stopped on unmount; here `isLoading` is a plain `boolean`
- *    state value and listeners/observers tear down through the composed
- *    hooks' own unmount effects — no cleanup is returned.
- * 2. Upstream wraps `useScroll` in `reactive` and `watch`es the arrived /
- *    visibility / `canLoad` computationals with an immediate, post-flush
- *    watcher that calls `checkAndLoad`. Here a post-commit `useEffect` on the
- *    same values plays that role: every committed change to the arrived state
- *    (for the listened direction), the visibility boolean, the resolved
- *    `canLoad` predicate or the internal re-check signal re-runs the check.
- *    After `onLoadMore` settles, `measure()` is re-run together with the
- *    re-check signal (single batched commit), which replaces upstream's
- *    `finally → nextTick(checkAndLoad)` re-check after the DOM has grown.
- * 3. `canLoadMore` is evaluated fresh inside the re-check effect against the
- *    element resolved at effect time (upstream caches the predicate result in
- *    a `computed` keyed on `observedElement`), so a swapped predicate is
- *    honored on the next re-check instead of waiting for the element itself
- *    to change.
- * 4. `reset` re-measures and schedules a re-check in one tick (upstream:
- *    `nextTick(() => checkAndLoad())`).
- * 5. SSR-safe: nothing touches `window` or the DOM during render — the
- *    observed element and the effect both resolve through `typeof` guards and
- *    all listeners attach in effects.
- * 6. The upstream `v-infinite-scroll` directive variant is a Vue feature and
- *    is not ported; check the `distance` / `direction` / `canLoadMore`
- *    options instead and call `reset()` from a click handler for the same
- *    per-element behavior.
+ * 1. Upstream returns `{ isLoading: ComputedRef<boolean>, reset }` where the composable; here
+ * `isLoading` is a plain `boolean` state value and listeners/observers tear down through the
+ * composed hooks' own unmount effects — no cleanup is returned. 2. Upstream wraps `useScroll` in
+ * `reactive` and `watch`es the arrived / visibility / `canLoad` computationals with an immediate,
+ * post-flush watcher that calls `checkAndLoad`. Here a post-commit `useEffect` on the same values
+ * plays that role: every committed change to the arrived state (for the listened direction), the
+ * visibility boolean, the resolved `canLoad` predicate or the internal re-check signal re-runs the
+ * check. After `onLoadMore` settles, `measure()` is re-run together with the re-check signal
+ * (single batched commit), which replaces upstream's `finally → nextTick(checkAndLoad)` re-check
+ * after the DOM has grown. 3. `canLoadMore` is evaluated fresh inside the re-check effect against
+ * the element resolved at effect time (upstream caches the predicate result in a `computed` keyed
+ * on `observedElement`), so a swapped predicate is honored on the next re-check instead of waiting
+ * for the element itself to change. 4. `reset` re-measures and schedules a re-check in one tick. 5.
+ * SSR-safe: nothing touches `window` or the DOM during render — the observed element and the effect
+ * both resolve through `typeof` guards and all listeners attach in effects. 6. The upstream
+ * `v-infinite-scroll` directive variant is a Vue feature and is not ported; check the `distance` /
+ * `direction` / `canLoadMore` options instead and call `reset()` from a click handler for the same
+ * per-element behavior.
  *
  * @example
  * const el = useRef<HTMLDivElement>(null)
@@ -116,7 +102,7 @@ export interface UseInfiniteScrollReturn {
  * reset()
  */
 export function useInfiniteScroll<T extends InfiniteScrollElement>(
-  element: RefOrValue<T>,
+  element: RefObject<T | null>,
   onLoadMore: (state: UseScrollReturn) => Awaitable<void>,
   options: UseInfiniteScrollOptions<T> = {},
 ): UseInfiniteScrollReturn {
@@ -153,8 +139,8 @@ export function useInfiniteScroll<T extends InfiniteScrollElement>(
   isLoadingRef.current = isLoading
 
   // Document and Window cannot be observed by IntersectionObserver
-  const observedElement = resolveObservedElement(toValue(element))
-  const isElementVisible = useElementVisibility(observedElement)
+  const observedElement = resolveObservedElement(element ? unrefElement(element) : undefined)
+  const isElementVisible = useElementVisibility({ current: observedElement })
 
   // the resolved element drives `useElementVisibility` at render time; the
   // `canLoadMore` predicate itself is evaluated fresh inside the re-check
@@ -169,7 +155,7 @@ export function useInfiniteScroll<T extends InfiniteScrollElement>(
 
   useEffect(() => {
     const currentState = stateRef.current
-    const el = resolveObservedElement(toValue(elementRef.current))
+    const el = resolveObservedElement(elementRef.current ? unrefElement(elementRef.current) : undefined)
     const canLoad = el ? canLoadMoreRef.current(el as T) : false
     if (!el || !isElementVisible || !canLoad || isLoadingRef.current)
       return

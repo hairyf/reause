@@ -36,30 +36,25 @@ export interface UseEventBusReturn<T, P> {
 }
 
 /**
- * The global event registry — port of upstream `internal.ts`. A single `Map`
- * shared by every bus instance, keyed by the bus identifier. Exported so the
- * mirrored tests can inspect it the same way upstream does via `./internal`.
+ * The global event registry — port of upstream `internal.ts`. A single `Map` shared by every bus
+ * instance, keyed by the bus identifier. Exported so the mirrored tests can inspect it the same way
+ * upstream does via `./internal`.
  */
 export const events = new Map<EventBusIdentifier<any>, EventBusEvents<any>>()
 
 /**
- * React port of VueUse's `useEventBus`.
- *
  * Map from @vueuse/core `useEventBus`
  * (`source/vueuse/packages/core/useEventBus/`). A basic event bus.
  *
- * This is a pure factory — no React state or effects — so the returned
- * `{ on, once, off, emit, reset }` object mirrors the upstream API 1:1, with
- * listeners stored in the module-level `events` registry above. Any number of
- * `useEventBus(key)` call sites with the same key share the same bus, and
- * `EventBusKey` binds the event type to the key at the type level.
+ * This is a pure factory — no React state or effects — so the returned `{ on, once, off, emit,
+ * reset }` object mirrors the upstream API 1:1, with listeners stored in the module-level `events`
+ * registry above. Any number of `useEventBus(key)` call sites with the same key share the same bus,
+ * and `EventBusKey` binds the event type to the key at the type level.
  *
- * React divergences:
- * - upstream auto-unsubscribes listeners when the calling effect scope is
- *   disposed (`tryOnScopeDispose`). React has no scope disposal, so there is
- *   no unmount cleanup; instead `on` / `once` return an unsubscribe function
- *   that removes the listener. When a component owns a subscription, call it
- *   from a `useEffect` cleanup to avoid leaks.
+ * React divergences: upstream auto-unsubscribes listeners when the calling effect scope is disposed
+ * (`tryOnScopeDispose`). React has no scope disposal, so there is no unmount cleanup; instead `on`
+ * / `once` return an unsubscribe function that removes the listener. When a component owns a
+ * subscription, call it from a `useEffect` cleanup to avoid leaks.
  *
  * @example
  * const { on, emit, reset } = useEventBus<string>('news')

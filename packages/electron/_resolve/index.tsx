@@ -1,16 +1,14 @@
 import type { IpcRenderer, WebFrame } from 'electron'
 
 /**
- * Resolve an `ipcRenderer` instance from the explicit argument or, when
- * `nodeIntegration` is enabled, from `window.require('electron')`.
+ * Resolve an `ipcRenderer` instance from the explicit argument or, when `nodeIntegration` is
+ * enabled, from `window.require('electron')`.
  *
- * Internal helper (not exported from `index.ts`). Resolution happens at
- * render time — not inside an effect — so a missing instance throws
- * synchronously, exactly like upstream.
+ * Internal helper (not exported from `index.ts`). Resolution happens at render time — not inside an
+ * effect — so a missing instance throws synchronously, exactly like upstream.
  *
- * Each caller passes its own upstream-verbatim error message, because
- * upstream `useIpcRenderer` and the `useIpcRendererInvoke` /
- * `useIpcRendererOn` pair word it differently.
+ * Each caller passes its own upstream-verbatim error message, because upstream `useIpcRenderer` and
+ * the `useIpcRendererInvoke` / `useIpcRendererOn` pair word it differently.
  */
 export function resolveIpcRenderer(
   ipcRenderer?: IpcRenderer,
@@ -30,11 +28,11 @@ export function resolveIpcRenderer(
 }
 
 /**
- * Resolve a `webFrame` instance from the explicit argument or, when
- * `nodeIntegration` is enabled, from `window.require('electron')`.
+ * Resolve a `webFrame` instance from the explicit argument or, when `nodeIntegration` is enabled,
+ * from `window.require('electron')`.
  *
- * Internal helper (not exported from `index.ts`), reserved for the zoom
- * hooks (`useZoomFactor` / `useZoomLevel`, #256 / #257).
+ * Internal helper (not exported from `index.ts`), reserved for the zoom hooks (`useZoomFactor` /
+ * `useZoomLevel`, #256 / #257).
  */
 export function resolveWebFrame(
   webFrame?: WebFrame,

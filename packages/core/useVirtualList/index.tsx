@@ -47,9 +47,8 @@ export interface UseVirtualListScrollToOptions {
 
 export interface UseVirtualListReturn<T> {
   /**
-   * The currently visible window of items (plus `overscan`), each with its
-   * original `data` and its absolute `index` into the source list. A plain
-   * array — there is no `.value` wrapper.
+   * The currently visible window of items (plus `overscan`), each with its original `data` and its
+   * absolute `index` into the source list. A plain array — there is no `.value` wrapper.
    */
   list: UseVirtualListItem<T>[]
   /**
@@ -59,9 +58,8 @@ export interface UseVirtualListReturn<T> {
 
   containerProps: {
     /**
-     * Ref callback to attach to the scroll container element. Spread
-     * `containerProps` onto the container `<div>` — `ref` is a ref callback
-     * exposing the container element.
+     * Ref callback to attach to the scroll container element. Spread `containerProps` onto the
+     * container `<div>` — `ref` is a ref callback exposing the container element.
      */
     ref: (element: HTMLElement | null) => void
     onScroll: () => void
@@ -75,9 +73,8 @@ export interface UseVirtualListReturn<T> {
 const defaultScrollToOptions: UseVirtualListScrollToOptions = { behavior: 'auto', block: 'start', inline: 'nearest' }
 
 /**
- * Returns the first index whose item "starts" at or after `scrollDirection`,
- * plus one — mirrors upstream's `createGetOffset`. The `+ 1` keeps the
- * formula identical to VueUse; it is compensated by the overscan below.
+ * Returns the first index whose item "starts" at or after `scrollDirection`, plus one —. The `+ 1`
+ * keeps the formula identical to VueUse; it is compensated by the overscan below.
  */
 function getOffset<T>(source: readonly T[], itemSize: UseVirtualListItemSize, scrollDirection: number): number {
   if (typeof itemSize === 'number')
@@ -98,8 +95,7 @@ function getOffset<T>(source: readonly T[], itemSize: UseVirtualListItemSize, sc
 }
 
 /**
- * How many items fit in `containerSize`, counted from `start` — mirrors
- * upstream's `createGetViewCapacity` (which reads the current range `start`).
+ * How many items fit in `containerSize`, counted from `start` —.
  */
 function getViewCapacity<T>(
   start: number,
@@ -123,8 +119,7 @@ function getViewCapacity<T>(
 }
 
 /**
- * The pixel offset at which the item at `index` starts — mirrors upstream's
- * `createGetDistance`.
+ * The pixel offset at which the item at `index` starts —.
  */
 function getDistance<T>(source: readonly T[], itemSize: UseVirtualListItemSize, index: number): number {
   if (typeof itemSize === 'number')
@@ -136,7 +131,7 @@ function getDistance<T>(source: readonly T[], itemSize: UseVirtualListItemSize, 
 }
 
 /**
- * Total size of every item — mirrors upstream's `createComputedTotalSize`.
+ * Total size of every item —.
  */
 function getTotalSize<T>(source: readonly T[], itemSize: UseVirtualListItemSize): number {
   if (typeof itemSize === 'number')
@@ -146,30 +141,24 @@ function getTotalSize<T>(source: readonly T[], itemSize: UseVirtualListItemSize)
 }
 
 /**
- * Create virtual lists with ease. Virtual lists (sometimes called
- * [_virtual scrollers_](https://vue-virtual-scroller-demo.netlify.app/)) allow
- * you to render a large number of items performantly. They only render the
- * minimum number of DOM nodes necessary to show the items within the
- * `container` element by using the `wrapper` element to emulate the container
+ * Create virtual lists with ease. Virtual lists (sometimes called [_virtual
+ * scrollers_](https://vue-virtual-scroller-demo.netlify.app/)) allow you to render a large number
+ * of items performantly. They only render the minimum number of DOM nodes necessary to show the
+ * items within the `container` element by using the `wrapper` element to emulate the container
  * element's full height.
  *
  * Map from @vueuse/core `useVirtualList`
  * (`source/vueuse/packages/core/useVirtualList/`), which renders a sliding
  * window of `source` based on the container's scroll offset and size.
  *
- * React divergences:
- *
  * - the upstream return object is preserved 1:1, with the Vue reactivity
  *   removed: `list` is a plain array (no `.value`), and `containerProps` /
  *   `wrapperProps` are plain objects meant to be spread onto JSX;
- * - the visible window is derived during render from the container's scroll
- *   offset and size (kept in state, updated by `onScroll` / `scrollTo` / the
- *   container ref callback / a `ResizeObserver`), so the source list, the
- *   item-size function and the options are re-read every render — no `watch`
- *   setup needed; `list` is a read-only value source and takes a plain
- *   `readonly T[]` (upstream: `MaybeRef<readonly T[]>`), so a React ref or
- *   state value is resolved at the call site (`useVirtualList(itemsRef.current,
- *   …)`);
+ * - the visible window is derived during render from the container's scroll offset and size (kept
+ * in state, updated by `onScroll` / `scrollTo` / the container ref callback / a `ResizeObserver`),
+ * so the source list, the item-size function and the options are re-read every render — no `watch`
+ * setup needed; `list` is a read-only value source and takes a plain `readonly T[]`, so a React ref
+ * or state value is resolved at the call site (`useVirtualList(itemsRef.current, …)`);
  * - upstream's `watch` over the container size (via `useElementSize`) becomes
  *   the `ResizeObserver` attached to the container element, and the item-size
  *   recomputation that upstream's `totalSize` computed drives is simply a
@@ -179,8 +168,8 @@ function getTotalSize<T>(source: readonly T[], itemSize: UseVirtualListItemSize)
  *   the element's new scroll position into state.
  *
  * The upstream component variant `UseVirtualList` is not ported — React has no
- * directive/component-slot equivalent; the same capability is expressed with
- * the hook and a function-as-children renderer (see the docs page).
+ * directive/component-slot equivalent; the same capability is expressed with the hook and a
+ * function-as-children renderer (see the docs page).
  *
  * SSR-safe: nothing touches `window` or the DOM during render.
  *
@@ -231,11 +220,9 @@ export function useVirtualList<T = any>(list: readonly T[], options: UseVirtualL
   overscanRef.current = overscan
 
   /**
-   * Mirrors upstream's `useWatchForSizes` + `useElementSize`: whenever the
-   * container element is replaced (attach / detach / swap), (re-)attach a
-   * `ResizeObserver` so size changes recalc the window. The recalculation
-   * itself is derived during render from `containerSize` / `scrollPosition`
-   * state, so this effect only needs to keep the observer in sync.
+   * (re-)attach a `ResizeObserver` so size changes recalc the window. The recalculation itself is
+   * derived during render from `containerSize` / `scrollPosition` state, so this effect only needs
+   * to keep the observer in sync.
    */
   useEffect(() => {
     const element = containerRef.current
@@ -268,10 +255,8 @@ export function useVirtualList<T = any>(list: readonly T[], options: UseVirtualL
   }, [])
 
   /**
-   * Ref callback spread onto the container element. Stores the element and
-   * mirrors its current size / offset into state so the render-derived window
-   * updates as soon as the element attaches (upstream: the `containerRef`
-   * watch in `useWatchForSizes`).
+   * Ref callback spread onto the container element. Stores the element and mirrors its current size
+   * / offset into state so the render-derived window updates as soon as the element attaches.
    */
   const setContainerRef = useCallback((element: HTMLElement | null): void => {
     containerRef.current = element

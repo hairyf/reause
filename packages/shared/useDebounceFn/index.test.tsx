@@ -66,22 +66,23 @@ describe('useDebounceFn', () => {
     expect(await pending).toBe('c')
   })
 
-  it('re-reads a ref ms on every call', async () => {
+  it('re-reads ms from the latest render on every call', async () => {
     const calls: number[] = []
-    const delay = { current: 100 }
     let first!: Promise<unknown>
     let pending!: Promise<unknown>
-    const { result, act } = await renderHook(() =>
-      useDebounceFn((n: number) => {
+    const { result, act, rerender } = await renderHook(
+      ({ ms }: { ms: number } = { ms: 100 }) => useDebounceFn((n: number) => {
         calls.push(n)
         return n
-      }, delay))
+      }, ms),
+      { initialProps: { ms: 100 } },
+    )
 
     await act(async () => {
       first = result.current(1)
     })
+    await rerender({ ms: 300 })
     await act(async () => {
-      delay.current = 300
       pending = result.current(2)
     })
 
@@ -98,31 +99,33 @@ describe('useDebounceFn', () => {
     expect(await pending).toBe(2)
   })
 
-  it('re-reads a ref-like ms ({ current }) on every call', async () => {
+  it('re-arms the pending call with the ms of the latest render', async () => {
     const calls: number[] = []
-    const delay = { current: 100 }
     let pending!: Promise<unknown>
-    const { result, act } = await renderHook(() =>
-      useDebounceFn((n: number) => {
+    const { result, act, rerender } = await renderHook(
+      ({ ms }: { ms: number } = { ms: 50 }) => useDebounceFn((n: number) => {
         calls.push(n)
         return n
-      }, delay))
+      }, ms),
+      { initialProps: { ms: 50 } },
+    )
 
     await act(async () => {
       pending = result.current(1)
     })
+
+    await rerender({ ms: 500 })
     await act(async () => {
-      delay.current = 300
       pending = result.current(2)
     })
 
     await act(async () => {
-      vi.advanceTimersByTime(100)
+      vi.advanceTimersByTime(50)
     })
     expect(calls).toEqual([])
 
     await act(async () => {
-      vi.advanceTimersByTime(200)
+      vi.advanceTimersByTime(450)
     })
     expect(calls).toEqual([2])
     expect(await pending).toBe(2)

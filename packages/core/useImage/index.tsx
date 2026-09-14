@@ -33,9 +33,8 @@ export interface UseImageOptions {
 }
 
 /**
- * Async-state options, mirroring upstream `useAsyncState`'s
- * `UseAsyncStateOptions` (with `shallow` omitted — React state is always
- * shallow).
+ * Async-state options, mirroring upstream `useAsyncState`'s `UseAsyncStateOptions` (with `shallow`
+ * omitted — React state is always shallow).
  */
 export interface UseImageAsyncStateOptions {
   /**
@@ -46,8 +45,7 @@ export interface UseImageAsyncStateOptions {
   delay?: number
 
   /**
-   * Execute the promise right after the function is invoked.
-   * Will apply the delay if any.
+   * Execute the promise right after the function is invoked. Will apply the delay if any.
    *
    * When set to false, you will need to execute it manually.
    *
@@ -69,9 +67,8 @@ export interface UseImageAsyncStateOptions {
   /**
    * Sets the state to initialState before executing the promise.
    *
-   * This can be useful when calling the execute function more than once (for
-   * example, to refresh data). When set to false, the current state remains
-   * unchanged until the promise resolves.
+   * This can be useful when calling the execute function more than once (for example, to refresh
+   * data). When set to false, the current state remains unchanged until the promise resolves.
    *
    * @default true
    */
@@ -97,8 +94,8 @@ export interface UseImageReturn {
   error: unknown
 
   /**
-   * The `currentSrc` of the last successfully loaded image — `null` until a
-   * load succeeds (and while `resetOnExecute` restarts one).
+   * The `currentSrc` of the last successfully loaded image — `null` until a load succeeds (and
+   * while `resetOnExecute` restarts one).
    */
   url: string | null
 
@@ -108,8 +105,8 @@ export interface UseImageReturn {
   isLoading: boolean
 
   /**
-   * (Re)start the image load, optionally delayed, resolving with the loaded
-   * image element once its `onload` fires.
+   * (Re)start the image load, optionally delayed, resolving with the loaded image element once its
+   * `onload` fires.
    *
    * @param delay Delay in milliseconds before starting the load.
    */
@@ -160,8 +157,8 @@ async function loadImage(options: UseImageOptions): Promise<HTMLImageElement> {
  *
  * Map from @vueuse/core `useImage`
  * (`source/vueuse/packages/core/useImage/`). Asynchronously loads an image
- * (accepting every `<img>` attribute) and exposes the state of that load so
- * you can render a loading fallback, an error state, or the image once ready.
+ * (accepting every `<img>` attribute) and exposes the state of that load so you can render a
+ * loading fallback, an error state, or the image once ready.
  *
  * React divergences:
  * - upstream composes `useAsyncState` with a deep `watch` on the options and
@@ -172,7 +169,7 @@ async function loadImage(options: UseImageOptions): Promise<HTMLImageElement> {
  *   `currentSrc` of the last successfully loaded image (upstream's `state`
  *   holds the loaded element itself), and `executeImmediate` is dropped in
  *   favor of `execute(0)`;
- * - `options` is a plain object (upstream `RefOrValue<UseImageOptions>`)
+ * - `options` is a plain object (upstream `MaybeRefOrGetter<UseImageOptions>`)
  *   — pass a new options object to load a different image. The mount effect is
  *   keyed on a stable `JSON.stringify` of the options, mirroring upstream's
  *   deep `watch`, so changing any attribute reloads the image;
@@ -181,9 +178,8 @@ async function loadImage(options: UseImageOptions): Promise<HTMLImageElement> {
  * - rendering never touches the DOM: the load starts in the mount effect, so
  *   server rendering is safe (on the server `execute` rejects with the
  *   unavailable-`Image` error, which is captured in `error`);
- * - unmounting (or a newer `execute`/options change) invalidates the in-flight
- *   load via an execution counter, so a stale load can no longer update state
- *   — the React equivalent of upstream's `useAsyncState` execution guard.
+ * - unmounting (or a newer `execute`/options change) invalidates the in-flight load via an
+ * execution counter, so a stale load can no longer update state execution guard.
  *
  * @example
  * const avatarUrl = 'https://place.dog/300/200'

@@ -50,8 +50,6 @@ export interface UseSpeechSynthesisReturn {
 }
 
 /**
- * React port of VueUse's `useSpeechSynthesis`.
- *
  * Map from @vueuse/core `useSpeechSynthesis`
  * (`source/vueuse/packages/core/useSpeechSynthesis/`). Reactive
  * [SpeechSynthesis](https://developer.mozilla.org/en-US/docs/Web/API/SpeechSynthesis).
@@ -60,11 +58,9 @@ export interface UseSpeechSynthesisReturn {
  * - the `isSupported` / `isPlaying` / `status` / `error` / `utterance` shallow
  *   refs become plain state values; `isSupported` resolves in a mount effect
  *   (same pattern as `useMounted`) so SSR and hydration render `false` first;
- * - upstream's `utterance` is a computed that recreates a
- *   `SpeechSynthesisUtterance` on every read — here each `speak()` call owns
- *   that lifecycle: it creates the fresh utterance, binds its events in
- *   speak's own scope and stores it in the `utterance` state, which stays
- *   `undefined` until the first `speak()`;
+ * - is a computed that recreates a `SpeechSynthesisUtterance` on every read — here each `speak()`
+ * call owns that lifecycle: it creates the fresh utterance, binds its events in speak's own scope
+ * and stores it in the `utterance` state, which stays `undefined` until the first `speak()`;
  * - `speak` / `stop` / `toggle` are stable callbacks reading the latest
  *   `text` and options through refs;
  * - the `isPlaying` watcher (`synth.resume()` / `synth.pause()`) and the
@@ -73,9 +69,8 @@ export interface UseSpeechSynthesisReturn {
  *   is unavailable; unmount is a no-op — upstream only clears `isPlaying` on
  *   scope dispose and does not cancel ongoing speech either.
  *
- * Note: upstream docs list a `voiceInfo` return member, but the upstream
- * implementation (vendored source and `vueuse/main` alike) never provides it —
- * this port mirrors the implementation.
+ * Note: upstream docs list a `voiceInfo` return member, but the upstream implementation (vendored
+ * source and `vueuse/main` alike) never provides it — this port mirrors the implementation.
  *
  * @example
  * const { isSupported, isPlaying, status, speak } = useSpeechSynthesis('Hello world')

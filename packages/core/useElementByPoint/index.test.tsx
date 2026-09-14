@@ -65,7 +65,7 @@ describe('useElementByPoint', () => {
     const spy = vi.spyOn(document, 'elementFromPoint').mockReturnValue(first)
 
     const { result, rerender } = await renderHook(
-      (props: { x: number, y: number }) => useElementByPoint(props),
+      (props: { x: number, y: number } = { x: 0, y: 0 }) => useElementByPoint(props),
       { initialProps: { x: 0, y: 0 } },
     )
 

@@ -61,11 +61,9 @@ export type UseCachedComparator<T> = (
  * comparator. Because the change check is ref-based rather than render-based,
  * unrelated re-renders — including React StrictMode's double mount render —
  * do not re-run the comparator. The source is a plain value per the mapped
- * API, and also accepts a ref-like `{ current }` object (a React ref),
- * resolved through `isRefLike`. Only real ref-like sources are unwrapped: a
- * plain data object that happens to carry a `value` key (e.g.
- * `{ value: 42, extra: 0 }`) is cached as-is — `toValue` would unwrap it as a
- * Vue-style ref and return `42`.
+ * API — a ref, getter or `State<T>` is not accepted. A plain data object that
+ * happens to carry a `value` key (e.g. `{ value: 42, extra: 0 }`) is cached
+ * as-is and never unwrapped.
  *
  * Upstream `options` are intentionally not ported: `deepRefs` (shallow vs deep
  * ref) has no React analog because the port always stores and returns the plain
@@ -84,7 +82,7 @@ export type UseCachedComparator<T> = (
  * cached // { value: 43, extra: 1 } — significant change, cache follows
  */
 export declare function useCached<T>(
-  source: RefOrValue<T>,
+  source: T,
   comparator?: UseCachedComparator<T>,
 ): T
 ```

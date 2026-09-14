@@ -69,7 +69,7 @@ export interface Pausable {
  *
  * React divergences:
  * - `fn` and `interval` are plain values kept in refs (upstream: closure +
- *   `RefOrValue<number>`), so `pause` / `resume` stay referentially
+ *   `MaybeRefOrGetter<number>`), so `pause` / `resume` stay referentially
  *   stable and a changing (typically stable) callback identity never restarts
  *   the chain. Like upstream, the `interval` is only read when a run is
  *   scheduled — a changed `interval` does not re-arm the pending timeout,

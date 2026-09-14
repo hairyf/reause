@@ -1,15 +1,15 @@
-import type { ConfigurableWindow, RefOrValue } from '@reause/shared'
-import { isIOS, noop, toValue } from '@reause/shared'
+import type { ConfigurableWindow } from '@reause/shared'
+import type { RefObject } from 'react'
+import { isIOS, noop } from '@reause/shared'
 import { useCallback, useEffect, useRef } from 'react'
+import { unrefElement } from '../unrefElement'
 import { useEventListener } from '../useEventListener'
 
 export interface UseClickOutsideOptions<Controls extends boolean = false> extends ConfigurableWindow {
   /**
-   * List of elements that should not trigger the event,
-   * provided as elements (plain elements or ref-like `{ current }` objects)
-   * or CSS Selectors.
+   * List of elements that should not trigger the event, provided as elements or CSS Selectors.
    */
-  ignore?: RefOrValue<(RefOrValue<Element | null> | string)[]>
+  ignore?: (Element | string)[]
   /**
    * Use capturing phase for the internal event listener.
    *
@@ -23,10 +23,9 @@ export interface UseClickOutsideOptions<Controls extends boolean = false> extend
    */
   detectIframe?: boolean
   /**
-   * Expose more controls. When `true` the return is a
-   * `{ stop, cancel, trigger }` object instead of a single stop function:
-   * `cancel()` suppresses the next click and `trigger(event)` force-fires the
-   * handler.
+   * Expose more controls. When `true` the return is a `{ stop, cancel, trigger }` object instead of
+   * a single stop function: `cancel()` suppresses the next click and `trigger(event)` force-fires
+   * the handler.
    *
    * @default false
    */
@@ -61,19 +60,16 @@ let _iOSWorkaround = false
  *
  * Map from @vueuse/core `onClickOutside`
  * (`source/vueuse/packages/core/onClickOutside/`). Attaches `click`,
- * `pointerdown` (and — when `detectIframe` is enabled — `blur`) listeners to
- * the window, and calls the handler when a click lands outside the resolved
- * `target` element. The `ignore` option suppresses the handler for matching
- * elements (elements or CSS selectors), `capture` controls the phase of the
- * internal `click` listener (default `true`), and `detectIframe` also fires
- * the handler when focus moves to an iframe.
+ * `pointerdown` (and — when `detectIframe` is enabled — `blur`) listeners to the window, and calls
+ * the handler when a click lands outside the resolved `target` element. The `ignore` option
+ * suppresses the handler for matching elements (elements or CSS selectors), `capture` controls the
+ * phase of the internal `click` listener (default `true`), and `detectIframe` also fires the
+ * handler when focus moves to an iframe.
  *
  * React divergences:
- * - React has no composable-function API, so this is a hook (upstream's
- *   `onClickOutside` is a plain function): the listeners bind in effects and
- *   are removed on unmount;
- * - the target resolves through `toValue` — a plain element or a ref-like
- *   `{ current }` object (e.g. a `useRef`) are both accepted;
+ * - React has no composable-function API, so this is a hook: the listeners bind in effects;
+ * - the target is a React ref object (`RefObject`); a plain element, getter or callback ref is not
+ * accepted;
  * - the return is a single stop function (`() => void`) by default; with
  *   `controls: true` it is upstream's `{ stop, cancel, trigger }` object —
  *   `cancel()` suppresses the next click, `trigger(event)` force-fires the
@@ -82,10 +78,9 @@ let _iOSWorkaround = false
  * - the target/handler/options are read through latest-value refs, so new
  *   inline targets or handlers never cause re-subscription — only changes to
  *   the resolved window, `capture` or the bound event options re-bind;
- * - SSR-safe: nothing touches `window` during render — the window target only
- *   resolves when `window` is defined and the listeners bind in the mount
- *   effects. The one-time iOS Safari click workaround also runs inside an
- *   effect instead of during setup.
+ * - SSR-safe: nothing touches `window` during render — the window target only resolves when
+ * `window` is defined ands. The one-time iOS Safari click workaround also runs inside an effect
+ * instead of during setup.
  *
  * @see https://vueuse.org/core/onClickOutside/
  *
@@ -101,19 +96,19 @@ let _iOSWorkaround = false
  * trigger(event)
  */
 export function useClickOutside<T extends UseClickOutsideOptions>(
-  target: RefOrValue<Element | null | undefined>,
+  target: RefObject<Element | null | undefined>,
   handler: UseClickOutsideHandler,
   options?: T,
 ): () => void
 
 export function useClickOutside(
-  target: RefOrValue<Element | null | undefined>,
+  target: RefObject<Element | null | undefined>,
   handler: UseClickOutsideHandler,
   options: UseClickOutsideOptions<true>,
 ): UseClickOutsideControls
 
 export function useClickOutside(
-  target: RefOrValue<Element | null | undefined>,
+  target: RefObject<Element | null | undefined>,
   handler: UseClickOutsideHandler,
   options: UseClickOutsideOptions<boolean> = {},
 ): UseClickOutsideReturn<boolean> {
@@ -163,18 +158,18 @@ export function useClickOutside(
     const currentWindow = winRef.current
     if (!currentWindow)
       return false
-    return toValue(ignoreRef.current).some((item) => {
+    return ignoreRef.current.some((item) => {
       if (typeof item === 'string') {
         return Array.from(currentWindow.document.querySelectorAll(item))
           .some(el => el === event.target || event.composedPath().includes(el))
       }
-      const el = toValue(item) as Element | null | undefined
+      const el = item
       return !!el && (event.target === el || event.composedPath().includes(el))
     })
   }, [])
 
   const listener = useCallback((event: Event): void => {
-    const el = toValue(targetRef.current) as Element | null | undefined
+    const el = unrefElement(targetRef.current)
 
     if (event.target == null)
       return
@@ -196,7 +191,7 @@ export function useClickOutside(
   }, [shouldIgnore])
 
   const stopClick = useEventListener(
-    win,
+    { current: win },
     'click',
     (event: Event) => {
       if (!isProcessingClickRef.current) {
@@ -211,17 +206,17 @@ export function useClickOutside(
   )
 
   const stopPointerDown = useEventListener(
-    win,
+    { current: win },
     'pointerdown',
     (e: PointerEvent) => {
-      const el = toValue(targetRef.current) as Element | null | undefined
+      const el = unrefElement(targetRef.current)
       shouldListenRef.current = !shouldIgnore(e) && !!(el && !e.composedPath().includes(el))
     },
     { passive: true },
   )
 
   const stopBlur = useEventListener(
-    win,
+    { current: win },
     'blur',
     (event: FocusEvent) => {
       // `detectIframe` is read through a ref so the listener stays registered
@@ -232,7 +227,7 @@ export function useClickOutside(
         const currentWindow = winRef.current
         if (!currentWindow)
           return
-        const el = toValue(targetRef.current) as Element | null | undefined
+        const el = unrefElement(targetRef.current)
         let activeEl: Element | null | undefined = currentWindow.document.activeElement
         while (activeEl?.shadowRoot)
           activeEl = activeEl.shadowRoot.activeElement

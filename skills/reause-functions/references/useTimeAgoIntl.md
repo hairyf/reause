@@ -103,7 +103,7 @@ export interface UseTimeAgoIntlOptions extends FormatTimeAgoIntlOptions {
  *   between.
  * - upstream `ConfigurableScheduler` → `updateInterval` option (default
  *   `30_000` ms, matching upstream's default `useIntervalFn(cb, 30_000)`).
- * - upstream `RefOrValue<Date | number | string>` → plain
+ * - upstream `MaybeRefOrGetter<Date | number | string>` → plain
  *   `Date | number | string`.
  *
  * @example

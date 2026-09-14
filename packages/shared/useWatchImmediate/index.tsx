@@ -2,16 +2,14 @@ import type { UseWatchCallback } from '../useWatch'
 import { useWatch } from '../useWatch'
 
 /**
- * Shorthand for watching value with `{ immediate: true }` — React port of
- * VueUse's `watchImmediate`.
+ * Shorthand for watching value with `{ immediate: true }` — React
+ * port of VueUse's `watchImmediate`.
  *
  * Map from @vueuse/shared watchImmediate. Upstream is a shorthand for
- * `watch(source, cb, { ...options, immediate: true })`; this port composes
- * the same pieces from house primitives: `useWatch` tracks the source across
- * renders (Vue's reactive dependency tracking becomes the effect dependency
- * list) and the hardcoded `immediate: true` fires the callback once on mount
- * with the current value, then again on every subsequent change with
- * `(value, oldValue)`.
+ * `watch(source, cb, {...options, immediate: true })`; this port composes the same pieces from
+ * house primitives: `useWatch` tracks the source across renders (Vue's reactive dependency tracking
+ * becomes the effect dependency list) and the hardcoded `immediate: true` fires the callback once
+ * on mount with the current value, then again on every subsequent change with `(value, oldValue)`.
  *
  * Divergences from the upstream Vue API:
  * - Returns `void` — upstream returns a `WatchHandle`; here disposal follows

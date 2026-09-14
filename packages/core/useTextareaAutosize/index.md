@@ -79,8 +79,8 @@ Upstream returns `{ textarea: Ref<HTMLTextAreaElement | undefined | null>, input
 so consumers read and write `input.value`. This port mirrors that object and pairs the writable content
 with a setter — `{ input, setInput, textarea, triggerResize }`.
 
-The `element` and `styleTarget` options accept a plain element or a ref-like `{ current }` object
-(`RefOrValue`), and the textarea is resolved at commit time, so an element attached after mount
+The `element` and `styleTarget` options accept a React ref (`RefObject` holding the element), and the
+textarea is resolved at commit time, so an element attached after mount
 (conditional or async render) still triggers the resize and the `ResizeObserver`. The `watch` values
 are compared with the shared structural `deepEqual` (functions by reference; `Map` / `Set` / `Date` /
 `RegExp` by contents) instead of a `JSON.stringify` key, so non-serializable values re-trigger the

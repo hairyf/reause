@@ -13,9 +13,9 @@ export interface FunctionInfo {
   category: string
   /**
    * Upstream source this export ports from (`vueuse`, `react-use`,
-   * `react-hookz`, `mantine`, `ahooks`, `react-spring`), resolved from the
-   * port's own annotation against that source's pinned tree. Absent for a pure
-   * reause-only export (the table's `—`).
+   * `react-hookz`, `mantine`, `ahooks`), resolved from the port's own
+   * annotation against that source's pinned tree. Absent for a pure reause-only
+   * export (the table's `—`).
    */
   source?: string
   lastUpdated?: number
@@ -205,7 +205,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'createGlobalState',
     category: 'State',
-    source: 'vueuse',
+    source: 'react-use',
     lastUpdated: 1789010295000,
   },
   {
@@ -927,7 +927,7 @@ export const functions: FunctionInfo[] = [
     file: 'packages/core/useAsyncFn/index.tsx',
     pkg: 'core',
     dir: 'useAsyncFn',
-    category: 'Side-effects',
+    category: 'State',
     source: 'react-use',
     lastUpdated: 1789254431000,
   },
@@ -1865,6 +1865,15 @@ export const functions: FunctionInfo[] = [
     lastUpdated: 1788942682000,
   },
   {
+    name: 'useLockFn',
+    file: 'packages/shared/useLockFn/index.tsx',
+    pkg: 'shared',
+    dir: 'useLockFn',
+    category: 'Side-effects',
+    source: 'ahooks',
+    lastUpdated: 1789321531000,
+  },
+  {
     name: 'useLogger',
     file: 'packages/shared/useLogger/index.tsx',
     pkg: 'shared',
@@ -2261,6 +2270,15 @@ export const functions: FunctionInfo[] = [
     lastUpdated: 1788964249000,
   },
   {
+    name: 'usePreviousDistinct',
+    file: 'packages/shared/usePreviousDistinct/index.tsx',
+    pkg: 'shared',
+    dir: 'usePreviousDistinct',
+    category: 'State',
+    source: 'react-use',
+    lastUpdated: 1789320527000,
+  },
+  {
     name: 'useProjection',
     file: 'packages/math/useProjection/index.tsx',
     pkg: 'math',
@@ -2484,15 +2502,6 @@ export const functions: FunctionInfo[] = [
     category: 'Elements',
     source: 'mantine',
     lastUpdated: 1789286495000,
-  },
-  {
-    name: 'useSpring',
-    file: 'packages/integrations/useSpring/index.tsx',
-    pkg: 'integrations',
-    dir: 'useSpring',
-    category: 'Animation',
-    source: 'react-spring',
-    lastUpdated: 1789289266000,
   },
   {
     name: 'useSSRWidth',
@@ -3257,7 +3266,7 @@ export const pages: FunctionPageInfo[] = [
     pkg: 'shared',
     doc: 'packages/shared/isDefined/index.md',
     category: 'Utilities',
-    description: 'non-nullish checking type guard for ref-like objects',
+    description: 'non-nullish checking type guard for React ref objects and plain values',
     lastUpdated: 1788999327000,
   },
   {
@@ -3314,7 +3323,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/rxjs/toObserver/index.md',
     category: '@RxJS',
     description:
-      'sugar function to convert a ref-like object (`{ current }`) or a setter function into an RxJS [Observer](https://rxjs.dev/guide/observer) — a `useRef` write does not re-render',
+      'sugar function to convert a ref object (`RefObject`) or a setter function into an RxJS [Observer](https://rxjs.dev/guide/observer) — a `useRef` write does not re-render',
     lastUpdated: 1789147565000,
   },
   {
@@ -3322,7 +3331,7 @@ export const pages: FunctionPageInfo[] = [
     pkg: 'core',
     doc: 'packages/core/unrefElement/index.md',
     category: 'Component',
-    description: 'get the DOM element of a React ref-like object or a plain element',
+    description: 'get the DOM element a React ref object currently holds',
     lastUpdated: 1789147565000,
   },
   {
@@ -3465,7 +3474,7 @@ export const pages: FunctionPageInfo[] = [
     name: 'useAsyncFn',
     pkg: 'core',
     doc: 'packages/core/useAsyncFn/index.md',
-    category: 'Side-effects',
+    category: 'State',
     description:
       "returns state and a callback for an `async` function (or any function returning a promise) — React port of react-use's [`useAsyncFn`](https://github.com/streamich/react-use/blob/master/docs/useAsyncFn.md) (upstream mapping files: `source/react-use/src/useAsyncFn.ts`",
     lastUpdated: 1789254431000,
@@ -3604,7 +3613,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useClickAway/index.md',
     category: 'Sensors',
     description:
-      "fire a handler when a click lands outside one or more target elements — the reause port of ahooks' [`useClickAway`](https://github.com/alibaba/hooks/blob/master/packages/hooks/src/useClickAway/index.ts) (upstream mapping files: `source/ahooks/packages/hooks/src/useClickAway/index.ts`",
+      "fire a handler when a click lands outside one or more target elements — the reause port of ahooks' [`useClickAway`](https://github.com/alibaba/hooks/blob/master/packages/hooks/src/useClickAway/index.ts) (`source/ahooks/packages/hooks/src/useClickAway/index.ts`)",
     lastUpdated: 1789256593000,
   },
   {
@@ -4304,6 +4313,15 @@ export const pages: FunctionPageInfo[] = [
     lastUpdated: 1788942682000,
   },
   {
+    name: 'useLockFn',
+    pkg: 'shared',
+    doc: 'packages/shared/useLockFn/index.md',
+    category: 'Side-effects',
+    description:
+      "add a lock to an async function so overlapping calls are dropped rather than run in parallel — React port of ahooks' `useLockFn`",
+    lastUpdated: 1789321531000,
+  },
+  {
     name: 'useLogger',
     pkg: 'shared',
     doc: 'packages/shared/useLogger/index.md',
@@ -4664,6 +4682,14 @@ export const pages: FunctionPageInfo[] = [
     lastUpdated: 1788964249000,
   },
   {
+    name: 'usePreviousDistinct',
+    pkg: 'shared',
+    doc: 'packages/shared/usePreviousDistinct/index.md',
+    category: 'State',
+    description: 'just like `usePrevious`',
+    lastUpdated: 1789320527000,
+  },
+  {
     name: 'useProjection',
     pkg: 'math',
     doc: 'packages/math/useProjection/index.md',
@@ -4865,14 +4891,6 @@ export const pages: FunctionPageInfo[] = [
     category: 'Elements',
     description: 'resizable panel layout with draggable',
     lastUpdated: 1789286495000,
-  },
-  {
-    name: 'useSpring',
-    pkg: 'integrations',
-    doc: 'packages/integrations/useSpring/index.md',
-    category: 'Animation',
-    description: 're-export of `useSpring` from',
-    lastUpdated: 1789289266000,
   },
   {
     name: 'useSSRWidth',

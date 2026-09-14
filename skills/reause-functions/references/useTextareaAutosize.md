@@ -79,8 +79,8 @@ Upstream returns `{ textarea: Ref<HTMLTextAreaElement | undefined | null>, input
 so consumers read and write `input.value`. This port mirrors that object and pairs the writable content
 with a setter — `{ input, setInput, textarea, triggerResize }`.
 
-The `element` and `styleTarget` options accept a plain element or a ref-like `{ current }` object
-(`RefOrValue`), and the textarea is resolved at commit time, so an element attached after mount
+The `element` and `styleTarget` options accept a React ref (`RefObject` holding the element), and the
+textarea is resolved at commit time, so an element attached after mount
 (conditional or async render) still triggers the resize and the `ResizeObserver`. The `watch` values
 are compared with the shared structural `deepEqual` (functions by reference; `Map` / `Set` / `Date` /
 `RegExp` by contents) instead of a `JSON.stringify` key, so non-serializable values re-trigger the
@@ -103,7 +103,7 @@ export interface UseTextareaAutosizeOptions {
    * Textarea element to autosize — a plain element or a ref-like `{ current }`
    * object. When omitted, bind the returned `textarea` ref instead.
    */
-  element?: RefOrValue<HTMLTextAreaElement | null | undefined>
+  element?: RefObject<HTMLTextAreaElement | null | undefined>
   /**
    * Textarea content. When omitted, the hook owns the content state and you
    * update it through the returned `setInput`.
@@ -126,7 +126,7 @@ export interface UseTextareaAutosizeOptions {
    * plain element or a ref-like `{ current }` object. If not provided it will
    * use textarea itself.
    */
-  styleTarget?: RefOrValue<HTMLElement | null | undefined>
+  styleTarget?: RefObject<HTMLElement | null | undefined>
   /**
    * Specify the style property that will be used to manipulate height. Can be
    * `height | minHeight`. Default value is `height`.
@@ -167,7 +167,7 @@ export interface UseTextareaAutosizeReturn {
  *   mapping of upstream's writable `input` ref), and `textarea` stays an
  *   element ref;
  * - the `element` and `styleTarget` options accept a plain element or a
- *   ref-like `{ current }` object (`RefOrValue`). The textarea is resolved at
+ *   ref-like `{ current }` object (`MaybeRefOrGetter`). The textarea is resolved at
  *   commit time, so an element attached after mount (conditional or async
  *   render) still triggers the resize and the `ResizeObserver`;
  * - upstream's `watch([input, textarea], () => nextTick(triggerResize), {

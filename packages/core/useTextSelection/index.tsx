@@ -20,8 +20,6 @@ function getRangesFromSelection(selection: Selection) {
 }
 
 /**
- * React port of VueUse's `useTextSelection`.
- *
  * Map from @vueuse/core `useTextSelection`
  * (`source/vueuse/packages/core/useTextSelection/`). Reactively track user
  * text selection based on
@@ -35,8 +33,7 @@ function getRangesFromSelection(selection: Selection) {
  * - upstream reads `window.getSelection()` during setup — here the initial
  *   read happens in the mount effect instead (SSR-safe: render never touches
  *   `window` / `document`, so the server renders the empty snapshot);
- * - the `document` `selectionchange` listener lives in a self-contained
- *   `useEffect` (upstream uses `useEventListener`) and is removed on unmount;
+ * - the `document` `selectionchange` listener lives in a self-contained `useEffect`;
  * - upstream's `selection.value = null` re-assign trick to force computed
  *   updates is unnecessary — React replaces the whole snapshot.
  *

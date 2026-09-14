@@ -1,13 +1,10 @@
 export type UseArraySomeReturn = boolean
 
 /**
- * React port of VueUse's `useArraySome`.
- *
  * Map from @vueuse/shared `useArraySome`
- * Mapping: `computed(() => ...)` → recompute on every render — the result is a
- * plain `boolean` (no `.value`, no caching) computed from the plain `list`
- * array the caller passes. Hold the array in `useState` and pass a new array
- * to observe a change; the result recomputes on the next render.
+ * Mapping: `computed(() =>...)` → recompute on every render — the result is a plain `boolean` (no
+ * `.value`, no caching) computed from the plain `list` array the caller passes. Hold the array in
+ * `useState` and pass a new array to observe a change; the result recomputes on the next render.
  *
  * @see https://vueuse.org/shared/useArraySome/
  * @param list - the array was called upon.

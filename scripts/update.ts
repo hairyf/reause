@@ -51,10 +51,8 @@ interface MappedPage {
 const RE_EXPORT = /export\s+(?:async\s+)?function\s+(\w+)|export\s+const\s+(\w+)\s*=/g
 
 /**
- * One upstream source reause ports from (issue #915). Every mounted
- * `source/<id>` is a pinned checkout read for provenance; `react-spring` has no
- * mount at all — it is a re-export-only dependency whose claims name a source
- * but no pinned path to verify.
+ * One upstream source reause ports from (issue #915). Every source is a pinned
+ * read-only checkout under `source/*`, read for provenance.
  *
  * The trees are shaped differently per source, which is why each entry declares
  * its own marker, file glob and module key rather than sharing one probe:
@@ -72,16 +70,16 @@ interface UpstreamSource {
    * qualifier (`@vueuse/core` → `core`).
    */
   marker: RegExp
-  /** Pinned checkout under the repo root; absent for a re-export-only source. */
-  tree?: string
+  /** Pinned checkout under the repo root. */
+  tree: string
   /** The export-defining files under `tree`. */
-  files?: string[]
+  files: string[]
   /**
    * How a file keys its module: `dir` when one directory is one module
    * (`packages/core/useNow`, `src/useMap`), `file` for a flat layout
    * (react-use's `src/useMount.ts`).
    */
-  modulePer?: 'dir' | 'file'
+  modulePer: 'dir' | 'file'
   /**
    * Candidate module paths for a bare `` `symbol` `` claim, confirmed against
    * the pin like every other candidate — never assumed to exist.
@@ -133,22 +131,17 @@ const SOURCES: UpstreamSource[] = [
     modulePer: 'dir',
     modulesOf: (_pkg, symbol) => [`packages/hooks/src/${symbol}`],
   },
-  // No `source/react-spring` submodule: the mount does not exist, so a claim on
-  // this source is provenance without a pinned path — rendered `✅ re-exported`
-  // with `—` in the path column rather than as a hand-written port.
-  { id: 'react-spring', marker: /@react-spring\/web/ },
 ]
 
 const SOURCE_BY_ID = new Map(SOURCES.map(source => [source.id, source]))
 
 /**
- * Source id → pinned tree, relative to the repo root (a source with no mount,
- * `react-spring`, is absent). Exported so the structural guard in
- * `test/functions-table.test.ts` resolves each committed row against its own
- * pin rather than assuming `source/vueuse`.
+ * Source id → pinned tree, relative to the repo root. Exported so the
+ * structural guard in `test/functions-table.test.ts` resolves each committed row
+ * against its own pin rather than assuming `source/vueuse`.
  */
 export const sourceTrees: Record<string, string> = Object.fromEntries(
-  SOURCES.filter(source => source.tree).map(source => [source.id, source.tree!]),
+  SOURCES.map(source => [source.id, source.tree]),
 )
 
 /** `useCollapse` → `use-collapse` (mantine's per-hook directory naming). */
@@ -375,9 +368,9 @@ function collectSourceModules(source: UpstreamSource): SourceIndex {
   const cached = sourceIndexes.get(source.id)
   if (cached)
     return cached
-  const treeRoot = join(root, source.tree!).replace(/\\/g, '/').replace(/\/$/, '')
+  const treeRoot = join(root, source.tree).replace(/\\/g, '/').replace(/\/$/, '')
   const modules = new Map<string, string[]>()
-  const files = globSync(source.files!, {
+  const files = globSync(source.files, {
     cwd: treeRoot,
     absolute: true,
     // Tests, stories and demos never define the public hook.
@@ -399,21 +392,13 @@ function collectSourceModules(source: UpstreamSource): SourceIndex {
 
 /**
  * The module index of a source id. VueUse reuses its own reader unchanged;
- * a re-export-only source (`react-spring`) has no pin, so its index is empty
- * and its claims can never be "confirmed" against disk.
+ * every other source is read from its own pinned tree.
  */
 function indexOf(sourceId: string): SourceIndex {
   const source = SOURCE_BY_ID.get(sourceId)!
-  if (!source.tree)
-    return { modules: new Map(), exports: new Map() }
   if (sourceId === 'vueuse')
     return { modules: collectUpstreamModules(), exports: upstreamExports }
   return collectSourceModules(source)
-}
-
-/** A source with no pinned checkout — provenance without a path to verify. */
-function isReexportOnly(sourceId: string): boolean {
-  return !SOURCE_BY_ID.get(sourceId)?.tree
 }
 
 function exportsOf(content: string): Set<string> {
@@ -548,8 +533,7 @@ function modulesOfPackage(pkg: string): string[] {
 interface ResolvedExport {
   /**
    * Source id the resolved upstream belongs to (`vueuse`, `react-use`, …), or
-   * `undefined` when the export is reause-only. Set for a re-export whose
-   * source has no pinned tree (`react-spring`), which has no `upstream` path.
+   * `undefined` when the export is reause-only.
    */
   source?: string
   /** Resolved upstream module, or `undefined` when the export is reause-only. */
@@ -559,8 +543,6 @@ interface ResolvedExport {
    * (so a renamed port shows both names), otherwise the reause export name.
    */
   symbol?: string
-  /** Whether the export re-exports its upstream instead of porting it. */
-  reexported?: boolean
   /** Upstream module this export's own annotation names, when it names one. */
   claimed?: string
   /** Whether `claimed` exists upstream and really exports the symbol it names. */
@@ -616,24 +598,19 @@ function resolveExport(name: string, pkg: string, dir: string, file: string): Re
   // The upstream this export's own annotation names, and whether that claim is
   // materially true — surfaced on the row so the structural guard can assert
   // that a `reause-only` verdict is never contradicted by the port's own claim.
-  // A `Map from` that names a module is preferred over the prose form, and a
-  // non-VueUse marker counts even without a module (`react-spring` has no pin
-  // to derive one from).
+  // A `Map from` that names a module is preferred over the prose form; a
+  // non-VueUse marker still counts when no module path could be derived.
   const named = own.find(claim => claim.module) || own.find(claim => claim.source !== 'vueuse')
   const claimed = named?.module
   const claimedSymbol = named?.symbol
   const claimedSource = named?.source
-  const claimConfirmed = !!named && (named.module
-    ? moduleExports(named.source, named.module, named.symbol)
-    // A source with no pin cannot be verified against disk; the annotation is
-    // the provenance, and the row renders `✅ re-exported` rather than `ported`.
-    : isReexportOnly(named.source))
+  const claimConfirmed = !!named && !!named.module
+    && moduleExports(named.source, named.module, named.symbol)
 
-  // `upstream || undefined`: a claim on a source with no pin resolves to the
-  // source alone (`react-spring`), and an empty module path must read as "no
-  // pinned path", not as a path.
+  // `upstream || undefined`: an empty module path must read as "no pinned
+  // path", not as a path.
   const resolved = (source: string, upstream: string | undefined, symbol: string | undefined): ResolvedExport =>
-    ({ source, upstream: upstream || undefined, symbol, reexported: isReexportOnly(source), claimed, claimConfirmed })
+    ({ source, upstream: upstream || undefined, symbol, claimed, claimConfirmed })
 
   // 1 — the claim this export's own annotation makes, in its own source.
   if (claimConfirmed)
@@ -732,7 +709,7 @@ function getLastUpdated(file: string): number | undefined {
  * mirroring VueUse's metadata-driven function list.
  */
 export async function generateFunctionsMD() {
-  const rows = collectFunctionRows().map(({ name, file, source, upstream, symbol, reexported, missingFrom }) => {
+  const rows = collectFunctionRows().map(({ name, file, source, upstream, symbol, missingFrom }) => {
     // The `source` column names the upstream a row belongs to and is `—` for a
     // pure reause-only export (nothing upstream defines or re-exports it).
     // `upstream function` is the symbol the port's own annotation names — the
@@ -742,27 +719,23 @@ export async function generateFunctionsMD() {
     // `source path` is the resolved pin-relative module; `—` means no module in
     // a pinned submodule has this export, and the status distinguishes *why*:
     //   - `reause-only export`  — nothing upstream defines or re-exports it;
-    //   - `re-exported` — the port re-exports a source that has no pin to resolve
-    //     (`react-spring`), so it is not a hand-written port;
     //   - `not in pinned submodule` — the port claims an upstream the pin cannot
     //     confirm (`useWebMCP` postdates it, `useWatch` is Vue's `watch`) or the
     //     symbol is one VueUse takes from `vue` (`toValue`).
     // Neither is "no upstream match" for a renamed or secondary export, which is
     // what the removed same-name-directory probe used to report.
-    const status = reexported
-      ? '✅ re-exported'
-      : upstream
-        ? '✅ ported'
-        : missingFrom === 'reause-only' ? '✅ reause-only export' : '✅ ported (not in pinned submodule)'
+    const status = upstream
+      ? '✅ ported'
+      : missingFrom === 'reause-only' ? '✅ reause-only export' : '✅ ported (not in pinned submodule)'
     return `| ${source || '—'} | \`${symbol || name}\` | ${upstream || '—'} | \`${file}\` | ${status} |`
   })
 
   const md = `# Function mapping status
 
 > Auto-generated by \`npm run update\` (scripts/update.ts) — do not edit by hand.
-> The upstream sources of truth are the pinned \`source/*\` submodules: \`source/vueuse\` for ports that name no other source, and the tree of the source the row's own \`Map from\` annotation names otherwise — react-use, react-hookz, mantine and ahooks have pins, react-spring has none (re-export only). Only \`source/vueuse\` is polled for upstream updates (docs/upstream-monitoring.md §1).
+> The upstream sources of truth are the pinned \`source/*\` submodules: \`source/vueuse\` for ports that name no other source, and the tree of the source the row's own \`Map from\` annotation names otherwise — react-use, react-hookz, mantine and ahooks each have their own pin. Only \`source/vueuse\` is polled for upstream updates (docs/upstream-monitoring.md §1).
 > Export-driven: every row is an export of this repo, so an upstream function with no reause port would simply be absent — this table is a port registry, not a coverage proof (audit procedure: docs/upstream-monitoring.md §3.2).
-> Status: \`✅ ported\` = resolved to a module in its source's pin; \`✅ re-exported\` = re-exports a source that has no pinned checkout (\`react-spring\`); \`✅ ported (not in pinned submodule)\` = the port's upstream is newer than the pin, or a symbol VueUse re-exports from \`vue\`; \`✅ reause-only export\` = nothing upstream defines or re-exports it.
+> Status: \`✅ ported\` = resolved to a module in its source's pin; \`✅ ported (not in pinned submodule)\` = the port's upstream is newer than the pin, or a symbol VueUse re-exports from \`vue\`; \`✅ reause-only export\` = nothing upstream defines or re-exports it.
 
 | source | upstream function | source path (pinned) | reause | status |
 |---|---|---|---|---|
@@ -961,9 +934,9 @@ export interface FunctionInfo {
   category: string
   /**
    * Upstream source this export ports from (\`vueuse\`, \`react-use\`,
-   * \`react-hookz\`, \`mantine\`, \`ahooks\`, \`react-spring\`), resolved from the
-   * port's own annotation against that source's pinned tree. Absent for a pure
-   * reause-only export (the table's \`—\`).
+   * \`react-hookz\`, \`mantine\`, \`ahooks\`), resolved from the port's own
+   * annotation against that source's pinned tree. Absent for a pure reause-only
+   * export (the table's \`—\`).
    */
   source?: string
   lastUpdated?: number

@@ -11,9 +11,8 @@ export interface UseFirestoreOptions {
   errorHandler?: (err: Error) => void
 
   /**
-   * Automatically unsubscribe when the component unmounts. Pass a number to
-   * delay the unsubscribe by that many milliseconds (upstream's
-   * `useTimeoutFn`-based delayed dispose).
+   * Automatically unsubscribe when the component unmounts. Pass a number to delay the unsubscribe
+   * by that many milliseconds (upstream's `useTimeoutFn`-based delayed dispose).
    *
    * @default true
    */
@@ -25,9 +24,8 @@ export type FirebaseDocRef<T>
     | DocumentReference<T>
 
 /**
- * Attach the document `id` as a non-writable property of the snapshot data —
- * ported verbatim from upstream. `data()` may be `undefined` for a deleted
- * document.
+ * Attach the document `id` as a non-writable property of the snapshot data — ported verbatim from
+ * upstream. `data()` may be `undefined` for a deleted document.
  */
 function getData<T>(docRef: DocumentSnapshot<T> | QueryDocumentSnapshot<T>) {
   const data = docRef.data()
@@ -43,9 +41,8 @@ function getData<T>(docRef: DocumentSnapshot<T> | QueryDocumentSnapshot<T>) {
 }
 
 /**
- * Slash-parity check, ported verbatim from upstream: a `DocumentReference`
- * path has an odd number of segments (`users/ada`), a `Query` path an even
- * number (`users` or `users/ada/posts`).
+ * Slash-parity check, ported verbatim from upstream: a `DocumentReference` path has an odd number
+ * of segments (`users/ada`), a `Query` path an even number (`users` or `users/ada/posts`).
  */
 function isDocumentReference<T>(docRef: any): docRef is DocumentReference<T> {
   return (docRef.path?.match(/\//g) || []).length % 2 !== 0
@@ -81,11 +78,10 @@ export function useFirestore<T extends DocumentData>(
  *
  * Map from @vueuse/firebase/useFirestore
  * (`source/vueuse/packages/firebase/useFirestore/`). Reactive
- * [Firestore](https://firebase.google.com/docs/firestore) binding — it keeps
- * local state in sync with a document reference or a query, so a component
- * always renders the freshest remote data.
+ * [Firestore](https://firebase.google.com/docs/firestore) binding — it keeps local state in sync
+ * with a document reference or a query, so a component always renders the freshest remote data.
  *
- * Adjustment for React:
+ * React divergences:
  * - `maybeDocRef` is a plain value (upstream accepts `MaybeRef`): read-only
  *   value-source parameters take plain `T`. Pass a new reference/query
  *   identity to re-subscribe — **keep it stable across renders** (memoize

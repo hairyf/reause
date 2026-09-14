@@ -6,26 +6,20 @@ export interface UseNavigatorLanguageOptions extends ConfigurableWindow {
 
 export interface UseNavigatorLanguageReturn {
   /**
-   * Whether the Navigator `language` property is available in the current
-   * window. `false` during SSR and before the mount effect has probed
-   * `navigator`.
+   * Whether the Navigator `language` property is available in the current window. `false` during
+   * SSR and before the mount effect has probed `navigator`.
    */
   isSupported: boolean
   /**
-   *
    * ISO 639-1 standard Language Code
    *
-   * @info The detected user agent language preference as a language tag
-   * (which is sometimes referred to as a "locale identifier").
-   * This consists of a 2-3 letter base language tag that indicates a
-   * language, optionally followed by additional subtags separated by
-   * '-'. The most common extra information is the country or region
-   * variant (like 'en-US' or 'fr-CA').
-   *
+   * @info The detected user agent language preference as a language tag (which is sometimes
+   * referred to as a "locale identifier"). This consists of a 2-3 letter base language tag that
+   * indicates a language, optionally followed by additional subtags separated by '-'. The most
+   * common extra information is the country or region variant (like 'en-US' or 'fr-CA').
    *
    * @see https://www.iso.org/iso-639-language-codes.html
    * @see https://www.loc.gov/standards/iso639-2/php/code_list.php
-   *
    */
   language: string | undefined
 }
@@ -37,10 +31,9 @@ export interface UseNavigatorLanguageReturn {
  *
  * Map from @vueuse/core `useNavigatorLanguage`
  * (`source/vueuse/packages/core/useNavigatorLanguage/`), which reads
- * `navigator?.language` and keeps it fresh via a `languagechange` listener.
- * Reactive `navigator.language` as an object mirroring the upstream
- * `{ isSupported, language }` members — the component re-renders when the
- * user's language preference changes.
+ * `navigator?.language` and keeps it fresh via a `languagechange` listener. Reactive
+ * `navigator.language` as an object mirroring the upstream `{ isSupported, language }` members —
+ * the component re-renders when the user's language preference changes.
  *
  * React divergences:
  * - the Vue `ShallowRef<string | undefined>` return becomes a plain
@@ -51,8 +44,6 @@ export interface UseNavigatorLanguageReturn {
  *   `navigator` during render (SSR-safe);
  * - the initial `navigator.language` read happens in the mount effect
  *   (upstream reads it during setup);
- * - the `languagechange` listener lives in a self-contained `useEffect`
- *   (upstream uses `useEventListener`) and is removed on unmount.
  *
  * @see https://vueuse.org/core/useNavigatorLanguage/
  * @param options

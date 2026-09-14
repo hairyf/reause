@@ -3,8 +3,8 @@ import { useEffect, useState } from 'react'
 import { resolveIpcRenderer } from '../_resolve'
 
 /**
- * Returns `T | null` — the response from the main process once the
- * asynchronous `invoke` call resolves.
+ * Returns `T | null` — the response from the main process once the asynchronous `invoke` call
+ * resolves.
  *
  * Send a message to the main process via channel and expect a result asynchronously.
  *
@@ -35,12 +35,13 @@ import { resolveIpcRenderer } from '../_resolve'
 export function useIpcRendererInvoke<T>(ipcRenderer: IpcRenderer, channel: string, ...args: any[]): T | null
 
 /**
- * Returns `T | null` — the response from the main process once the
- * asynchronous `invoke` call resolves.
+ * Returns `T | null` — the response from the main process once the asynchronous `invoke` call
+ * resolves.
  *
  * Send a message to the main process via channel and expect a result asynchronously.
  *
- * `ipcRenderer` will be automatically gotten (`window.require('electron')`, i.e. `nodeIntegration`).
+ * `ipcRenderer` will be automatically gotten (`window.require('electron')`, i.e.
+ * `nodeIntegration`).
  *
  * Map from @vueuse/electron `useIpcRendererInvoke`
  * (`source/vueuse/packages/electron/useIpcRendererInvoke/`).

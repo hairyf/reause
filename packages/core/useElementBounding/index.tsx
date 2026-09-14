@@ -1,15 +1,15 @@
 import type { ConfigurableWindow } from '@reause/shared'
 import type { ElementTarget, TargetElement } from '../useResizeObserver'
-import { toValue } from '@reause/shared'
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { unrefElement } from '../unrefElement'
 import { useMutationObserver } from '../useMutationObserver'
 import { useResizeObserver } from '../useResizeObserver'
 
 /**
- * Options for `useElementBounding`: `reset` (re-zero on detached element),
- * `windowResize` / `windowScroll` (window listeners), `immediate` (measure on
- * mount) and `updateTiming` (`'sync'` or `'next-frame'`), plus a custom
- * `window` instance, e.g. working with iframes or in testing environments.
+ * Options for `useElementBounding`: `reset` (re-zero on detached element), `windowResize` /
+ * `windowScroll` (window listeners), `immediate` (measure on mount) and `updateTiming` (`'sync'` or
+ * `'next-frame'`), plus a custom `window` instance, e.g. working with iframes or in testing
+ * environments.
  */
 export interface UseElementBoundingOptions extends ConfigurableWindow {
   /**
@@ -43,10 +43,9 @@ export interface UseElementBoundingOptions extends ConfigurableWindow {
   /**
    * Timing to recalculate the bounding box
    *
-   * Setting to `next-frame` can be useful when using this together with
-   * something like `useBreakpoints` and therefore the layout (which influences
-   * the bounding box of the observed element) is not updated on the current
-   * tick.
+   * Setting to `next-frame` can be useful when using this together with something like
+   * `useBreakpoints` and therefore the layout (which influences the bounding box of the observed
+   * element) is not updated on the current tick.
    *
    * @default 'sync'
    */
@@ -54,8 +53,8 @@ export interface UseElementBoundingOptions extends ConfigurableWindow {
 }
 
 /**
- * Return of `useElementBounding`. Upstream exposes `ShallowRef`s; the React
- * port exposes plain `number` state plus the `update` function.
+ * Return of `useElementBounding`. Upstream exposes `ShallowRef`s; the React port exposes plain
+ * `number` state plus the `update` function.
  */
 export interface UseElementBoundingReturn {
   height: number
@@ -74,32 +73,25 @@ export interface UseElementBoundingReturn {
  *
  * Map from @vueuse/core `useElementBounding`
  * (`source/vueuse/packages/core/useElementBounding/`), which measures the
- * target with `getBoundingClientRect()` and re-measures on window
- * `scroll`/`resize`, on `style`/`class` mutations (MutationObserver) and on
- * element size changes (ResizeObserver).
+ * target with `getBoundingClientRect()` and re-measures on window `scroll`/`resize`, on
+ * `style`/`class` mutations (MutationObserver) and on element size changes (ResizeObserver).
  *
  * React divergences:
- * - the Vue `ShallowRef`s returned by upstream become a plain object of plain
- *   `number` state read off the result — `x`, `y`, `top`, `right`, `bottom`,
- *   `left`, `width`, `height` — plus `update()`, which re-measures on demand;
- * - `target` accepts a plain element or a React ref object (`{ current }`) —
- *   the React analog of upstream's `ElementTarget`;
- * - upstream's `watch(() => unrefElement(target), ele => !ele && update())`
- *   (reset the values whenever the resolved target element becomes detached)
- *   becomes an effect that re-resolves the target after every render and
- *   re-measures only when the resolved element actually became `null`;
+ * - `target` accepts a React ref object (`RefObject`) holding the element; a plain element, a
+ * getter and a callback ref are not accepted;
+ * - an effect that re-resolves the target after every render and re-measures only when the resolved
+ * element actually became `null`;
  * - upstream's `tryOnMounted` immediate measurement happens in a mount-only
  *   effect, so the values are correct before the first async observer
  *   delivery;
- * - the window `scroll`/`resize` listeners attach in a mount effect and are
- *   removed on unmount (upstream: `useEventListener`); the component and
- *   directive variants (`UseElementBounding` / `v-element-bounding`) are not
- *   ported — they have no React equivalents;
+ * - the window `scroll`/`resize` listeners attach in a mount effect; the component and directive
+ * variants (`UseElementBounding` / `v-element-bounding`) are not ported — they have no React
+ * equivalents;
  * - SSR-safe: nothing touches `window` or the DOM during render — all
  *   measurements happen in effects.
  *
- * @param target - element or React ref object (`{ current }`) returning
- *   the element to measure the bounding box of
+ * @param target - React ref object (`RefObject`) holding the element to
+ *   measure the bounding box of, resolved with the shared `unrefElement`
  * @param options - `reset` (default `true`), `windowResize` (default `true`),
  *   `windowScroll` (default `true`), `immediate` (default `true`),
  *   `updateTiming` (default `'sync'`), and a custom `window` instance
@@ -132,7 +124,7 @@ export function useElementBounding(
   // `getBoundingClientRect()`, resetting every value to 0 when no element is
   // attached (unless `reset: false`).
   const recalculate = useCallback(() => {
-    const el = toValue(targetRef.current)
+    const el = unrefElement(targetRef.current)
 
     if (!el) {
       if (optionsRef.current.reset !== false) {
@@ -182,7 +174,7 @@ export function useElementBounding(
   // immediate mount effect below performs the initial measurement.
   const previousElementRef = useRef<TargetElement>(undefined)
   useEffect(() => {
-    const el = toValue(targetRef.current)
+    const el = unrefElement(targetRef.current)
     if (previousElementRef.current !== el) {
       previousElementRef.current = el
       if (!el)

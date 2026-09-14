@@ -67,27 +67,27 @@ export interface UseFileDialogOptions {
   /**
    * @default true
    */
-  multiple?: RefOrValue<boolean>
+  multiple?: boolean
   /**
    * @default '*'
    */
-  accept?: RefOrValue<string>
+  accept?: string
   /**
    * Select the input source for the capture file.
    * @see [HTMLInputElement Capture](https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/capture)
    */
-  capture?: RefOrValue<string>
+  capture?: string
   /**
    * Reset when open file dialog.
    * @default false
    */
-  reset?: RefOrValue<boolean>
+  reset?: boolean
   /**
    * Select directories instead of files.
    * @see [HTMLInputElement webkitdirectory](https://developer.mozilla.org/en-US/docs/Web/API/HTMLInputElement/webkitdirectory)
    * @default false
    */
-  directory?: RefOrValue<boolean>
+  directory?: boolean
   /**
    * Initial files to set.
    * @default null
@@ -97,7 +97,7 @@ export interface UseFileDialogOptions {
    * The input element to use for file dialog.
    * @default document.createElement('input')
    */
-  input?: RefOrValue<HTMLInputElement | null>
+  input?: RefObject<HTMLInputElement | null>
 }
 export interface UseFileDialogReturn {
   files: FileList | null

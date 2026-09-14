@@ -8,15 +8,13 @@ import { useSupported } from '../useSupported'
 /**
  * Options for `useGamepad`.
  *
- * The `navigator` option is inlined (not composed from a shared
- * `ConfigurableNavigator`) because other core hooks export a same-named type
- * — `export *` in `index.ts` would collide (TS2308), so like `useWakeLock`
- * this module declares the member directly.
+ * The `navigator` option is inlined (not composed from a shared `ConfigurableNavigator`) because
+ * other core hooks export a same-named type — `export *` in `index.ts` would collide (TS2308), so
+ * like `useWakeLock` this module declares the member directly.
  */
 export interface UseGamepadOptions extends ConfigurableWindow {
   /**
-   * Specify a custom `navigator` instance, e.g. working with iframes or in
-   * testing environments.
+   * Specify a custom `navigator` instance, e.g. working with iframes or in testing environments.
    *
    * @default typeof navigator !== 'undefined' ? navigator : undefined
    */
@@ -24,31 +22,27 @@ export interface UseGamepadOptions extends ConfigurableWindow {
 }
 
 /**
- * Reactive companion members of `useGamepad` — the React replacement for the
- * upstream event hooks, `Pausable` controls and `isSupported` ref.
+ * Reactive companion members of `useGamepad` — the React replacement for the upstream event hooks,
+ * `Pausable` controls and `isSupported` ref.
  */
 export interface UseGamepadControls {
   /**
-   * `true` when the resolved navigator exposes `getGamepads`. Resolved in a
-   * mount effect, so it stays `false` during the first render and on the
-   * server (SSR-safe).
+   * `true` when the resolved navigator exposes `getGamepads`. Resolved in a mount effect, so it
+   * stays `false` during the first render and on the server (SSR-safe).
    */
   isSupported: boolean
   /**
-   * Register a callback fired with the `index` of a newly connected gamepad.
-   * Returns an `off` handle to unsubscribe — compatible with the
-   * `useListener` protocol.
+   * Register a callback fired with the `index` of a newly connected gamepad. Returns an `off`
+   * handle to unsubscribe — compatible with the `useListener` protocol.
    */
   onConnected: (fn: (index: number) => void) => { off: () => void }
   /**
-   * Register a callback fired with the `index` of a disconnected gamepad.
-   * Returns an `off` handle to unsubscribe — compatible with the
-   * `useListener` protocol.
+   * Register a callback fired with the `index` of a disconnected gamepad. Returns an `off` handle
+   * to unsubscribe — compatible with the `useListener` protocol.
    */
   onDisconnected: (fn: (index: number) => void) => { off: () => void }
   /**
-   * Pause the `requestAnimationFrame` poller — the `gamepads` snapshot stops
-   * updating.
+   * Pause the `requestAnimationFrame` poller — the `gamepads` snapshot stops updating.
    */
   pause: () => void
   /**
@@ -56,16 +50,16 @@ export interface UseGamepadControls {
    */
   resume: () => void
   /**
-   * `true` while the `requestAnimationFrame` poller is running (upstream
-   * `useRafFn`'s `isActive` shallow ref as a plain boolean). It starts
-   * `false` and flips to `true` the first time a gamepad connects.
+   * `true` while the `requestAnimationFrame` poller is running (upstream `useRafFn`'s `isActive`
+   * shallow ref as a plain boolean). It starts `false` and flips to `true` the first time a gamepad
+   * connects.
    */
   isActive: boolean
 }
 
 /**
- * The Xbox 360 controller button/axis layout produced by
- * `mapGamepadToXbox360Controller` from a standard-mapping gamepad.
+ * The Xbox 360 controller button/axis layout produced by `mapGamepadToXbox360Controller` from a
+ * standard-mapping gamepad.
  */
 export interface Xbox360Controller {
   buttons: {
@@ -109,9 +103,8 @@ export interface Xbox360Controller {
  *
  * Map from @vueuse/core `mapGamepadToXbox360Controller`
  * (`source/vueuse/packages/core/useGamepad/`). React divergence: upstream
- * takes a `Ref<Gamepad | undefined>` and returns a `ComputedRef`; here the
- * gamepad is a plain value and the mapped layout (or `null` when no gamepad
- * is passed) is returned directly.
+ * takes a `Ref<Gamepad | undefined>` and returns a `ComputedRef`; here the gamepad is a plain value
+ * and the mapped layout (or `null` when no gamepad is passed) is returned directly.
  */
 export function mapGamepadToXbox360Controller(gamepad: Gamepad | undefined): Xbox360Controller | null {
   if (!gamepad)
@@ -156,9 +149,8 @@ export function mapGamepadToXbox360Controller(gamepad: Gamepad | undefined): Xbo
 }
 
 /**
- * React return type: `[gamepads, setGamepads, controls]` — the state-like
- * tuple family used by `useStateWithControl` and `useStorage`. `gamepads` is
- * the plain `Gamepad[]` snapshot (upstream: a writable `Ref<Gamepad[]>`) and
+ * React return type: `[gamepads, setGamepads, controls]` — the state-like tuple family used by
+ * `useStateWithControl` and `useStorage`. `gamepads` is the plain `Gamepad[]` snapshot and
  * `setGamepads` is the React setter for it.
  */
 export type UseGamepadReturn = readonly [
@@ -168,9 +160,9 @@ export type UseGamepadReturn = readonly [
 ]
 
 /**
- * Normalize a raw `Gamepad` into a stable snapshot: arrays/buttons are copied
- * so later browser mutations of the same gamepad object don't leak into the
- * stored state, and the haptic actuators are collected.
+ * Normalize a raw `Gamepad` into a stable snapshot: arrays/buttons are copied so later browser
+ * mutations of the same gamepad object don't leak into the stored state, and the haptic actuators
+ * are collected.
  */
 function stateFromGamepad(gamepad: Gamepad): Gamepad {
   const hapticActuators: GamepadHapticActuator[] = []
@@ -198,13 +190,10 @@ function stateFromGamepad(gamepad: Gamepad): Gamepad {
 }
 
 /**
- * React port of VueUse's `useGamepad`.
- *
  * Map from @vueuse/core `useGamepad`
  * (`source/vueuse/packages/core/useGamepad/`). Provides reactive bindings
- * for the Gamepad API — the `gamepads` snapshot, `onConnected` /
- * `onDisconnected` events and `pause` / `resume` control over the polling
- * loop.
+ * for the Gamepad API — the `gamepads` snapshot, `onConnected` / `onDisconnected` events and
+ * `pause` / `resume` control over the polling loop.
  *
  * React divergences:
  * - the return is the React tuple `[gamepads, setGamepads, controls]` instead
@@ -218,18 +207,16 @@ function stateFromGamepad(gamepad: Gamepad): Gamepad {
  * - the Vue `gamepads` ref becomes a plain `Gamepad[]` state refreshed by an
  *   rAF poller (upstream `updateGamepadState`), so read it directly from the
  *   first tuple slot instead of `.value`;
- * - upstream's `createEventHook()` on* members become stable subscribe
- *   functions with the same `(fn) => { off }` shape, managed with Sets, so
- *   they are identity-stable across renders and compatible with the
- *   `useListener` protocol; the Sets are cleared on unmount (upstream:
- *   `tryOnScopeDispose` inside `createEventHook`'s `on`);
+ * - upstream's `createEventHook()` on* members become stable subscribe functions with the same
+ * `(fn) => { off }` shape, managed with Sets, so they are identity-stable across renders and
+ * compatible with the `useListener` protocol; the Sets;
  * - `isSupported` (upstream `useSupported`) is a plain boolean resolved in
  *   the mount effect — nothing touches `navigator` during render (SSR-safe);
  * - `isActive` (upstream `useRafFn`'s shallow ref, missing from the earlier
  *   reause port) is a plain boolean in `controls`;
- * - the polling loop starts paused (`useRafFn` with `immediate: false`,
- *   mirroring upstream's post-setup `pause()`) and is resumed the first time
- *   a gamepad connects; disconnecting never pauses it, matching upstream;
+ * - the polling loop starts paused (`useRafFn` with `immediate: false`, mirroring upstream's
+ * post-setup `pause()`) and is resumed the first time a gamepad connects; disconnecting never
+ * pauses it;
  * - the `gamepadconnected` / `gamepaddisconnected` listeners register via
  *   `useEventListener` (window target) and the initial `getGamepads()` poll
  *   (upstream `tryOnMounted`) runs in a mount effect.

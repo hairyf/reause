@@ -15,22 +15,22 @@ export type EasingFunction = (n: number) => number
  */
 export interface UseTransitionOptions {
   /**
-   * Manually abort the running transition — checked on every frame, aborting
-   * stops the loop without snapping to the target and fires `onFinished`.
+   * Manually abort the running transition — checked on every frame, aborting stops the loop without
+   * snapping to the target and fires `onFinished`.
    */
   abort?: () => boolean
 
   /**
-   * Milliseconds to wait before starting the transition. A new source change
-   * while waiting cancels the pending one.
+   * Milliseconds to wait before starting the transition. A new source change while waiting cancels
+   * the pending one.
    *
    * @default 0
    */
   delay?: number
 
   /**
-   * Disables the transition — the output follows the source synchronously,
-   * and any running transition is dropped.
+   * Disables the transition — the output follows the source synchronously, and any running
+   * transition is dropped.
    *
    * @default false
    */
@@ -51,8 +51,7 @@ export interface UseTransitionOptions {
   easing?: EasingFunction | CubicBezierPoints
 
   /**
-   * Specify a custom `window` instance, e.g. working with iframes or in
-   * testing environments.
+   * Specify a custom `window` instance, e.g. working with iframes or in testing environments.
    */
   window?: Window
 
@@ -155,20 +154,19 @@ export function useTransition(source: readonly number[], options?: UseTransition
  *
  * Map from @vueuse/core `useTransition`
  * (`source/vueuse/packages/core/useTransition/`): a rAF-driven tween that
- * interpolates the output between source changes. Every source change starts
- * a transition from the currently displayed values, and a newer change
- * cancels the pending one — a generation counter invalidates the previous
- * rAF loop, mirroring upstream's `currentId` guard.
+ * interpolates the output between source changes. Every source change starts a transition from the
+ * currently displayed values, and a newer change cancels the pending one — a generation counter
+ * invalidates the previous rAF loop, mirroring upstream's `currentId` guard.
  *
  * React divergences:
  * - the returned `ComputedRef` becomes a plain value (`number` for a scalar
  *   source, `number[]` for an array source) backed by `useState`; the calling
  *   component re-renders on every animation frame while a transition runs;
  * - the source is a plain number or a `number[]` (upstream's
- *   `RefOrValue<number>` / `RefOrValue<number[]>` overloads map to the same
+ *   `MaybeRefOrGetter<number>` / `MaybeRefOrGetter<number[]>` overloads map to the same
  *   forms);
  * - options are plain values read when a transition starts — upstream keeps
- *   `duration` / `easing` / `delay` / `disabled` reactive via `RefOrValue`,
+ *   `duration` / `easing` / `delay` / `disabled` reactive via `MaybeRefOrGetter`,
  *   which has no React equivalent;
  * - the deprecated `transition` option, the deprecated `executeTransition`
  *   function and the `interpolation` option are not ported: sources are

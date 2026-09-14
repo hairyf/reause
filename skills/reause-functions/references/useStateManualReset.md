@@ -21,9 +21,9 @@ console.log(message) // 'default message'
 ```
 
 > [!NOTE]
-> The input accepts `State<T>`: a plain value, ref-like object, getter, state tuple, or controlled
-> `{ value, onChange }` object. `reset` re-reads the input on every call, so plain, getter and
-> ref-like sources reset to the latest source value; tuple / `{ value, onChange }` (controlled)
+> The input accepts `State<T>`: a plain value, getter, state tuple, or controlled
+> `{ value, onChange }` object. `reset` re-reads the input on every call, so plain and getter
+> sources reset to the latest source value; tuple / `{ value, onChange }` (controlled)
 > sources carry no stored default, so they restore the initial argument value.
 
 ## Type Declarations

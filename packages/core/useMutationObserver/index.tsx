@@ -1,68 +1,50 @@
 import type { ConfigurableWindow } from '@reause/shared'
 import type { ElementTargetOrArray } from '../useResizeObserver'
-import { toValue } from '@reause/shared'
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { unrefElement } from '../unrefElement'
 
 /**
- * Target types accepted by `useMutationObserver` (`ElementTarget`
- * / `ElementTargetOrArray`, backed by `TargetElement`) are the
- * canonical React-native definitions shared from `./useResizeObserver`
- * (single source of truth; the previous duplicate local copies were
- * consolidated in the #462 audit).
+ * Target types accepted by `useMutationObserver` (`ElementTarget` / `ElementTargetOrArray`, backed
+ * by `TargetElement`) are the canonical React-native definitions shared from `./useResizeObserver`
+ * (single source of truth; the previous duplicate local copies were consolidated in the #462
+ * audit).
  */
 
 /**
- * Options for `useMutationObserver`: passthrough of the platform
- * `MutationObserverInit` (e.g. `attributes`, `childList`, `subtree`) plus a
- * custom `window` instance, e.g. working with iframes or in testing
- * environments.
+ * Options for `useMutationObserver`: passthrough of the platform `MutationObserverInit` (e.g.
+ * `attributes`, `childList`, `subtree`) plus a custom `window` instance, e.g. working with iframes
+ * or in testing environments.
  */
 export interface UseMutationObserverOptions extends MutationObserverInit, ConfigurableWindow {}
 
 /**
- * Return of `useMutationObserver`. Upstream extends `Supportable` with a
- * `ComputedRef<boolean>`; the React port exposes a plain `boolean` state.
+ * Return of `useMutationObserver`. Upstream extends `Supportable` with a `ComputedRef<boolean>`;
+ * the React port exposes a plain `boolean` state.
  */
 export interface UseMutationObserverReturn {
   /**
-   * Whether the current environment supports the `MutationObserver` API.
-   * Starts `false` and settles in a mount effect (SSR-safe).
+   * Whether the current environment supports the `MutationObserver` API. Starts `false` and settles
+   * in a mount effect (SSR-safe).
    */
   isSupported: boolean
   /**
-   * Stop observing. Disconnects the observer and stops tracking target
-   * changes. Calling it again is a no-op — the hook does not restart after
-   * `stop()`.
+   * Stop observing. Disconnects the observer and stops tracking target changes. Calling it again is
+   * a no-op — the hook does not restart after `stop()`.
    */
   stop: () => void
   /**
-   * Return all pending mutations records that have not yet been delivered to
-   * the callback, then clear them. Returns `undefined` when no observer is
-   * active — no target resolved yet, or after `stop()`.
+   * Return all pending mutations records that have not yet been delivered to the callback, then
+   * clear them. Returns `undefined` when no observer is active — no target resolved yet, or after
+   * `stop()`.
    */
   takeRecords: () => MutationRecord[] | undefined
 }
 
 /**
- * React equivalent of upstream's `unrefElement`: resolves a ref-like object
- * or a plain value down to an element.
- */
-function unrefElement(value: unknown): Element | undefined {
-  if (typeof value === 'function')
-    return unrefElement((value as () => unknown)())
-  if (value && typeof value === 'object' && 'current' in value)
-    return unrefElement((value as { current: unknown }).current)
-  return (value as Element | null | undefined) ?? undefined
-}
-
-/**
- * Mirrors upstream's `targets` computed: normalize the target into an array
- * of resolved elements, dropping empty slots (upstream filters at observe
- * time with `if (_el)`).
+ * dropping empty slots (upstream filters at observe time with `if (_el)`).
  */
 function resolveTargets(target: ElementTargetOrArray): Element[] {
-  const value = toValue(target)
-  const items = Array.isArray(value) ? value : [value]
+  const items = Array.isArray(target) ? target : [target]
 
   const elements: Element[] = []
   for (const item of items) {
@@ -76,13 +58,10 @@ function resolveTargets(target: ElementTargetOrArray): Element[] {
 /**
  * Watch for changes being made to the DOM tree
  *
- * React port of VueUse's `useMutationObserver`.
- *
  * Map from @vueuse/core `useMutationObserver`
  * (`source/vueuse/packages/core/useMutationObserver/`), which wraps a
- * platform `MutationObserver`, observes every resolved target, and tracks
- * target changes with `watch(computed(() => ...), ..., { immediate: true,
- * flush: 'post' })`.
+ * platform `MutationObserver`, observes every resolved target, and tracks target changes with
+ * `watch(computed(() =>...)..., { immediate: true, flush: 'post' })`.
  *
  * React divergences:
  * - the Vue `watch` over the targets computed becomes an effect that
@@ -91,15 +70,14 @@ function resolveTargets(target: ElementTargetOrArray): Element[] {
  *   re-render that swaps `target.current` re-observes (mirroring the
  *   upstream reactivity) while unchanged renders never do, so pending
  *   mutation records are never dropped on an unnecessary reconnect;
- * - `isSupported` is plain `boolean` state settled in the mount effect
- *   (upstream composes `useSupported`, a `ComputedRef<boolean>`);
+ * - `isSupported` is plain `boolean` state settled in the mount effect;
  * - `tryOnScopeDispose(stop)` becomes an unmount effect that disconnects;
  * - the observer is constructed through the resolved `window`, and a changed
  *   `window` option re-observes (upstream destructures it once at setup;
  *   this matches this repo's `useOnline`).
  *
- * SSR-safe: nothing touches `window` during render — support detection and
- * observation both happen in effects.
+ * SSR-safe: nothing touches `window` during render — support detection and observation both happen
+ * in effects.
  *
  * @see https://vueuse.org/core/useMutationObserver/
  * @see https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver

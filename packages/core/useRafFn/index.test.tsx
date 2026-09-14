@@ -161,10 +161,9 @@ describe('useRafFn', () => {
     expect(fn1.mock.calls.length).toBeLessThan(fn2.mock.calls.length)
   })
 
-  it('should handle a reactive null fpsLimit as no limit', async () => {
+  it('should handle a null fpsLimit as no limit', async () => {
     const fn = vi.fn()
-    const limit = { current: null as number | null }
-    await renderHook(() => useRafFn(fn, { fpsLimit: limit }))
+    await renderHook(() => useRafFn(fn, { fpsLimit: null }))
     await vi.waitFor(() => {
       expect(fn).toHaveBeenCalled()
     })
@@ -173,10 +172,12 @@ describe('useRafFn', () => {
   it('should handle a framerate change', async () => {
     const frames = installManualFrames()
     const initialFramerate = 60
-    const fr = { current: initialFramerate }
     const fn1 = vi.fn()
     const fn2 = vi.fn()
-    await renderHook(() => useRafFn(fn1, { fpsLimit: fr }))
+    const { rerender } = await renderHook(
+      ({ fpsLimit }: { fpsLimit: number } = { fpsLimit: initialFramerate }) => useRafFn(fn1, { fpsLimit }),
+      { initialProps: { fpsLimit: initialFramerate } },
+    )
     const { act } = await renderHook(() => useRafFn(fn2, { fpsLimit: initialFramerate }))
 
     await act(() => {
@@ -187,7 +188,7 @@ describe('useRafFn', () => {
     expect(fn1.mock.calls.length).toBe(fn2.mock.calls.length)
 
     // clearAllMocks drops the call history, not the manual frame clock
-    fr.current = 20
+    await rerender({ fpsLimit: 20 })
     vi.clearAllMocks()
     await act(() => {
       frames.frames([200, 210, 220, 230, 240, 250, 260, 270, 280, 290, 300, 310])

@@ -193,7 +193,7 @@ export interface UseMagicKeysOptions<Reactive extends boolean> {
    *
    * @default window
    */
-  target?: RefOrValue<EventTarget>
+  target?: RefObject<EventTarget | null | undefined>
   /**
    * Alias map for keys, all the keys should be lowercase
    * { target: keycode }

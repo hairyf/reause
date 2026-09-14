@@ -1,15 +1,14 @@
 /**
- * Make isomorphic destructurable for object and array at the same time —
- * React port of VueUse's `makeDestructurable` (a pure utility function, so it
- * maps 1:1 with no React adaptation). See this blog for the underlying idea:
+ * Make isomorphic destructurable for object and array at the same time — React
+ * port of VueUse's `makeDestructurable` (a pure utility function, so it maps 1:1 with no React
+ * adaptation). See this blog for the underlying idea:
  * https://antfu.me/posts/destructuring-with-object-or-array/
  *
  * Map from @vueuse/shared `makeDestructurable`
- * Upstream semantics are kept verbatim: given `(obj, arr)` the returned value
- * can be destructured as an object (`const { foo, bar } = obj`) or as an array
- * (`const [foo, bar] = obj`) — the array mode is backed by a non-enumerable
- * `Symbol.iterator` defined on a shallow clone of `obj` (spread
- * `{ ...obj }`); `Object.assign` appears only in the no-Symbol SSR fallback.
+ * Upstream semantics are kept verbatim: given `(obj, arr)` the returned value can be destructured
+ * as an object (`const { foo, bar } = obj`) or as an array (`const [foo, bar] = obj`) — the array
+ * mode is backed by a non-enumerable `Symbol.iterator` defined on a shallow clone of `obj` (spread
+ * `{...obj }`); `Object.assign` appears only in the no-Symbol SSR fallback.
  *
  * @example
  * const foo = { name: 'foo' }

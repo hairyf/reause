@@ -13,9 +13,8 @@ export interface UseNowOptions<Controls extends boolean> {
   /**
    * Custom scheduler to use for interval execution.
    *
-   * Called during render, so it must follow the Rules of Hooks — pass it
-   * consistently across renders, e.g.
-   * `scheduler: cb => useIntervalFn(cb, 500)` with `useIntervalFn` from
+   * Called during render, so it must follow the Rules of Hooks — pass it consistently across
+   * renders, e.g. `scheduler: cb => useIntervalFn(cb, 500)` with `useIntervalFn` from
    * `@reause/shared`.
    *
    * @default useRafFn
@@ -28,8 +27,6 @@ export type UseNowReturn<Controls extends boolean> = Controls extends true
   : Date
 
 /**
- * React port of VueUse's `useNow`.
- *
  * Map from @vueuse/core `useNow`
  * (`source/vueuse/packages/core/useNow/`). Reactive current `Date` instance,
  * updated by the `scheduler` — upstream's default scheduler is `useRafFn`.

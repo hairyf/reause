@@ -231,7 +231,7 @@ export type UseLongPressReturn = () => void
  * stop()
  */
 export declare function useLongPress(
-  target: RefOrValue<EventTarget | null | undefined>,
+  target: RefObject<EventTarget | null | undefined>,
   handler: (evt: PointerEvent) => void,
   options?: UseLongPressOptions,
 ): UseLongPressReturn

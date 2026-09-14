@@ -71,9 +71,9 @@ describe('useStateAutoReset', () => {
     await unmount()
   })
 
-  it('should be reset with ref-like defaultValue and afterMs', async () => {
-    const defaultValue = { current: [123] }
-    const afterMs = { current: 10 }
+  it('should be reset with a defaultValue and a plain-number afterMs', async () => {
+    const defaultValue = [123] as number[]
+    const afterMs = 10
     const { result, act, unmount } = await renderHook(() => useStateAutoReset(defaultValue, afterMs))
 
     await act(() => {
@@ -90,14 +90,16 @@ describe('useStateAutoReset', () => {
   })
 
   it('should change afterMs', async () => {
-    const afterMs = { current: 150 }
-    const { result, act, unmount } = await renderHook(() => useStateAutoReset('default', afterMs))
+    const { result, act, rerender, unmount } = await renderHook(
+      ({ afterMs }: { afterMs: number } = { afterMs: 150 }) => useStateAutoReset('default', afterMs),
+      { initialProps: { afterMs: 150 } },
+    )
 
     await act(() => {
       result.current[1]('update')
     })
-    afterMs.current = 100
 
+    // the first reset was scheduled with the initial 150ms delay
     await act(() => {
       vi.advanceTimersByTime(101)
     })
@@ -108,6 +110,8 @@ describe('useStateAutoReset', () => {
     })
     expect(result.current[0]).toBe('default')
 
+    // a new delay is picked up when the next reset is scheduled
+    await rerender({ afterMs: 100 })
     await act(() => {
       result.current[1]('update')
     })

@@ -39,16 +39,17 @@ describe('useAsync', () => {
     expect(result.current).toBe('initial')
   })
 
-  it('supports a ref-like initial state', async () => {
-    const initialState = { current: 'ref-initial' }
+  it('supports a getter initial state (refs are not a state source)', async () => {
+    const source = 'getter-initial'
     const deferred = createDeferred<string>()
-    const { result } = await renderHook(() => useAsync(() => deferred.promise, initialState))
-    expect(result.current).toBe('ref-initial')
+    const { result } = await renderHook(() => useAsync(() => deferred.promise, () => source))
+    expect(result.current).toBe('getter-initial')
     deferred.resolve('resolved')
     await vi.waitFor(() => {
       expect(result.current).toBe('resolved')
     })
-    expect(initialState.current).toBe('ref-initial')
+    // the getter is read-only: the resolved value never writes back to it
+    expect(source).toBe('getter-initial')
   })
 
   it('supports a controlled state tuple and publishes resolved values through its setter', async () => {

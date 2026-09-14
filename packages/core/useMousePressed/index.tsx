@@ -1,7 +1,9 @@
-import type { ConfigurableWindow, RefOrValue, State } from '@reause/shared'
+import type { ConfigurableWindow, State } from '@reause/shared'
+import type { RefObject } from 'react'
 import type { UseMouseSourceType } from '../useMouse'
-import { toValue, useControllableState } from '@reause/shared'
+import { useControllableState } from '@reause/shared'
 import { useEffect, useRef, useState } from 'react'
+import { unrefElement } from '../unrefElement'
 
 export interface UseMousePressedOptions extends ConfigurableWindow {
   /**
@@ -19,8 +21,8 @@ export interface UseMousePressedOptions extends ConfigurableWindow {
   drag?: boolean
 
   /**
-   * Add event listeners with the `capture` option set to `true`
-   * (see [MDN](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener#capture))
+   * Add event listeners with the `capture` option set to `true` (see
+   * [MDN](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener#capture))
    *
    * @default false
    */
@@ -36,7 +38,7 @@ export interface UseMousePressedOptions extends ConfigurableWindow {
   /**
    * Element target to be capture the click
    */
-  target?: RefOrValue<EventTarget | null | undefined>
+  target?: RefObject<EventTarget | null | undefined>
 
   /**
    * Callback to be called when the mouse is pressed
@@ -62,30 +64,24 @@ export interface UseMousePressedReturn {
 }
 
 /**
- * React port of VueUse's `useMousePressed`.
- *
  * Map from @vueuse/core `useMousePressed`
  * (`source/vueuse/packages/core/useMousePressed/`), which tracks a reactive
- * pressing state — `pressed` flips on `mousedown`/`touchstart` (optionally
- * `dragstart`) on the `target` option (default `window`) and back off on
- * `mouseup`/`mouseleave`/`touchend`/`touchcancel` (optionally `drop`/
- * `dragend`) on `window`, recording the `sourceType` of the press.
- *
- * React divergences:
+ * pressing state — `pressed` flips on `mousedown`/`touchstart` (optionally `dragstart`) on the
+ * `target` option (default `window`) and back off on
+ * `mouseup`/`mouseleave`/`touchend`/`touchcancel` (optionally `drop`/ `dragend`) on `window`,
+ * recording the `sourceType` of the press.
  *
  * - the Vue `pressed`/`sourceType` shallow refs become plain values in a
  *   `{ pressed, sourceType }` object backed by React state;
- * - upstream's `useEventListener` becomes a self-contained mount `useEffect`
- *   that re-subscribes when `target`/`capture`/`drag`/`touch` change and
- *   removes all listeners on unmount;
+ * - a self-contained mount `useEffect` that re-subscribes when `target`/`capture`/`drag`/`touch`
+ * change and removes all listeners on unmount;
  * - `onPressed`/`onReleased` are read through a latest-value ref, so the
  *   listeners always call the newest callbacks without re-binding on renders;
- * - `target` accepts an element or a ref-like `{ current }` object
- *   (React equivalent of `RefOrValue`). It is re-resolved on every
- *   render and the listeners re-bind when the resolved element changes;
- * - SSR-safe: nothing touches `window` during render — the listeners attach
- *   in the mount effect only, and `initialValue` seeds `useState` so SSR
- *   renders the same initial state.
+ * - `target` accepts a React ref object (`RefObject`) holding the element (React equivalent of
+ * `MaybeRefOrGetter`). It is re-resolved on every render and the listeners re-bind when the
+ * resolved element changes; a plain element, a getter and a callback ref are not accepted;
+ * - SSR-safe: nothing touches `window` during render — only, and `initialValue` seeds `useState` so
+ * SSR renders the same initial state.
  *
  * @example
  * const { pressed, sourceType } = useMousePressed()
@@ -108,9 +104,9 @@ export function useMousePressed(options: UseMousePressedOptions = {}): UseMouseP
   optionsRef.current = options
 
   // dependency-tracking read: refs populate before effects run, so the first
-  // render reports `null` for ref-like targets — the effect below re-resolves
+  // render reports `null` for the ref's `.current` — the effect below re-resolves
   // fresh and re-binds whenever the resolved element changes
-  const trackedTarget = toValue(options.target)
+  const trackedTarget = options.target
 
   useEffect(() => {
     // upstream `defaultWindow`: only an `undefined` window falls back to the
@@ -122,7 +118,7 @@ export function useMousePressed(options: UseMousePressedOptions = {}): UseMouseP
     if (!instance)
       return
 
-    const target = toValue(optionsRef.current.target) ?? instance
+    const target = (optionsRef.current.target ? unrefElement(optionsRef.current.target) : undefined) ?? instance
     const listenerOptions: AddEventListenerOptions = { passive: true, capture }
 
     const onPressed = (srcType: UseMouseSourceType) => (event: MouseEvent | TouchEvent | DragEvent) => {

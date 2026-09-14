@@ -26,9 +26,9 @@ export interface UseCounterReturn {
    */
   dec: (delta?: number) => void
   /**
-   * Get the current value of the counter — the latest rendered value (React
-   * state updates are applied on the next render, so a read right after
-   * `inc` / `dec` / `set` still sees the previous value).
+   * Get the current value of the counter — the latest rendered value (React state updates are
+   * applied on the next render, so a read right after `inc` / `dec` / `set` still sees the previous
+   * value).
    */
   get: () => number
   /**
@@ -38,8 +38,8 @@ export interface UseCounterReturn {
    */
   set: (value: number) => void
   /**
-   * Reset the counter to the initial value — or to `val` when passed, which
-   * also rebases the value future resets restore — and return the new value.
+   * Reset the counter to the initial value — or to `val` when passed, which also rebases the value
+   * future resets restore — and return the new value.
    *
    * @param val The value to reset to (defaults to the initial value).
    */
@@ -47,11 +47,9 @@ export interface UseCounterReturn {
 }
 
 /**
- * React port of VueUse's `useCounter`.
- *
  * Map from @vueuse/shared `useCounter`
- * Mapping: `ref(initialValue)` → `useState`, mutation functions become
- * stable `useCallback`s; options are kept in refs so callbacks stay stable.
+ * Mapping: `ref(initialValue)` → `useState`, mutation functions become stable `useCallback`s;
+ * options are kept in refs so callbacks stay stable.
  *
  * @example
  * const { count, inc, dec, set, reset } = useCounter(10, { min: 0, max: 100 })

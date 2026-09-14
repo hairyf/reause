@@ -1,5 +1,4 @@
-import type { RefOrValue } from '@reause/shared'
-import { toValue } from '@reause/shared'
+import type { RefObject } from 'react'
 import { useCallback, useRef } from 'react'
 import { useEventListener } from '../useEventListener'
 
@@ -15,12 +14,11 @@ export interface UseKeyStrokeOptions {
    */
   eventName?: KeyStrokeEventName
   /**
-   * Event target to listen on. A plain element or a ref-like `{ current }`
-   * object (`RefOrValue`).
+   * Event target to listen on, as a React ref object (`RefObject`) holding the target.
    *
    * @default window
    */
-  target?: RefOrValue<EventTarget | null | undefined>
+  target?: RefObject<EventTarget | null | undefined>
   /**
    * Set to `true` to use a passive event listener.
    *
@@ -32,7 +30,7 @@ export interface UseKeyStrokeOptions {
    *
    * @default false
    */
-  dedupe?: RefOrValue<boolean>
+  dedupe?: boolean
 }
 
 function createKeyPredicate(keyFilter: KeyFilter): KeyPredicate {
@@ -52,26 +50,12 @@ function createKeyPredicate(keyFilter: KeyFilter): KeyPredicate {
  * Listen for keyboard keystrokes. By default, listens on `keydown` events on `window`.
  *
  * Map from @vueuse/core `onKeyStroke`
- * (`source/vueuse/packages/core/onKeyStroke/`). Accepts a single key, an
- * array of keys, `true` (any key) or a custom predicate as the key filter,
- * and supports the `keypress` / `keyup` events, a custom `target`, `passive`
- * listeners and `dedupe` (ignore repeated
- * [`KeyboardEvent.repeat`](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/repeat)
- * events while a key is held down).
- *
- * React divergences:
- * - React has no composable-function API, so this is a hook (upstream's
- *   `onKeyStroke` is a plain function): the listener is registered in a
- *   mount effect and removed on unmount;
- * - the handler is read through a latest-value ref, so new inline handler
- *   identities never cause re-subscription — only resolved
- *   target / event name / passive changes re-bind the listener;
- * - the returned value is a stop function (`() => void`) that removes the
- *   currently registered listener (upstream returns a Vue `Fn` that stops its
- *   internal watcher);
- * - SSR-safe: nothing touches `window` during render — the default window
- *   target only resolves when `window` is defined and binding happens in the
- *   mount effect.
+ * (`source/vueuse/packages/core/onKeyStroke/`). React divergences: this is a
+ * hook whose listener binds in the mount effect and unbinds on unmount; the handler is read through
+ * a latest-value ref, so new inline handler identities never re-subscribe — only a changed target,
+ * event name or `passive` flag re-binds; the returned `stop` function removes the registered
+ * listener (upstream returns a Vue `Fn` that stops its internal watcher). Nothing touches `window`
+ * during render.
  *
  * @see https://vueuse.org/core/onKeyStroke/
  *
@@ -122,7 +106,7 @@ export function useKeyStroke(
 
   const defaultWindow = typeof window === 'undefined' ? undefined : window
   const {
-    target = defaultWindow,
+    target = { current: defaultWindow },
     eventName = 'keydown',
     passive = false,
     dedupe = false,
@@ -133,7 +117,7 @@ export function useKeyStroke(
   const handlerRef = useRef(handler)
   handlerRef.current = handler
   const listener = (e: KeyboardEvent) => {
-    if (e.repeat && toValue(dedupe))
+    if (e.repeat && dedupe)
       return
 
     if (predicate(e))
@@ -149,7 +133,7 @@ export function useKeyStroke(
  *
  * Map from @vueuse/core `onKeyDown`
  * (`source/vueuse/packages/core/onKeyStroke/`) — shorthand for
- * `useKeyStroke(key, handler, { ...options, eventName: 'keydown' })`.
+ * `useKeyStroke(key, handler, {...options, eventName: 'keydown' })`.
  *
  * @see https://vueuse.org/onKeyStroke
  *
@@ -171,7 +155,7 @@ export function useKeyDown(
  *
  * Map from @vueuse/core `onKeyPressed`
  * (`source/vueuse/packages/core/onKeyStroke/`) — shorthand for
- * `useKeyStroke(key, handler, { ...options, eventName: 'keypress' })`.
+ * `useKeyStroke(key, handler, {...options, eventName: 'keypress' })`.
  *
  * @see https://vueuse.org/onKeyStroke
  *
@@ -193,7 +177,7 @@ export function useKeyPressed(
  *
  * Map from @vueuse/core `onKeyUp`
  * (`source/vueuse/packages/core/onKeyStroke/`) — shorthand for
- * `useKeyStroke(key, handler, { ...options, eventName: 'keyup' })`.
+ * `useKeyStroke(key, handler, {...options, eventName: 'keyup' })`.
  *
  * @see https://vueuse.org/onKeyStroke
  *

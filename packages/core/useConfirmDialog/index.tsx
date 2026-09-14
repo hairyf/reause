@@ -18,22 +18,21 @@ export interface UseConfirmDialogReturn<RevealData, ConfirmData, CancelData> {
   isRevealed: boolean
 
   /**
-   * Opens the dialog.
-   * Create promise and return it. Triggers `onReveal` hook.
+   * Opens the dialog. Create promise and return it. Triggers `onReveal` hook.
    */
   reveal: (data?: RevealData) => Promise<UseConfirmDialogRevealResult<ConfirmData, CancelData>>
 
   /**
-   * Confirms and closes the dialog. Triggers a callback inside `onConfirm` hook.
-   * Resolves promise from `reveal()` with `data` and `isCanceled` ref with `false` value.
-   * Can accept any data and to pass it to `onConfirm` hook.
+   * Confirms and closes the dialog. Triggers a callback inside `onConfirm` hook. Resolves promise
+   * from `reveal()` with `data` and `isCanceled` ref with `false` value. Can accept any data and to
+   * pass it to `onConfirm` hook.
    */
   confirm: (data?: ConfirmData) => void
 
   /**
-   * Cancels and closes the dialog. Triggers a callback inside `onCancel` hook.
-   * Resolves promise from `reveal()` with `data` and `isCanceled` ref with `true` value.
-   * Can accept any data and to pass it to `onCancel` hook.
+   * Cancels and closes the dialog. Triggers a callback inside `onCancel` hook. Resolves promise
+   * from `reveal()` with `data` and `isCanceled` ref with `true` value. Can accept any data and to
+   * pass it to `onCancel` hook.
    */
   cancel: (data?: CancelData) => void
 
@@ -43,28 +42,24 @@ export interface UseConfirmDialogReturn<RevealData, ConfirmData, CancelData> {
   onReveal: (fn: (data: RevealData) => void) => { off: () => void }
 
   /**
-   * Event Hook to be called on `confirm()`.
-   * Gets data object from `confirm` function.
+   * Event Hook to be called on `confirm()`. Gets data object from `confirm` function.
    */
   onConfirm: (fn: (data: ConfirmData) => void) => { off: () => void }
 
   /**
-   * Event Hook to be called on `cancel()`.
-   * Gets data object from `cancel` function.
+   * Event Hook to be called on `cancel()`. Gets data object from `cancel` function.
    */
   onCancel: (fn: (data: CancelData) => void) => { off: () => void }
 }
 
 /**
- * React port of VueUse's `useConfirmDialog`.
- *
  * Map from @vueuse/core `useConfirmDialog`
  * (`source/vueuse/packages/core/useConfirmDialog/`). Creates event hooks to
  * support modals and confirmation dialog chains.
  *
- * The hook exposes `isRevealed` (boolean state), the `reveal` / `confirm` /
- * `cancel` controls and three listener registration functions (`onReveal` /
- * `onConfirm` / `onCancel`) following the `useListener` protocol.
+ * The hook exposes `isRevealed` (boolean state), the `reveal` / `confirm` / `cancel` controls and
+ * three listener registration functions (`onReveal` / `onConfirm` / `onCancel`) following the
+ * `useListener` protocol.
  *
  * React divergences:
  * - upstream's `isRevealed` computed ref becomes plain boolean state; the
@@ -85,8 +80,7 @@ export interface UseConfirmDialogReturn<RevealData, ConfirmData, CancelData> {
  *   as an unhandled rejection on the discarded aggregate promise, while a
  *   synchronous throw propagates to the `reveal()` / `confirm()` / `cancel()`
  *   caller in both implementations;
- * - the event subscriptions are cleared on unmount (upstream:
- *   `tryOnScopeDispose` inside `createEventHook`'s `on`).
+ * - the event subscriptions.
  *
  * @example
  * const { isRevealed, reveal, confirm, cancel, onReveal, onConfirm, onCancel } = useConfirmDialog()

@@ -66,9 +66,8 @@ export type ZoomLevelSetter = (value: number) => void
  *   explicitly passed level (upstream's immediate run) and re-applies when
  *   the source value changes. The last level written to `webFrame` is tracked
  *   in a ref, so a redundant render never re-writes the same level;
- * - a ref-like level source stays the single source of truth (upstream's
- *   `deepRef` passthrough): `setLevel` writes back to `ref.current`, so later
- *   renders re-read the updated value instead of a stale one;
+ * - upstream's `deepRef` passthrough is dropped: the level is a plain number,
+ *   so there is no external ref to write back to;
  * - upstream has no range guard for zoom levels, so neither has this port —
  *   `0` is a valid level (upstream's `useZoomFactor` guard does not apply);
  * - the `WebFrame` instance is resolved once per render through the internal
@@ -76,7 +75,7 @@ export type ZoomLevelSetter = (value: number) => void
  *   so it can be read from `window.require('electron').webFrame`;
  * - `useZoomLevel()` reads the current level from `getZoomLevel()`, while
  *   `useZoomLevel(2)` / `useZoomLevel(webFrame, 2)` apply the level given as a
- *   plain number or a React ref.
+ *   plain number (upstream accepts a ref).
  *
  * @see https://www.electronjs.org/docs/api/web-frame#webframesetzoomlevellevel
  * @see https://vueuse.org/useZoomLevel
@@ -91,11 +90,9 @@ export type ZoomLevelSetter = (value: number) => void
  *
  * @__NO_SIDE_EFFECTS__
  */
-export declare function useZoomLevel(
-  level?: RefOrValue<number>,
-): [number, ZoomLevelSetter]
+export declare function useZoomLevel(level?: number): [number, ZoomLevelSetter]
 export declare function useZoomLevel(
   webFrame: WebFrame,
-  level?: RefOrValue<number>,
+  level?: number,
 ): [number, ZoomLevelSetter]
 ```

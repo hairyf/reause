@@ -1,25 +1,23 @@
-import type { ConfigurableWindow, RefOrValue } from '@reause/shared'
-import type { Dispatch, SetStateAction } from 'react'
-import { toValue } from '@reause/shared'
+import type { ConfigurableWindow } from '@reause/shared'
+import type { Dispatch, RefObject, SetStateAction } from 'react'
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { unrefElement } from '../unrefElement'
 
 /**
- * Options for `useCssVar`: an optional `initialValue` (also the SSR default —
- * no `document` access happens during render) and an `observe` flag that
- * tracks external changes with a MutationObserver.
+ * Options for `useCssVar`: an optional `initialValue` (also the SSR default — no `document` access
+ * happens during render) and an `observe` flag that tracks external changes with a
+ * MutationObserver.
  */
 export interface UseCssVarOptions extends ConfigurableWindow {
   /**
-   * Initial value, also the SSR default — no `document` access happens during
-   * render.
+   * Initial value, also the SSR default — no `document` access happens during render.
    *
    * @default undefined
    */
   initialValue?: string
   /**
-   * Use MutationObserver to monitor variable changes. The observer is created
-   * from the configured `window`; when that window has no `MutationObserver`,
-   * observation is skipped silently.
+   * Use MutationObserver to monitor variable changes. The observer is created from the configured
+   * `window`; when that window has no `MutationObserver`, observation is skipped silently.
    *
    * @default false
    */
@@ -27,14 +25,13 @@ export interface UseCssVarOptions extends ConfigurableWindow {
 }
 
 /**
- * Elements accepted as the CSS variable target — a plain element or a ref-like
- * `{ current }` object (a React ref; upstream: `ElementRef`).
+ * Elements accepted as the CSS variable target — a React ref object holding the element.
  */
 export type UseCssVarElement = HTMLElement | SVGElement | null | undefined
 
 /**
- * Return of `useCssVar`: a writable `[value, setValue]` tuple (upstream
- * returns a single `ShallowRef`).
+ * Return of `useCssVar`: a writable `[value, setValue]` tuple (upstream returns a single
+ * `ShallowRef`).
  */
 export type UseCssVarReturn = [
   value: string | null | undefined,
@@ -46,14 +43,9 @@ export type UseCssVarReturn = [
  *
  * Map from @vueuse/core `useCssVar`
  * (`source/vueuse/packages/core/useCssVar/`). Reads the value of a CSS custom
- * property on an element (or on `document.documentElement` when no `target`
- * is given), keeps it in state and writes changes back to the element's
- * inline style. Setting `null`/`undefined` through the setter removes the
- * property.
- *
- * Return tuple follows this repo's React idiom (see hairyf/reause#100) —
- * upstream returns a single writable Vue `ShallowRef`, here it becomes
- * `const [value, setValue] = useCssVar('--color', el)`.
+ * property on an element (or on `document.documentElement` when no `target` is given), keeps it in
+ * state and writes changes back to the element's inline style. Setting `null`/`undefined` through
+ * the setter removes the property.
  *
  * React divergences:
  * - the two upstream `watch`es become `useEffect`s: the read/sync effect
@@ -61,16 +53,13 @@ export type UseCssVarReturn = [
  *   changes (removing the previous key from the previous element first, as
  *   upstream's watcher does), and the write effect applies the state back to
  *   the element whenever the value or target changes;
- * - the prop is resolved with `toValue` on every render, so a plain string or a
- *   ref-like `{ current }` object are both accepted, and a key
+ * - the prop is a plain value read on every render, so a key
  *   change is picked up on the next render (upstream re-fires its watcher via
- *   reactive refs);
- * - the optional MutationObserver (upstream composes `useMutationObserver`
- *   with `{ attributeFilter: ['style', 'class'] }`) is a self-contained
- *   observer inside an effect, disconnected on unmount — like upstream it only
- *   updates the state, since the DOM is already the source of the change; it is
- *   built from the configured `window` and skipped silently when that window
- *   has no `MutationObserver` (upstream's per-window support guard);
+ *   reactive refs); the target is a `RefObject` resolved with `unrefElement`;
+ * - the optional MutationObserver is a self-contained observer inside an effect, disconnected on
+ * unmount — like upstream it only updates the state, since the DOM is already the source of the
+ * change; it is built from the configured `window` and skipped silently when that window has no
+ * `MutationObserver` (upstream's per-window support guard);
  * - SSR-safe: the value initializes from `initialValue` during render, the
  *   first DOM read happens in a mount effect, and a nullish initial value is
  *   never written back before that read ran (mirroring upstream's watcher
@@ -82,8 +71,8 @@ export type UseCssVarReturn = [
  * setColor('#df8543') // writes style="--color: #df8543" on the element
  */
 export function useCssVar(
-  prop: RefOrValue<string | null | undefined>,
-  target?: RefOrValue<UseCssVarElement>,
+  prop: string | null | undefined,
+  target?: RefObject<UseCssVarElement | null>,
   options: UseCssVarOptions = {},
 ): UseCssVarReturn {
   const {
@@ -108,17 +97,17 @@ export function useCssVar(
   // resolve the target element during render so the effects re-run when it
   // changes (upstream: computed `elRef`); falls back to `documentElement`,
   // and stays `undefined` on the server
-  const el = toValue(target) ?? customWindow?.document?.documentElement
+  const el = (target ? unrefElement(target) : undefined) ?? customWindow?.document?.documentElement
   // resolve the prop value during render so the read/sync effect re-runs when
   // the key changes (a changing key re-reads the variable via the effect)
-  const key = toValue(prop)
+  const key = prop
 
   // upstream `updateCssVar`: re-read the variable's current value. Uses a
   // functional setState so the fallback chain `value || variable.value ||
   // initialValue` resolves against the freshest state.
   const updateCssVar = useCallback(() => {
-    const rawKey = toValue(propRef.current)
-    const currentEl = toValue(targetRef.current) ?? windowRef.current?.document?.documentElement
+    const rawKey = propRef.current
+    const currentEl = (targetRef.current ? unrefElement(targetRef.current) : undefined) ?? windowRef.current?.document?.documentElement
     if (currentEl && windowRef.current && rawKey) {
       const currentValue = windowRef.current.getComputedStyle(currentEl).getPropertyValue(rawKey).trim()
       setValue(previous => currentValue || previous || initialValueRef.current)
@@ -145,7 +134,7 @@ export function useCssVar(
   const isFirstWriteRef = useRef(true)
 
   useEffect(() => {
-    const rawKey = toValue(propRef.current)
+    const rawKey = propRef.current
     if (!el?.style || !rawKey)
       return
 

@@ -25,15 +25,12 @@ function isArrayIncludesOptions<T, V>(obj: any): obj is UseArrayIncludesOptions<
 }
 
 /**
- * React port of VueUse's `useArrayIncludes`.
- *
  * Map from @vueuse/shared `useArrayIncludes`
- * Mapping: upstream wraps `toValue(list).slice(fromIndex).some(...)` in
- * `computed(() => ...)` and returns a `ComputedRef`; React has no reactive
- * value tracking, so this is a plain function recomputed on every render over
- * the plain `list` array and `value` the caller passes. The default comparator
- * mirrors `Array.prototype.includes` (strict equality). Hold the array in
- * `useState` and pass a new array to observe a change.
+ * Mapping: upstream wraps `toValue(list).slice(fromIndex).some(...)` in `computed(() =>...)` and
+ * returns a `ComputedRef`; React has no reactive value tracking, so this is a plain function
+ * recomputed on every render over the plain `list` array and `value` the caller passes. The default
+ * comparator mirrors `Array.prototype.includes` (strict equality). Hold the array in `useState` and
+ * pass a new array to observe a change.
  *
  * @see https://vueuse.org/shared/useArrayIncludes/
  *

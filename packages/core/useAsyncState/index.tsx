@@ -3,9 +3,9 @@ import { noop, promiseTimeout } from '@reause/shared'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 /**
- * Default `onError` — mirrors upstream's `globalThis.reportError` fallback.
- * `reportError` must be invoked with the global object as `this`, otherwise
- * Chromium throws "Illegal invocation" for a detached call.
+ * Default `onError` — mirrors upstream's `globalThis.reportError` fallback. `reportError` must be
+ * invoked with the global object as `this`, otherwise Chromium throws "Illegal invocation" for a
+ * detached call.
  */
 function defaultOnError(e: unknown) {
   if (typeof globalThis.reportError === 'function')
@@ -16,19 +16,16 @@ export interface UseAsyncStateReturnBase<Data, Params extends any[], _Shallow ex
   /**
    * The resolved result of the async function.
    *
-   * Upstream types this as
-   * `Shallow extends true ? Ref<Data> : Ref<UnwrapRef<Data>>`, but React state
-   * is never deep-wrapped, so both arms of that conditional are `Data`. The
-   * unused `_Shallow` type parameter is kept only for generic-arity parity
-   * with VueUse and never affects this type.
+   * Upstream types this as `Shallow extends true ? Ref<Data>: Ref<UnwrapRef<Data>>`, but React
+   * state is never deep-wrapped, so both arms of that conditional are `Data`. The unused `_Shallow`
+   * type parameter is kept only for generic-arity parity with VueUse and never affects this type.
    */
   state: Data
   /**
    * Set the state value directly, without re-executing the async function.
    *
-   * The React equivalent of writing upstream's writable `state` ref
-   * (`state.value = next`). It updates only `state`; `isReady`, `isLoading`
-   * and `error` are left untouched.
+   * The React equivalent of writing upstream's writable `state` ref (`state.value = next`). It
+   * updates only `state`; `isReady`, `isLoading` and `error` are left untouched.
    */
   setState: Dispatch<SetStateAction<Data>>
   isReady: boolean
@@ -51,8 +48,7 @@ export interface UseAsyncStateOptions<Shallow extends boolean = true, D = any> {
   delay?: number
 
   /**
-   * Execute the promise right after the function is invoked.
-   * Will apply the delay if any.
+   * Execute the promise right after the function is invoked. Will apply the delay if any.
    *
    * When set to false, you will need to execute it manually.
    *
@@ -74,9 +70,8 @@ export interface UseAsyncStateOptions<Shallow extends boolean = true, D = any> {
   /**
    * Sets the state to initialState before executing the promise.
    *
-   * This can be useful when calling the execute function more than once (for
-   * example, to refresh data). When set to false, the current state remains
-   * unchanged until the promise resolves.
+   * This can be useful when calling the execute function more than once (for example, to refresh
+   * data). When set to false, the current state remains unchanged until the promise resolves.
    *
    * @default true
    */
@@ -85,8 +80,8 @@ export interface UseAsyncStateOptions<Shallow extends boolean = true, D = any> {
   /**
    * Use shallowRef.
    *
-   * Accepted for API parity with VueUse only — React state is never
-   * deep-wrapped, so this option has no effect.
+   * Accepted for API parity with VueUse only — React state is never deep-wrapped, so this option
+   * has no effect.
    *
    * @default true
    */
@@ -101,27 +96,24 @@ export interface UseAsyncStateOptions<Shallow extends boolean = true, D = any> {
 }
 
 /**
- * Reactive async state. Will not block your component and will trigger
- * changes once the promise is ready.
+ * Reactive async state. Will not block your component and will trigger changes once the promise is
+ * ready.
  *
  * Map from @vueuse/core `useAsyncState`
  * (`source/vueuse/packages/core/useAsyncState/`). Mirrors the upstream object
- * return: `{ state, setState, isReady, isLoading, error, execute, executeImmediate }`.
- * `state` holds the resolved result of the async function, `setState` writes
- * it directly (the React equivalent of upstream's writable `state` ref, see
- * below), `isReady` becomes `true` when the latest execution resolved (reset
- * to `false` on each execution and stays `false` when it rejects), `isLoading`
- * is `true` while a promise is pending and `error` holds the rejection reason.
- * `execute(delay?, ...args)` re-runs the promise (waiting for `delay` ms first)
- * and `executeImmediate(...args)` is shorthand for `execute(0, ...args)`.
- * `onSuccess`/`onError` callbacks fire for every settled execution and
- * `throwError` re-throws the rejection from `execute`.
+ * return: `{ state, setState, isReady, isLoading, error, execute, executeImmediate }`. `state`
+ * holds the resolved result of the async function, `setState` writes it directly (the React
+ * equivalent of upstream's writable `state` ref, see below), `isReady` becomes `true` when the
+ * latest execution resolved (reset to `false` on each execution and stays `false` when it rejects),
+ * `isLoading` is `true` while a promise is pending and `error` holds the rejection reason.
+ * `execute(delay?...args)` re-runs the promise (waiting for `delay` ms first) and
+ * `executeImmediate(...args)` is shorthand for `execute(0...args)`. `onSuccess`/`onError` callbacks
+ * fire for every settled execution and `throwError` re-throws the rejection from `execute`.
  *
  * React divergences:
- * - upstream exposes refs (`state.value`, `isLoading.value`, ...); this port
- *   is an object mirror whose members are live React state values — the
- *   members render as plain values (no `.value`) and re-reading them yields
- *   the latest committed state (getters over the current render state);
+ * - upstream exposes refs (`state.value`, `isLoading.value`...); this port is an object mirror
+ * whose members are live React state values — the members render as plain values (no `.value`) and
+ * re-reading them yields the latest committed state (getters over the current render state);
  * - upstream's `state` ref is writable, so this port pairs it with
  *   `setState(next)` / `setState(prev => next)` (the React equivalent of
  *   `state.value = next`). `setState` updates `state` only and never triggers

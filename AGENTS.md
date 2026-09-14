@@ -12,7 +12,7 @@
 | **React 体系** | react-use | **直接镜像** | 完全保持上游原生 React 的 API 命名、参数类型与返回值结构。                                                                  |
 
 > **“直接镜像”的边界**：参数类型以 §2 的绑定标准为准，**不得**用 §1.1 的镜像规则放宽类型；命名、返回值结构与整体语义仍按上游镜像（个别 Hook 有意偏离处，在各自 JSDoc 里写明）。
-> 例如上游 ahooks `useClickAway` 的目标参数是 `BasicTarget | BasicTarget[]`，reause 侧收窄为 §2 规定的 `RefOrValue<T>` 或元素类型一致的 `RefOrValue<T>[]`，异构目标数组仍不支持——这是**参数类型收窄**，不是偏离镜像规则。
+> 例如上游 ahooks `useClickAway` 的目标参数是 `BasicTarget | BasicTarget[]`，reause 侧收窄为 §2 规定的 `RefObject<T | null>` 或元素类型一致的 `RefObject<T | null>[]`，异构目标数组仍不支持——这是**参数类型收窄**，不是偏离镜像规则。
 
 ### 1.2 VueUse 侧命名转换细节
 
@@ -26,10 +26,11 @@
 ## 2. 绑定标准
 
 - **参数类型**：
-  - **只读 value-source 参数**：仅接受纯类型 `T`（严禁 `RefOrValue` / `State<T>` / getter）。
-  - **内部写入参数**：仅接受 `State<T>`。
-  - **DOM Hook 参数**：单个目标仅接受 `RefOrValue<T>`。
-    - **多目标**：接受**元素类型一致的**数组——`RefOrValue<T[]>`、`RefOrValue<T>[]`、`RefOrValue<T | T[]>` 都只是同一规则的不同写法，判定标准只有一条：数组里每个元素的类型必须相同（`T` 为元素类型）。既有的两种包装都合规：整体包装（`useEventListener` 的 `RefOrValue<Arrayable<T>>`）与逐元素包装（`useClickAway` 的 `RefOrValue<T>[]`）。
+  - **只读 value-source 参数**：仅接受纯类型 `T`（严禁 `RefObject` / `RefOrValue` / `State<T>` / getter）。
+  - **内部写入参数**：仅接受 `State<T>`（纯值、getter、`[value, setter]` 元组或 `{ value, onChange }` 对，**不含** ref）。
+  - **DOM Hook 参数**：单个目标仅接受 React 原生 `RefObject<T | null>`（禁止纯元素、getter、callback ref）。
+    - ref 只是 DOM 句柄，读取一律走 `unrefElement`（`@reause/core`）；`toValue` **不再解析 ref**，也不接受 `RefObject`。
+    - **多目标**：接受**元素类型一致的**数组——`RefObject<T | null>[]`、`RefObject<T[] | null>` 都只是同一规则的不同写法，判定标准只有一条：数组里每个元素的类型必须相同（`T` 为元素类型）。既有别名 `ElementTarget<T>` / `ElementTargetOrArray<T>`（`@reause/core`）就是这套写法。
       异构目标数组（如 `[buttonRef, divRef]`，元素类型不同）**刻意不支持**，也不会通过类型检查；需要宽元素类型时由调用方自行收窄或包装成同一 `T`。
       与 §1.1 的分工：本节的 DOM 目标类型规则**优先于** §1.1 的直接镜像——上游 DOM 目标类型更宽时按本条收窄，这属于参数类型收窄、不算偏离镜像规则；其余（命名、返回值结构）仍按 §1.1 镜像。
 - **返回值约束（VueUse 转换类）**：

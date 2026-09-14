@@ -1,23 +1,22 @@
-import type { RefOrValue } from '@reause/shared'
-import { toValue } from '@reause/shared'
+import type { RefObject } from 'react'
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { unrefElement } from '../unrefElement'
 
 /**
- * The callback signature for drop-zone events — the dropped files (or `null`
- * for enter/leave/over and when the drop carries no files) plus the underlying
- * `DragEvent`.
+ * The callback signature for drop-zone events — the dropped files (or `null` for enter/leave/over
+ * and when the drop carries no files) plus the underlying `DragEvent`.
  */
 export type UseDropZoneCallback = (files: File[] | null, event: DragEvent) => void
 
 export interface UseDropZoneOptions {
   /**
-   * Allowed data types, if not set, all data types are allowed.
-   * Also can be a function to check the data types.
+   * Allowed data types, if not set, all data types are allowed. Also can be a function to check the
+   * data types.
    */
-  dataTypes?: RefOrValue<readonly string[]> | ((types: readonly string[]) => boolean)
+  dataTypes?: readonly string[] | ((types: readonly string[]) => boolean)
   /**
-   * Similar to dataTypes, but exposes the DataTransferItemList for custom validation.
-   * If provided, this function takes precedence over dataTypes.
+   * Similar to dataTypes, but exposes the DataTransferItemList for custom validation. If provided,
+   * this function takes precedence over dataTypes.
    */
   checkValidity?: (items: DataTransferItemList) => boolean
   /**
@@ -39,11 +38,11 @@ export interface UseDropZoneOptions {
   /**
    * Allow multiple files to be dropped. Defaults to true.
    */
-  multiple?: RefOrValue<boolean>
+  multiple?: boolean
   /**
    * Prevent default behavior for unhandled events. Defaults to false.
    */
-  preventDefaultForUnhandled?: RefOrValue<boolean>
+  preventDefaultForUnhandled?: boolean
 }
 
 export interface UseDropZoneReturn {
@@ -52,13 +51,12 @@ export interface UseDropZoneReturn {
    */
   isOverDropZone: boolean
   /**
-   * The files of the last valid drop, or `null` when nothing has been
-   * dropped yet (mirrors upstream's `files` shallowRef).
+   * The files of the last valid drop, or `null` when nothing has been dropped yet (mirrors
+   * upstream's `files` shallowRef).
    */
   files: File[] | null
   /**
-   * Subscribe to the drop event — fires with the dropped files when a valid
-   * drop happens.
+   * Subscribe to the drop event — fires with the dropped files when a valid drop happens.
    */
   onDrop: (fn: UseDropZoneCallback) => { off: () => void }
   /**
@@ -72,8 +70,6 @@ export interface UseDropZoneReturn {
 }
 
 /**
- * React port of VueUse's `useDropZone`.
- *
  * Map from @vueuse/core `useDropZone`
  * (`source/vueuse/packages/core/useDropZone/`). Create a zone where files can
  * be dropped.
@@ -108,7 +104,7 @@ export interface UseDropZoneReturn {
  * })
  */
 export function useDropZone(
-  target: RefOrValue<HTMLElement | Document | null | undefined>,
+  target: RefObject<HTMLElement | Document | null | undefined>,
   options: UseDropZoneOptions | UseDropZoneOptions['onDrop'] = {},
 ): UseDropZoneReturn {
   const [isOverDropZone, setIsOverDropZone] = useState(false)
@@ -162,7 +158,7 @@ export function useDropZone(
     }
   }, [])
 
-  const resolvedTarget = toValue(target)
+  const resolvedTarget = unrefElement(target)
 
   useEffect(() => {
     const el = resolvedTarget
@@ -178,7 +174,7 @@ export function useDropZone(
 
     const getFiles = (event: DragEvent) => {
       const list = Array.from(event.dataTransfer?.files ?? [])
-      return list.length === 0 ? null : (toValue(getOptions().multiple ?? true) ? list : [list[0]])
+      return list.length === 0 ? null : (getOptions().multiple ?? true ? list : [list[0]])
     }
 
     const checkDataTypes = (types: string[]) => {
@@ -187,7 +183,7 @@ export function useDropZone(
       if (typeof dataTypes === 'function')
         return dataTypes(types)
 
-      const unwrapped = toValue(dataTypes)
+      const unwrapped = dataTypes
 
       if (!unwrapped?.length)
         return true
@@ -208,7 +204,7 @@ export function useDropZone(
       const types = Array.from(items ?? []).map(item => item.type)
 
       const dataTypesValid = checkDataTypes(types)
-      const multipleFilesValid = toValue(getOptions().multiple ?? true) || items.length <= 1
+      const multipleFilesValid = (getOptions().multiple ?? true) || items.length <= 1
 
       return dataTypesValid && multipleFilesValid
     }
@@ -226,7 +222,7 @@ export function useDropZone(
       const dataTransferItemList = event.dataTransfer?.items
       const isValid = (dataTransferItemList && checkValidity(dataTransferItemList)) ?? false
 
-      if (toValue(getOptions().preventDefaultForUnhandled ?? false)) {
+      if (getOptions().preventDefaultForUnhandled ?? false) {
         event.preventDefault()
       }
 

@@ -134,7 +134,7 @@ export interface UseScriptTagReturn {
  * the script loads on mount and unloads on unmount.
  *
  * React divergences:
- * - `src` is a plain string (upstream `RefOrValue<string>`);
+ * - `src` is a plain string (upstream `MaybeRefOrGetter<string>`);
  * - the `scriptTag` shallowRef becomes plain state — a
  *   `HTMLScriptElement | null` value that stays `null` during render, so no
  *   document access happens while rendering (SSR-safe);

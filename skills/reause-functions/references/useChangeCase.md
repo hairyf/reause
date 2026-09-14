@@ -57,8 +57,7 @@ caller (upstream's writable computed writes through to a ref input). A changed `
 over an internal `setValue` write, and an internal write survives a re-render that leaves `input`
 unchanged.
 
-`type` and `options` remain `RefOrValue` (a plain value or ref-like `{ current }`) — they are
-format knobs, not the hook's value source.
+`type` and `options` are plain values — they are format knobs, not the hook's value source.
 
 Can be passed into `options` for customization
 
@@ -104,8 +103,7 @@ export type UseChangeCaseReturn = [string, Dispatch<SetStateAction<string>>]
  * `setValue` updates that internal input state like a controlled `useState`.
  * `input` is the hook's **read-only value source** and takes a plain `string`
  * (upstream: `MaybeRef<string>` / `MaybeRefOrGetter<string>`); `type` and
- * `options` stay `RefOrValue` (format knobs, upstream `MaybeRefOrGetter`) and
- * are resolved with `toValue` from `@reause/shared`.
+ * `options` are plain values (format knobs, upstream `MaybeRefOrGetter`).
  *
  * Adjustment for React:
  * - upstream's writable computed captures a plain `input` once at setup. Here
@@ -128,7 +126,7 @@ export type UseChangeCaseReturn = [string, Dispatch<SetStateAction<string>>]
  */
 export declare function useChangeCase(
   input: string,
-  type: RefOrValue<ChangeCaseType>,
-  options?: RefOrValue<Options> | undefined,
+  type: ChangeCaseType,
+  options?: Options | undefined,
 ): UseChangeCaseReturn
 ```

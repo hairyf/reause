@@ -159,14 +159,12 @@ export interface UseFocusTrapReturn {
 }
 /** Accepted DOM target kinds — mirrors upstream's `MaybeElement`. */
 type MaybeElement = HTMLElement | SVGElement | null | undefined
-/** A plain element or a React ref-like object (`{ current }`) — upstream `MaybeElementRef`. */
-type MaybeElementRef =
-  | MaybeElement
-  | {
-      readonly current: MaybeElement
-    }
+/** A React ref object holding the element — upstream `MaybeElementRef`. */
+interface MaybeElementRef {
+  readonly current: MaybeElement
+}
 /** One item of the focus-trap target list (upstream `MaybeComputedElementRef`, without its getter branch). */
-type FocusTrapTarget = RefOrValue<string> | MaybeElementRef
+type FocusTrapTarget = string | MaybeElementRef
 /**
  * React port of VueUse's `useFocusTrap` — trap focus within one or more
  * elements.
@@ -204,7 +202,7 @@ type FocusTrapTarget = RefOrValue<string> | MaybeElementRef
  * activate() // traps focus inside target
  */
 export declare function useFocusTrap(
-  target: RefOrValue<FocusTrapTarget | FocusTrapTarget[]>,
+  target: FocusTrapTarget | FocusTrapTarget[],
   options?: UseFocusTrapOptions,
 ): UseFocusTrapReturn
 ```

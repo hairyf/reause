@@ -72,7 +72,7 @@ interface UseShareNavigatorOptions {
  *   resolved in a mount effect — `false` during render and on the server
  *   (SSR-safe), `true` afterwards when the navigator exposes `canShare`
  *   (upstream's exact check — note: `canShare`, not `navigator.share`);
- * - upstream accepts `RefOrValue<UseShareOptions>`; React has no
+ * - upstream accepts `MaybeRefOrGetter<UseShareOptions>`; React has no
  *   reactive refs, so options are plain values. The latest options and
  *   navigator live in refs synced each render, keeping `share` a stable
  *   callback that always reads the newest values — inline option objects

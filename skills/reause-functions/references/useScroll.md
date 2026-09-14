@@ -213,7 +213,7 @@ export interface UseScrollReturn {
  *    is a self-contained observer inside the same effect, disconnected on
  *    unmount.
  * 4. `element` accepts a plain element or a ref-like `{ current }` object
- *    (upstream: `RefOrValue`). It is re-resolved on every render
+ *    (upstream: `MaybeRefOrGetter`). It is re-resolved on every render
  *    and the listeners re-bind when the resolved element changes, so a
  *    `useRef` target that is `null` during first render still binds once
  *    React attaches the element.
@@ -226,7 +226,7 @@ export interface UseScrollReturn {
  * setX(100) // scroll to x = 100
  */
 export declare function useScroll(
-  element: RefOrValue<UseScrollElement>,
+  element: RefObject<UseScrollElement | null>,
   options?: UseScrollOptions,
 ): UseScrollReturn
 ```

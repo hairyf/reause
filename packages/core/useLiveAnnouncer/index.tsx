@@ -39,32 +39,28 @@ export interface UseLiveAnnouncerReturn {
 }
 
 /**
- * Vue's `nextTick` has no React equivalent — DOM writes are not coordinated
- * through a reactive scheduler. The clear-then-set-on-the-next-tick announce
- * pattern is kept (mirrors upstream) but the "next tick" is the microtask
- * queue, which is enough to let the browser re-read a live region even when
- * the exact same message is announced twice in a row. Promise-based so it
- * resolves normally under `vi.useFakeTimers()`.
+ * Vue's `nextTick` has no React equivalent — DOM writes are not coordinated through a reactive
+ * scheduler. The clear-then-set-on-the-next-tick announce pattern is kept (mirrors upstream) but
+ * the "next tick" is the microtask queue, which is enough to let the browser re-read a live region
+ * even when the exact same message is announced twice in a row. Promise-based so it resolves
+ * normally under `vi.useFakeTimers()`.
  */
 function nextTick(callback?: () => void): Promise<void> {
   return callback ? Promise.resolve().then(callback) : Promise.resolve()
 }
 
 /**
- * React port of VueUse's `useLiveAnnouncer`.
- *
  * Map from @vueuse/core `useLiveAnnouncer`
  * (`source/vueuse/packages/core/useLiveAnnouncer/`). Accessible way to
  * announce messages to screen reader users (ARIA live regions).
  *
- * The hook maintains a visually-hidden `<div>` (per `idPrefix`) containing a
- * `polite` (`role="status"`, `aria-live="polite"`) and an `assertive`
- * (`role="alert"`, `aria-live="assertive"`) region. `announce(message, mode,
- * timeout)` writes the message into the region with the given mode (default
- * `'polite'`), optionally auto-clearing it after `timeout` ms; a new
- * announcement cancels any pending auto-clear for the same mode so a
- * previously scheduled clear can never wipe a fresh message. `polite` /
- * `assertive` are shorthand for `announce` with a fixed mode.
+ * The hook maintains a visually-hidden `<div>` (per `idPrefix`) containing a `polite`
+ * (`role="status"`, `aria-live="polite"`) and an `assertive` (`role="alert"`,
+ * `aria-live="assertive"`) region. `announce(message, mode, timeout)` writes the message into the
+ * region with the given mode (default `'polite'`), optionally auto-clearing it after `timeout` ms;
+ * a new announcement cancels any pending auto-clear for the same mode so a previously scheduled
+ * clear can never wipe a fresh message. `polite` / `assertive` are shorthand for `announce` with a
+ * fixed mode.
  *
  * React divergences:
  * - upstream registers cleanup on the active effect scope
@@ -75,8 +71,7 @@ function nextTick(callback?: () => void): Promise<void> {
  *   container is only removed when the last mounted hook sharing an
  *   `idPrefix` unmounts;
  * - upstream `nextTick` becomes a microtask flush (see `nextTick` above);
- * - the return object `{ announce, polite, assertive }` mirrors upstream and
- *   is identity-stable across renders;
+ * - the return object `{ announce, polite, assertive }`;
  * - the `window` option defaults to the global `window` (`undefined` on the
  *   server, where the hook becomes a no-op) — upstream's `defaultWindow`
  *   symbol is inlined here because the shared package does not export it.

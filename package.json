@@ -48,7 +48,6 @@
     "@antfu/eslint-config": "^9.5.1",
     "@antfu/ni": "^30.5.0",
     "@arethetypeswrong/core": "^0.18.5",
-    "@react-spring/web": "^10.1.2",
     "@reause/core": "workspace:*",
     "@reause/integrations": "workspace:*",
     "@reause/math": "workspace:*",

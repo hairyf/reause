@@ -53,7 +53,7 @@ export interface UsePointerOptions extends ConfigurableWindow {
    *
    * @default window
    */
-  target?: RefOrValue<EventTarget | null | undefined>
+  target?: RefObject<EventTarget | null | undefined>
 }
 export interface UsePointerReturn extends UsePointerState {
   isInside: boolean
@@ -78,7 +78,7 @@ export interface UsePointerReturn extends UsePointerState {
  *   the defaults (`x: 0`, `y: 0`, ..., `pointerType: null`, `isInside: false`)
  *   without touching `window`;
  * - `target` accepts a plain `EventTarget` or a ref-like `{ current }` object
- *   (`RefOrValue`) and an explicit `null` disables listening, while an omitted
+ *   (`MaybeRefOrGetter`) and an explicit `null` disables listening, while an omitted
  *   `target` falls back to the `window` option (upstream `target = defaultWindow`
  *   plus `if (target)`).
  *

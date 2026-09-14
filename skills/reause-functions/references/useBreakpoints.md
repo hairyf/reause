@@ -269,10 +269,7 @@ export declare const breakpointsElement: {
   lg: number
   xl: number
 }
-export type Breakpoints<K extends string = string> = Record<
-  K,
-  RefOrValue<number | string>
->
+export type Breakpoints<K extends string = string> = Record<K, number | string>
 export interface UseBreakpointsOptions extends ConfigurableWindow {
   /**
    * The query strategy to use for the generated shortcut methods like `.lg`
@@ -289,16 +286,16 @@ export type UseBreakpointReturn<K extends string = string> = Record<
   K,
   boolean
 > & {
-  greaterOrEqual: (k: RefOrValue<K>) => boolean
-  smallerOrEqual: (k: RefOrValue<K>) => boolean
-  greater: (k: RefOrValue<K>) => boolean
-  smaller: (k: RefOrValue<K>) => boolean
-  between: (a: RefOrValue<K>, b: RefOrValue<K>) => boolean
-  isGreater: (k: RefOrValue<K>) => boolean
-  isGreaterOrEqual: (k: RefOrValue<K>) => boolean
-  isSmaller: (k: RefOrValue<K>) => boolean
-  isSmallerOrEqual: (k: RefOrValue<K>) => boolean
-  isInBetween: (a: RefOrValue<K>, b: RefOrValue<K>) => boolean
+  greaterOrEqual: (k: K) => boolean
+  smallerOrEqual: (k: K) => boolean
+  greater: (k: K) => boolean
+  smaller: (k: K) => boolean
+  between: (a: K, b: K) => boolean
+  isGreater: (k: K) => boolean
+  isGreaterOrEqual: (k: K) => boolean
+  isSmaller: (k: K) => boolean
+  isSmallerOrEqual: (k: K) => boolean
+  isInBetween: (a: K, b: K) => boolean
   current: () => K[]
   active: () => K | ""
 }

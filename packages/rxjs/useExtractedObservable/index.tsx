@@ -6,19 +6,17 @@ import { useEffect, useRef, useState } from 'react'
 /**
  * Options for `useExtractedObservable`.
  *
- * Upstream `UseExtractedObservableOptions` extends `UseObservableOptions`
- * with `onComplete`; the React port reuses the same option names (`onError`,
- * `initialValue`) from `useObservable` and adds `deps`, the substitute for
- * Vue's reactive tracking (see {@link useExtractedObservable}).
+ * Upstream `UseExtractedObservableOptions` extends `UseObservableOptions` with `onComplete`; the
+ * React port reuses the same option names (`onError`, `initialValue`) from `useObservable` and adds
+ * `deps`, the substitute for Vue's reactive tracking (see {@link useExtractedObservable}).
  */
 export interface UseExtractedObservableOptions<E> extends UseObservableOptions<E> {
   /** Called when the extracted `Observable` completes. */
   onComplete?: () => void
   /**
-   * Extra React effect dependencies — the React substitute for Vue's
-   * reactive tracking (same convention as `useAsync`'s `options.deps`,
-   * `packages/core/useAsync/index.tsx`). The resolved source value's identity
-   * is always compared as well, so a new source object re-extracts even
+   * Extra React effect dependencies — the React substitute for Vue's reactive tracking (same
+   * convention as `useAsync`'s `options.deps`, `packages/core/useAsync/index.tsx`). The resolved
+   * source value's identity is always compared as well, so a new source object re-extracts even
    * without `deps`. Defaults to `[]`.
    */
   deps?: unknown[]
@@ -27,11 +25,10 @@ export interface UseExtractedObservableOptions<E> extends UseObservableOptions<E
 /**
  * Extracts the `Observable` to subscribe to from the resolved source value.
  *
- * Note the parameter list is `(value, onCleanup)` — upstream's extractor also
- * receives Vue's `oldValue` between the two; React has no previous-value
- * tracking for arbitrary sources, so that argument is intentionally absent
- * (see the JSDoc of {@link useExtractedObservable}). The signature is shared
- * with the sibling `useWatchExtractedObservable`
+ * Note the parameter list is `(value, onCleanup)` — upstream's extractor also receives Vue's
+ * `oldValue` between the two; React has no previous-value tracking for arbitrary sources, so that
+ * argument is intentionally absent (see the JSDoc of {@link useExtractedObservable}). The signature
+ * is shared with the sibling `useWatchExtractedObservable`
  * (`packages/rxjs/useWatchExtractedObservable/index.tsx`).
  */
 export type ExtractedObservableExtractor<Value, E> = (
@@ -40,34 +37,29 @@ export type ExtractedObservableExtractor<Value, E> = (
 ) => Observable<E>
 
 /**
- * Shared empty dependency array — a stable identity so the default `deps`
- * never re-creates the effect dependency list.
+ * Shared empty dependency array — a stable identity so the default `deps` never re-creates the
+ * effect dependency list.
  */
 const EMPTY_DEPS: unknown[] = []
 
 /**
- * Use an RxJS [`Observable`](https://rxjs.dev/guide/observable) as extracted
- * from one or more hooks, and automatically unsubscribe from it when the
- * component is unmounted.
+ * Use an RxJS [`Observable`](https://rxjs.dev/guide/observable) as extracted from one or more
+ * hooks, and automatically unsubscribe from it when the component is unmounted.
  *
  * Map from @vueuse/rxjs `useExtractedObservable`
  * (`source/vueuse/packages/rxjs/useExtractedObservable/`): whenever the
- * resolved source value changes, the previous subscription is unsubscribed
- * and `extractor` derives a new `Observable` from the new value, whose
- * emissions become the hook's value. Unsubscribing happens both on a source
- * change and on unmount.
+ * resolved source value changes, the previous subscription is unsubscribed and `extractor` derives
+ * a new `Observable` from the new value, whose emissions become the hook's value. Unsubscribing
+ * happens both on a source change and on unmount.
  *
  * React adaptation (upstream's Vue reactivity graph is replaced):
  *
- * - `value` is a read-only value source and takes a plain
- *   `Value | null | undefined` (upstream: `T | WatchSource<T>`, i.e. a
- *   reactive object, an array of sources or a getter). Resolve a React ref or
- *   getter at the call site; a list of sources is passed as a plain array and
- *   re-extracts when a new array identity arrives. There is no reactive graph:
- *   the effect re-runs when the value's identity changes **or** when
- *   `options.deps` change (upstream re-runs whenever any tracked source
- *   mutates), so a source object mutated **in place** needs a new identity or
- *   the mutation inputs listed in `deps`.
+ * - `value` is a read-only value source and takes a plain `Value | null | undefined`. Resolve a
+ * React ref or getter at the call site; a list of sources is passed as a plain array and
+ * re-extracts when a new array identity arrives. There is no reactive graph: the effect re-runs
+ * when the value's identity changes **or** when `options.deps` change (upstream re-runs whenever
+ * any tracked source mutates), so a source object mutated **in place** needs a new identity or the
+ * mutation inputs listed in `deps`.
  * - the extractor is `(value, onCleanup) => Observable<E>`: upstream also
  *   passes Vue's `oldValue` as the second argument, which has no React
  *   equivalent (React keeps no previous-value tracking) and is dropped.

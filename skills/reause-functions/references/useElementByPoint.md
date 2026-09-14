@@ -51,7 +51,7 @@ export interface UseElementByPointOptions<Multiple extends boolean = false> {
    *
    * @default false
    */
-  multiple?: RefOrValue<Multiple>
+  multiple?: Multiple
   /**
    * Allow a custom `document` instance, e.g. working with iframes or in
    * testing environments (upstream: `ConfigurableDocument`).
@@ -116,7 +116,7 @@ export interface UseElementByPointReturn<Multiple extends boolean = false> {
  *   (upstream: `MaybeRefOrGetter<number>`; resolve a React ref or getter at
  *   the call site). They are re-read on every tick through latest-value refs,
  *   so e.g. a `useMouse` position updates the hit element without re-running
- *   the hook; `multiple` stays `RefOrValue<Multiple>` (a behavior toggle, not
+ *   the hook; `multiple` stays a plain `Multiple` (a behavior toggle, not
  *   a value source);
  * - the `document` option is inlined (upstream: `ConfigurableDocument`) and
  *   defaults to the global `document` only on the client, so SSR renders never

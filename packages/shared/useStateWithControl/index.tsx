@@ -22,27 +22,24 @@ export interface UseStateWithControlOptions<T> {
 
 export interface UseStateWithControlControls<T> {
   /**
-   * Get the current value. The `tracking` argument is accepted for API parity
-   * with upstream but is a no-op in React — there is no reactivity dependency
-   * collection during render.
+   * Get the current value. The `tracking` argument is accepted for API parity with upstream but is
+   * a no-op in React — there is no reactivity dependency collection during render.
    */
   get: (tracking?: boolean) => T
 
   /**
-   * Set the value with fine-grained control. `triggering` controls whether the
-   * change re-renders the component (defaults to `true`).
+   * Set the value with fine-grained control. `triggering` controls whether the change re-renders
+   * the component (defaults to `true`).
    */
   set: (value: T, triggering?: boolean) => void
 
   /**
-   * Get the value without tracking in the reactivity system — alias for
-   * `get(false)`.
+   * Get the value without tracking in the reactivity system — alias for `get(false)`.
    */
   untrackedGet: () => T
 
   /**
-   * Set the value without triggering the reactivity system — alias for
-   * `set(value, false)`.
+   * Set the value without triggering the reactivity system — alias for `set(value, false)`.
    */
   silentSet: (value: T) => void
 
@@ -72,15 +69,15 @@ export type UseStateWithControlReturn<T> = [
    */
   setValue: Dispatch<SetStateAction<T>>,
   /**
-   * Fine-grained controls over the value: `get` / `set` / `peek` / `lay`, the
-   * untracked/silent shorthands, and `reset`.
+   * Fine-grained controls over the value: `get` / `set` / `peek` / `lay`, the untracked/silent
+   * shorthands, and `reset`.
    */
   control: UseStateWithControlControls<T>,
 ]
 
 /**
- * A controlled source — a `[value, setter]` tuple or a `{ value, onChange }`
- * object — whose value is owned by the caller (re-rendered externally).
+ * A controlled source — a `[value, setter]` tuple or a `{ value, onChange }` object — whose value
+ * is owned by the caller (re-rendered externally).
  */
 function isControlledSource<T>(state: State<T>): boolean {
   return (
@@ -90,31 +87,25 @@ function isControlledSource<T>(state: State<T>): boolean {
 }
 
 /**
- * Fine-grained controls over a state and its re-renders — React port of
- * VueUse's `refWithControl`.
+ * Fine-grained controls over a state and its re-renders — React port of VueUse's `refWithControl`.
  *
  * Map from @vueuse/shared `refWithControl`
  * (`source/vueuse/packages/shared/refWithControl/`). Upstream returns a single
- * writable Vue `Ref` extended with `get` / `set` / `untrackedGet` /
- * `silentSet` / `peek` / `lay`. This port owns the state like a `useState` and
- * returns the React tuple `const [num, setNum, control] = useStateWithControl(0)`
- * — the name follows this repo's `ref*` → `useState*` mapping rule. `setNum`
- * behaves like a normal `setState` (value or updater form — the updater base
- * is the current internal value, which may be ahead of the rendered value
- * after a silent write), while `control`
- * keeps the fine-grained get/set pair: `set(value, false)` (and `lay` /
- * `silentSet`) updates the value without re-rendering (upstream: without
- * triggering reactivity), and `peek` / `untrackedGet` read it back — in React
- * there is no dependency tracking during render, so those are plain aliases
- * for the current value. `reset()` (a small addition, upstream has no
- * equivalent) restores the initial value and participates in the change
- * callbacks (`onBeforeChange` can dismiss it, `onChanged` fires when
- * accepted). Option names are kept from upstream:
- * `onBeforeChange` can dismiss a change by returning `false`, and `onChanged`
- * fires synchronously after an accepted change.
+ * writable Vue `Ref` extended with `get` / `set` / `untrackedGet` / `silentSet` / `peek` / `lay`.
+ * This port owns the state like a `useState` and returns the React tuple `const [num, setNum,
+ * control] = useStateWithControl(0)` — the name follows this repo's `ref*` → `useState*` mapping
+ * rule. `setNum` behaves like a normal `setState` (value or updater form — the updater base is the
+ * current internal value, which may be ahead of the rendered value after a silent write), while
+ * `control` keeps the fine-grained get/set pair: `set(value, false)` (and `lay` / `silentSet`)
+ * updates the value without re-rendering, and `peek` / `untrackedGet` read it back — in React there
+ * is no dependency tracking during render, so those are plain aliases for the current value.
+ * `reset()` (a small addition, upstream has no equivalent) restores the initial value and
+ * participates in the change callbacks (`onBeforeChange` can dismiss it, `onChanged` fires when
+ * accepted). Option names are kept from upstream: `onBeforeChange` can dismiss a change by
+ * returning `false`, and `onChanged` fires synchronously after an accepted change.
  *
- * @param   state    State source: a plain value, getter, ref-like value, state
- *                   tuple, or `{ value, onChange }` controllable state.
+ * @param   state    State source: a plain value, getter, state tuple, or
+ *                   `{ value, onChange }` controllable state.
  * @param   options
  * @return  A tuple `[value, setValue, control]` — the current value, a
  *          `setState`-like setter and the fine-grained control object.

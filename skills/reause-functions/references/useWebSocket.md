@@ -306,12 +306,12 @@ type WebSocketUrl = string | URL | undefined
  *   refs), and `close()` runs on unmount when `autoClose` is on (upstream:
  *   `tryOnScopeDispose`), including the `beforeunload` listener;
  * - `url` accepts a plain value or a ref-like `{ current }` object
- *   (upstream: `RefOrValue`); when `autoConnect` is on, a URL change between
+ *   (upstream: `MaybeRefOrGetter`); when `autoConnect` is on, a URL change between
  *   renders reconnects, mirroring upstream's `watch(urlRef, open)` — the
  *   initial connection is still only opened once by `immediate`;
  * - `heartbeat.message` / `responseMessage` accept a plain value, a ref-like
  *   `{ current }` object or a message factory function, resolved on every
- *   tick via `toValue` (upstream: `RefOrValue`); the default scheduler is a
+ *   tick via `toValue` (upstream: `MaybeRefOrGetter`); the default scheduler is a
  *   local `setInterval`-based `{ pause, resume }` pair instead of upstream's
  *   `useIntervalFn` default (which is a hook and cannot be created lazily),
  *   and — like upstream's `{ immediate: false }` default — it stays inert

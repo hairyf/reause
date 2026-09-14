@@ -1,8 +1,8 @@
-import type { RefOrValue } from '@reause/shared'
+import type { RefObject } from 'react'
 import type { PointerType } from '../usePointer'
 import type { UseSwipeDirection } from '../useSwipe'
-import { toValue } from '@reause/shared'
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { unrefElement } from '../unrefElement'
 
 interface Position {
   x: number
@@ -74,27 +74,20 @@ function getSwipeDirection(start: Position, end: Position, threshold: number): U
  * [`PointerEvents`](https://developer.mozilla.org/en-US/docs/Web/API/PointerEvent).
  *
  * Map from @vueuse/core `usePointerSwipe`
- * React port of VueUse's `usePointerSwipe`
  * (`source/vueuse/packages/core/usePointerSwipe/`), which tracks
- * `pointerdown` / `pointermove` / `pointerup` + `pointercancel` on the target
- * and derives the swipe `direction` once `max(|dx|, |dy|)` crosses
- * `threshold` (default `50`), comparing the axes: `|dx| > |dy|` decides
- * `left`/`right`, otherwise `up`/`down`. Below the threshold the direction
- * stays `'none'` and `isSwiping` stays `false` — `onSwipeEnd` only fires for
- * swipes that actually crossed the threshold (like upstream).
+ * `pointerdown` / `pointermove` / `pointerup` + `pointercancel` on the target and derives the swipe
+ * `direction` once `max(|dx|, |dy|)` crosses `threshold` (default `50`), comparing the axes: `|dx|
+ * > |dy|` decides `left`/`right`, otherwise `up`/`down`. Below the threshold the direction stays
+ * `'none'` and `isSwiping` stays `false` — `onSwipeEnd` only fires for swipes that actually crossed
+ * the threshold (like upstream).
  *
- * React divergences:
- *
- * - the Vue return object (`isSwiping` shallow ref, `direction` / `distanceX`
- *   / `distanceY` computeds, reactive `posStart` / `posEnd`) becomes a plain
- *   object of plain values backed by state, derived during render — the
- *   pointer listeners live in a self-contained `useEffect` (upstream composes
- *   `useEventListener`) and are removed on unmount;
- * - `target` accepts an element or a ref-like `{ current }` object
- *   (React equivalent of `RefOrValue`). It is re-resolved on every
- *   render and the listeners re-bind when the resolved element changes;
- *   ref-likes are re-read at bind time, so a `useRef` target that is `null`
- *   during first render still binds once React attaches the element;
+ * - the Vue return object (`isSwiping` shallow ref, `direction` / `distanceX` / `distanceY`
+ * computeds, reactive `posStart` / `posEnd`) becomes a plain object of plain values backed by
+ * state, derived during render —;
+ * - `target` accepts a React ref object (`RefObject`) holding the element (React equivalent of
+ * `MaybeRefOrGetter`). It is re-resolved on every render and the listeners re-bind when the
+ * resolved element changes; the ref's `.current` is re-read at bind time, so a `useRef` target that
+ * is `null` during first render still binds once React attaches the element.
  * - `onSwipeStart` / `onSwipe` / `onSwipeEnd` are read through latest-value
  *   refs, so the listeners always call the newest callbacks without
  *   re-binding on renders;
@@ -107,8 +100,8 @@ function getSwipeDirection(start: Position, end: Position, threshold: number): U
  *   attach and the `touch-action` / `user-select` styles are applied in the
  *   mount effect only.
  *
- * @param target - element or ref-like `{ current }` object returning
- *   the element to listen on
+ * @param target - React ref object (`RefObject`) holding the element to
+ *   listen on, resolved with the shared `unrefElement`
  * @param options - `threshold` (default `50`), `pointerTypes` (default
  *   `['mouse', 'touch', 'pen']`), `disableTextSelect` (default `false`) and
  *   the `onSwipeStart` / `onSwipe` / `onSwipeEnd` callbacks
@@ -121,7 +114,7 @@ function getSwipeDirection(start: Position, end: Position, threshold: number): U
  * })
  */
 export function usePointerSwipe(
-  target: RefOrValue<HTMLElement | null | undefined>,
+  target: RefObject<HTMLElement | null | undefined>,
   options: UsePointerSwipeOptions = {},
 ): UsePointerSwipeReturn {
   const { threshold = 50, disableTextSelect = false } = options
@@ -147,9 +140,9 @@ export function usePointerSwipe(
   const detachRef = useRef<(() => void) | null>(null)
 
   // dependency-tracking read: refs populate before effects run, so the first
-  // render reports `null` for ref-like targets — the effect below re-resolves
+  // render reports `null` for the ref's `.current` — the effect below re-resolves
   // fresh and re-binds whenever the resolved element changes
-  const trackedTarget = toValue(target)
+  const trackedTarget = target
 
   const stop = useCallback(() => {
     stoppedRef.current = true
@@ -161,7 +154,7 @@ export function usePointerSwipe(
     if (stoppedRef.current)
       return
 
-    const el = toValue(targetRef.current)
+    const el = unrefElement(targetRef.current)
     if (!el)
       return
 

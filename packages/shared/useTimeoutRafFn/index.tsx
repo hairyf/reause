@@ -2,10 +2,9 @@ import { useLatest } from '@reause/shared'
 import { useCallback, useEffect, useRef } from 'react'
 
 /**
- * A scheduled frame-aligned timeout. `id` is a frame handle when the
- * `requestAnimationFrame` branch is active and a `setTimeout` handle when the
- * environment downgrades — the tagged single-field shape ahooks uses, so the
- * clear path can re-derive which canceller belongs to the handle the way
+ * A scheduled frame-aligned timeout. `id` is a frame handle when the `requestAnimationFrame` branch
+ * is active and a `setTimeout` handle when the environment downgrades — the tagged single-field
+ * shape ahooks uses, so the clear path can re-derive which canceller belongs to the handle the way
  * upstream does.
  */
 interface Handle {
@@ -13,22 +12,20 @@ interface Handle {
 }
 
 /**
- * ahooks' own `isNumber` (`packages/hooks/src/utils/index.ts`): a number that
- * is not `NaN`. Kept local because `@reause/shared` has no equivalent export —
- * `NaN` fails it on purpose, so a `NaN` delay disables the timeout instead of
- * arming one that could never fire.
+ * ahooks' own `isNumber` (`packages/hooks/src/utils/index.ts`): a number that is not `NaN`. Kept
+ * local because `@reause/shared` has no equivalent export — `NaN` fails it on purpose, so a `NaN`
+ * delay disables the timeout instead of arming one that could never fire.
  */
 function isNumber(value: unknown): value is number {
   return typeof value === 'number' && !Number.isNaN(value)
 }
 
 /**
- * Arm a **one-shot** frame-aligned timeout: `startTime` is captured once, and
- * each frame only checks `Date.now() - startTime >= delay`. The first frame at
- * or after `delay` runs the callback and schedules **no** further frame, so the
- * timeout stops by construction rather than being cancelled. When
- * `requestAnimationFrame` is undefined the call downgrades to a plain
- * `setTimeout`, which is what makes the hook usable during a server render.
+ * Arm a **one-shot** frame-aligned timeout: `startTime` is captured once, and each frame only
+ * checks `Date.now() - startTime >= delay`. The first frame at or after `delay` runs the callback
+ * and schedules **no** further frame, so the timeout stops by construction rather than being
+ * cancelled. When `requestAnimationFrame` is undefined the call downgrades to a plain `setTimeout`,
+ * which is what makes the hook usable during a server render.
  */
 function setRafTimeout(callback: () => void, delay: number = 0): Handle {
   if (typeof requestAnimationFrame === 'undefined') {
@@ -58,9 +55,9 @@ function setRafTimeout(callback: () => void, delay: number = 0): Handle {
 }
 
 /**
- * Upstream classifies the handle by asking whether `cancelAnimationFrame`
- * exists — not by remembering which branch armed it. Preserved as-is (a
- * mirroring quirk, see the hook's note below).
+ * Upstream classifies the handle by asking whether `cancelAnimationFrame` exists — not by
+ * remembering which branch armed it. Preserved as-is (a mirroring quirk, see the hook's note
+ * below).
  */
 function cancelAnimationFrameIsNotDefined(_id: Handle['id']): _id is ReturnType<typeof setTimeout> {
   return typeof cancelAnimationFrame === 'undefined'
@@ -75,16 +72,15 @@ function clearRafTimeout(handle: Handle) {
 }
 
 /**
- * Fire `fn` once, on the first animation frame at or after `delay`
- * milliseconds, and return a stable `clear` that cancels the pending timeout.
+ * Fire `fn` once, on the first animation frame at or after `delay` milliseconds, and return a
+ * stable `clear` that cancels the pending timeout.
  *
  * Map from ahooks `useRafTimeout`
  * (`source/ahooks/packages/hooks/src/useRafTimeout/`). Mirrored directly
- * (AGENTS.md §1.1, React source ⇒ direct mirror) apart from the required
- * rename to `useTimeoutRafFn`, which aligns the export with the existing
- * `useTimeoutFn` in `@reause/shared`; the JSDoc marker keeps upstream's symbol
- * name. Upstream ships this hook as a default export, reause exports it by
- * name.
+ * (AGENTS.md §1.1, React source ⇒ direct mirror) apart from the required rename to
+ * `useTimeoutRafFn`, which aligns the export with the existing `useTimeoutFn` in `@reause/shared`;
+ * the JSDoc marker keeps upstream's symbol name. Upstream ships this hook as a default export,
+ * reause exports it by name.
  *
  * Semantics worth stating, because they differ from the interval sibling:
  * - **one-shot.** `startTime` is captured once when the timeout is armed and is
@@ -102,12 +98,9 @@ function clearRafTimeout(handle: Handle) {
  *   `NaN` and any negative number return before arming anything, so nothing is
  *   scheduled and nothing can fire. Changing `delay` to such a value cancels
  *   the timeout armed by the previous value (effect cleanup).
- * - **dual branch.** With no `requestAnimationFrame` (a server render, or any
- *   frame-less host) the timeout downgrades to `setTimeout(fn, delay)`. The
- *   clear path mirrors upstream's classifier: it looks at
- *   `typeof cancelAnimationFrame`, so an environment that has one global but
- *   not the other mis-classifies the handle exactly as upstream does — a
- *   preserved quirk, not a divergence.
+ * - **dual branch.** With no `requestAnimationFrame` (a server render, or any frame-less host) the
+ * timeout downgrades to `setTimeout(fn, delay)`. The clear path, so an environment that has one
+ * global but not the other mis-classifies the handle, not a divergence.
  * - **`fn` is read through `@reause/shared`'s `useLatest`** (the merged
  *   react-use port), and the arming effect depends on `delay` alone. A
  *   re-render carrying a new inline callback therefore neither restarts the
@@ -119,10 +112,9 @@ function clearRafTimeout(handle: Handle) {
  *   Extracting a shared draw-loop helper is deferred until #941 lands, rather
  *   than invented here for a single caller.
  *
- * Not a duplicate of `useTimeoutFn` (VueUse's `useTimeoutFn`, also in
- * `@reause/shared`): that one is a plain `setTimeout` with controls
- * (`{ isPending, start, stop }`, manually restartable and re-armable as often
- * as wanted); this is the frame-aligned, one-shot variant — it fires only when
+ * Not a duplicate of `useTimeoutFn` (VueUse's `useTimeoutFn`, also in `@reause/shared`): that one
+ * is a plain `setTimeout` with controls (`{ isPending, start, stop }`, manually restartable and
+ * re-armable as often as wanted); this is the frame-aligned, one-shot variant — it fires only when
  * the page is actually rendering and cannot be restarted, only cleared.
  *
  * @example

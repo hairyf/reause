@@ -66,17 +66,18 @@ describe('useZoomFactor', () => {
     expect(webFrame.setZoomFactor).toHaveBeenLastCalledWith(3)
   })
 
-  it('accepts a React ref as the factor source', async () => {
+  it('accepts a plain-number factor source', async () => {
     const webFrame = createWebFrame(1)
-    const factor = { current: 2 }
 
-    const { result, rerender } = await renderHook(() => useZoomFactor(asWebFrame(webFrame), factor))
+    const { result, rerender } = await renderHook(
+      ({ factor }: { factor: number } = { factor: 2 }) => useZoomFactor(asWebFrame(webFrame), factor),
+      { initialProps: { factor: 2 } },
+    )
 
     expect(result.current[0]).toBe(2)
     expect(webFrame.setZoomFactor).toHaveBeenCalledWith(2)
 
-    factor.current = 3
-    await rerender()
+    await rerender({ factor: 3 })
 
     expect(result.current[0]).toBe(3)
     expect(webFrame.setZoomFactor).toHaveBeenLastCalledWith(3)
@@ -132,19 +133,19 @@ describe('useZoomFactor', () => {
       .toThrow('the factor must be greater than 0.0.')
   })
 
-  it('throws when a ref factor transitions to 0 mid-flight', async () => {
+  it('throws when a plain-number factor transitions to 0 mid-flight', async () => {
     const webFrame = createWebFrame(1)
-    const factor = { current: 2 }
 
-    const { result, rerender } = await renderHook(() => useZoomFactor(asWebFrame(webFrame), factor))
+    const { result, rerender } = await renderHook(
+      ({ factor }: { factor: number } = { factor: 2 }) => useZoomFactor(asWebFrame(webFrame), factor),
+      { initialProps: { factor: 2 } },
+    )
 
     expect(result.current[0]).toBe(2)
     expect(webFrame.setZoomFactor).toHaveBeenCalledWith(2)
 
-    factor.current = 0
-
     // the render-time guard rejects on the next render, before any write
-    await expect(rerender()).rejects.toThrow('the factor must be greater than 0.0.')
+    await expect(rerender({ factor: 0 })).rejects.toThrow('the factor must be greater than 0.0.')
   })
 
   it('throws the upstream message when the setter is called with 0', async () => {

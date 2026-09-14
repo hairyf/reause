@@ -33,7 +33,7 @@ function App() {
 }
 ```
 
-`syncState` is a hook: call it unconditionally at the top level of a component (or another hook). Each side accepts any shared `State<T>` — a plain value, a getter, a ref-like `{ current }`, a `[value, setter]` tuple or a `{ value, onChange }` pair. Values are read with `toValue` and written back through the side's writable form (tuple setter, `onChange` callback or `.current`); a plain value or getter has no write path, so that side is treated as read-only (the sync becomes one-way for it).
+`syncState` is a hook: call it unconditionally at the top level of a component (or another hook). Each side accepts any shared `State<T>` — a plain value, a getter, a `[value, setter]` tuple or a `{ value, onChange }` pair. Values are read with `toValue` and written back through the side's writable form (tuple setter or `onChange` callback); a plain value or getter has no write path, so that side is treated as read-only (the sync becomes one-way for it).
 
 ### One directional
 
@@ -161,10 +161,10 @@ export interface SyncStateOptions<L, R, D extends SyncStateDirection = "both"> {
  * Map from @vueuse/shared `syncRef`
  * (`source/vueuse/packages/shared/syncRef/`), renamed `syncState` for the
  * React port: the two sides are `State<T>` sources — a `[value, setter]`
- * tuple, a `{ value, onChange }` pair, a ref-like `{ current }`, a getter or
- * a plain value — instead of Vue refs. Each side is read with `toValue` and
- * written back through its writable form (tuple setter / `onChange` /
- * `.current`); plain values and getters have no write path, so that side is
+ * tuple, a `{ value, onChange }` pair, a getter or a plain value — instead of
+ * Vue refs. Each side is read with `toValue` and
+ * written back through its writable form (tuple setter / `onChange`);
+ * plain values and getters have no write path, so that side is
  * treated as read-only (the sync becomes one-way for it).
  *
  * React Hook adaptation: upstream drives both sides through Vue's reactive
@@ -175,19 +175,18 @@ export interface SyncStateOptions<L, R, D extends SyncStateDirection = "both"> {
  * value with the last observed one via `Object.is` and mirrors the changed
  * side into the other — through the optional `transform` convertors when
  * given — recording the value it just wrote as already observed on the
- * receiving side (the React analogue of upstream's pause/resume). Ref-like
- * `.current` writes are synchronous and need no absorption; writes through a
- * setter / `onChange` are asynchronous, so until the target's value reflects
- * the write the stale pre-write value is absorbed and never mistaken for an
- * external change. Read-only sides (plain values / getters) are never marked
- * as written, so a changing source keeps propagating. The initial sync
+ * receiving side (the React analogue of upstream's pause/resume). Writes
+ * through a setter / `onChange` are asynchronous, so until the target's value
+ * reflects the write the stale pre-write value is absorbed and never mistaken
+ * for an external change. Read-only sides (plain values / getters) are never
+ * marked as written, so a changing source keeps propagating. The initial sync
  * (upstream default `immediate: true`) runs in the mount effect and cascades
  * ltr before rtl,
  * matching upstream's watcher creation order. Because the observation happens
  * post-commit, an external mutation is only adopted on the render that
- * follows it — the mutation itself never schedules a render, so a bare
- * `.current` write outside of React is not observed (see the maintainer
- * notes on reause #40 / #41). The returned `stop` function tears the
+ * follows it — the mutation itself never schedules a render, so a write made
+ * outside of React is only observed once something else re-renders (see the
+ * maintainer notes on reause #40 / #41). The returned `stop` function tears the
  * synchronization down; the effect also stops doing any work once the owning
  * component unmounts.
  *

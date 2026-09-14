@@ -1,5 +1,5 @@
-import type { ConfigurableWindow, RefOrValue } from '@reause/shared'
-import { increaseWithUnit, pxValue, toValue } from '@reause/shared'
+import type { ConfigurableWindow } from '@reause/shared'
+import { increaseWithUnit, pxValue } from '@reause/shared'
 import { useEffect, useRef } from 'react'
 import { useMediaQuery } from '../useMediaQuery'
 import { useSSRWidth } from '../useSSRWidth'
@@ -149,14 +149,15 @@ export const breakpointsElement = {
   xl: 1920,
 }
 
-export type Breakpoints<K extends string = string> = Record<K, RefOrValue<number | string>>
+export type Breakpoints<K extends string = string> = Record<K, number | string>
 
 export interface UseBreakpointsOptions extends ConfigurableWindow {
   /**
    * The query strategy to use for the generated shortcut methods like `.lg`
    *
-   * 'min-width' - .lg will be true when the viewport is greater than or equal to the lg breakpoint (mobile-first)
-   * 'max-width' - .lg will be true when the viewport is smaller than the xl breakpoint (desktop-first)
+   * 'min-width' -.lg will be true when the viewport is greater than or equal to the lg breakpoint
+   * (mobile-first) 'max-width' -.lg will be true when the viewport is smaller than the xl
+   * breakpoint (desktop-first)
    *
    * @default "min-width"
    */
@@ -165,49 +166,43 @@ export interface UseBreakpointsOptions extends ConfigurableWindow {
 }
 
 export type UseBreakpointReturn<K extends string = string> = Record<K, boolean> & {
-  greaterOrEqual: (k: RefOrValue<K>) => boolean
-  smallerOrEqual: (k: RefOrValue<K>) => boolean
-  greater: (k: RefOrValue<K>) => boolean
-  smaller: (k: RefOrValue<K>) => boolean
-  between: (a: RefOrValue<K>, b: RefOrValue<K>) => boolean
-  isGreater: (k: RefOrValue<K>) => boolean
-  isGreaterOrEqual: (k: RefOrValue<K>) => boolean
-  isSmaller: (k: RefOrValue<K>) => boolean
-  isSmallerOrEqual: (k: RefOrValue<K>) => boolean
-  isInBetween: (a: RefOrValue<K>, b: RefOrValue<K>) => boolean
+  greaterOrEqual: (k: K) => boolean
+  smallerOrEqual: (k: K) => boolean
+  greater: (k: K) => boolean
+  smaller: (k: K) => boolean
+  between: (a: K, b: K) => boolean
+  isGreater: (k: K) => boolean
+  isGreaterOrEqual: (k: K) => boolean
+  isSmaller: (k: K) => boolean
+  isSmallerOrEqual: (k: K) => boolean
+  isInBetween: (a: K, b: K) => boolean
   current: () => K[]
   active: () => K | ''
 }
 
 /**
- * React port of VueUse's `useBreakpoints`.
- *
  * Map from @vueuse/core `useBreakpoints`
  * (`source/vueuse/packages/core/useBreakpoints/`), which composes
- * `useMediaQuery` per breakpoint key and returns an object of shortcut
- * methods (`.sm`, `.md`, ...) plus comparison helpers. Reactively viewport
- * breakpoints — an object mirror (not a tuple): every breakpoint key
- * becomes a plain boolean, e.g. `breakpoints.md` is `true` while the
- * viewport is `>= 768px` (with the default `min-width` strategy).
+ * `useMediaQuery` per breakpoint key and returns an object of shortcut methods (`.sm`, `.md`...)
+ * plus comparison helpers. Reactively viewport breakpoints — an object mirror (not a tuple): every
+ * breakpoint key becomes a plain boolean, e.g. `breakpoints.md` is `true` while the viewport is `>=
+ * 768px` (with the default `min-width` strategy).
  *
  * React divergences:
- * - upstream's shortcut properties are `Object.defineProperty` getters that
- *   lazily create a `useMediaQuery` `ComputedRef`; React hooks cannot be
- *   created at property-read time, so `useBreakpoints` eagerly creates four
- *   `useMediaQuery` queries per key (min/max, each with the ±0.1 delta that
- *   separates strict/equal comparisons) and exposes the resulting plain
- *   booleans. The dynamic-key methods (`greaterOrEqual('sm')`, ...) return
- *   booleans from the current render, so the `breakpoints` map and the keys
- *   passed to the methods must stay stable across renders (the number of
- *   media queries cannot change between renders);
+ * - upstream's shortcut properties are `Object.defineProperty` getters that lazily create a
+ * `useMediaQuery` `ComputedRef`; React hooks cannot be created at property-read time, so
+ * `useBreakpoints` eagerly creates four `useMediaQuery` queries per key (min/max, each with the
+ * ±0.1 delta that separates strict/equal comparisons) and exposes the resulting plain booleans. The
+ * dynamic-key methods (`greaterOrEqual('sm')`...) return booleans from the current render, so the
+ * `breakpoints` map and the keys passed to the methods must stay stable across renders (the number
+ * of media queries cannot change between renders);
  * - upstream's `current()`/`active()` `computed` values become plain
  *   functions recomputed from the current render's booleans, so they stay
  *   in sync with media query changes (components re-render when the
  *   underlying `useMediaQuery` state flips);
- * - the `is*` helpers evaluate `window.matchMedia().matches` synchronously
- *   (non-reactive, matching upstream) and fall back to `ssrWidth`
- *   comparisons while the `matchMedia` query is unavailable (SSR / custom
- *   `window: null`);
+ * - the `is*` helpers evaluate `window.matchMedia().matches` synchronously (non-reactive, matching
+ * upstream) and fall back to `ssrWidth` comparisons while the `matchMedia` query is unavailable
+ * (SSR / custom `window: null`);
  * - SSR via the `ssrWidth` option is evaluated inside the `useMediaQuery`
  *   mount effects, so the server renders the `false`/empty default without
  *   touching `window` and the simulated values appear after hydration —
@@ -233,16 +228,13 @@ export function useBreakpoints<K extends string>(
   breakpoints: Breakpoints<K>,
   options: UseBreakpointsOptions = {},
 ): UseBreakpointReturn<K> {
-  function getValue(k: RefOrValue<K>, delta?: number) {
-    let v = toValue(breakpoints[toValue(k)])
+  function getValue(k: K, delta?: number): string {
+    let v = breakpoints[k]
 
     if (delta != null)
       v = increaseWithUnit(v, delta)
 
-    if (typeof v === 'number')
-      v = `${v}px`
-
-    return v
+    return typeof v === 'number' ? `${v}px` : v
   }
 
   const { window: windowOption, strategy = 'min-width', ssrWidth: ssrWidthOption } = options
@@ -299,12 +291,12 @@ export function useBreakpoints<K extends string>(
     maxMinusWidths[k] = useMediaQuery(`(max-width: ${getValue(k, -0.1)})`, mediaOptions)
   }
 
-  const greaterOrEqual = (k: RefOrValue<K>) => minWidths[toValue(k)]
-  const smallerOrEqual = (k: RefOrValue<K>) => maxWidths[toValue(k)]
-  const greater = (k: RefOrValue<K>) => minPlusWidths[toValue(k)]
-  const smaller = (k: RefOrValue<K>) => maxMinusWidths[toValue(k)]
-  const between = (a: RefOrValue<K>, b: RefOrValue<K>) =>
-    minWidths[toValue(a)] && maxMinusWidths[toValue(b)]
+  const greaterOrEqual = (k: K) => minWidths[k]
+  const smallerOrEqual = (k: K) => maxWidths[k]
+  const greater = (k: K) => minPlusWidths[k]
+  const smaller = (k: K) => maxMinusWidths[k]
+  const between = (a: K, b: K) =>
+    minWidths[a] && maxMinusWidths[b]
 
   const shortcutMethods = {} as Record<K, boolean>
   keys.forEach((k) => {
@@ -325,11 +317,11 @@ export function useBreakpoints<K extends string>(
     greater,
     smaller,
     between,
-    isGreater: (k: RefOrValue<K>) => match('min', getValue(k, 0.1)),
-    isGreaterOrEqual: (k: RefOrValue<K>) => match('min', getValue(k)),
-    isSmaller: (k: RefOrValue<K>) => match('max', getValue(k, -0.1)),
-    isSmallerOrEqual: (k: RefOrValue<K>) => match('max', getValue(k)),
-    isInBetween: (a: RefOrValue<K>, b: RefOrValue<K>) =>
+    isGreater: (k: K) => match('min', getValue(k, 0.1)),
+    isGreaterOrEqual: (k: K) => match('min', getValue(k)),
+    isSmaller: (k: K) => match('max', getValue(k, -0.1)),
+    isSmallerOrEqual: (k: K) => match('max', getValue(k)),
+    isInBetween: (a: K, b: K) =>
       match('min', getValue(a)) && match('max', getValue(b, -0.1)),
     current,
     active() {

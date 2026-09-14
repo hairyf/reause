@@ -8,23 +8,19 @@ export function useSessionStorage<T>(key: string, initialValue: T | (() => T), o
 export function useSessionStorage<T = unknown>(key: string, initialValue: null, options?: UseStorageOptions<T>): UseStorageReturn<T>
 
 /**
- * React port of VueUse's `useSessionStorage`.
- *
  * Map from @vueuse/core `useSessionStorage`
  * (`source/vueuse/packages/core/useSessionStorage/`), which is a thin wrapper
  * over `useStorage` bound to `window.sessionStorage`. Reactive
- * [SessionStorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage) —
- * the value is persisted under `key`, re-read on mount and key change, and
- * kept in sync across hook instances sharing the same key.
+ * [SessionStorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage) — the
+ * value is persisted under `key`, re-read on mount and key change, and kept in sync across hook
+ * instances sharing the same key.
  *
- * This hook has **no logic of its own** — it is a thin wrapper delegating to
- * `useStorage` (already ported) with `window.sessionStorage` as the backend:
- * `useStorage(key, initialValue, window.sessionStorage, options)`. All
- * serialization (type-guessed `StorageSerializers` or a custom `serializer`),
- * `writeDefaults` / `mergeDefaults`, same-document sync through synthetic
- * `storage` events and `onError` handling live in `useStorage`, mirroring
- * upstream where `useSessionStorage` calls `useStorage(key, initialValue,
- * window?.sessionStorage, options)`.
+ * This hook has **no logic of its own** — it is a thin wrapper delegating to `useStorage` (already
+ * ported) with `window.sessionStorage` as the backend: `useStorage(key, initialValue,
+ * window.sessionStorage, options)`. All serialization (type-guessed `StorageSerializers` or a
+ * custom `serializer`), `writeDefaults` / `mergeDefaults`, same-document sync through synthetic
+ * `storage` events and `onError` handling live in `useStorage`, mirroring upstream where
+ * `useSessionStorage` calls `useStorage(key, initialValue, window?.sessionStorage, options)`.
  *
  * React divergences (inherited from `useStorage`):
  * - the Vue `RemovableRef<T>` return becomes a `useState`-backed tuple
@@ -37,7 +33,7 @@ export function useSessionStorage<T = unknown>(key: string, initialValue: null, 
  *   replaces it after hydration;
  * - `key` is a plain React string that can change between renders — a key
  *   change re-reads the new key (upstream takes a reactive
- *   `RefOrValue` key). Writes always go to the key of the current
+ *   `MaybeRefOrGetter` key). Writes always go to the key of the current
  *   render, and when `writeDefaults` is on, a new key with no stored value is
  *   seeded with the initial value;
  * - Vue reactivity options have no React equivalent and are omitted:

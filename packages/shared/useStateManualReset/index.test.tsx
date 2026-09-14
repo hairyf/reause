@@ -65,16 +65,16 @@ it('useStateManualReset supports a state tuple', async () => {
   expect(value).toBe('default')
 })
 
-it('useStateManualReset restores a ref-like default', async () => {
-  const defaultValue = { current: 'default' }
-  const { result, act } = await renderHook(() => useStateManualReset(defaultValue))
+it('useStateManualReset restores a lazy-getter default', async () => {
+  const defaultValue = 'default'
+  const { result, act } = await renderHook(() => useStateManualReset(() => defaultValue))
 
   expect(result.current[0]).toBe('default')
 
   await act(() => result.current[1]('update'))
   expect(result.current[0]).toBe('update')
 
-  // the source ref stays constant — only the displayed value changed, so a
+  // the getter source stays constant — only the displayed value changed, so a
   // restore can only come from `reset` (the passive sync has nothing to push)
   await act(() => result.current[2]())
   expect(result.current[0]).toBe('default')

@@ -4,7 +4,7 @@ category: Component
 
 # unrefElement
 
-Get the DOM element of a React ref-like object or a plain element
+Get the DOM element a React ref object currently holds
 
 ## Usage
 
@@ -21,10 +21,11 @@ useEffect(() => {
 
 ## React divergences
 
-- **Callback refs are not supported.** VueUse accepts getters (`MaybeRefOrGetter`), but React's
-  callback ref (`ref={(el) => { ... }}`) is a function and `toValue` _invokes_ functions instead of
-  resolving them — a callback ref would be called with no arguments and never yield a DOM node.
-  `unrefElement` therefore accepts only an element or a `{ current }` ref object (`RefObject`); the
-  `RefCallback` arm is rejected at the type level. Use `useRef` when you need to pass a ref.
+- **Refs only — no plain elements or getters.** Upstream accepts `MaybeRefOrGetter`, but reause binds
+  DOM targets to React refs: the input is a `RefObject` and `unrefElement` resolves it to `.current`
+  (`undefined` when empty). A plain element or a zero-argument getter is rejected at the type level —
+  hold the element in a `useRef` instead.
+- **Callback refs are not supported.** React's callback ref (`ref={(el) => { ... }}`) is a function and
+  cannot be read synchronously, so the `RefCallback` arm is rejected at the type level too.
 - **No Vue component instances.** React refs hold DOM nodes directly, so upstream's `$el` unwrap and
   the `VueInstance` members of `MaybeElement` have no equivalent here.

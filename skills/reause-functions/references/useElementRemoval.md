@@ -128,7 +128,7 @@ export type UseElementRemovalReturn = () => void
  * stop()
  */
 export declare function useElementRemoval(
-  target: RefOrValue<Element | null | undefined>,
+  target: RefObject<Element | null | undefined>,
   callback: (mutationRecords: MutationRecord[]) => void,
   options?: UseElementRemovalOptions,
 ): UseElementRemovalReturn

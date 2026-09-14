@@ -99,12 +99,14 @@ describe('useTextareaAutosize', () => {
     expect(node.style.height).toBe('')
   })
 
-  it('should accept a plain element and a plain styleTarget', async () => {
+  it('should accept ref objects for element and styleTarget', async () => {
     const node = document.createElement('textarea')
     Object.defineProperty(node, 'scrollHeight', { configurable: true, value: 90 })
     const styleTarget = document.createElement('div')
+    const element: RefObject<HTMLTextAreaElement | null> = { current: node }
+    const styleTargetRef: RefObject<HTMLElement | null> = { current: styleTarget }
 
-    await renderHook(() => useTextareaAutosize({ element: node, styleTarget }))
+    await renderHook(() => useTextareaAutosize({ element, styleTarget: styleTargetRef }))
 
     expect(styleTarget.style.height).toBe('90px')
     expect(node.style.height).toBe('')

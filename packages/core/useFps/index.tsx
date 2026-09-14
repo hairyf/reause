@@ -15,8 +15,8 @@ export interface UseFpsOptions {
  *
  * Map from @vueuse/core `useFps`
  * (`source/vueuse/packages/core/useFps/`): counts `requestAnimationFrame`
- * ticks and reports the rounded frame rate once `every` frames (default 10)
- * have elapsed, driven by the shared `useRafFn` frame loop.
+ * ticks and reports the rounded frame rate once `every` frames (default 10) have elapsed, driven by
+ * the shared `useRafFn` frame loop.
  *
  * React divergences:
  * - the upstream `ShallowRef<number>` becomes a plain number state

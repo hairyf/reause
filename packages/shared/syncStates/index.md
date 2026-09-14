@@ -29,7 +29,7 @@ function Form() {
 }
 ```
 
-`syncStates` is a hook: call it unconditionally at the top level of a component (or another hook). The `source` is a `State<T>` resolved with `toValue` — a plain value, a getter, a ref-like `{ current }`, a `[value, setter]` tuple or a `{ value, onChange }` pair; the effect compares it after every commit and writes changes into each target. Targets are writable `State<T>` sources, written back through their writable form (tuple setter, `onChange` callback or `.current`); pair ref-likes with a state bridge (e.g. `{ get current() { return state }, set current(v) { setState(v) } }`) so the synced values become visible on the re-renders that follow them.
+`syncStates` is a hook: call it unconditionally at the top level of a component (or another hook). The `source` is a `State<T>` resolved with `toValue` — a plain value, a getter, a `[value, setter]` tuple or a `{ value, onChange }` pair; the effect compares it after every commit and writes changes into each target. Targets are writable `State<T>` sources, written back through their writable form (tuple setter or `onChange` callback); a plain value or getter has no write path and is treated as read-only.
 
 ### Sync with multiple targets
 

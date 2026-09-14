@@ -32,8 +32,8 @@ useEffect(() => {
 ### Source Forms
 
 `src` and `tracks` are read-only value sources and take plain values (upstream:
-`MaybeRefOrGetter`). Resolve a React ref or state value at the call site; the element `target` stays
-a plain element or React ref (`RefOrValue`) because it is a DOM target, not a value source:
+`MaybeRefOrGetter`). Resolve a React ref or state value at the call site; the element `target` is a
+React ref (`RefObject`) because it is a DOM target, not a value source:
 
 ```tsx
 const [src, setSrc] = useState('video.mp4')
@@ -214,7 +214,7 @@ export interface UseMediaTextTrack {
  * `current` is populated after mount) — the React analog of upstream's
  * media-element target.
  */
-export type UseMediaControlsTarget = RefOrValue<
+export type UseMediaControlsTarget = RefObject<
   HTMLMediaElement | null | undefined
 >
 export interface UseMediaControlsReturn {
@@ -291,7 +291,7 @@ type EventHookOn<T = any> = (fn: (param: T) => void) => () => void
  *    `options.tracks` are read-only value sources and take plain values
  *    (upstream: `MaybeRefOrGetter`; resolve a React ref or getter at the call
  *    site). The `target` element param stays
- *    `RefOrValue<HTMLMediaElement | null | undefined>` (a DOM target, not a
+ *    `MaybeRefOrGetter<HTMLMediaElement | null | undefined>` (a DOM target, not a
  *    value source).
  * 5. `supportsPictureInPicture` is resolved once at setup (upstream reads a
  *    computed at setup too) and state defaults (`volume: 1`, `muted: false`,

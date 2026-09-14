@@ -157,11 +157,9 @@ export interface UseAnimateOptions
 /**
  * Animation keyframes — an array of keyframe objects, a keyframe object, or
  * `null` (see [Keyframe Formats](https://developer.mozilla.org/en-US/docs/Web/API/Web_Animations_API/Keyframe_Formats)),
- * accepted as a plain value or a ref-like `{ current }` object (a React ref).
+ * as a plain value.
  */
-export type UseAnimateKeyframes = RefOrValue<
-  Keyframe[] | PropertyIndexedKeyframes | null
->
+export type UseAnimateKeyframes = Keyframe[] | PropertyIndexedKeyframes | null
 /**
  * Return of `useAnimate`. Mirrors the upstream `UseAnimateReturn` member by
  * member; the upstream Vue refs become plain values:
@@ -233,9 +231,8 @@ export interface UseAnimateReturn {
  * - the returned `ComputedRef` / `WritableComputedRef` members become plain
  *   values re-rendered per frame — the writable setters (e.g. seeking through
  *   `currentTime`) are dropped, use the returned `animate` object for that;
- * - `keyframes` re-resolves with `toValue` on every render and is compared
- *   with deep equality, so a ref-like `{ current }` object keyframes input
- *   updates live without an explicit subscription while a deep-equal
+ * - `keyframes` is re-read on every render and is compared
+ *   with deep equality, so a deep-equal
  *   reassignment (e.g. reordered keys) stays silent (upstream: a deep
  *   watcher);
  * - `isSupported` is plain `boolean` state settled in the mount effect

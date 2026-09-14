@@ -29,13 +29,11 @@ export interface UseAsyncQueueOptions {
 
   /**
    * Trigger it when the tasks fails.
-   *
    */
   onError?: () => void
 
   /**
    * Trigger it when the tasks ends.
-   *
    */
   onFinished?: () => void
 
@@ -50,9 +48,9 @@ export interface UseAsyncQueueOptions {
  *
  * Map from @vueuse/core `useAsyncQueue`
  * (`source/vueuse/packages/core/useAsyncQueue/`). Executes each asynchronous
- * task sequentially, passing the current task result to the next one, and
- * exposes the currently running task index (`activeIndex`) together with the
- * per-task results (`result`, an array of `{ state, data }` entries).
+ * task sequentially, passing the current task result to the next one, and exposes the currently
+ * running task index (`activeIndex`) together with the per-task results (`result`, an array of `{
+ * state, data }` entries).
  *
  * React divergences:
  * - upstream returns `activeIndex` as a `ShallowRef` and `result` as a

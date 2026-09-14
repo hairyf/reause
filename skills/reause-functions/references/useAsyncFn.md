@@ -1,5 +1,5 @@
 ---
-category: Side-effects
+category: State
 ---
 
 # useAsyncFn

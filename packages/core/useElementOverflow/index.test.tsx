@@ -1,7 +1,17 @@
+import type { RefObject } from 'react'
 import type { UseElementOverflowReturn } from '../useElementOverflow'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, expectTypeOf, it, vi } from 'vitest'
 import { renderHook } from 'vitest-browser-react'
 import { useElementOverflow } from '../useElementOverflow'
+
+/**
+ * The hook binds DOM targets to React refs only — a plain element, a getter or
+ * a callback ref is not accepted, so every test wraps its element in a
+ * `{ current }` holder.
+ */
+function refOf<T>(value: T | null): RefObject<T | null> {
+  return { current: value }
+}
 
 describe('useElementOverflow', () => {
   afterEach(() => {
@@ -12,15 +22,24 @@ describe('useElementOverflow', () => {
     expect(useElementOverflow).toBeDefined()
   })
 
+  it('accepts only a React ref object as the DOM target', () => {
+    expectTypeOf<Parameters<typeof useElementOverflow>[0]>()
+      .toEqualTypeOf<RefObject<Element | null | undefined>>()
+    // a plain element is deliberately rejected — refs are the only DOM target
+    expectTypeOf<HTMLDivElement>()
+      .not
+      .toMatchTypeOf<Parameters<typeof useElementOverflow>[0]>()
+  })
+
   it('should work when el is not an element', async () => {
-    const { result } = await renderHook(() => useElementOverflow(null))
+    const { result } = await renderHook(() => useElementOverflow(refOf<Element>(null)))
     expect(result.current.isXOverflowed).toBe(false)
     expect(result.current.isYOverflowed).toBe(false)
   })
 
   it('should expose the overflow state as plain boolean state', async () => {
     // upstream returns `shallowReadonly` refs — React exposes plain booleans
-    const { result } = await renderHook(() => useElementOverflow(null))
+    const { result } = await renderHook(() => useElementOverflow(refOf<Element>(null)))
     expect(result.current.isXOverflowed).toBeTypeOf('boolean')
     expect(result.current.isYOverflowed).toBeTypeOf('boolean')
   })
@@ -37,7 +56,7 @@ describe('useElementOverflow', () => {
     changeDomWidth(content, 'width', 50)
     el.appendChild(content)
 
-    const { result, act } = await renderHook(() => useElementOverflow(el))
+    const { result, act } = await renderHook(() => useElementOverflow(refOf(el)))
 
     expect(result.current.isXOverflowed).toBe(false)
 
@@ -61,7 +80,7 @@ describe('useElementOverflow', () => {
     el.appendChild(content)
 
     const { result, act } = await renderHook(() =>
-      useElementOverflow(el, { observeMutation: true }),
+      useElementOverflow(refOf(el), { observeMutation: true }),
     )
 
     // update content's size
@@ -77,7 +96,7 @@ describe('useElementOverflow', () => {
     changeDomSize(el, 'offsetHeight', 10)
     changeDomSize(el, 'scrollHeight', 50)
 
-    const { result, act } = await renderHook(() => useElementOverflow(el))
+    const { result, act } = await renderHook(() => useElementOverflow(refOf(el)))
 
     await act(() => result.current.update())
     expect(result.current.isYOverflowed).toBe(true)
@@ -89,7 +108,7 @@ describe('useElementOverflow', () => {
     changeDomSize(el, 'scrollWidth', 50)
 
     const { result, act } = await renderHook(() =>
-      useElementOverflow(el, { window: null as unknown as Window }),
+      useElementOverflow(refOf(el), { window: null as unknown as Window }),
     )
 
     await act(() => result.current.update())
@@ -99,7 +118,7 @@ describe('useElementOverflow', () => {
   it('should ignore svg elements', async () => {
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
 
-    const { result, act } = await renderHook(() => useElementOverflow(svg))
+    const { result, act } = await renderHook(() => useElementOverflow(refOf(svg)))
 
     await act(() => result.current.update())
     expect(result.current.isXOverflowed).toBe(false)
@@ -128,7 +147,7 @@ describe('useElementOverflow', () => {
     changeDomSize(el, 'scrollWidth', 50)
 
     const { result, act, unmount } = await renderHook(() =>
-      useElementOverflow(el, { onUpdated }),
+      useElementOverflow(refOf(el), { onUpdated }),
     )
 
     await act(() => {
@@ -186,7 +205,7 @@ describe('useElementOverflow', () => {
     changeDomSize(el, 'scrollWidth', 50)
 
     const { result, act } = await renderHook(() =>
-      useElementOverflow(el, { observeMutation: true, onUpdated }),
+      useElementOverflow(refOf(el), { observeMutation: true, onUpdated }),
     )
 
     // wired with the default characterData/subtree options
@@ -222,7 +241,7 @@ describe('useElementOverflow', () => {
     const el = document.createElement('div')
 
     const { result } = await renderHook(() =>
-      useElementOverflow(el, { observeMutation: { childList: true, subtree: true } }),
+      useElementOverflow(refOf(el), { observeMutation: { childList: true, subtree: true } }),
     )
 
     expect(result.current.isXOverflowed).toBe(false)
@@ -235,7 +254,7 @@ describe('useElementOverflow', () => {
     changeDomSize(el, 'offsetWidth', 10)
     changeDomSize(el, 'scrollWidth', 50)
 
-    const { result, act } = await renderHook(() => useElementOverflow(el))
+    const { result, act } = await renderHook(() => useElementOverflow(refOf(el)))
 
     // stop() only disconnects the observers — like upstream (no stop guard on
     // its public `update`), the manual update still re-measures after stop()
@@ -258,7 +277,7 @@ describe('useElementOverflow', () => {
 
     const el = document.createElement('div')
     document.body.appendChild(el)
-    const { result } = await renderHook(() => useElementOverflow(el))
+    const { result } = await renderHook(() => useElementOverflow(refOf(el)))
 
     expect(disconnect).not.toHaveBeenCalled()
     result.current.stop()
@@ -287,7 +306,7 @@ describe('useElementOverflow', () => {
 
     const { rerender } = await renderHook<{ observeMutation: boolean | MutationObserverInit }, UseElementOverflowReturn>(
       (props = { observeMutation: false }) =>
-        useElementOverflow(el, { observeMutation: props.observeMutation }),
+        useElementOverflow(refOf(el), { observeMutation: props.observeMutation }),
       { initialProps: { observeMutation: { childList: true, subtree: true } } },
     )
 
@@ -323,10 +342,10 @@ describe('useElementOverflow', () => {
     document.body.appendChild(el)
     changeDomSize(el, 'offsetWidth', 10)
     changeDomSize(el, 'scrollWidth', 50)
-    const ref = { current: null as HTMLDivElement | null }
+    const ref = refOf<HTMLDivElement>(null)
 
     const { result, rerender, act } = await renderHook(
-      (props?: { target: { current: HTMLDivElement | null } }) =>
+      (props?: { target: RefObject<HTMLDivElement | null> }) =>
         useElementOverflow(props?.target ?? ref),
       { initialProps: { target: ref } },
     )

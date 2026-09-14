@@ -3,18 +3,15 @@ import { useEffect, useState } from 'react'
 /**
  * Return type of `useSupported` — a plain boolean state.
  *
- * Upstream's alias is `ComputedRef<boolean>`; React has no computed refs, so
- * the compliant port returns the plain `boolean` the hook holds.
+ * Upstream's alias is `ComputedRef<boolean>`; React has no computed refs, so the compliant port
+ * returns the plain `boolean` the hook holds.
  */
 export type UseSupportedReturn = boolean
 
 /**
- * React port of VueUse's `useSupported`.
- *
  * Map from @vueuse/core `useSupported`
  * (`source/vueuse/packages/core/useSupported/`). SSR compatibility
- * `isSupported` — `true` when the feature probed by `callback` is supported
- * by the current browser.
+ * `isSupported` — `true` when the feature probed by `callback` is supported by the current browser.
  *
  * React divergences:
  * - the Vue `ComputedRef<boolean>` return becomes a plain boolean state;

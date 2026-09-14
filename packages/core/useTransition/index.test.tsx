@@ -53,7 +53,7 @@ it('useTransition tweens between numbers', async () => {
 })
 
 it('useTransition tweens between arrays of numbers', async () => {
-  const { result } = await renderTransition<number[]>([0, 0], v => ({
+  const { result } = await renderTransition([0, 0], v => ({
     value: useTransition(v, { duration: 500 }),
   }))
 

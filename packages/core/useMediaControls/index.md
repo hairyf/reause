@@ -32,8 +32,8 @@ useEffect(() => {
 ### Source Forms
 
 `src` and `tracks` are read-only value sources and take plain values (upstream:
-`MaybeRefOrGetter`). Resolve a React ref or state value at the call site; the element `target` stays
-a plain element or React ref (`RefOrValue`) because it is a DOM target, not a value source:
+`MaybeRefOrGetter`). Resolve a React ref or state value at the call site; the element `target` is a
+React ref (`RefObject`) because it is a DOM target, not a value source:
 
 ```tsx
 const [src, setSrc] = useState('video.mp4')

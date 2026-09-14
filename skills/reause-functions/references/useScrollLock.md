@@ -31,7 +31,7 @@ export type ScrollLockElement =
 /**
  * The scroll-lock target: a plain element (or `Window` / `Document`) or a
  * React ref holding one — the React equivalent of upstream's
- * `RefOrValue<HTMLElement | SVGElement | Window | Document | null | undefined>`.
+ * `MaybeRefOrGetter<HTMLElement | SVGElement | Window | Document | null | undefined>`.
  */
 export type ScrollLockTarget = ScrollLockElement | Ref<ScrollLockElement>
 /**

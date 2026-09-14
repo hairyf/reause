@@ -41,7 +41,7 @@ describe('useFileDialog', () => {
     const input = document.createElement('input')
     input.click = vi.fn()
 
-    const { result } = await renderHook(() => useFileDialog({ input, initialFiles: [file1], reset: true }))
+    const { result } = await renderHook(() => useFileDialog({ input: { current: input }, initialFiles: [file1], reset: true }))
 
     result.current.open()
     await expect.poll(() => result.current.files).toBeNull()
@@ -52,7 +52,7 @@ describe('useFileDialog', () => {
     const input = document.createElement('input')
     input.click = vi.fn()
 
-    const { result } = await renderHook(() => useFileDialog({ input }))
+    const { result } = await renderHook(() => useFileDialog({ input: { current: input } }))
 
     result.current.open()
     expect(input.type).toBe('file')
@@ -84,11 +84,10 @@ describe('useFileDialog', () => {
     expect(inputEl2.click).toHaveBeenCalledTimes(1)
   })
 
-  it('should re-apply option attributes when a ref-like input is swapped', async () => {
-    const inputSource = { current: null as HTMLInputElement | null }
-    const multiple = { current: false }
+  it('should re-apply option attributes when the input ref is swapped', async () => {
+    const inputSource: { current: HTMLInputElement | null } = { current: null }
 
-    const { rerender } = await renderHook(() => useFileDialog({ input: inputSource, multiple }))
+    const { rerender } = await renderHook(() => useFileDialog({ input: inputSource, multiple: false }))
 
     const inputEl = document.createElement('input')
     inputEl.click = vi.fn()
@@ -110,7 +109,7 @@ describe('useFileDialog', () => {
       writable: true,
     })
 
-    const { result } = await renderHook(() => useFileDialog({ input }))
+    const { result } = await renderHook(() => useFileDialog({ input: { current: input } }))
 
     const changeHandler = vi.fn()
     result.current.onChange(changeHandler)
@@ -127,83 +126,86 @@ describe('useFileDialog', () => {
     await expect.poll(() => result.current.files).toBe(calledWith)
   })
 
-  it('should work with ref value for multiple option', async () => {
+  it('should work with a plain value for the multiple option', async () => {
     const input = document.createElement('input')
     input.click = vi.fn()
-    const multiple = { current: true }
+    const inputRef = { current: input }
+    let multiple = true
 
-    const { result, rerender } = await renderHook(() => useFileDialog({ input, multiple }))
+    const { result, rerender } = await renderHook(() => useFileDialog({ input: inputRef, multiple }))
 
     await expect.poll(() => input.multiple).toBe(true)
     result.current.open()
     expect(input.multiple).toBe(true)
 
-    multiple.current = false
+    multiple = false
     await rerender()
     await expect.poll(() => input.multiple).toBe(false)
     result.current.open()
     expect(input.multiple).toBe(false)
   })
 
-  it('should work with ref value for accept option', async () => {
+  it('should work with a plain value for the accept option', async () => {
     const input = document.createElement('input')
     input.click = vi.fn()
-    const accept = { current: 'image/*' }
+    const inputRef = { current: input }
+    let accept = 'image/*'
 
-    const { result, rerender } = await renderHook(() => useFileDialog({ input, accept }))
+    const { result, rerender } = await renderHook(() => useFileDialog({ input: inputRef, accept }))
 
     await expect.poll(() => input.accept).toBe('image/*')
     result.current.open()
     expect(input.accept).toBe('image/*')
 
-    accept.current = 'video/*'
+    accept = 'video/*'
     await rerender()
     await expect.poll(() => input.accept).toBe('video/*')
     result.current.open()
     expect(input.accept).toBe('video/*')
   })
 
-  it('should work with ref value for directory option', async () => {
+  it('should work with a plain value for the directory option', async () => {
     const input = document.createElement('input')
     input.click = vi.fn()
-    const directory = { current: true }
+    const inputRef = { current: input }
+    let directory = true
 
-    const { result, rerender } = await renderHook(() => useFileDialog({ input, directory }))
+    const { result, rerender } = await renderHook(() => useFileDialog({ input: inputRef, directory }))
 
     await expect.poll(() => input.webkitdirectory).toBe(true)
     result.current.open()
     expect(input.webkitdirectory).toBe(true)
 
-    directory.current = false
+    directory = false
     await rerender()
     await expect.poll(() => input.webkitdirectory).toBe(false)
     result.current.open()
     expect(input.webkitdirectory).toBe(false)
   })
 
-  it('should work with ref value for reset option', async () => {
+  it('should work with a plain value for the reset option', async () => {
     const input = document.createElement('input')
     input.click = vi.fn()
-    const reset = { current: true }
 
-    const { result } = await renderHook(() => useFileDialog({ input, reset }))
+    const { result } = await renderHook(() => useFileDialog({ input: { current: input }, reset: true }))
     result.current.open()
 
     expect(input.click).toHaveBeenCalled() // reset does not change input attributes
   })
 
-  it('should work with ref value for capture option', async () => {
+  it('should work with a plain value for the capture option', async () => {
     const input = document.createElement('input')
     input.click = vi.fn()
-    const capture = { current: 'user' }
+    const inputRef = { current: input }
+    let capture = 'user'
 
-    const { result, rerender } = await renderHook(() => useFileDialog({ input, capture }))
+    const { result, rerender } = await renderHook(() => useFileDialog({ input: inputRef, capture }))
 
     await expect.poll(() => input.capture).toBe('user')
     result.current.open()
     expect(input.capture).toBe('user')
 
-    capture.current = 'environment'
+    capture = 'environment'
     await rerender()
     await expect.poll(() => input.capture).toBe('environment')
     result.current.open()
@@ -221,7 +223,7 @@ describe('useFileDialog', () => {
 
     const calls: Array<FileList | null | undefined> = []
     const { unmount } = await renderHook(() => {
-      const dialog = useFileDialog({ input })
+      const dialog = useFileDialog({ input: { current: input } })
       useListener(dialog.onChange, (selected) => {
         calls.push(selected)
       })
@@ -244,7 +246,7 @@ describe('useFileDialog', () => {
 
     const calls = vi.fn()
     const { unmount } = await renderHook(() => {
-      const dialog = useFileDialog({ input })
+      const dialog = useFileDialog({ input: { current: input } })
       useListener(dialog.onCancel, () => {
         calls()
       })

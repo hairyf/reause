@@ -52,7 +52,7 @@ function dispatchSwipeSequence(target: EventTarget, coords: SwipeCoords) {
 describe('useSwipe', () => {
   it('returns the idle state before any touch', async () => {
     const el = createTarget()
-    const { result } = await renderHook(() => useSwipe(el))
+    const { result } = await renderHook(() => useSwipe({ current: el }))
 
     expect(result.current.isSwiping).toBe(false)
     expect(result.current.direction).toBe('none')
@@ -64,7 +64,7 @@ describe('useSwipe', () => {
 
   it('tracks touchstart and touchmove reactivity', async () => {
     const el = createTarget()
-    const { result, act } = await renderHook(() => useSwipe(el, { threshold: THRESHOLD }))
+    const { result, act } = await renderHook(() => useSwipe({ current: el }, { threshold: THRESHOLD }))
 
     await act(() => {
       el.dispatchEvent(makeTouchEvent('touchstart', 0, 0, el))
@@ -87,7 +87,7 @@ describe('useSwipe', () => {
     const el = createTarget()
     const onSwipe = vi.fn()
     const onSwipeEnd = vi.fn()
-    const { act } = await renderHook(() => useSwipe(el, { threshold: THRESHOLD, onSwipe, onSwipeEnd }))
+    const { act } = await renderHook(() => useSwipe({ current: el }, { threshold: THRESHOLD, onSwipe, onSwipeEnd }))
 
     await act(() => {
       dispatchSwipeSequence(el, [[0, 0], [THRESHOLD - 1, 0], [THRESHOLD - 1, 0]])
@@ -101,7 +101,7 @@ describe('useSwipe', () => {
     const el = createTarget()
     const onSwipe = vi.fn()
     const onSwipeEnd = vi.fn()
-    const { act } = await renderHook(() => useSwipe(el, { threshold: THRESHOLD, onSwipe, onSwipeEnd }))
+    const { act } = await renderHook(() => useSwipe({ current: el }, { threshold: THRESHOLD, onSwipe, onSwipeEnd }))
 
     await act(() => {
       dispatchSwipeSequence(el, [[0, 0], [THRESHOLD / 2, 0], [THRESHOLD, 0], [THRESHOLD, 0]])
@@ -117,7 +117,7 @@ describe('useSwipe', () => {
     const el = createTarget()
     const onSwipe = vi.fn()
     const onSwipeEnd = vi.fn()
-    const { act } = await renderHook(() => useSwipe(el, { threshold: THRESHOLD, onSwipe, onSwipeEnd }))
+    const { act } = await renderHook(() => useSwipe({ current: el }, { threshold: THRESHOLD, onSwipe, onSwipeEnd }))
 
     await act(() => {
       dispatchSwipeSequence(el, [[0, 0], [THRESHOLD / 2, 0], [THRESHOLD, 0], [THRESHOLD - 1, 0], [THRESHOLD - 1, 0]])
@@ -138,7 +138,7 @@ describe('useSwipe', () => {
   it.each(swipeCases)('detects swipe %s past the threshold', async (expected, coords) => {
     const el = createTarget()
     const onSwipeEnd = vi.fn()
-    const { result, act } = await renderHook(() => useSwipe(el, { threshold: THRESHOLD, onSwipeEnd }))
+    const { result, act } = await renderHook(() => useSwipe({ current: el }, { threshold: THRESHOLD, onSwipeEnd }))
 
     await act(() => {
       dispatchSwipeSequence(el, coords)
@@ -152,7 +152,7 @@ describe('useSwipe', () => {
   it('fires onSwipeStart once per touchstart with the event', async () => {
     const el = createTarget()
     const onSwipeStart = vi.fn()
-    const { act } = await renderHook(() => useSwipe(el, { onSwipeStart }))
+    const { act } = await renderHook(() => useSwipe({ current: el }, { onSwipeStart }))
 
     const event = makeTouchEvent('touchstart', 10, 10, el)
     await act(() => {
@@ -167,7 +167,7 @@ describe('useSwipe', () => {
     const el = createTarget()
     const onSwipeStart = vi.fn()
     const onSwipe = vi.fn()
-    const { act } = await renderHook(() => useSwipe(el, { threshold: THRESHOLD, onSwipeStart, onSwipe }))
+    const { act } = await renderHook(() => useSwipe({ current: el }, { threshold: THRESHOLD, onSwipeStart, onSwipe }))
 
     await act(() => {
       el.dispatchEvent(makeMultiTouchEvent('touchstart', [[0, 0], [10, 10]], el))
@@ -180,7 +180,7 @@ describe('useSwipe', () => {
 
   it('uses the default threshold of 50', async () => {
     const el = createTarget()
-    const { result, act } = await renderHook(() => useSwipe(el))
+    const { result, act } = await renderHook(() => useSwipe({ current: el }))
 
     await act(() => {
       dispatchSwipeSequence(el, [[0, 0], [49, 0], [49, 0]])
@@ -195,7 +195,7 @@ describe('useSwipe', () => {
 
   it('prevents touchmove default only when passive is false', async () => {
     const passiveEl = createTarget()
-    const passiveHook = await renderHook(() => useSwipe(passiveEl, { threshold: THRESHOLD }))
+    const passiveHook = await renderHook(() => useSwipe({ current: passiveEl }, { threshold: THRESHOLD }))
     const passiveMove = makeTouchEvent('touchmove', THRESHOLD, 0, passiveEl)
     const passivePreventDefault = vi.spyOn(passiveMove, 'preventDefault')
     await passiveHook.act(() => {
@@ -206,7 +206,7 @@ describe('useSwipe', () => {
     await passiveHook.unmount()
 
     const nonPassiveEl = createTarget()
-    const nonPassiveHook = await renderHook(() => useSwipe(nonPassiveEl, { passive: false, threshold: THRESHOLD }))
+    const nonPassiveHook = await renderHook(() => useSwipe({ current: nonPassiveEl }, { passive: false, threshold: THRESHOLD }))
     const nonPassiveMove = makeTouchEvent('touchmove', THRESHOLD, 0, nonPassiveEl)
     const nonPassivePreventDefault = vi.spyOn(nonPassiveMove, 'preventDefault')
     await nonPassiveHook.act(() => {
@@ -221,7 +221,7 @@ describe('useSwipe', () => {
     const el = createTarget()
     const targetRef: { current: EventTarget | null } = { current: null }
     const { result, act, rerender } = await renderHook<{ current: EventTarget | null }, UseSwipeReturn>(
-      props => useSwipe(props, { threshold: THRESHOLD }),
+      (props = targetRef) => useSwipe(props, { threshold: THRESHOLD }),
       { initialProps: targetRef },
     )
 
@@ -273,7 +273,7 @@ describe('useSwipe', () => {
     const addSpy = vi.spyOn(element, 'addEventListener')
     const removeSpy = vi.spyOn(element, 'removeEventListener')
     const { rerender } = await renderHook<{ el: EventTarget | null }, UseSwipeReturn>(
-      ({ el } = { el: element }) => useSwipe(el, { threshold: THRESHOLD }),
+      ({ el } = { el: element }) => useSwipe({ current: el }, { threshold: THRESHOLD }),
       { initialProps: { el: element } },
     )
 
@@ -291,7 +291,7 @@ describe('useSwipe', () => {
     const elB = createTarget()
     const onSwipeEnd = vi.fn()
     const { result, act, rerender } = await renderHook<{ el: EventTarget | null }, UseSwipeReturn>(
-      ({ el } = { el: elA }) => useSwipe(el, { threshold: THRESHOLD, onSwipeEnd }),
+      ({ el } = { el: elA }) => useSwipe({ current: el }, { threshold: THRESHOLD, onSwipeEnd }),
       { initialProps: { el: elA } },
     )
 
@@ -320,7 +320,7 @@ describe('useSwipe', () => {
   it('treats touchcancel as a swipe end', async () => {
     const el = createTarget()
     const onSwipeEnd = vi.fn()
-    const { result, act } = await renderHook(() => useSwipe(el, { threshold: THRESHOLD, onSwipeEnd }))
+    const { result, act } = await renderHook(() => useSwipe({ current: el }, { threshold: THRESHOLD, onSwipeEnd }))
 
     await act(() => {
       el.dispatchEvent(makeTouchEvent('touchstart', 0, 0, el))
@@ -340,7 +340,7 @@ describe('useSwipe', () => {
     const el = createTarget()
     const onSwipeStart = vi.fn()
     const onSwipeEnd = vi.fn()
-    const { result, unmount } = await renderHook(() => useSwipe(el, { threshold: THRESHOLD, onSwipeStart, onSwipeEnd }))
+    const { result, unmount } = await renderHook(() => useSwipe({ current: el }, { threshold: THRESHOLD, onSwipeStart, onSwipeEnd }))
     await unmount()
 
     expect(() => {
@@ -355,7 +355,7 @@ describe('useSwipe', () => {
   it('stop() detaches the listeners for this instance', async () => {
     const el = createTarget()
     const onSwipeEnd = vi.fn()
-    const { result, act } = await renderHook(() => useSwipe(el, { threshold: THRESHOLD, onSwipeEnd }))
+    const { result, act } = await renderHook(() => useSwipe({ current: el }, { threshold: THRESHOLD, onSwipeEnd }))
 
     await act(() => {
       result.current.stop()

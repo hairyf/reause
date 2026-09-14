@@ -124,7 +124,7 @@ export interface UseClipboardItemsReturn<Optional> {
  *   after mount re-binds or removes them (strictly more reactive than
  *   upstream's freeze-in), and removes them on unmount;
  * - `copy` is a stable callback that resolves the `source` option at call
- *   time through `toValue` (React has no reactive refs), writes no-op when
+ *   time (a plain value; upstream accepts a ref), writes no-op when
  *   the API is unsupported or no value is available, and sets `content` +
  *   `copied` after a successful write;
  * - the `copiedDuring` reset timer composes `@reause/shared` `useTimeoutFn`
@@ -143,6 +143,6 @@ export declare function useClipboardItems(
   options?: UseClipboardItemsOptions<undefined>,
 ): UseClipboardItemsReturn<false>
 export declare function useClipboardItems(
-  options: UseClipboardItemsOptions<RefOrValue<ClipboardItems>>,
+  options: UseClipboardItemsOptions<ClipboardItems>,
 ): UseClipboardItemsReturn<true>
 ```

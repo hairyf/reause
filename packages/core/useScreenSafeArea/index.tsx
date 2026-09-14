@@ -20,24 +20,19 @@ export interface UseScreenSafeAreaReturn {
 }
 
 /**
- * React port of VueUse's `useScreenSafeArea`.
- *
  * Map from @vueuse/core `useScreenSafeArea`
  * (`source/vueuse/packages/core/useScreenSafeArea/`), which writes the
- * `--vueuse-safe-area-*` custom properties with `env(safe-area-inset-*, 0px)`
- * fallbacks onto `document.documentElement` (via `useCssVar`), reads their
- * computed values back through `getComputedStyle(...).getPropertyValue(...)`
- * and re-reads on a debounced passive `resize` listener (via
- * `useEventListener` + `useDebounceFn`).
+ * `--vueuse-safe-area-*` custom properties with `env(safe-area-inset-*, 0px)` fallbacks onto
+ * `document.documentElement` (via `useCssVar`), reads their computed values back through
+ * `getComputedStyle(...).getPropertyValue(...)` and re-reads on a debounced passive `resize`
+ * listener (via `useEventListener` + `useDebounceFn`).
  *
  * React divergences:
  * - the four `shallowRef` string values become a single state object
  *   `{ top, right, bottom, left }` (computed style strings, e.g. `0px`)
  *   plus a stable `update()` callback;
- * - the custom-property setup and the 200ms-debounced passive `resize`
- *   listener live in one self-contained mount `useEffect` (upstream composes
- *   `useCssVar` / `useEventListener` / `useDebounceFn`, which are not ported
- *   here) and the listener is removed on unmount;
+ * - the custom-property setup and the 200ms-debounced passive `resize` listener live in one
+ * self-contained mount `useEffect` and the listener;
  * - SSR-safe: nothing touches the DOM during render — the state stays `''`
  *   on the server, the custom properties are set and first-read in the mount
  *   effect, and `update` is a no-op without `document` (upstream guards only

@@ -1,13 +1,11 @@
-import type { ConfigurableWindow, RefOrValue } from '@reause/shared'
+import type { ConfigurableWindow } from '@reause/shared'
+import type { RefObject } from 'react'
 import type { ElementTarget } from '../useResizeObserver'
-import { toValue } from '@reause/shared'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useIntersectionObserver } from '../useIntersectionObserver'
 
 /**
- * Options for `useElementVisibility`. Mirrors upstream's
- * `UseElementVisibilityOptions` minus `controls` — the React port returns a
- * plain `boolean`, so there is no control object to expose.
+ * Options for `useElementVisibility`., so there is no control object to expose.
  */
 export interface UseElementVisibilityOptions extends ConfigurableWindow {
   /**
@@ -19,7 +17,7 @@ export interface UseElementVisibilityOptions extends ConfigurableWindow {
   /**
    * The element that is used as the viewport for checking visibility of the target.
    */
-  scrollTarget?: ElementTarget | Document
+  scrollTarget?: ElementTarget | RefObject<Document | null>
   /**
    * Either a single number or an array of numbers between 0.0 and 1.
    *
@@ -27,9 +25,10 @@ export interface UseElementVisibilityOptions extends ConfigurableWindow {
    */
   threshold?: number | number[]
   /**
-   * A string which specifies a set of offsets to add to the root's bounding_box when calculating intersections.
+   * A string which specifies a set of offsets to add to the root's bounding_box when calculating
+   * intersections.
    */
-  rootMargin?: RefOrValue<string>
+  rootMargin?: string
   /**
    * Stop tracking when element visibility changes for the first time.
    *
@@ -39,21 +38,19 @@ export interface UseElementVisibilityOptions extends ConfigurableWindow {
 }
 
 /**
- * React equivalent of upstream's `unrefElement`: resolves a ref-like object
- * or a plain value down to an element (or, for a scroll target, a
- * `Document`). Built on the shared `toValue`.
+ * Read a ref's `current` down to an element (or, for a scroll target, a `Document`) — a plain
+ * element, getter or callback ref is not accepted.
  */
-function resolveTarget(value: unknown): Element | Document | undefined {
-  const resolved = toValue(value as RefOrValue<unknown>)
-  if (resolved && typeof resolved === 'object' && 'current' in resolved)
-    return resolveTarget(resolved)
-  return (resolved as Element | Document | null | undefined) ?? undefined
+function resolveTarget(
+  value: RefObject<Element | Document | null | undefined> | undefined,
+): Element | Document | undefined {
+  return value?.current ?? undefined
 }
 
 /**
- * Parse an `IntersectionObserver`-style `rootMargin` string (`'10px 20px 30px
- * 40px'`, CSS margin shorthand) into per-side pixel offsets. Values with units
- * other than `px` are ignored — the fallback approximates the root expansion.
+ * Parse an `IntersectionObserver`-style `rootMargin` string (`'10px 20px 30px 40px'`, CSS margin
+ * shorthand) into per-side pixel offsets. Values with units other than `px` are ignored — the
+ * fallback approximates the root expansion.
  */
 function parseRootMargin(rootMargin: string | undefined): { top: number, right: number, bottom: number, left: number } {
   if (!rootMargin)
@@ -67,9 +64,9 @@ function parseRootMargin(rootMargin: string | undefined): { top: number, right: 
 }
 
 /**
- * Fallback intersection check used when `IntersectionObserver` is unavailable:
- * expands the viewport (or `scrollTarget`) bounding box by `rootMargin` and
- * returns whether the visible portion of the element meets `threshold`.
+ * Fallback intersection check used when `IntersectionObserver` is unavailable: expands the viewport
+ * (or `scrollTarget`) bounding box by `rootMargin` and returns whether the visible portion of the
+ * element meets `threshold`.
  */
 function computeVisibility(
   element: Element,
@@ -122,9 +119,8 @@ function computeVisibility(
  *
  * Map from @vueuse/core `useElementVisibility`
  * (`source/vueuse/packages/core/useElementVisibility/`), which observes the
- * target with an `IntersectionObserver` rooted at the viewport (or a custom
- * `scrollTarget`) and maps the latest entry's `isIntersecting` onto a reactive
- * boolean.
+ * target with an `IntersectionObserver` rooted at the viewport (or a custom `scrollTarget`) and
+ * maps the latest entry's `isIntersecting` onto a reactive boolean.
  *
  * React divergences:
  * - upstream returns a `ShallowRef<boolean>`, or — with `controls: true` —
@@ -267,7 +263,7 @@ export function useElementVisibility(
       return
     }
 
-    const rootMarginValue = rootMargin === undefined ? undefined : toValue(rootMargin)
+    const rootMarginValue = rootMargin
 
     const check = () => {
       updateVisibility(computeVisibility(el, root, resolvedWindow, rootMarginValue, threshold))

@@ -15,8 +15,6 @@ import { useRef } from 'react'
 const childRef = useRef<HTMLDivElement>(null)
 const parent = useParentElement(childRef) // HTMLElement | SVGElement | null | undefined
 
-// with a plain element
-const parentOfChild = useParentElement(document.querySelector<HTMLElement>('#child'))
 ```
 
 ## Type Declarations
@@ -37,7 +35,7 @@ type ElementSource = HTMLElement | SVGElement | null | undefined
  * the commit phase (after render), so resolving it while rendering returns
  * `null` for the canonical `useRef(null)` usage. The Vue ref return becomes a
  * plain value (no `.value`). The source accepts a plain element or a React
- * ref (upstream: `RefOrValue<HTMLElement | SVGElement | null | undefined>`).
+ * ref (upstream: `MaybeRefOrGetter<HTMLElement | SVGElement | null | undefined>`).
  *
  * Divergences from upstream (Vue reactivity does not translate 1:1):
  *
@@ -56,11 +54,8 @@ type ElementSource = HTMLElement | SVGElement | null | undefined
  * @example
  * const childRef = useRef<HTMLDivElement>(null)
  * const parent = useParentElement(childRef)
- *
- * // with a plain element
- * const parentOfChild = useParentElement(document.querySelector<HTMLElement>('#child'))
  */
 export declare function useParentElement(
-  element?: ElementSource | Ref<ElementSource>,
+  element?: RefObject<ElementSource>,
 ): ElementSource
 ```

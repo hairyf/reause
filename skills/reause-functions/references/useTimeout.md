@@ -123,7 +123,7 @@ export interface UseTimeoutReturn {
  * `useState` for `isPending`, `ready` derived as `!isPending` like upstream,
  * the setup-time `start()` (immediate) becomes an empty-dependency `useEffect`
  * on mount, and `tryOnScopeDispose(stop)` becomes the effect cleanup.
- * `interval` accepts a number or a React ref (upstream: `RefOrValue<number>`);
+ * `interval` is a plain number (upstream: `MaybeRefOrGetter<number>`);
  * `start` / `stop` are stable `useCallback`s.
  *
  * @example
@@ -132,11 +132,11 @@ export interface UseTimeoutReturn {
  * const { ready, start, stop } = useTimeout(1000, { controls: true })
  */
 export declare function useTimeout(
-  interval?: RefOrValue<number>,
+  interval?: number,
   options?: UseTimeoutOptions<false>,
 ): boolean
 export declare function useTimeout(
-  interval: RefOrValue<number>,
+  interval: number,
   options: UseTimeoutOptions<true>,
 ): UseTimeoutReturn
 ```

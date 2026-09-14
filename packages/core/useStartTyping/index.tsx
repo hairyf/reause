@@ -2,12 +2,12 @@ import { useRef } from 'react'
 import { useEventListener } from '../useEventListener'
 
 /**
- * Check if the currently focused element is editable — `<input>`,
- * `<textarea>` or a `contenteditable` element.
+ * Check if the currently focused element is editable — `<input>`, `<textarea>` or a
+ * `contenteditable` element.
  *
- * A single source of truth mirroring the upstream default
- * (`onStartTyping`'s `isFocusedElementEditable`), exported so it can be
- * reused in custom `isFocusedElementEditable` options.
+ * A single source of truth mirroring the upstream default (`onStartTyping`'s
+ * `isFocusedElementEditable`), exported so it can be reused in custom `isFocusedElementEditable`
+ * options.
  */
 export function isFocusedElementEditable(): boolean {
   const { activeElement, body } = document
@@ -31,9 +31,8 @@ export function isFocusedElementEditable(): boolean {
 }
 
 /**
- * Check whether the pressed key counts as a "typing" character — `A–Z`,
- * `0–9` (main row and numpad) without any Ctrl / Alt / Meta modifier held
- * down. Bound to the legacy `keyCode` like upstream.
+ * Check whether the pressed key counts as a "typing" character — `A–Z`, `0–9` (main row and numpad)
+ * without any Ctrl / Alt / Meta modifier held down. Bound to the legacy `keyCode` like upstream.
  *
  * Exported so it can be reused in custom `isTypedCharValid` options.
  */
@@ -61,14 +60,12 @@ export function isTypedCharValid({
 /**
  * Options for `useStartTyping`.
  *
- * The upstream `ConfigurableDocument` is inlined as `document` here (see
- * `useActiveElement` / `useScriptTag` — `ConfigurableDocument` is not ported
- * to `@reause/shared`).
+ * The upstream `ConfigurableDocument` is inlined as `document` here (see `useActiveElement` /
+ * `useScriptTag` — `ConfigurableDocument` is not ported to `@reause/shared`).
  */
 export interface UseStartTypingOptions {
   /**
-   * Custom `document` instance to listen on, e.g. working with iframes or in
-   * testing environments (upstream: `ConfigurableDocument`).
+   * Custom `document` instance to listen on, e.g. working with iframes or in testing environments.
    *
    * @default the global `document` on the client
    */
@@ -82,8 +79,8 @@ export interface UseStartTypingOptions {
   isTypedCharValid?: (event: KeyboardEvent) => boolean
 
   /**
-   * Decide whether the currently focused element counts as editable — the
-   * callback never fires while such an element has focus.
+   * Decide whether the currently focused element counts as editable — the callback never fires
+   * while such an element has focus.
    *
    * @default `isFocusedElementEditable`
    */
@@ -91,19 +88,17 @@ export interface UseStartTypingOptions {
 }
 
 /**
- * Fires when users start typing on non-editable elements. Useful for
- * auto-focusing an input field when the user starts typing anywhere on the
- * page.
+ * Fires when users start typing on non-editable elements. Useful for auto-focusing an input field
+ * when the user starts typing anywhere on the page.
  *
  * Map from @vueuse/core `onStartTyping`
  * (`source/vueuse/packages/core/onStartTyping/`). Registers a passive
- * `keydown` listener on the `document` and calls `callback(event)` whenever
- * the currently focused element is not editable and the pressed key is a
- * valid typing character. Focus is considered editable when it is an
- * `<input>`, `<textarea>` or `contenteditable` element; a key is a valid
- * typing character when it is alphanumeric (`A–Z`, `0–9` incl. numpad) and
- * no Ctrl / Alt / Meta modifier is held. Both gates are configurable via
- * options and also exported as standalone utilities.
+ * `keydown` listener on the `document` and calls `callback(event)` whenever the currently focused
+ * element is not editable and the pressed key is a valid typing character. Focus is considered
+ * editable when it is an `<input>`, `<textarea>` or `contenteditable` element; a key is a valid
+ * typing character when it is alphanumeric (`A–Z`, `0–9` incl. numpad) and no Ctrl / Alt / Meta
+ * modifier is held. Both gates are configurable via options and also exported as standalone
+ * utilities.
  *
  * React divergences:
  * - the returned value is the unmount function that removes the `keydown`
@@ -158,7 +153,7 @@ export function useStartTyping(
   // render and re-binds whenever the resolved document changes, and the
   // `typeof document` guard keeps SSR safe
   return useEventListener<KeyboardEvent>(
-    doc ?? (typeof document === 'undefined' ? undefined : document),
+    { current: doc ?? (typeof document === 'undefined' ? undefined : document) },
     'keydown',
     keydown,
     { passive: true },

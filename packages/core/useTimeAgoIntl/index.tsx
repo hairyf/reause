@@ -44,9 +44,8 @@ export interface FormatTimeAgoIntlOptions {
 
 export interface UseTimeAgoIntlOptions extends FormatTimeAgoIntlOptions {
   /**
-   * Interval in milliseconds at which the formatted string refreshes so the
-   * relative time stays up to date (upstream: `ConfigurableScheduler`, whose
-   * default ticks every `30_000` ms).
+   * Interval in milliseconds at which the formatted string refreshes so the relative time stays up
+   * to date.
    *
    * @default 30000
    */
@@ -64,14 +63,11 @@ const UNITS: TimeAgoUnit[] = [
 ]
 
 /**
- * React port of VueUse's `useTimeAgoIntl`.
- *
  * Map from @vueuse/core `useTimeAgoIntl`
  * (`source/vueuse/packages/core/useTimeAgoIntl/`). A wrapper for the
- * browser-native `Intl.RelativeTimeFormat` API — reactive time ago with
- * i18n supported.
+ * browser-native `Intl.RelativeTimeFormat` API — reactive time ago with i18n supported.
  *
- * Divergences from upstream:
+ * React divergences:
  * - upstream returns `ComputedRef<string>`, or `{ timeAgoIntl, parts,
  *   pause, resume, isActive }` with `controls: true`; this port returns a
  *   **plain string** recomputed on every render (house pattern, see
@@ -80,13 +76,11 @@ const UNITS: TimeAgoUnit[] = [
  *   `Intl.RelativeTimeFormatPart[]` access is available through
  *   `formatTimeAgoIntlParts`. A `controls: true` passed by JS callers is a
  *   no-op (the option is not read).
- * - the refresh timer lives in the house `useNow`, driven by a
- *   `useIntervalFn` scheduler that is cleaned up on unmount — pass new
- *   `time` values to re-render, the interval keeps the result fresh in
- *   between.
- * - upstream `ConfigurableScheduler` → `updateInterval` option (default
- *   `30_000` ms, matching upstream's default `useIntervalFn(cb, 30_000)`).
- * - upstream `RefOrValue<Date | number | string>` → plain
+ * - the refresh timer lives in the house `useNow`, driven by a `useIntervalFn` scheduler that, the
+ * interval keeps the result fresh in between.
+ * - upstream `ConfigurableScheduler` → `updateInterval` option (default `30_000` ms, matching
+ * upstream's default `useIntervalFn(cb, 30_000)`).
+ * - upstream `MaybeRefOrGetter<Date | number | string>` → plain
  *   `Date | number | string`.
  *
  * @example

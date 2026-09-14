@@ -128,12 +128,10 @@ The following helper functions are also exported:
 ```ts
 /** Accepted DOM target kinds — mirrors upstream's `MaybeElement`. */
 type MaybeElement = HTMLElement | SVGElement | null | undefined
-/** A plain element or a React ref-like object (`{ current }`) — upstream `MaybeElementRef`. */
-type MaybeElementRef =
-  | MaybeElement
-  | {
-      readonly current: MaybeElement
-    }
+/** A React ref object holding the element — upstream `MaybeElementRef`. */
+interface MaybeElementRef {
+  readonly current: MaybeElement
+}
 /** Target of the sortable container (upstream `MaybeRefOrGetter<MaybeElement>`). */
 type SortableTarget = MaybeElementRef
 /**
@@ -261,7 +259,9 @@ export declare function removeNode(node: Node): void
 /**
  * Move an element of `list` from `from` to `to`, returning a NEW array.
  *
- * Map from @vueuse/integrations `useSortable`'s `moveArrayElement`, with one
+ * Map from @vueuse/integrations `moveArrayElement` — the helper module
+ * (`source/vueuse/packages/integrations/useSortable/`) shares its directory
+ * with the `useSortable` hook ported above. With one
  * deliberate deviation: upstream mutates the caller's array in place (and
  * defers the splice with `nextTick` when the list is a ref), which cannot work
  * in React — an in-place mutation does not re-render. This implementation is

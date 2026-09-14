@@ -505,7 +505,7 @@ export interface UseFetchOptions {
    *
    * @default false
    */
-  refetch?: RefOrValue<boolean>
+  refetch?: boolean
   /**
    * Initial data before the request finished
    *
@@ -611,7 +611,7 @@ export declare function createFetch(
  * - `url` and `baseUrl` are read-only value sources and take plain strings
  *   (upstream: `MaybeRefOrGetter<string>`; resolve a React ref or getter at
  *   the call site), and the request `payload` is a plain `unknown` (upstream:
- *   `MaybeRefOrGetter<unknown>`). `refetch` stays `RefOrValue<boolean>` (a
+ *   `MaybeRefOrGetter<unknown>`). `refetch` is a plain `boolean` (a
  *   behavior toggle, not a value source);
  * - `updateDataOnError`, `initialData`, `timeout` (via shared
  *   `useTimeoutFn`), `beforeFetch`/`afterFetch`/`onFetchError` and the

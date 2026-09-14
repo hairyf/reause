@@ -1,12 +1,11 @@
 import { useStateDefault } from '@reause/shared'
 import { useState } from 'react'
 
-// externally-controlled ref-like source — `value` reflects its current value,
-// falling back to the default while it is `undefined`
-const raw: { current: string | undefined } = { current: undefined }
-
 export default function UseStateDefaultDemo() {
-  const [value, setValue] = useStateDefault(raw, 'default')
+  // externally-controlled `{ value, onChange }` source — `value` reflects the
+  // source's current value, falling back to the default while it is `undefined`
+  const [raw, setRaw] = useState<string | null | undefined>(undefined)
+  const [value, setValue] = useStateDefault({ value: raw, onChange: setRaw }, 'default')
   const [input, setInput] = useState('')
 
   const update = (next: string) => {
@@ -28,9 +27,9 @@ export default function UseStateDefaultDemo() {
         <strong>{value}</strong>
       </p>
       <p>
-        Raw source (raw.current):
+        Raw source (raw):
         {' '}
-        {raw.current === undefined ? 'undefined' : raw.current}
+        {raw === undefined ? 'undefined' : raw}
       </p>
       <button
         onClick={() => {

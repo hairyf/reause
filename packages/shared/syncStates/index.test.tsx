@@ -9,118 +9,128 @@ describe('syncStates', () => {
   })
 
   it('should work with array', async () => {
-    const target1 = { current: 'bar' }
-    const target2 = { current: 'bar2' }
-
     const { result, act } = await renderHook(() => {
       const [source, setSource] = useState('foo')
-      return { stop: syncStates(source, [target1, target2]), setSource }
+      const [target1, setTarget1] = useState('bar')
+      const [target2, setTarget2] = useState('bar2')
+      return {
+        stop: syncStates(source, [[target1, setTarget1], [target2, setTarget2]]),
+        setSource,
+        target1,
+        target2,
+      }
     })
 
     // upstream: immediate sync on setup (default `immediate: true`) — here the
     // initial sync runs in the mount effect, i.e. once the hook has rendered
-    expect(target1.current).toBe('foo')
-    expect(target2.current).toBe('foo')
+    expect(result.current.target1).toBe('foo')
+    expect(result.current.target2).toBe('foo')
 
     // upstream: `source.value = 'bar'` fires the watcher synchronously — in
-    // React the new plain value is adopted on the following render
+    // React the new source value is adopted on the following commit
     await act(() => result.current.setSource('bar'))
 
-    expect(target1.current).toBe('bar')
-    expect(target2.current).toBe('bar')
+    expect(result.current.target1).toBe('bar')
+    expect(result.current.target2).toBe('bar')
 
     result.current.stop()
 
     await act(() => result.current.setSource('bar2'))
 
-    expect(target1.current).toBe('bar')
-    expect(target2.current).toBe('bar')
+    expect(result.current.target1).toBe('bar')
+    expect(result.current.target2).toBe('bar')
   })
 
   it('should work with non-array', async () => {
-    const target = { current: 'bar' }
-
     const { result, act } = await renderHook(() => {
       const [source, setSource] = useState('foo')
-      return { stop: syncStates(source, target), setSource }
+      const [target, setTarget] = useState('bar')
+      return { stop: syncStates(source, [target, setTarget]), setSource, target }
     })
 
-    expect(target.current).toBe('foo')
+    expect(result.current.target).toBe('foo')
 
     await act(() => result.current.setSource('bar'))
 
-    expect(target.current).toBe('bar')
+    expect(result.current.target).toBe('bar')
 
     result.current.stop()
 
     await act(() => result.current.setSource('bar2'))
 
-    expect(target.current).toBe('bar')
+    expect(result.current.target).toBe('bar')
   })
 
   it('does not sync on mount when immediate is false', async () => {
-    const target = { current: 'bar' }
+    const { result } = await renderHook(() => {
+      const [target, setTarget] = useState('bar')
+      syncStates('foo', [target, setTarget], { immediate: false })
+      return { target }
+    })
 
-    await renderHook(() => syncStates('foo', target, { immediate: false }))
-
-    expect(target.current).toBe('bar')
+    expect(result.current.target).toBe('bar')
   })
 
   it('syncs a later change when immediate is false', async () => {
-    const target = { current: 'bar' }
-
     const { result, act } = await renderHook(() => {
       const [source, setSource] = useState('foo')
-      return { stop: syncStates(source, target, { immediate: false }), setSource }
+      const [target, setTarget] = useState('bar')
+      syncStates(source, [target, setTarget], { immediate: false })
+      return { target, setSource }
     })
 
     // nothing on mount
-    expect(target.current).toBe('bar')
+    expect(result.current.target).toBe('bar')
 
     // a later source change syncs post-commit
     await act(() => result.current.setSource('baz'))
-    expect(target.current).toBe('baz')
+    expect(result.current.target).toBe('baz')
   })
 
   it('returns a stable stop across renders', async () => {
-    const target = { current: 'bar' }
+    const { result, rerender } = await renderHook(() => {
+      const [target, setTarget] = useState('bar')
+      return { stop: syncStates('foo', [target, setTarget]) }
+    })
 
-    const { result, rerender } = await renderHook(() => syncStates('foo', target))
-
-    const stop = result.current
+    const stop = result.current.stop
     await rerender()
 
-    expect(result.current).toBe(stop)
+    expect(result.current.stop).toBe(stop)
   })
 
   it('does not clobber targets when an unrelated re-render happens', async () => {
-    const target = { current: 'foo' }
-
-    const { rerender } = await renderHook(() => syncStates('foo', target))
-
-    target.current = 'custom'
-    await rerender()
-
-    // the source did not change — the target keeps its own value
-    expect(target.current).toBe('custom')
-  })
-
-  it('accepts ref.current as the source value', async () => {
-    const source = { current: 'foo' }
-    const target = { current: 'bar' }
-
-    const { result, act } = await renderHook(() => {
-      const [, setVersion] = useState(0)
-      syncStates(source.current, target)
-      return { bump: () => setVersion(version => version + 1) }
+    const { result, act, rerender } = await renderHook(() => {
+      const [target, setTarget] = useState('foo')
+      syncStates('foo', [target, setTarget])
+      return { target, setTarget }
     })
 
-    expect(target.current).toBe('foo')
+    await act(() => result.current.setTarget('custom'))
 
-    source.current = 'bar'
-    await act(() => result.current.bump())
+    // the source did not change — the target keeps its own value
+    expect(result.current.target).toBe('custom')
 
-    expect(target.current).toBe('bar')
+    await rerender()
+    expect(result.current.target).toBe('custom')
+  })
+
+  it('accepts a lazy-getter source', async () => {
+    let source = 'foo'
+    const { result, rerender } = await renderHook(() => {
+      const [target, setTarget] = useState('bar')
+      syncStates(() => source, [target, setTarget])
+      return { target }
+    })
+
+    expect(result.current.target).toBe('foo')
+
+    // the getter is re-read on every commit — a bare mutation is only adopted
+    // once something re-renders
+    source = 'bar'
+    await rerender()
+
+    expect(result.current.target).toBe('bar')
   })
 
   it('syncs a [value, setter] tuple target through its setter', async () => {
@@ -155,26 +165,9 @@ describe('syncStates (component)', () => {
     const [target1, setTarget1] = useState('')
     const [target2, setTarget2] = useState('')
 
-    // ref-like bridges onto the target state — the syncStates effect writes a
-    // target's `.current`, which lands in state and re-renders the input
-    const target1Ref = {
-      get current() {
-        return target1
-      },
-      set current(value: string) {
-        setTarget1(value)
-      },
-    }
-    const target2Ref = {
-      get current() {
-        return target2
-      },
-      set current(value: string) {
-        setTarget2(value)
-      },
-    }
-
-    syncStates(source, [target1Ref, target2Ref])
+    // tuple targets — the syncStates effect writes through each target's
+    // setter, which lands in state and re-renders the inputs
+    syncStates(source, [[target1, setTarget1], [target2, setTarget2]])
 
     return (
       <div>

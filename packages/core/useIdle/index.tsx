@@ -25,8 +25,7 @@ export interface UseIdleOptions extends ConfigurableWindow {
    */
   initialState?: boolean
   /**
-   * Filter for if events should to be received (upstream:
-   * `ConfigurableEventFilter`).
+   * Filter for if events should to be received.
    *
    * @default throttleFilter(50)
    */
@@ -43,23 +42,18 @@ export interface UseIdleReturn {
 }
 
 /**
- * React port of VueUse's `useIdle` — tracks whether the user is being
- * inactive.
+ * React port of VueUse's `useIdle` — tracks whether the user is being inactive.
  *
  * Map from @vueuse/core `useIdle`
  * (`source/vueuse/packages/core/useIdle/`). Returns an object mirroring the
- * upstream members: `{ idle, lastActive, isPending, reset, stop, start }`.
- * `idle` is a plain boolean state (user inactive), `lastActive` the timestamp
- * of the latest activity, and `reset` restarts the idle timer (without
- * touching `lastActive`). Every activity event (default:
- * `mousemove`/`mousedown`/`resize`/`keydown`/`touchstart`/`wheel` on the
- * window, plus document `visibilitychange`) refreshes `lastActive` and
- * restarts the timer — after `timeout` ms without activity `idle` flips to
- * `true`.
+ * upstream members: `{ idle, lastActive, isPending, reset, stop, start }`. `idle` is a plain
+ * boolean state (user inactive), `lastActive` the timestamp of the latest activity, and `reset`
+ * restarts the idle timer (without touching `lastActive`). Every activity event (default:
+ * `mousemove`/`mousedown`/`resize`/`keydown`/`touchstart`/`wheel` on the window, plus document
+ * `visibilitychange`) refreshes `lastActive` and restarts the timer — after `timeout` ms without
+ * activity `idle` flips to `true`.
  *
  * React divergences:
- * - the Vue shallow refs returned by upstream become plain values read off
- *   the result object (`idle` is a boolean, `lastActive` a number);
  * - upstream's `useEventListener` + `createFilterWrapper` become a
  *   self-contained mount `useEffect` that registers the listeners (passive)
  *   and removes them on unmount, with each event flowing through the 50ms

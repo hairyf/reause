@@ -1,8 +1,7 @@
-import type { RefOrValue } from '@reause/shared'
 import type { RefObject } from 'react'
 import type { StorageLike, UseStorageOptions } from '../useStorage'
-import { toValue } from '@reause/shared'
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { unrefElement } from '../unrefElement'
 import { usePreferredDark } from '../usePreferredDark'
 import { useStorage } from '../useStorage'
 
@@ -11,11 +10,12 @@ export type BasicColorSchema = BasicColorMode | 'auto'
 
 export interface UseColorModeOptions<T extends string = BasicColorMode> extends UseStorageOptions<T | BasicColorMode> {
   /**
-   * CSS Selector for the target element applying to
+   * CSS Selector for the target element applying to, or a React ref object (`RefObject`) holding
+   * that element (upstream's `ElementRef`).
    *
    * @default 'html'
    */
-  selector?: string | RefOrValue<HTMLElement | null>
+  selector?: string | RefObject<HTMLElement | null>
 
   /**
    * HTML attribute applying the target element
@@ -29,7 +29,7 @@ export interface UseColorModeOptions<T extends string = BasicColorMode> extends 
    *
    * @default 'auto'
    */
-  initialValue?: RefOrValue<T | BasicColorSchema>
+  initialValue?: T | BasicColorSchema
 
   /**
    * Prefix when adding value to the attribute
@@ -37,8 +37,8 @@ export interface UseColorModeOptions<T extends string = BasicColorMode> extends 
   modes?: Partial<Record<T | BasicColorSchema, string>>
 
   /**
-   * A custom handler for handle the updates.
-   * When specified, the default behavior will be overridden.
+   * A custom handler for handle the updates. When specified, the default behavior will be
+   * overridden.
    *
    * @default undefined
    */
@@ -47,10 +47,9 @@ export interface UseColorModeOptions<T extends string = BasicColorMode> extends 
   /**
    * Custom storage ref
    *
-   * When provided, the persistence layer is skipped entirely — no localStorage
-   * read/write and no storage-event listener (`useStorage` is still called
-   * internally for the rules of hooks, backed by an inert in-memory storage).
-   * A `null` `storageRef.current` falls back to `initialValue`.
+   * When provided, the persistence layer is skipped entirely — no localStorage read/write and no
+   * storage-event listener (`useStorage` is still called internally for the rules of hooks, backed
+   * by an inert in-memory storage). A `null` `storageRef.current` falls back to `initialValue`.
    */
   storageRef?: RefObject<T | BasicColorSchema>
 
@@ -71,8 +70,8 @@ export interface UseColorModeOptions<T extends string = BasicColorMode> extends 
   /**
    * Emit `auto` mode from state
    *
-   * When set to `true`, preferred mode won't be translated into `light` or `dark`.
-   * This is useful when the fact that `auto` mode was selected needs to be known.
+   * When set to `true`, preferred mode won't be translated into `light` or `dark`. This is useful
+   * when the fact that `auto` mode was selected needs to be known.
    *
    * @default undefined
    * @deprecated use the stored value when `auto` mode needs to be known
@@ -107,18 +106,17 @@ const inertStorage: StorageLike = {
 }
 
 /**
- * Reactive color mode (dark / light / customs) with auto data persistence —
- * React port of VueUse's `useColorMode`.
+ * Reactive color mode (dark / light / customs) with auto data persistence — React
+ * port of VueUse's `useColorMode`.
  *
  * Map from @vueuse/core `useColorMode`
  * (`source/vueuse/packages/core/useColorMode/`), which composes
- * `useStorage` + `usePreferredDark` and keeps the `html` (or a custom target)
- * element's `class`/attribute in sync with the resolved mode. By default the
- * mode starts `auto` — matching the user's browser preference through
- * `usePreferredDark` — and is persisted under the `storageKey`
- * ('vueuse-color-scheme') in `localStorage` (or a custom `storage`). Writing
- * `dark`/`light`/custom modes persists them and updates the DOM; writing
- * `auto` switches back to following the system preference.
+ * `useStorage` + `usePreferredDark` and keeps the `html` (or a custom target) element's
+ * `class`/attribute in sync with the resolved mode. By default the mode starts `auto` — matching
+ * the user's browser preference through `usePreferredDark` — and is persisted under the
+ * `storageKey` ('vueuse-color-scheme') in `localStorage` (or a custom `storage`). Writing
+ * `dark`/`light`/custom modes persists them and updates the DOM; writing `auto` switches back to
+ * following the system preference.
  *
  * React divergences:
  * - the Vue `Ref<T | BasicColorSchema> & { store, system, state }` return
@@ -128,12 +126,10 @@ const inertStorage: StorageLike = {
  *   value) and `system` (raw system preference) surfaces are not exposed —
  *   the storage key can be read directly and `usePreferredDark` composes, and
  *   `mode` already reflects both through the `auto` translation;
- * - the DOM `class`/attribute update and the initial storage read run in a
- *   `useEffect` (upstream's `watch(state, ..., { immediate: true })` +
- *   `tryOnMounted`), so SSR renders the translated `initialValue` and only
- *   touches `window`/`document`/storage after mount. `state` changes only
- *   re-run the effect when the resolved mode actually changed (upstream's
- *   `flush: 'post'` watch);
+ * - the DOM `class`/attribute update and the initial storage read run in a `useEffect` (upstream's
+ * `watch(state..., { immediate: true })` + `tryOnMounted`), so SSR renders the translated
+ * `initialValue` and only touches `window`/`document`/storage after mount. `state` changes only
+ * re-run the effect when the resolved mode actually changed (upstream's `flush: 'post'` watch);
  * - options are captured once at mount (upstream destructures them once at
  *   setup) — changing them between renders has no effect;
  * - `initialValue` is resolved once at mount; `storageRef` accepts a
@@ -144,8 +140,8 @@ const inertStorage: StorageLike = {
  *   localStorage read/write, no storage-event listener); a `null`
  *   `storageRef.current` falls back to `initialMode`, whereas upstream's raw
  *   `store.value` passthrough would expose `null`;
- * - `selector` accepts a string (queried on every update) or a plain element
- *   / ref-like `{ current }` object (upstream's `ElementRef`).
+ * - `selector` accepts a string (queried on every update) or a React ref object (`RefObject`)
+ * holding the target element (upstream's `ElementRef`).
  *
  * @example
  * const [mode, setMode] = useColorMode()
@@ -184,7 +180,7 @@ export function useColorMode<T extends string = BasicColorMode>(
 
   // resolved once at mount (upstream resolves the source at setup)
   const initialModeRef = useRef<T | BasicColorSchema | undefined>(undefined)
-  initialModeRef.current ??= toValue(initialValue) as T | BasicColorSchema
+  initialModeRef.current ??= initialValue as T | BasicColorSchema
   const initialMode = initialModeRef.current
 
   const preferredDark = usePreferredDark({ window: win })
@@ -239,7 +235,7 @@ export function useColorMode<T extends string = BasicColorMode>(
 
     const el = typeof selector === 'string'
       ? win.document.querySelector(selector)
-      : toValue(selector as RefOrValue<HTMLElement | null>)
+      : unrefElement(selector)
     if (!el)
       return
 

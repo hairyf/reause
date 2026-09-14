@@ -66,7 +66,7 @@ useSubscription(count$.subscribe((value) => {
 }))
 ```
 
-Only plain values are accepted — never a getter, `State<T>` or `RefOrValue`.
+Only plain values are accepted — never a getter, `State<T>` or a React ref.
 
 ## React divergences from upstream
 
@@ -109,7 +109,7 @@ Only plain values are accepted — never a getter, `State<T>` or `RefOrValue`.
  *   `deep` / `flush` are not mapped — handle extra control at the call site
  *   with rxjs operators or effect dependencies.
  * - the value source is a plain `T` only — never a getter, `State<T>` or
- *   `RefOrValue` (AGENTS.md §2).
+ *   `MaybeRefOrGetter` (AGENTS.md §2).
  * - on unmount the subject is completed: subscriptions stop and no further
  *   emissions are delivered. In dev, React StrictMode remounts effects and
  *   runs that cleanup, which completes the subject; the mount effect detects

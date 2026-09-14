@@ -4,34 +4,28 @@ import { useLayoutEffect, useRef, useSyncExternalStore } from 'react'
  * Make a composable function usable with multiple React components.
  *
  * Map from @vueuse/shared `createSharedComposable`
- * Mapping: upstream runs the composable once inside a detached
- * `effectScope(true)`, counts the subscribers and stops the scope when the
- * last consumer leaves. React has no `effectScope`, so the same lifetime is
- * expressed by an external store held in the closure of one
- * `createSharedHook` call — the `state` snapshot, a `Set` of `listeners`, the
- * `refCount` and the optional `cleanup` — which every consumer reads through
- * `useSyncExternalStore`.
+ * Mapping: upstream runs the composable once inside a detached `effectScope(true)`, counts the
+ * subscribers and stops the scope when the last consumer leaves. React has no `effectScope`, so the
+ * same lifetime is expressed by an external store held in the closure of one `createSharedHook`
+ * call — the `state` snapshot, a `Set` of `listeners`, the `refCount` and the optional `cleanup` —
+ * which every consumer reads through `useSyncExternalStore`.
  *
- * The shared instance is created by the **first consumer to render** (the
- * "creator"): it runs the wrapped hook on every one of its renders — the
- * wrapped hook is therefore free to use React hooks internally — assigning
- * the result to `state`, and `useLayoutEffect` publishes the latest value to
- * every other consumer after commit. Every later consumer never calls the
- * wrapped hook (both call patterns are stable per consumer, so the hook order
- * never changes across renders); it just reads the published snapshot. The
- * creator assigns `state` *before* `useSyncExternalStore` reads its snapshot
- * in the same render, so every consumer — creator included — receives the
- * shared value on its very first render, never `undefined`.
+ * The shared instance is created by the **first consumer to render** (the "creator"): it runs the
+ * wrapped hook on every one of its renders — the wrapped hook is therefore free to use React hooks
+ * internally — assigning the result to `state`, and `useLayoutEffect` publishes the latest value to
+ * every other consumer after commit. Every later consumer never calls the wrapped hook (both call
+ * patterns are stable per consumer, so the hook order never changes across renders); it just reads
+ * the published snapshot. The creator assigns `state` *before* `useSyncExternalStore` reads its
+ * snapshot in the same render, so every consumer — creator included — receives the shared value on
+ * its very first render, never `undefined`.
  *
- * The creator deliberately **does not register a store listener**: it already
- * re-renders on its own state changes (the wrapped hook's setters belong to
- * its component) and re-publishes afterwards, so a notification would only
- * re-render it from its own publish. `useSyncExternalStore` requires the
- * snapshot to stay reference-stable between real changes ("the result of
- * getSnapshot should be cached"): every creator render assigns a fresh
- * reference, so a subscribed creator would see "the store changed" forever and
- * loop. The creator still counts toward `refCount`, so teardown timing is
- * exact — it just never receives notifications.
+ * The creator deliberately **does not register a store listener**: it already re-renders on its own
+ * state changes (the wrapped hook's setters belong to its component) and re-publishes afterwards,
+ * so a notification would only re-render it from its own publish. `useSyncExternalStore` requires
+ * the snapshot to stay reference-stable between real changes ("the result of getSnapshot should be
+ * cached"): every creator render assigns a fresh reference, so a subscribed creator would see "the
+ * store changed" forever and loop. The creator still counts toward `refCount`, so teardown timing
+ * is exact — it just never receives notifications.
  *
  * Deviations from upstream:
  * - upstream runs the composable exactly once, with the first caller's

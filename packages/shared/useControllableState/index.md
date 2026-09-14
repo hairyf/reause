@@ -19,7 +19,7 @@ const [value, setValue] = useControllableState(props.value, {
 - `defaultValue` accepts a value or lazy initializer; it seeds the internal state of uncontrolled sources.
 - `setValue` accepts both values and updater functions wherever it has a write channel (tuple, `{ value, onChange }`, or uncontrolled sources).
 - `shouldUpdate(prev, next)` returns `true` when the value should be committed; unchanged values are ignored — the passive sync honors it too.
-- Note: plain object/array sources with `passive: true` are not synced back (an inline literal is a new identity on every render, so syncing it would re-render forever). Use a ref-like `{ current }` or getter source for object sync.
+- Note: plain object/array sources with `passive: true` are not synced back (an inline literal is a new identity on every render, so syncing it would re-render forever). Use a `{ value, onChange }` pair or a getter source for object sync.
 
 `toValue` resolution is applied on every render, so lazy getters, refs, tuples, and value objects are supported consistently.
 

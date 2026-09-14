@@ -135,8 +135,8 @@ export interface UseClipboardReturn<Optional> {
  * - the `ComputedRef<boolean>` isSupported becomes plain boolean state
  *   resolved through `useSupported` in a mount effect — `false` during the
  *   first render and on the server (SSR-safe);
- * - the `source` option (a plain string or a React ref) is resolved through
- *   `toValue` (React has no reactive refs); the `copy` callback is stable and
+ * - the `source` option is a plain string (upstream accepts a ref); the `copy`
+ *   callback is stable and
  *   reads the latest `source`/`navigator`/permission state through refs;
  * - the `copy`/`cut` listeners are wired in a `useEffect` guarded by
  *   `isSupported && read` with proper cleanup (upstream registers them
@@ -153,6 +153,6 @@ export declare function useClipboard(
   options?: UseClipboardOptions<undefined>,
 ): UseClipboardReturn<false>
 export declare function useClipboard(
-  options: UseClipboardOptions<RefOrValue<string>>,
+  options: UseClipboardOptions<string>,
 ): UseClipboardReturn<true>
 ```

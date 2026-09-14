@@ -1,5 +1,5 @@
 import { useDropZone } from '@reause/core'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 
 interface FileData {
   name: string
@@ -17,8 +17,9 @@ function BooleanDisplay({ value }: { value: boolean }) {
 }
 
 export default function UseDropZoneDemo() {
-  const [dropZoneEl, setDropZoneEl] = useState<HTMLDivElement | null>(null)
-  const [imageDropZoneEl, setImageDropZoneEl] = useState<HTMLDivElement | null>(null)
+  // DOM targets are React refs (a plain element is no longer accepted)
+  const dropZoneEl = useRef<HTMLDivElement | null>(null)
+  const imageDropZoneEl = useRef<HTMLDivElement | null>(null)
 
   const [filesData, setFilesData] = useState<FileData[]>([])
   const [imageFilesData, setImageFilesData] = useState<FileData[]>([])
@@ -58,7 +59,7 @@ export default function UseDropZoneDemo() {
 
       <div className="flex gap-2">
         <div
-          ref={setDropZoneEl}
+          ref={dropZoneEl}
           className="flex flex-col w-full min-h-200px h-auto bg-gray-400/10 justify-center items-center mt-6 rounded"
         >
           <div className="font-bold mb-2">
@@ -97,7 +98,7 @@ export default function UseDropZoneDemo() {
           </div>
         </div>
         <div
-          ref={setImageDropZoneEl}
+          ref={imageDropZoneEl}
           className="flex flex-col w-full min-h-200px h-auto bg-gray-400/10 justify-center items-center mt-6 rounded"
         >
           <div className="font-bold mb-2">

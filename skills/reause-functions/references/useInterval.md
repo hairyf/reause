@@ -130,10 +130,9 @@ export type UseIntervalReturn = number | UseIntervalControls
  * double-invocation so `immediateCallback` fires only once), and
  * `tryOnScopeDispose(pause)` becomes the effect cleanup. `{ controls: true }`
  * exposes `counter` / `reset` plus the `Pausable` controls (`isActive` /
- * `pause` / `resume`). `interval` accepts a number or a React ref (upstream:
- * `RefOrValue<number>`); like upstream's reactive watch, a changed interval
- * live-restarts the timer while it is active (a ref's `.current` mutation is
- * only picked up on the next render — React has no reactive refs).
+ * `pause` / `resume`). `interval` is a plain number (upstream:
+ * `MaybeRefOrGetter<number>`); like upstream's reactive watch, a changed
+ * interval live-restarts the timer while it is active.
  * `immediateCallback` follows `useIntervalFn`'s semantics (upstream
  * `useInterval` doesn't forward it). `pause` / `resume` / `reset` are stable
  * `useCallback`s.
@@ -145,11 +144,11 @@ export type UseIntervalReturn = number | UseIntervalControls
  * const { counter, isActive, pause, resume, reset } = useInterval(200, { controls: true })
  */
 export declare function useInterval(
-  interval?: RefOrValue<number>,
+  interval?: number,
   options?: UseIntervalOptions<false>,
 ): number
 export declare function useInterval(
-  interval: RefOrValue<number>,
+  interval: number,
   options: UseIntervalOptions<true>,
 ): UseIntervalControls
 ```

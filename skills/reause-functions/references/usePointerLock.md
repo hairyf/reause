@@ -31,11 +31,11 @@ export interface UsePointerLockOptions {
   document?: Document
 }
 /**
- * Element, element ref, or nothing — the React analog of upstream's
- * `ElementRef` (a bare element or a React ref is accepted; refs are
- * resolved at `lock()` call time, mirroring upstream's `unrefElement`).
+ * Element ref or nothing — the React analog of upstream's `ElementRef`
+ * (reause binds DOM targets to a React ref only; the ref is resolved at
+ * `lock()` call time, mirroring upstream's `unrefElement`).
  */
-type ElementRef = Element | Ref<Element> | null | undefined
+type ElementRef = RefObject<Element | null | undefined>
 export interface UsePointerLockReturn {
   /**
    * Whether the Pointer Lock API is supported by the resolved document.

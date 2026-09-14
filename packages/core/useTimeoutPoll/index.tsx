@@ -24,8 +24,8 @@ export interface Pausable {
    */
   isActive: boolean
   /**
-   * Stop the poll — the pending timeout is cleared and no further runs are
-   * scheduled; a callback already in flight still finishes
+   * Stop the poll — the pending timeout is cleared and no further runs are scheduled; a callback
+   * already in flight still finishes
    */
   pause: () => void
   /**
@@ -35,23 +35,17 @@ export interface Pausable {
 }
 
 /**
- * React port of VueUse's `useTimeoutPoll`.
- *
  * Map from @vueuse/core `useTimeoutPoll`
  * (`source/vueuse/packages/core/useTimeoutPoll/`): a timeout-based poll chain
- * that triggers the callback one `interval` after activation and re-schedules
- * only after the previous run has finished, so a slow poll never overlaps
- * itself. Self-contained `setTimeout` chain (upstream composes
- * `useTimeoutFn`); there is no document-visibility gating in upstream, so
- * none here either.
+ * that triggers the callback one `interval` after activation and re-schedules only after the
+ * previous run has finished, so a slow poll never overlaps itself. Self-contained `setTimeout`
+ * chain; there is no document-visibility gating in upstream, so none here either.
  *
  * React divergences:
- * - `fn` and `interval` are plain values kept in refs (upstream: closure +
- *   `RefOrValue<number>`), so `pause` / `resume` stay referentially
- *   stable and a changing (typically stable) callback identity never restarts
- *   the chain. Like upstream, the `interval` is only read when a run is
- *   scheduled — a changed `interval` does not re-arm the pending timeout,
- *   which keeps its old cadence until the next schedule;
+ * - `fn` and `interval` are plain values kept in refs, so `pause` / `resume` stay referentially
+ * stable and a changing (typically stable) callback identity never restarts the chain. Like
+ * upstream, the `interval` is only read when a run is scheduled — a changed `interval` does not
+ * re-arm the pending timeout, which keeps its old cadence until the next schedule;
  * - the `isActive` shallow ref becomes a plain boolean state, flipped by
  *   `resume` / `pause` (upstream sets it synchronously during setup);
  * - the setup-time auto `resume()` (`immediate`, client-only) becomes a mount

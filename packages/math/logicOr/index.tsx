@@ -5,14 +5,12 @@
  * (`source/vueuse/packages/math/logicOr/`). Compute the logical `OR` of any
  * number of values.
  *
- * Adjustment for React: upstream wraps the computation in `computed(() => ...)`
- * and returns a `ComputedRef<boolean>`; the reause version is a pure utility
- * function — all plain arguments are evaluated on every call and the plain
- * boolean result is returned directly, with no effects and no `.value` wrapper
- * (SSR-safe). The caller re-invokes it to react to changing values.
+ * React divergences: upstream wraps the computation in `computed(() =>...)` and returns a
+ * `ComputedRef<boolean>`; the reause version is a pure utility function — all plain arguments are
+ * evaluated on every call and the plain boolean result is returned directly, with no effects and no
+ * `.value` wrapper (SSR-safe). The caller re-invokes it to react to changing values.
  *
- * React divergence: arguments are plain values, not upstream's
- * `MaybeRefOrGetter<any>[]`.
+ * React divergence: arguments are plain values, not upstream's `MaybeRefOrGetter<any>[]`.
  *
  * @see https://vueuse.org/math/logicOr/
  *

@@ -57,8 +57,7 @@ caller (upstream's writable computed writes through to a ref input). A changed `
 over an internal `setValue` write, and an internal write survives a re-render that leaves `input`
 unchanged.
 
-`type` and `options` remain `RefOrValue` (a plain value or ref-like `{ current }`) — they are
-format knobs, not the hook's value source.
+`type` and `options` are plain values — they are format knobs, not the hook's value source.
 
 Can be passed into `options` for customization
 

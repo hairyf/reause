@@ -78,7 +78,7 @@ export interface UseColorModeOptions<
    *
    * @default 'html'
    */
-  selector?: string | RefOrValue<HTMLElement | null>
+  selector?: string | HTMLElement | null
   /**
    * HTML attribute applying the target element
    *
@@ -90,7 +90,7 @@ export interface UseColorModeOptions<
    *
    * @default 'auto'
    */
-  initialValue?: RefOrValue<T | BasicColorSchema>
+  initialValue?: T | BasicColorSchema
   /**
    * Prefix when adding value to the attribute
    */

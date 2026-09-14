@@ -27,10 +27,10 @@ raw.current = 'from outside' // external control — picked up on the next rende
 
 ## Value sources
 
-`source` accepts a `State<T | undefined | null>`: a plain value, a ref-like
-`{ current }`, a getter, a `[value, setter]` tuple or a `{ value, onChange }`
-pair. `setValue` accepts a value or an updater function (`current => ...`),
-writes through to the ref-like `current`, the tuple setter or `onChange`, and
+`source` accepts a `State<T | undefined | null>`: a plain value, a getter, a
+`[value, setter]` tuple or a `{ value, onChange }` pair. `setValue` accepts a
+value or an updater function (`current => ...`),
+writes through to the tuple setter or `onChange`, and
 re-renders the derived value; a plain value / getter source stays read-only
 (calls are a no-op — there is no channel to write back to the source).
 

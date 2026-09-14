@@ -23,11 +23,11 @@ useWatchDebounced(
 
 ### Options
 
-| Option      | Type                 | Default | Description                                                              |
-| ----------- | -------------------- | ------- | ------------------------------------------------------------------------ |
-| `debounce`  | `RefOrValue<number>` | `0`     | Debounce delay in ms (can be reactive)                                   |
-| `maxWait`   | `RefOrValue<number>` | —       | Maximum wait time before forced invocation                               |
-| `immediate` | `boolean`            | `false` | Fire the callback once on mount with the current value (still debounced) |
+| Option      | Type      | Default | Description                                                              |
+| ----------- | --------- | ------- | ------------------------------------------------------------------------ |
+| `debounce`  | `number`  | `0`     | Debounce delay in ms                                                     |
+| `maxWait`   | `number`  | —       | Maximum wait time before forced invocation                               |
+| `immediate` | `boolean` | `false` | Fire the callback once on mount with the current value (still debounced) |
 
 Fire the callback once on mount with the current value (still debounced):
 
@@ -42,12 +42,12 @@ useWatchDebounced(input, () => console.log('changed!'), { immediate: true })
 ```ts
 export interface UseWatchDebouncedOptions extends DebounceFilterOptions {
   /**
-   * Debounce delay in milliseconds. Accepts a plain number or a ref-like
-   * `{ current }` — re-read on every source change.
+   * Debounce delay in milliseconds — a plain number, re-read on every source
+   * change.
    *
    * @default 0
    */
-  debounce?: RefOrValue<number>
+  debounce?: number
   /**
    * Fire the callback once on mount with the current value (still debounced).
    *

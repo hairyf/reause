@@ -19,8 +19,8 @@ export interface UseDarkOptions extends Omit<UseColorModeOptions<BasicColorSchem
   valueLight?: string
 
   /**
-   * A custom handler for handle the updates.
-   * When specified, the default behavior will be overridden.
+   * A custom handler for handle the updates. When specified, the default behavior will be
+   * overridden.
    *
    * @default undefined
    */
@@ -38,17 +38,15 @@ export type UseDarkReturn = [
  * Map from @vueuse/core `useDark`
  * (`source/vueuse/packages/core/useDark/`), which composes `useColorMode`
  * (`source/vueuse/packages/core/useColorMode/`) with a two-mode palette and a
- * boolean projection. Reactive dark mode with auto data persistence: on
- * start up it reads the value from localStorage (the key is configurable) to
- * see if there is a user configured color scheme, if not, it uses the user's
- * system preference. Changing `isDark` updates the target element's
+ * boolean projection. Reactive dark mode with auto data persistence: on start up it reads the value
+ * from localStorage (the key is configurable) to see if there is a user configured color scheme, if
+ * not, it uses the user's system preference. Changing `isDark` updates the target element's
  * attribute and stores the preference for persistence.
  *
  * React divergences:
- * - the Vue `WritableComputedRef<boolean>` return becomes a state-like tuple
- *   `[isDark, toggleDark]`: `isDark` is plain boolean state (re-renders the
- *   component on change) and `toggleDark` is a toggle callback (upstream
- *   composes `useToggle(isDark)` for the same effect);
+ * - the Vue `WritableComputedRef<boolean>` return becomes a state-like tuple `[isDark,
+ * toggleDark]`: `isDark` is plain boolean state (re-renders the component on change) and
+ * `toggleDark` is a toggle callback;
  * - the composed `useColorMode` `[mode, setMode]` tuple is projected to a
  *   boolean: `isDark = mode === 'dark'`, and `toggleDark` flips the resolved
  *   mode, storing `auto` when the flipped value equals the system preference

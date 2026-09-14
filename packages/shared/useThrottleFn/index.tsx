@@ -1,33 +1,24 @@
-import type { FunctionArgs, RefOrValue } from '../index'
+import type { FunctionArgs } from '../index'
 import { useEffect, useMemo, useRef } from 'react'
 import { noop } from '../index'
-import { toValue } from '../utils'
 
 export type PromisifyFn<T extends FunctionArgs> = (...args: Parameters<T>) => Promise<Awaited<ReturnType<T>>>
 
 /**
- * Throttle execution of a function — React port of VueUse's `useThrottleFn`.
- * Especially useful for rate limiting execution of handlers on events like
- * resize and scroll.
+ * Throttle execution of a function — React port of VueUse's `useThrottleFn`. Especially useful for
+ * rate limiting execution of handlers on events like resize and scroll.
  *
  * Map from @vueuse/shared `useThrottleFn`
- * Mapping: upstream builds `createFilterWrapper(throttleFilter(ms, trailing,
- * leading, rejectOnCancel), fn)` and returns a plain `PromisifyFn<T>` — the
- * throttled wrapper carries no `cancel` / `flush` / `isPending` (unlike the
- * debounce filter, upstream's `throttleFilter` is not cancelable), so this
- * port mirrors that: the return value is the wrapped function and nothing
- * more. The wrapper is built once (`useMemo`) so its identity is stable
- * across renders — safe to add/remove in effects; the latest `fn` / `ms` /
- * `trailing` / `leading` / `rejectOnCancel` are mirrored into refs so every
- * call sees fresh values (upstream captures the flags once, at filter
- * creation). `ms` accepts a number or a ref-like `{ current: number }`
- * (upstream: `RefOrValue<number>`) and is re-read on every call. The
- * throttle filter logic is inlined (upstream: `utils/filters.ts`
- * `throttleFilter` — leading/trailing timestamps with a trailing invoke on
- * window end). The wrapper is cleaned up on unmount: any pending trailing
- * timer is cleared when the component unmounts — a React hygiene measure;
- * upstream registers no disposal at all (`@__NO_SIDE_EFFECTS__`), so a
- * pending call would still fire there after teardown.
+ * Mapping: upstream builds `createFilterWrapper(throttleFilter(ms, trailing, leading,
+ * rejectOnCancel), fn)` and returns a plain `PromisifyFn<T>` — the throttled wrapper carries no
+ * `cancel` / `flush` / `isPending` (unlike the debounce filter, upstream's `throttleFilter` is not
+ * cancelable), so this port mirrors that: the return value is the wrapped function and nothing
+ * more. The wrapper is built once (`useMemo`) so its identity is stable across renders — safe to
+ * add/remove in effects; the latest `fn` / `ms` / `trailing` / `leading` / `rejectOnCancel` are
+ * mirrored into refs so every call sees fresh values (upstream captures the flags once, at filter
+ * creation). `ms` is a plain number, re-read on every call. The throttle filter logic is inlined.
+ * The wrapper; upstream registers no disposal at all (`@__NO_SIDE_EFFECTS__`), so a pending call
+ * would still fire there after teardown.
  *
  * @param   fn             A function to be executed after delay milliseconds. The `this` context and all arguments are passed through, as-is,
  *                                    to `callback` when the throttled-function is executed.
@@ -48,7 +39,7 @@ export type PromisifyFn<T extends FunctionArgs> = (...args: Parameters<T>) => Pr
  */
 export function useThrottleFn<T extends FunctionArgs>(
   fn: T,
-  ms: RefOrValue<number> = 200,
+  ms: number = 200,
   trailing = true,
   leading = true,
   rejectOnCancel = false,
@@ -88,7 +79,7 @@ export function useThrottleFn<T extends FunctionArgs>(
     // inlined upstream `throttleFilter` — leading/trailing timestamps with a
     // trailing invoke on window end
     const handler = (_invoke: () => unknown): unknown => {
-      const duration = toValue(msRef.current)
+      const duration = msRef.current
       const elapsed = Date.now() - lastExec
       const invoke = (): unknown => {
         return (lastValue = _invoke())
@@ -97,8 +88,8 @@ export function useThrottleFn<T extends FunctionArgs>(
       clear()
 
       // deviation from upstream (`filters.ts` only checks `duration <= 0`):
-      // an `undefined` ms (e.g. `{ current: undefined }`) would otherwise run
-      // an immediate NaN timeout — invoke right away instead
+      // a non-positive ms would otherwise schedule an immediate timeout —
+      // invoke right away instead
       if (duration === undefined || duration <= 0) {
         lastExec = Date.now()
         return invoke()

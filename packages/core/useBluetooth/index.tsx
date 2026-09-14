@@ -14,14 +14,13 @@ import { useSupported } from '../useSupported'
 // ---------------------------------------------------------------------------
 
 /**
- * A Bluetooth service UUID — either a 16/32-bit number or a canonical
- * 128-bit UUID string.
+ * A Bluetooth service UUID — either a 16/32-bit number or a canonical 128-bit UUID string.
  */
 export type BluetoothServiceUUID = string | number
 
 /**
- * A filter for the device chooser: restrict devices by advertised services,
- * a name or a name prefix.
+ * A filter for the device chooser: restrict devices by advertised services, a name or a name
+ * prefix.
  */
 export interface BluetoothLEScanFilter {
   services?: BluetoothServiceUUID[]
@@ -116,9 +115,8 @@ type BluetoothNavigator = Navigator & { bluetooth: Bluetooth }
 
 export interface UseBluetoothRequestDeviceOptions {
   /**
-   * An array of `BluetoothLEScanFilter`s. This filter consists of an array
-   * of `BluetoothServiceUUID`s, a `name` parameter, and a `namePrefix`
-   * parameter.
+   * An array of `BluetoothLEScanFilter`s. This filter consists of an array of
+   * `BluetoothServiceUUID`s, a `name` parameter, and a `namePrefix` parameter.
    */
   filters?: BluetoothLEScanFilter[] | undefined
   /**
@@ -131,12 +129,11 @@ export interface UseBluetoothRequestDeviceOptions {
 
 export interface UseBluetoothOptions extends UseBluetoothRequestDeviceOptions, ConfigurableNavigator {
   /**
-   * A boolean value indicating that the requesting script can accept all
-   * Bluetooth devices. The default is false.
+   * A boolean value indicating that the requesting script can accept all Bluetooth devices. The
+   * default is false.
    *
-   * !! This may result in a bunch of unrelated devices being shown in the
-   * chooser and energy being wasted as there are no filters. Use it with
-   * caution.
+   * !! This may result in a bunch of unrelated devices being shown in the chooser and energy being
+   * wasted as there are no filters. Use it with caution.
    *
    * @default false
    */
@@ -145,8 +142,8 @@ export interface UseBluetoothOptions extends UseBluetoothRequestDeviceOptions, C
 
 export interface UseBluetoothReturn {
   /**
-   * Whether the Web Bluetooth API is available in the current environment.
-   * `false` during render and on the server, resolved in a mount effect.
+   * Whether the Web Bluetooth API is available in the current environment. `false` during render
+   * and on the server, resolved in a mount effect.
    */
   isSupported: boolean
   /**
@@ -158,10 +155,9 @@ export interface UseBluetoothReturn {
    */
   device: BluetoothDevice | undefined
   /**
-   * Requests a Bluetooth device. Must be called from a user gesture — it
-   * opens the browser's native device chooser. Resolves without picking a
-   * device when the API is unsupported, and stores any rejection in
-   * `error`.
+   * Requests a Bluetooth device. Must be called from a user gesture — it opens the browser's native
+   * device chooser. Resolves without picking a device when the API is unsupported, and stores any
+   * rejection in `error`.
    */
   requestDevice: () => Promise<void>
   /**
@@ -179,19 +175,12 @@ export interface UseBluetoothReturn {
  *
  * Map from @vueuse/core `useBluetooth`
  * (`source/vueuse/packages/core/useBluetooth/`). Returns an object
- * mirroring the upstream members: `{ isSupported, isConnected, device,
- * requestDevice, server, error }`. `requestDevice` opens the browser's
- * device chooser and stores the picked `BluetoothDevice` in `device`; the
- * device then auto-connects to its GATT server (`server`, `isConnected`),
- * and a `gattserverdisconnected` event resets the connection state.
+ * mirroring the upstream members: `{ isSupported, isConnected, device, requestDevice, server, error
+ * }`. `requestDevice` opens the browser's device chooser and stores the picked `BluetoothDevice` in
+ * `device`; the device then auto-connects to its GATT server (`server`, `isConnected`), and a
+ * `gattserverdisconnected` event resets the connection state.
  *
  * React divergences:
- * - the Vue shallow refs returned by upstream become plain state values read
- *   off the result object (`device`/`server`/`error` are state values and
- *   `isConnected` is a boolean state), and `isSupported` (upstream
- *   `useSupported`) is a plain boolean settled in a mount effect, so no
- *   `.value` is involved and nothing touches `navigator` during render
- *   (SSR-safe);
  * - the upstream `watch(device)` auto-connect becomes an effect keyed on
  *   `device`, the mount-registered `gattserverdisconnected` listener becomes
  *   a per-device effect (re-bound whenever `device` changes), and the

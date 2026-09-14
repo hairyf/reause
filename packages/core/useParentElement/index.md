@@ -14,7 +14,4 @@ import { useRef } from 'react'
 
 const childRef = useRef<HTMLDivElement>(null)
 const parent = useParentElement(childRef) // HTMLElement | SVGElement | null | undefined
-
-// with a plain element
-const parentOfChild = useParentElement(document.querySelector<HTMLElement>('#child'))
 ```

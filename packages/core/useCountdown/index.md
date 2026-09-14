@@ -70,5 +70,5 @@ start()
 
 - The return is a React tuple `[remaining, setRemaining, { reset, stop, start, pause, resume, isActive }]` instead of upstream's object: `remaining` is a `number` and `controls.isActive` a `boolean` (no `.value`), and `setRemaining` is the React state setter writing the internal state directly.
 - Upstream accepts a `scheduler` option (`UseCountdownOptions extends ConfigurableScheduler`, defaulting to `useIntervalFn(cb, 1000, { immediate: false })`). There is no React equivalent, so `scheduler` is not ported; the reause-only `interval` option sets the tick rate instead (default `1000` ms, matching upstream's default scheduler).
-- A plain-number `initialCountdown` is captured once at setup, like upstream's `toValue(initialCountdown)` closure — a later no-arg `start()`/`reset()` keeps using the setup value. Pass a ref-like `{ current }` to read the latest value.
+- A plain-number `initialCountdown` is captured once at setup, like upstream's `toValue(initialCountdown)` closure — a later no-arg `start()`/`reset()` keeps using the setup value.
 - `start()`/`resume()` begin the interval from event handlers/effects only, so no timers run during SSR.

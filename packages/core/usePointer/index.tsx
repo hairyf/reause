@@ -1,6 +1,7 @@
-import type { ConfigurableWindow, RefOrValue } from '@reause/shared'
-import { toValue } from '@reause/shared'
+import type { ConfigurableWindow } from '@reause/shared'
+import type { RefObject } from 'react'
 import { useEffect, useState } from 'react'
+import { unrefElement } from '../unrefElement'
 
 /**
  * Pointer device type reported by `PointerEvent.pointerType`.
@@ -34,12 +35,12 @@ export interface UsePointerOptions extends ConfigurableWindow {
   initialValue?: Partial<UsePointerState>
 
   /**
-   * Element that listens to pointer events; an explicit `null` disables
-   * listening, while an omitted target falls back to `window`.
+   * React ref object (`RefObject`) holding the element that listens to pointer events; a ref whose
+   * `.current` is `null` disables listening, while an omitted target falls back to `window`.
    *
    * @default window
    */
-  target?: RefOrValue<EventTarget | null | undefined>
+  target?: RefObject<EventTarget | null | undefined>
 }
 
 export interface UsePointerReturn extends UsePointerState {
@@ -60,28 +61,23 @@ const defaultState: UsePointerState = {
 }
 
 /**
- * React port of VueUse's `usePointer`.
- *
  * Map from @vueuse/core `usePointer`
  * (`source/vueuse/packages/core/usePointer/`), which listens to
- * `pointerdown`/`pointermove`/`pointerup` on the `target` option (default
- * `window`), picks the pointer state from every event, and flips `isInside`
- * back to `false` on `pointerleave`/`pointercancel`. A `pointerTypes` filter
- * skips the state update but still marks `isInside`. Reactive pointer state.
+ * `pointerdown`/`pointermove`/`pointerup` on the `target` option (default `window`), picks the
+ * pointer state from every event, and flips `isInside` back to `false` on
+ * `pointerleave`/`pointercancel`. A `pointerTypes` filter skips the state update but still marks
+ * `isInside`. Reactive pointer state.
  *
  * React divergences:
- * - the Vue refs returned by upstream become a plain object of plain values —
- *   read `x`, `y`, `pressure`, `pointerType`, ... directly off the result;
- * - upstream's `useEventListener` becomes a self-contained mount `useEffect`
- *   that re-subscribes when the resolved `target`/`pointerTypes` change and
- *   removes all listeners on unmount;
- * - `initialValue` is folded into the `useState` initializer, so SSR renders
- *   the defaults (`x: 0`, `y: 0`, ..., `pointerType: null`, `isInside: false`)
- *   without touching `window`;
- * - `target` accepts a plain `EventTarget` or a ref-like `{ current }` object
- *   (`RefOrValue`) and an explicit `null` disables listening, while an omitted
- *   `target` falls back to the `window` option (upstream `target = defaultWindow`
- *   plus `if (target)`).
+ * - the Vue refs returned by upstream become a plain object of plain values — read `x`, `y`,
+ * `pressure`, `pointerType`... directly off the result;
+ * - a self-contained mount `useEffect` that re-subscribes when the resolved `target`/`pointerTypes`
+ * change and removes all listeners on unmount;
+ * - `initialValue` is folded into the `useState` initializer, so SSR renders the defaults (`x: 0`,
+ * `y: 0`..., `pointerType: null`, `isInside: false`) without touching `window`;
+ * - `target` accepts a React ref object (`RefObject`) holding the event target; a ref whose
+ * `.current` is `null` disables listening, while an omitted `target` falls back to the `window`
+ * option (upstream `target = defaultWindow` plus `if (target)`).
  *
  * @param options - `pointerTypes` / `initialValue` / `target` plus a custom
  *   `window` instance (`ConfigurableWindow`) used when `target` is omitted,
@@ -103,9 +99,9 @@ export function usePointer(options: UsePointerOptions = {}): UsePointerReturn {
   const instance = win ?? (typeof window === 'undefined' ? undefined : window)
 
   // dependency-tracking read: refs populate before effects run, so the first
-  // render resolves `null` for ref-like targets — the effect below re-resolves
+  // render resolves `null` for the ref's `.current` — the effect below re-resolves
   // fresh and re-binds whenever the resolved target changes
-  const trackedTarget = target === undefined ? instance : toValue(target)
+  const trackedTarget = target === undefined ? instance : unrefElement(target)
 
   useEffect(() => {
     if (!trackedTarget)

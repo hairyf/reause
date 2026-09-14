@@ -81,11 +81,11 @@ export interface UseIntersectionObserverOptions {
   /**
    * The Element or Document whose bounds are used as the bounding box when testing for intersection.
    */
-  root?: ElementTarget | Document
+  root?: ElementTarget | RefObject<Document | null>
   /**
    * A string which specifies a set of offsets to add to the root's bounding_box when calculating intersections.
    */
-  rootMargin?: RefOrValue<string>
+  rootMargin?: string
   /**
    * Either a single number or an array of numbers between 0.0 and 1.
    * @default 0

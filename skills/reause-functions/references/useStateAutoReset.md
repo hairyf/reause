@@ -36,9 +36,9 @@ export type UseStateAutoResetReturn<T = any> = [T, Dispatch<SetStateAction<T>>]
  * is a `useState`-style setter (value or updater form, `Dispatch<SetStateAction>`)
  * that also (re)schedules a timer to restore `defaultValue` after `afterMs`
  * milliseconds. `defaultValue` accepts the shared `State<T>` form (plain value,
- * lazy getter, ref-like object, state tuple, or controlled `{ value, onChange }` pair).
- * `afterMs` accepts the shared `RefOrValue<number>` form and is resolved with `toValue` at fire time
- * (upstream: `toValue`); the pending timer is cleared on unmount (upstream:
+ * lazy getter, state tuple, or controlled `{ value, onChange }` pair).
+ * `afterMs` is a plain number, read when the timer is scheduled
+ * (upstream: `MaybeRefOrGetter<number>`); the pending timer is cleared on unmount (upstream:
  * `tryOnScopeDispose`, timers in the effect scope). The deprecated `autoResetRef`
  * alias is not ported.
  *
@@ -53,6 +53,6 @@ export type UseStateAutoResetReturn<T = any> = [T, Dispatch<SetStateAction<T>>]
  */
 export declare function useStateAutoReset<T = any>(
   defaultValue: State<T>,
-  afterMs?: RefOrValue<number>,
+  afterMs?: number,
 ): UseStateAutoResetReturn<T>
 ```

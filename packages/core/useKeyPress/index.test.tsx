@@ -372,7 +372,7 @@ describe('useKeyPress — events', () => {
     const handler = vi.fn()
 
     const { rerender } = await renderHook(
-      (props?: { events: KeyPressEvent[] }) => useKeyPress('a', handler, { target: el, events: props!.events }),
+      (props?: { events: KeyPressEvent[] }) => useKeyPress('a', handler, { target: { current: el }, events: props!.events }),
       { initialProps: { events: ['keydown'] as KeyPressEvent[] } },
     )
 
@@ -401,8 +401,8 @@ describe('useKeyPress — events', () => {
 
     const capture = vi.fn()
     const bubble = vi.fn()
-    await renderHook(() => useKeyPress('a', capture, { target: parent, useCapture: true }))
-    await renderHook(() => useKeyPress('a', bubble, { target: parent }))
+    await renderHook(() => useKeyPress('a', capture, { target: { current: parent }, useCapture: true }))
+    await renderHook(() => useKeyPress('a', bubble, { target: { current: parent } }))
 
     // a non-bubbling event dispatched on the child never reaches a bubble-phase
     // ancestor listener, but the capture phase walks down to it
@@ -427,7 +427,7 @@ describe('useKeyPress — target', () => {
     const el = createTarget()
     const sibling = createTarget('span')
     const handler = vi.fn()
-    await renderHook(() => useKeyPress('a', handler, { target: el }))
+    await renderHook(() => useKeyPress('a', handler, { target: { current: el } }))
 
     press({ key: 'a', keyCode: 65 }, sibling)
     expect(handler).toHaveBeenCalledTimes(0)
@@ -476,22 +476,28 @@ describe('useKeyPress — target', () => {
     expect(handler).toHaveBeenCalledTimes(2)
   })
 
-  it('accepts a resolver function', async () => {
+  it('binds nothing when the target is a resolver function', async () => {
     const el = createTarget()
-    const sibling = createTarget('span')
     const handler = vi.fn()
-    await renderHook(() => useKeyPress('a', handler, { target: () => el }))
+    const add = vi.spyOn(el, 'addEventListener')
 
-    press({ key: 'a', keyCode: 65 }, sibling)
-    expect(handler).toHaveBeenCalledTimes(0)
+    await renderHook(() => {
+      // resolvers are gone from the DOM-target contract: only a ref object is
+      // accepted, which the compiler enforces here …
+      // @ts-expect-error a function is not assignable to a ref object
+      return useKeyPress('a', handler, { target: () => el })
+    })
 
     press({ key: 'a', keyCode: 65 }, el)
-    expect(handler).toHaveBeenCalledTimes(1)
+
+    // … and at runtime the function resolves to no `current`, so nothing binds
+    expect(add).not.toHaveBeenCalled()
+    expect(handler).toHaveBeenCalledTimes(0)
   })
 
-  it('does not fall back to window when a resolver resolves to null', async () => {
+  it('does not fall back to window when the target ref is empty', async () => {
     const handler = vi.fn()
-    await renderHook(() => useKeyPress('a', handler, { target: () => null }))
+    await renderHook(() => useKeyPress('a', handler, { target: { current: null } }))
 
     press({ key: 'a', keyCode: 65 })
 
@@ -504,7 +510,7 @@ describe('useKeyPress — lifecycle', () => {
     const el = createTarget()
     const remove = vi.spyOn(el, 'removeEventListener')
     const handler = vi.fn()
-    const { unmount } = await renderHook(() => useKeyPress('a', handler, { target: el }))
+    const { unmount } = await renderHook(() => useKeyPress('a', handler, { target: { current: el } }))
 
     press({ key: 'a', keyCode: 65 }, el)
     expect(handler).toHaveBeenCalledTimes(1)
@@ -523,7 +529,7 @@ describe('useKeyPress — lifecycle', () => {
     const second = vi.fn()
 
     const { rerender } = await renderHook(
-      (props?: { handler: (event: KeyboardEvent, key: KeyType) => void }) => useKeyPress('a', props!.handler, { target: el }),
+      (props?: { handler: (event: KeyboardEvent, key: KeyType) => void }) => useKeyPress('a', props!.handler, { target: { current: el } }),
       { initialProps: { handler: first } },
     )
 
@@ -544,7 +550,7 @@ describe('useKeyPress — lifecycle', () => {
     const handler = vi.fn()
 
     const { rerender } = await renderHook(
-      (props?: { filter: KeyPressFilter }) => useKeyPress(props!.filter, handler, { target: el }),
+      (props?: { filter: KeyPressFilter }) => useKeyPress(props!.filter, handler, { target: { current: el } }),
       { initialProps: { filter: 'a' as KeyPressFilter } },
     )
 

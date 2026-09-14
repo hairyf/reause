@@ -101,7 +101,7 @@ export type UseToggleReturn<T extends boolean | number | string = boolean> = [
  * Mapping: `ref(initialValue)` → `useControllableState(initialValue)`,
  * `toggle()` → stable `useCallback`; accepts the full `State<T>` input.
  * `truthyValue` / `falsyValue` are plain values (upstream: `MaybeRefOrGetter` —
- * reactive refs/getters are not supported, see `RefOrValue`). Upstream's
+ * reactive refs/getters are not supported, see `MaybeRefOrGetter`). Upstream's
  * `toggle` returns the new value synchronously; React state updates are async,
  * so here `toggle` is `() => void` and the new value is read from `value` on
  * the next render. Like upstream, a bare `toggle()` flips between

@@ -1,15 +1,13 @@
 import { useFetch } from '@reause/core'
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 
 export default function UseFetchDemo() {
   const [url, setUrl] = useState('https://httpbin.org/get')
-  // ref-like flag so the hook's `refetch` watch can observe the toggle
+  // `refetch` is a plain boolean option — a state change re-runs the hook
   const [refetchOn, setRefetchOn] = useState(false)
-  const refetchRef = useRef(refetchOn)
 
   const toggleRefetch = () => {
-    refetchRef.current = !refetchRef.current
-    setRefetchOn(refetchRef.current)
+    setRefetchOn(current => !current)
   }
 
   const {
@@ -21,7 +19,7 @@ export default function UseFetchDemo() {
     isFinished,
     canAbort,
     execute,
-  } = useFetch(url, { refetch: refetchRef }).get()
+  } = useFetch(url, { refetch: refetchOn }).get()
 
   let parsedData: unknown = null
   try {

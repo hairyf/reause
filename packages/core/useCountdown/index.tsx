@@ -1,6 +1,5 @@
-import type { RefOrValue } from '@reause/shared'
 import type { Dispatch, SetStateAction } from 'react'
-import { toValue, useIntervalFn } from '@reause/shared'
+import { useIntervalFn } from '@reause/shared'
 import { useCallback, useMemo, useRef, useState } from 'react'
 
 export interface UseCountdownOptions {
@@ -22,20 +21,19 @@ export interface UseCountdownOptions {
 
 export type UseCountdownReturn = readonly [
   /**
-   * Current countdown value — plain React state (upstream: a shallow ref).
+   * Current countdown value — plain React state.
    */
   remaining: number,
   /**
-   * Update the countdown with the React state protocol:
-   * `setRemaining(next)` or `setRemaining(prev => next)`. It writes the
-   * internal remaining state directly — there is no Vue-style ref object.
+   * Update the countdown with the React state protocol: `setRemaining(next)` or `setRemaining(prev
+   * => next)`. It writes the internal remaining state directly — there is no Vue-style ref object.
    */
   setRemaining: Dispatch<SetStateAction<number>>,
   controls: {
     /**
      * Resets the countdown to its initial value.
      */
-    reset: (countdown?: RefOrValue<number>) => void
+    reset: (countdown?: number) => void
     /**
      * Stops the countdown and resets its state.
      */
@@ -43,7 +41,7 @@ export type UseCountdownReturn = readonly [
     /**
      * Resets the countdown and starts it again.
      */
-    start: (countdown?: RefOrValue<number>) => void
+    start: (countdown?: number) => void
     /**
      * Pauses the countdown — the interval is cleared, `remaining` stays put.
      */
@@ -60,23 +58,18 @@ export type UseCountdownReturn = readonly [
 ]
 
 /**
- * React port of VueUse's `useCountdown` — a reactive countdown timer in
- * seconds.
+ * React port of VueUse's `useCountdown` — a reactive countdown timer in seconds.
  *
  * Map from @vueuse/core `useCountdown`
  * (`source/vueuse/packages/core/useCountdown/`). Returns a React tuple
- * `[remaining, setRemaining, { reset, stop, start, pause, resume, isActive }]`
- * (upstream: an object mirroring its members). `remaining` is a plain number
- * state (upstream: a shallow ref) that counts down one step per `interval`
- * (default `1000` ms) after `start()` — `setRemaining(next | prev => next)`
- * writes it directly, while `start(countdown?)`/`reset(countdown?)` accept a
- * number or a ref-like `{ current }` to feed a new value. A plain-number
- * `initialCountdown` is captured once at setup (upstream closes over its
- * argument), so a later no-arg `start()`/`reset()` still uses the setup value;
- * pass a ref-like `{ current }` to have it read the latest value. `stop()`
- * pauses and resets to the initial value, `pause()`/`resume()` freeze/thaw in
- * place (resume is a no-op at 0), and `onTick` fires every tick with
- * `onComplete` once the countdown reaches 0.
+ * `[remaining, setRemaining, { reset, stop, start, pause, resume, isActive }]`. `remaining` is a
+ * plain number state that counts down one step per `interval` (default `1000` ms) after `start()` —
+ * `setRemaining(next | prev => next)` writes it directly, while
+ * `start(countdown?)`/`reset(countdown?)` accept a plain number to feed a new value. A plain-number
+ * `initialCountdown` is captured once at setup (upstream closes over its argument), so a later
+ * no-arg `start()`/`reset()` still uses the setup value. `stop()` pauses and resets to the initial
+ * value, `pause()`/`resume()` freeze/thaw in place (resume is a no-op at 0), and `onTick` fires
+ * every tick with `onComplete` once the countdown reaches 0.
  *
  * React divergences:
  * - the return is a React tuple
@@ -86,11 +79,9 @@ export type UseCountdownReturn = readonly [
  *   `setRemaining` is the React state setter — no `.value`, no Vue-style ref
  *   object. A manual write composes with the running interval: the next tick
  *   decrements from the written value;
- * - the ticking interval composes shared `useIntervalFn` (upstream composes
- *   `useIntervalFn` too, through its `ConfigurableScheduler` `scheduler`
- *   option); the `scheduler` option itself has no React equivalent and is not
- *   ported — the interval is fixed via an `interval` option (upstream's
- *   default scheduler ticks every `1000` ms);
+ * - the ticking interval composes shared `useIntervalFn`; the `scheduler` option itself has no
+ * React equivalent and is not ported — the interval is fixed via an `interval` option (upstream's
+ * default scheduler ticks every `1000` ms);
  * - `start`/`resume` begin the interval only from event handlers/effects —
  *   SSR-safe, since timers never run on the server.
  *
@@ -102,7 +93,7 @@ export type UseCountdownReturn = readonly [
  * setRemaining(10) // jump to 10 on the next render
  */
 export function useCountdown(
-  initialCountdown: RefOrValue<number>,
+  initialCountdown: number,
   options: UseCountdownOptions = {},
 ): UseCountdownReturn {
   const {
@@ -113,11 +104,10 @@ export function useCountdown(
 
   // the setup-time source is captured once, mirroring upstream's closure over
   // the `initialCountdown` argument: a plain number stays pinned to its setup
-  // value for later no-arg `start()`/`reset()`, while a ref-like `{ current }`
-  // is still read lazily by `toValue`
+  // value for later no-arg `start()`/`reset()` (upstream: `MaybeRefOrGetter`)
   const initialCountdownRef = useRef(initialCountdown)
 
-  const [remaining, setRemainingState] = useState(() => toValue(initialCountdown))
+  const [remaining, setRemainingState] = useState(() => initialCountdown)
   const remainingRef = useRef(remaining)
   remainingRef.current = remaining
 
@@ -153,8 +143,8 @@ export function useCountdown(
 
   isActiveRef.current = isActive
 
-  const reset = useCallback((countdown?: RefOrValue<number>) => {
-    const value = toValue(countdown) ?? toValue(initialCountdownRef.current)
+  const reset = useCallback((countdown?: number) => {
+    const value = countdown ?? initialCountdownRef.current
     setRemaining(value)
   }, [setRemaining])
 
@@ -168,7 +158,7 @@ export function useCountdown(
       resumeInterval()
   }, [resumeInterval])
 
-  const start = useCallback((countdown?: RefOrValue<number>) => {
+  const start = useCallback((countdown?: number) => {
     reset(countdown)
     resumeInterval()
   }, [reset, resumeInterval])

@@ -93,13 +93,13 @@ describe('useInterval', () => {
     expect(result.current.counter).toBe(1)
   })
 
-  it('accepts a ref interval (upstream: ref target)', async () => {
-    const ms = { current: 10 }
+  it('accepts a plain-number interval', async () => {
+    const ms = 25
     const { result, act } = await renderHook(() => useInterval(ms))
     expect(result.current).toBe(0)
 
     await act(async () => {
-      vi.advanceTimersByTime(20)
+      vi.advanceTimersByTime(50)
     })
     expect(result.current).toBe(2)
   })
@@ -161,9 +161,11 @@ describe('useInterval', () => {
     expect(result.current.counter).toBe(0)
   })
 
-  it('re-evaluates a ref interval on resume()', async () => {
-    const ms = { current: 10 }
-    const { result, act } = await renderHook(() => useInterval(ms, { controls: true }))
+  it('re-evaluates the interval on resume()', async () => {
+    const { result, act, rerender } = await renderHook(
+      ({ ms }: { ms: number } = { ms: 10 }) => useInterval(ms, { controls: true }),
+      { initialProps: { ms: 10 } },
+    )
 
     await act(async () => {
       vi.advanceTimersByTime(10)
@@ -173,7 +175,7 @@ describe('useInterval', () => {
     await act(async () => {
       result.current.pause()
     })
-    ms.current = 20
+    await rerender({ ms: 20 })
     await act(async () => {
       result.current.resume()
     })

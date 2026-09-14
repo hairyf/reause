@@ -2,10 +2,7 @@ import { useEffect, useState } from 'react'
 
 export interface UseDocumentVisibilityOptions {
   /**
-   * Specify a custom `document` instance, e.g. working with iframes or in
-   * testing environments. Inlined here — `ConfigurableDocument` is not ported
-   * to `@reause/shared`, so `document?` mirrors the option `useFileDialog`
-   * exposes (defaults to the global `document` when not provided).
+   * Specify a custom `document` instance, e.g. working with iframes or in testing environments.
    *
    * @default typeof document !== 'undefined' ? document : undefined
    */
@@ -13,21 +10,14 @@ export interface UseDocumentVisibilityOptions {
 }
 
 /**
- * React port of VueUse's `useDocumentVisibility`.
- *
  * Map from @vueuse/core `useDocumentVisibility`
  * (`source/vueuse/packages/core/useDocumentVisibility/`). Reactively track
- * `document.visibilityState` — `'visible'` or `'hidden'` — by subscribing to
- * the document `visibilitychange` event.
+ * `document.visibilityState` — `'visible'` or `'hidden'` — by subscribing to the document
+ * `visibilitychange` event.
  *
- * React divergences:
- * - the Vue `ShallowRef<DocumentVisibilityState>` return becomes a plain
- *   `DocumentVisibilityState` value;
- * - the `visibilitychange` listener lives in a self-contained `useEffect`
- *   (upstream composes `useEventListener`) and is removed on unmount;
- * - the initial `document.visibilityState` read happens in the mount effect
- *   instead of during setup, so SSR renders the `'visible'` default without
- *   touching `document` (matching upstream's no-document value).
+ * React divergences: the initial `document.visibilityState` read happens in the mount effect
+ * instead of during setup, so SSR renders the `'visible'` default without touching `document`
+ * (matching upstream's no-document value).
  *
  * @example
  * const visibility = useDocumentVisibility()

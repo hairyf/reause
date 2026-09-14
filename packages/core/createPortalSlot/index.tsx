@@ -12,9 +12,9 @@ export type PortalSlotComponent<
   MapSlotNameToSlotProps extends ObjectLiteralWithPotentialObjectLiterals,
 > = ComponentType<{
   /**
-   * The template to capture — a function receiving the bindings passed to
-   * `<SlotTarget>` plus `$slots` (a function returning the `<SlotTarget>`'s
-   * children, the React equivalent of upstream's `$slots.default`).
+   * The template to capture — a function receiving the bindings passed to `<SlotTarget>` plus
+   * `$slots` (a function returning the `<SlotTarget>`'s children, the React equivalent of
+   * upstream's `$slots.default`).
    */
   children?: (bindings: Bindings & { $slots: GenerateSlotsFromSlotMap<MapSlotNameToSlotProps> }) => ReactNode
 }>
@@ -23,8 +23,8 @@ export type SlotTargetComponent<
   Bindings extends Record<string, any>,
 > = ComponentType<Bindings & {
   /**
-   * Children passed to `<SlotTarget>` — exposed to the template as
-   * `$slots.default` (React's single slot, mirroring upstream's default slot).
+   * Children passed to `<SlotTarget>` — exposed to the template as `$slots.default` (React's single
+   * slot, mirroring upstream's default slot).
    */
   children?: ReactNode
 }>
@@ -44,28 +44,24 @@ export interface CreatePortalSlotOptions<Bindings extends Record<string, any>> {
   /**
    * Restrict the props forwarded from `<SlotTarget>` to the template.
    *
-   * Upstream declares Vue runtime props (`ComponentObjectPropsOptions`); React
-   * has no runtime props declaration, so this is a list of prop keys instead —
-   * only these are passed to the template as bindings and the rest are
-   * dropped. When omitted, every prop except `children` is forwarded
-   * (upstream: all attributes are passed through). `children` is reserved by
-   * the components and excluded from the accepted keys.
+   * Upstream declares Vue runtime props (`ComponentObjectPropsOptions`); React has no runtime props
+   * declaration, so this is a list of prop keys instead — only these are passed to the template as
+   * bindings and the rest are dropped. When omitted, every prop except `children` is forwarded.
+   * `children` is reserved by the components and excluded from the accepted keys.
    *
    * @default undefined (all props forwarded)
    */
   props?: readonly (Exclude<keyof Bindings, 'children'>)[]
   /**
-   * Name for the target (reuse) component, useful for devtools. Both
-   * components get `${name}.define` / `${name}.reuse` display names, exactly
-   * like upstream.
+   * Name for the target (reuse) component, useful for devtools. Both components get
+   * `${name}.define` / `${name}.reuse` display names, exactly like upstream.
    *
    * @default 'PortalSlot'
    */
   name?: string
   /**
-   * Accepted for API parity with upstream; React has no attribute-inheritance
-   * system (props never fall through to a root element), so it has no runtime
-   * effect.
+   * Accepted for API parity with upstream; React has no attribute-inheritance system (props never
+   * fall through to a root element), so it has no runtime effect.
    *
    * @default true
    */
@@ -73,20 +69,18 @@ export interface CreatePortalSlotOptions<Bindings extends Record<string, any>> {
 }
 
 /**
- * Define and reuse a template inside the component scope — React port of
- * VueUse's `createReusableTemplate`.
+ * Define and reuse a template inside the component scope — React
+ * port of VueUse's `createReusableTemplate`.
  *
  * Map from @vueuse/core `createReusableTemplate`
  * (`source/vueuse/packages/core/createReusableTemplate/`). The factory creates
- * a pair of components sharing one captured template: `PortalSlot` (the
- * "define" side) captures the render function passed as its children and
- * renders nothing; `SlotTarget` (the "reuse" side) renders that template with
- * the props passed to it. The pair supports array destructuring
- * (`[PortalSlot, SlotTarget]`), object destructuring (`{ define, reuse }`) and
- * property access (`pair.define` / `pair.reuse`) through `makeDestructurable`,
- * exactly like upstream.
+ * a pair of components sharing one captured template: `PortalSlot` (the "define" side) captures the
+ * render function passed as its children and renders nothing; `SlotTarget` (the "reuse" side)
+ * renders that template with the props passed to it. The pair supports array destructuring
+ * (`[PortalSlot, SlotTarget]`), object destructuring (`{ define, reuse }`) and property access
+ * (`pair.define` / `pair.reuse`) through `makeDestructurable`, exactly like upstream.
  *
- * React divergences from upstream:
+ * React divergences:
  * - the template is a **children-as-function** render prop instead of a
  *   `v-slot`: the bindings object replaces the slot props (the `<SlotTarget>`
  *   props), and `$slots.default` — a function returning the `<SlotTarget>`
@@ -171,10 +165,9 @@ export function createPortalSlot<
 }
 
 /**
- * `my-msg` → `myMsg`. Upstream camelizes attrs with `camelize` from
- * `@vueuse/shared`; `camelize` is deliberately unported in `@reause/shared`
- * (only `hyphenate` exists there — see `packages/shared/utils/index.tsx`,
- * "port.ts (hyphenate only)"), so the helper is inlined here.
+ * `my-msg` → `myMsg`. Upstream camelizes attrs with `camelize` from `@vueuse/shared`; `camelize` is
+ * deliberately unported in `@reause/shared` (only `hyphenate` exists there — see
+ * `packages/shared/utils/index.tsx`, "port.ts (hyphenate only)"), so the helper is inlined here.
  */
 function camelize(str: string): string {
   return str.replace(/-(\w)/g, (_, c) => (c ? c.toUpperCase() : ''))

@@ -2,34 +2,31 @@ import { useLatest } from '@reause/shared'
 import { useCallback, useEffect, useRef } from 'react'
 
 /**
- * A scheduled frame-aligned interval. `id` is a frame handle when the
- * `requestAnimationFrame` branch is active and a `setInterval` handle when the
- * environment downgrades — the tagged single-field shape ahooks uses, so the
- * clear path can re-derive which canceller belongs to the handle the way
- * upstream does.
+ * A scheduled frame-aligned interval. `id` is a frame handle when the `requestAnimationFrame`
+ * branch is active and a `setInterval` handle when the environment downgrades — the tagged
+ * single-field shape ahooks uses, so the clear path can re-derive which canceller belongs to the
+ * handle the way upstream does.
  */
 interface Handle {
   id: ReturnType<typeof setInterval> | ReturnType<typeof requestAnimationFrame>
 }
 
 /**
- * ahooks' own `isNumber` (`packages/hooks/src/utils/index.ts`): a number that
- * is not `NaN`. Kept local because `@reause/shared` has no equivalent export —
- * `NaN` fails it on purpose, so a `NaN` delay disables the loop instead of
- * arming one that could never fire.
+ * ahooks' own `isNumber` (`packages/hooks/src/utils/index.ts`): a number that is not `NaN`. Kept
+ * local because `@reause/shared` has no equivalent export — `NaN` fails it on purpose, so a `NaN`
+ * delay disables the loop instead of arming one that could never fire.
  */
 function isNumber(value: unknown): value is number {
   return typeof value === 'number' && !Number.isNaN(value)
 }
 
 /**
- * Arm a **repeating** frame-aligned interval. `start` is captured once and then
- * reset to `Date.now()` *after* every callback, so each fire re-arms the next
- * frame and moves the deadline forward: the loop keeps running until it is
- * cleared. The period is therefore `delay` rounded up to the next frame
- * boundary (upstream's documented timing quirk), not an exact `delay`. When
- * `requestAnimationFrame` is undefined the call downgrades to a plain
- * `setInterval`, which is what makes the hook usable during a server render.
+ * Arm a **repeating** frame-aligned interval. `start` is captured once and then reset to
+ * `Date.now()` *after* every callback, so each fire re-arms the next frame and moves the deadline
+ * forward: the loop keeps running until it is cleared. The period is therefore `delay` rounded up
+ * to the next frame boundary (upstream's documented timing quirk), not an exact `delay`. When
+ * `requestAnimationFrame` is undefined the call downgrades to a plain `setInterval`, which is what
+ * makes the hook usable during a server render.
  */
 function setRafInterval(callback: () => void, delay: number = 0): Handle {
   if (typeof requestAnimationFrame === 'undefined') {
@@ -62,9 +59,9 @@ function setRafInterval(callback: () => void, delay: number = 0): Handle {
 }
 
 /**
- * Upstream classifies the handle by asking whether `cancelAnimationFrame`
- * exists — not by remembering which branch armed it. Preserved as-is (a
- * mirroring quirk, see the hook's note below).
+ * Upstream classifies the handle by asking whether `cancelAnimationFrame` exists — not by
+ * remembering which branch armed it. Preserved as-is (a mirroring quirk, see the hook's note
+ * below).
  */
 function cancelAnimationFrameIsNotDefined(_id: Handle['id']): _id is ReturnType<typeof setInterval> {
   return typeof cancelAnimationFrame === 'undefined'
@@ -91,17 +88,16 @@ export interface UseIntervalRafFnOptions {
 }
 
 /**
- * Fire `fn` repeatedly, on animation frames, once at least `delay` milliseconds
- * have elapsed since the last fire; return a stable `clear` that cancels the
- * running loop.
+ * Fire `fn` repeatedly, on animation frames, once at least `delay` milliseconds have elapsed since
+ * the last fire; return a stable `clear` that cancels the running loop.
  *
  * Map from ahooks `useRafInterval`
  * (`source/ahooks/packages/hooks/src/useRafInterval/`). Mirrored directly
- * (AGENTS.md §1.1, React source ⇒ direct mirror) apart from the required
- * rename to `useIntervalRafFn`, which aligns the export with the existing
- * `useIntervalFn` in `@reause/shared`; the JSDoc marker keeps upstream's symbol
- * name. Upstream ships this hook as a default export with an inline options
- * type, reause exports it by name behind `UseIntervalRafFnOptions`.
+ * (AGENTS.md §1.1, React source ⇒ direct mirror) apart from the required rename to
+ * `useIntervalRafFn`, which aligns the export with the existing `useIntervalFn` in
+ * `@reause/shared`; the JSDoc marker keeps upstream's symbol name. Upstream ships this hook as a
+ * default export with an inline options type, reause exports it by name behind
+ * `UseIntervalRafFnOptions`.
  *
  * Semantics worth stating, because they differ from the timeout sibling:
  * - **repeating.** `start` is captured when the loop is armed and then reset to
@@ -132,12 +128,9 @@ export interface UseIntervalRafFnOptions {
  *   the arming effect depends on `delay` alone, so flipping `immediate` on a
  *   later render neither fires again nor restarts the loop — upstream behaves
  *   the same way.
- * - **dual branch.** With no `requestAnimationFrame` (a server render, or any
- *   frame-less host) the loop downgrades to `setInterval(fn, delay)`. The clear
- *   path mirrors upstream's classifier: it looks at
- *   `typeof cancelAnimationFrame`, so an environment that has one global but
- *   not the other mis-classifies the handle exactly as upstream does — a
- *   preserved quirk, not a divergence.
+ * - **dual branch.** With no `requestAnimationFrame` (a server render, or any frame-less host) the
+ * loop downgrades to `setInterval(fn, delay)`. The clear path, so an environment that has one
+ * global but not the other mis-classifies the handle, not a divergence.
  * - **`fn` is read through `@reause/shared`'s `useLatest`** (the merged
  *   react-use port), and the arming effect depends on `delay` alone. A
  *   re-render carrying a new inline callback therefore neither restarts the
@@ -160,13 +153,12 @@ export interface UseIntervalRafFnOptions {
  *   `core` depends on `shared`, so a helper there could not be imported from
  *   here.)
  *
- * Not a duplicate of `useIntervalFn` (VueUse's `useIntervalFn`, also in
- * `@reause/shared`): that one is a plain `setInterval` returning controls
- * (`{ isActive, pause, resume }`) and fires on the wall clock even in a hidden
- * tab, while this is frame-aligned — it only runs when the page actually
- * renders — and returns a single stable `clear`. It is also not
- * `packages/core`'s `useRafFn` (VueUse's per-frame callback with
- * pause/resume): that one runs on *every* frame with no delay at all.
+ * Not a duplicate of `useIntervalFn` (VueUse's `useIntervalFn`, also in `@reause/shared`): that one
+ * is a plain `setInterval` returning controls (`{ isActive, pause, resume }`) and fires on the wall
+ * clock even in a hidden tab, while this is frame-aligned — it only runs when the page actually
+ * renders — and returns a single stable `clear`. It is also not `packages/core`'s `useRafFn`
+ * (VueUse's per-frame callback with pause/resume): that one runs on *every* frame with no delay at
+ * all.
  *
  * @example
  * const clear = useIntervalRafFn(() => setCount(c => c + 1), 1000)

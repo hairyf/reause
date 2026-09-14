@@ -136,7 +136,7 @@ describe('useSortable', () => {
 
   describe('start', () => {
     it('should create the instance on mount', async () => {
-      const { unmount } = await renderHook(() => useSortable(container, ['a', 'b', 'c']))
+      const { unmount } = await renderHook(() => useSortable({ current: container }, ['a', 'b', 'c']))
 
       expect(SortableJs.get(container)).toBeDefined()
 
@@ -144,7 +144,7 @@ describe('useSortable', () => {
     })
 
     it('should not create a second instance when already started', async () => {
-      const { result, unmount } = await renderHook(() => useSortable(container, ['a', 'b', 'c']))
+      const { result, unmount } = await renderHook(() => useSortable({ current: container }, ['a', 'b', 'c']))
       const first = SortableJs.get(container)
 
       result.current.start()
@@ -155,7 +155,7 @@ describe('useSortable', () => {
     })
 
     it('should recreate the instance after stop()', async () => {
-      const { result, unmount } = await renderHook(() => useSortable(container, ['a', 'b', 'c']))
+      const { result, unmount } = await renderHook(() => useSortable({ current: container }, ['a', 'b', 'c']))
 
       expect(SortableJs.get(container)).toBeDefined()
 
@@ -170,7 +170,7 @@ describe('useSortable', () => {
     })
 
     it('should destroy the instance on unmount', async () => {
-      const { unmount } = await renderHook(() => useSortable(container, ['a', 'b', 'c']))
+      const { unmount } = await renderHook(() => useSortable({ current: container }, ['a', 'b', 'c']))
 
       expect(SortableJs.get(container)).toBeDefined()
 
@@ -230,7 +230,7 @@ describe('useSortable', () => {
 
   describe('stop', () => {
     it('should destroy the instance', async () => {
-      const { result, unmount } = await renderHook(() => useSortable(container, ['a', 'b', 'c']))
+      const { result, unmount } = await renderHook(() => useSortable({ current: container }, ['a', 'b', 'c']))
 
       expect(SortableJs.get(container)).toBeDefined()
 
@@ -244,7 +244,7 @@ describe('useSortable', () => {
 
   describe('option', () => {
     it('should get an option from the instance', async () => {
-      const { result, unmount } = await renderHook(() => useSortable(container, ['a', 'b', 'c'], { animation: 150 }))
+      const { result, unmount } = await renderHook(() => useSortable({ current: container }, ['a', 'b', 'c'], { animation: 150 }))
 
       expect(result.current.option('animation')).toBe(150)
 
@@ -252,7 +252,7 @@ describe('useSortable', () => {
     })
 
     it('should set an option on the instance', async () => {
-      const { result, unmount } = await renderHook(() => useSortable(container, ['a', 'b', 'c']))
+      const { result, unmount } = await renderHook(() => useSortable({ current: container }, ['a', 'b', 'c']))
 
       expect(result.current.option('disabled')).toBe(false)
 
@@ -278,7 +278,7 @@ describe('useSortable', () => {
     it('should hand the reordered array to the caller', async () => {
       const onUpdate = vi.fn()
       const list = ['a', 'b', 'c']
-      const { unmount } = await renderHook(() => useSortable(container, list, { onUpdate }))
+      const { unmount } = await renderHook(() => useSortable({ current: container }, list, { onUpdate }))
 
       const sortable = SortableJs.get(container)!
       const event = makeSortableEvent(items[0], container, 0, 2)
@@ -298,7 +298,7 @@ describe('useSortable', () => {
 
     it('should reorder backwards too', async () => {
       const onUpdate = vi.fn()
-      const { unmount } = await renderHook(() => useSortable(container, ['a', 'b', 'c'], { onUpdate }))
+      const { unmount } = await renderHook(() => useSortable({ current: container }, ['a', 'b', 'c'], { onUpdate }))
 
       const sortable = SortableJs.get(container)!
       getOnUpdate(sortable)(makeSortableEvent(items[2], container, 2, 0))
@@ -309,7 +309,7 @@ describe('useSortable', () => {
     })
 
     it('should not throw when no onUpdate is provided', async () => {
-      const { unmount } = await renderHook(() => useSortable(container, ['a', 'b', 'c']))
+      const { unmount } = await renderHook(() => useSortable({ current: container }, ['a', 'b', 'c']))
 
       const sortable = SortableJs.get(container)!
 
@@ -326,17 +326,17 @@ describe('useSortable', () => {
 
       try {
         const { rerender, unmount } = await renderHook<
-          { el: HTMLElement },
+          { el: { current: HTMLElement | null } },
           ReturnType<typeof useSortable>
         >(
           props => useSortable(props!.el, ['a', 'b', 'c'], { watchElement: true }),
-          { initialProps: { el: container } },
+          { initialProps: { el: { current: container } } },
         )
 
         const firstInstance = SortableJs.get(container)
         expect(firstInstance).toBeDefined()
 
-        await rerender({ el: second })
+        await rerender({ el: { current: second } })
 
         expect(SortableJs.get(container)).toBeFalsy()
         expect(SortableJs.get(second)).toBeDefined()
@@ -351,17 +351,17 @@ describe('useSortable', () => {
 
     it('should keep the instance when the same element is re-rendered', async () => {
       const { rerender, unmount } = await renderHook<
-        { el: HTMLElement },
+        { el: { current: HTMLElement | null } },
         ReturnType<typeof useSortable>
       >(
         props => useSortable(props!.el, ['a', 'b', 'c'], { watchElement: true }),
-        { initialProps: { el: container } },
+        { initialProps: { el: { current: container } } },
       )
 
       const firstInstance = SortableJs.get(container)
       expect(firstInstance).toBeDefined()
 
-      await rerender({ el: container })
+      await rerender({ el: { current: container } })
 
       expect(SortableJs.get(container)).toBe(firstInstance)
 
@@ -370,16 +370,16 @@ describe('useSortable', () => {
 
     it('should destroy the instance when the element becomes null', async () => {
       const { rerender, unmount } = await renderHook<
-        { el: HTMLElement | null },
+        { el: { current: HTMLElement | null } },
         ReturnType<typeof useSortable>
       >(
         props => useSortable(props!.el, ['a', 'b', 'c'], { watchElement: true }),
-        { initialProps: { el: container as HTMLElement | null } },
+        { initialProps: { el: { current: container as HTMLElement | null } } },
       )
 
       expect(SortableJs.get(container)).toBeDefined()
 
-      await rerender({ el: null })
+      await rerender({ el: { current: null } })
 
       expect(SortableJs.get(container)).toBeFalsy()
 
@@ -392,18 +392,18 @@ describe('useSortable', () => {
 
       try {
         const { result, rerender, unmount } = await renderHook<
-          { el: HTMLElement },
+          { el: { current: HTMLElement | null } },
           ReturnType<typeof useSortable>
         >(
           props => useSortable(props!.el, ['a', 'b', 'c']),
-          { initialProps: { el: container } },
+          { initialProps: { el: { current: container } } },
         )
 
         expect(SortableJs.get(container)).toBeDefined()
 
         // the mount effect re-runs because the resolved element changed, so the
         // instance follows the new element without a manual start()
-        await rerender({ el: second })
+        await rerender({ el: { current: second } })
 
         expect(SortableJs.get(second)).toBeDefined()
         expect(SortableJs.get(container)).toBeFalsy()
@@ -420,7 +420,7 @@ describe('useSortable', () => {
 
     it('should apply extra options alongside the default handler', async () => {
       const options: UseSortableOptions<string> = { watchElement: true, animation: 200, onUpdate: vi.fn() }
-      const { result, unmount } = await renderHook(() => useSortable(container, ['a', 'b', 'c'], options))
+      const { result, unmount } = await renderHook(() => useSortable({ current: container }, ['a', 'b', 'c'], options))
 
       expect(result.current.option('animation')).toBe(200)
       expect(SortableJs.get(container)).toBeDefined()

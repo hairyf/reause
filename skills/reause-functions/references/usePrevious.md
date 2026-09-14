@@ -36,7 +36,7 @@ const previous = usePrevious(counter) // `undefined` until the first change
  *
  * Divergences from the Vue upstream:
  * - React values are plain, so the source is a plain `T` instead of a
- *   `RefOrValue`, and the hook returns the value itself instead of a
+ *   `MaybeRefOrGetter`, and the hook returns the value itself instead of a
  *   readonly shallow ref.
  * - React batches same-tick state updates into a single render. When the
  *   source changes several times between two commits (A→B→C), only the

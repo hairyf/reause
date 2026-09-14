@@ -1,39 +1,37 @@
-import type { RefOrValue } from '@reause/shared'
-import { hasOwn, toValue } from '@reause/shared'
+import type { RefObject } from 'react'
+import { hasOwn } from '@reause/shared'
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { unrefElement } from '../unrefElement'
 
 export interface UseFileDialogOptions {
   /**
-   * A custom `document` instance, e.g. working with iframes or in testing
-   * environments. Inlined here — `ConfigurableDocument` is not ported to
-   * `@reause/shared`, so `document?` mirrors the option `useTitle` exposes
-   * (defaults to the global `document` when not provided).
+   * A custom `document` instance, e.g. working with iframes or in testing environments.
    */
   document?: Document | null
   /**
    * @default true
    */
-  multiple?: RefOrValue<boolean>
+  multiple?: boolean
   /**
    * @default '*'
    */
-  accept?: RefOrValue<string>
+  accept?: string
   /**
    * Select the input source for the capture file.
    * @see [HTMLInputElement Capture](https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/capture)
    */
-  capture?: RefOrValue<string>
+  capture?: string
   /**
    * Reset when open file dialog.
    * @default false
    */
-  reset?: RefOrValue<boolean>
+  reset?: boolean
   /**
    * Select directories instead of files.
    * @see [HTMLInputElement webkitdirectory](https://developer.mozilla.org/en-US/docs/Web/API/HTMLInputElement/webkitdirectory)
    * @default false
    */
-  directory?: RefOrValue<boolean>
+  directory?: boolean
 
   /**
    * Initial files to set.
@@ -45,7 +43,7 @@ export interface UseFileDialogOptions {
    * The input element to use for file dialog.
    * @default document.createElement('input')
    */
-  input?: RefOrValue<HTMLInputElement | null>
+  input?: RefObject<HTMLInputElement | null>
 }
 
 const DEFAULT_OPTIONS = {
@@ -79,14 +77,11 @@ function prepareInitialFiles(files: UseFileDialogOptions['initialFiles']): FileL
 }
 
 /**
- * React port of VueUse's `useFileDialog`.
- *
  * Map from @vueuse/core `useFileDialog`
  * (`source/vueuse/packages/core/useFileDialog/`). Open file dialog with ease.
  *
- * The hook drives a hidden `<input type="file">` (created on mount unless a
- * custom `input` element is provided) and exposes `open` / `reset` / `files`
- * plus `onChange` / `onCancel` event hooks.
+ * The hook drives a hidden `<input type="file">` (created on mount unless a custom `input` element
+ * is provided) and exposes `open` / `reset` / `files` plus `onChange` / `onCancel` event hooks.
  *
  * React divergences:
  * - the Vue `files` shallowRef becomes plain state (`FileList | null`, no
@@ -97,13 +92,11 @@ function prepareInitialFiles(files: UseFileDialogOptions['initialFiles']): FileL
  *   `useListener` protocol;
  * - the input element is resolved and wired in a mount effect instead of a
  *   `computed`, so nothing touches the DOM during render (SSR-safe);
- * - upstream's `watchEffect(() => applyOptions(options))` becomes an effect
- *   re-applying `multiple` / `accept` / `directory` / `capture` to the input
- *   whenever the (unwrapped) option values change across renders — mutate a
- *   ref-like source's `.current` and re-render to mirror `watchEffect` on a
- *   Vue ref;
- * - the event subscriptions are cleared on unmount (upstream:
- *   `tryOnScopeDispose` inside `createEventHook`'s `on`).
+ * - an effect re-applying `multiple` / `accept` / `directory` / `capture` to the input whenever the
+ * plain option values change across renders — pass a new plain value and re-render to mirror
+ * `watchEffect` on a Vue ref; a React ref or getter must be resolved at the call site (upstream's
+ * `MaybeRefOrGetter`);
+ * - the event subscriptions.
  *
  * @example
  * const { files, open, reset, onChange, onCancel } = useFileDialog({ accept: 'image/*' })
@@ -156,7 +149,7 @@ export function useFileDialog(options: UseFileDialogOptions = {}): UseFileDialog
     Array.from(cancelFns.current).forEach(fn => fn())
   }, [])
 
-  const resolvedInput = toValue(options.input)
+  const resolvedInput = options.input ? unrefElement(options.input) : undefined
   const customDocument = options.document ?? (typeof document === 'undefined' ? null : document)
 
   // Resolve the input element (custom `input` option or a newly created one)
@@ -203,28 +196,27 @@ export function useFileDialog(options: UseFileDialogOptions = {}): UseFileDialog
     const el = inputRef.current
     if (!el)
       return
-    el.multiple = toValue(opts.multiple)!
-    el.accept = toValue(opts.accept)!
+    el.multiple = opts.multiple!
+    el.accept = opts.accept!
     // webkitdirectory key is not stabled, maybe replaced in the future.
-    el.webkitdirectory = toValue(opts.directory)!
+    el.webkitdirectory = opts.directory!
     if (hasOwn(opts, 'capture'))
-      el.capture = toValue(opts.capture)!
+      el.capture = opts.capture!
   }, [])
 
-  // Unwrapped option values so the effect re-applies when a ref-like source's
-  // `.current` changes across a re-render (upstream: `watchEffect`).
-  const multiple = toValue(options.multiple)
-  const accept = toValue(options.accept)
-  const capture = toValue(options.capture)
-  const directory = toValue(options.directory)
+  // Plain option values so the effect re-applies when one changes across a
+  // re-render (upstream: `watchEffect`).
+  const multiple = options.multiple
+  const accept = options.accept
+  const capture = options.capture
+  const directory = options.directory
 
   // React analog of upstream's `watchEffect(() => applyOptions(options))` —
-  // reuse `applyOptions` instead of duplicating its assignments. The
-  // unwrapped option values are deps so a ref-like source's `.current` change
-  // across a re-render re-applies the attributes, and `resolvedInput` is a dep
-  // so swapping a ref-like input applies the attributes to the newly wired
-  // element immediately (upstream's `watchEffect` reapplies without waiting
-  // for the next `open()`).
+  // reuse `applyOptions` instead of duplicating its assignments. The plain
+  // option values are deps so a changed value across a re-render re-applies the
+  // attributes, and `resolvedInput` is a dep so swapping the input ref applies
+  // the attributes to the newly wired element immediately (upstream's
+  // `watchEffect` reapplies without waiting for the next `open()`).
   useEffect(() => {
     applyOptions(options)
   }, [multiple, accept, capture, directory, options, resolvedInput, applyOptions])
@@ -248,7 +240,7 @@ export function useFileDialog(options: UseFileDialogOptions = {}): UseFileDialog
       ...localOptions,
     }
     applyOptions(mergedOptions)
-    if (toValue(mergedOptions.reset))
+    if (mergedOptions.reset)
       reset()
     el.click()
   }, [applyOptions, reset])

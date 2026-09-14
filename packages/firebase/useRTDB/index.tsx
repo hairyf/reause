@@ -10,8 +10,7 @@ export interface UseRTDBOptions {
    */
   errorHandler?: (err: Error) => void
   /**
-   * Automatically unsubscribe from the database reference when the component
-   * unmounts.
+   * Automatically unsubscribe from the database reference when the component unmounts.
    *
    * @default true
    */
@@ -19,22 +18,18 @@ export interface UseRTDBOptions {
 }
 
 /**
- * Result tuple of `useRTDB`, mirroring upstream's writable Vue ref:
- * `[data, setData]`.
+ * Result tuple of `useRTDB`, mirroring upstream's writable Vue ref: `[data, setData]`.
  */
 export type UseRTDBReturn<T> = [data: T | undefined, setData: (value: T | undefined) => void]
 
 /**
- * React port of VueUse's `useRTDB`.
- *
  * Map from @vueuse/firebase `useRTDB`
  *
- * Reactive [Firebase Realtime Database](https://firebase.google.com/docs/database)
- * binding — keeps local state in sync with a database reference. The listener
- * is registered with `onValue` in a mount effect and feeds `data` with
- * `snapshot.val()` on every database change.
+ * Reactive [Firebase Realtime Database](https://firebase.google.com/docs/database) binding — keeps
+ * local state in sync with a database reference. The listener is registered with `onValue` in a
+ * mount effect and feeds `data` with `snapshot.val()` on every database change.
  *
- * Adjustment for React:
+ * React divergences:
  * - upstream returns a writable `Ref<T | undefined>`, so this port returns the
  *   `[data, setData]` tuple; `data` starts `undefined` and holds the latest
  *   snapshot value;

@@ -65,7 +65,7 @@ const [search, setSearch] = useState('Jhon D')
 const { results } = useFuse(search, data) // setSearch('Peter') recomputes on the next render
 ```
 
-`options` stays `RefOrValue` (a config object, not a value source).
+`options` is a plain config object (a format/config knob, not a value source).
 
 Mutating the `data` array in place is not detected (upstream's deep watcher was) — pass a new array
 reference when the collection changes.

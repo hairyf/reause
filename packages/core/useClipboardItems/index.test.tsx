@@ -74,17 +74,18 @@ it('copy() falls back to the source option', async () => {
   expect(result.current.content).toEqual(source)
 })
 
-it('copy() resolves a ref source at call time', async () => {
+it('copy() reads the latest source at call time', async () => {
   const { writeSpy } = installClipboard()
-  const source = createItems('from ref')
-  // a ref-like `{ current }` holder: the source is only read when `copy()`
-  // runs, so a mutation after mount must still be picked up
-  const sourceRef = { current: createItems('stale') }
-  const { result, act } = await renderHook(() => useClipboardItems({ source: sourceRef }))
+  const source = createItems('from source')
+  // the source is a plain value read when `copy()` runs, so a re-render with a
+  // new one must still be picked up
+  let latest = createItems('stale')
+  const { result, act, rerender } = await renderHook(() => useClipboardItems({ source: latest }))
 
   await expect.poll(() => result.current.isSupported).toBe(true)
 
-  sourceRef.current = source
+  latest = source
+  await rerender()
 
   await act(async () => {
     await result.current.copy()
@@ -172,7 +173,7 @@ it('re-binds the copy/cut listeners when `read` toggles after mount', async () =
   // upstream decides once at setup; reause keys the listener effect on
   // `read`, so the listeners follow runtime toggles (documented divergence)
   const { result, rerender, act } = await renderHook(
-    ({ read }: { read: boolean }) => useClipboardItems({ read }),
+    ({ read }: { read: boolean } = { read: false }) => useClipboardItems({ read }),
     { initialProps: { read: false } },
   )
 

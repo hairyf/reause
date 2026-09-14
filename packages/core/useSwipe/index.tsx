@@ -1,6 +1,7 @@
-import type { ConfigurableWindow, RefOrValue } from '@reause/shared'
-import { toValue } from '@reause/shared'
+import type { ConfigurableWindow } from '@reause/shared'
+import type { RefObject } from 'react'
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { unrefElement } from '../unrefElement'
 
 export type UseSwipeDirection = 'up' | 'down' | 'left' | 'right' | 'none'
 
@@ -49,9 +50,9 @@ export interface UseSwipeReturn {
 }
 
 function resolveSwipeTarget(
-  target: RefOrValue<EventTarget | null | undefined>,
+  target: RefObject<EventTarget | null | undefined>,
 ): EventTarget | null | undefined {
-  return toValue(target)
+  return target ? unrefElement(target) : undefined
 }
 
 function getSwipeDirection(start: Position, end: Position, threshold: number): UseSwipeDirection {
@@ -73,28 +74,21 @@ function getSwipeDirection(start: Position, end: Position, threshold: number): U
  * [`TouchEvents`](https://developer.mozilla.org/en-US/docs/Web/API/TouchEvent).
  *
  * Map from @vueuse/core `useSwipe`
- * React port of VueUse's `useSwipe` (`source/vueuse/packages/core/useSwipe/`),
- * which tracks `touchstart` / `touchmove` / `touchend` + `touchcancel` on the
- * target and derives the swipe `direction` once `max(|dx|, |dy|)` crosses
- * `threshold` (default `50`), comparing the axes: `|dx| > |dy|` decides
- * `left`/`right`, otherwise `up`/`down`. Below the threshold the direction
- * stays `'none'` and `isSwiping` stays `false` — `onSwipeEnd` only fires for
- * touches that actually crossed the threshold (like upstream).
+ * React port of VueUse's `useSwipe` (`source/vueuse/packages/core/useSwipe/`), which tracks
+ * `touchstart` / `touchmove` / `touchend` + `touchcancel` on the target and derives the swipe
+ * `direction` once `max(|dx|, |dy|)` crosses `threshold` (default `50`), comparing the axes: `|dx|
+ * > |dy|` decides `left`/`right`, otherwise `up`/`down`. Below the threshold the direction stays
+ * `'none'` and `isSwiping` stays `false` — `onSwipeEnd` only fires for touches that actually
+ * crossed the threshold (like upstream).
  *
- * React divergences:
- *
- * - the Vue return object (`isSwiping` ref, `direction` / `lengthX` /
- *   `lengthY` computeds, reactive coords) becomes plain values backed by
- *   state, derived during render — the touch listeners live in a
- *   self-contained `useEffect` (upstream composes `useEventListener`) and are
- *   removed on unmount;
- * - `target` accepts an element or a ref-like `{ current }` object
- *   (React equivalent of `RefOrValue`). The resolved element is re-read after
- *   every commit and the listeners re-bind when it changes, so a `useRef`
- *   target that is `null` during first render still binds once React attaches
- *   the element. A `ref.current` write that causes no re-render cannot be
- *   observed — React refs are not reactive like upstream's Vue ref — so
- *   re-render (e.g. through state) after mutating it;
+ * - the Vue return object (`isSwiping` ref, `direction` / `lengthX` / `lengthY` computeds, reactive
+ * coords) becomes plain values backed by state, derived during render —;
+ * - `target` accepts a React ref object (`RefObject`) holding the event target (React equivalent of
+ * `MaybeRefOrGetter`). The resolved element is re-read after every commit and the listeners re-bind
+ * when it changes, so a `useRef` target that is `null` during first render still binds once React
+ * attaches the element. A `ref.current` write that causes no re-render cannot be observed — React
+ * refs are not reactive like upstream's Vue ref — so re-render (e.g. through state) after mutating
+ * it;
  * - `onSwipeStart` / `onSwipe` / `onSwipeEnd` are read through latest-value
  *   refs, so the listeners always call the newest callbacks without
  *   re-binding on renders;
@@ -104,8 +98,8 @@ function getSwipeDirection(start: Position, end: Position, threshold: number): U
  * - SSR-safe: nothing touches `window` or the DOM during render — listeners
  *   attach in the mount effect only.
  *
- * @param target - element or ref-like `{ current }` object returning
- *   the event target to listen on
+ * @param target - React ref object (`RefObject`) holding the event target to
+ *   listen on, resolved with the shared `unrefElement`
  * @param options - `passive` (default `true`), `threshold` (default `50`) and
  *   the `onSwipeStart` / `onSwipe` / `onSwipeEnd` callbacks
  *
@@ -117,7 +111,7 @@ function getSwipeDirection(start: Position, end: Position, threshold: number): U
  * })
  */
 export function useSwipe(
-  target: RefOrValue<EventTarget | null | undefined>,
+  target: RefObject<EventTarget | null | undefined>,
   options: UseSwipeOptions = {},
 ): UseSwipeReturn {
   const { threshold = 50, passive = true } = options
@@ -142,10 +136,10 @@ export function useSwipe(
   const stoppedRef = useRef(false)
   const detachRef = useRef<(() => void) | null>(null)
 
-  // The element the listeners are bound to. A plain target resolves during
-  // render; a ref-like target is re-resolved after every commit, because React
-  // writes `ref.current` in the commit phase — after the render that mounted
-  // the element — so a ref that was still `null` while rendering must still
+  // The element the listeners are bound to. The ref is resolved during render;
+  // the ref's `.current` is re-read after every commit, because React writes
+  // `ref.current` in the commit phase — after the render that mounted the
+  // element — so a ref that was still `null` while rendering must still
   // re-bind once the element exists.
   const [bindTarget, setBindTarget] = useState<EventTarget | null>(
     () => resolveSwipeTarget(target) ?? null,

@@ -33,7 +33,7 @@ function App() {
 }
 ```
 
-`syncState` is a hook: call it unconditionally at the top level of a component (or another hook). Each side accepts any shared `State<T>` — a plain value, a getter, a ref-like `{ current }`, a `[value, setter]` tuple or a `{ value, onChange }` pair. Values are read with `toValue` and written back through the side's writable form (tuple setter, `onChange` callback or `.current`); a plain value or getter has no write path, so that side is treated as read-only (the sync becomes one-way for it).
+`syncState` is a hook: call it unconditionally at the top level of a component (or another hook). Each side accepts any shared `State<T>` — a plain value, a getter, a `[value, setter]` tuple or a `{ value, onChange }` pair. Values are read with `toValue` and written back through the side's writable form (tuple setter or `onChange` callback); a plain value or getter has no write path, so that side is treated as read-only (the sync becomes one-way for it).
 
 ### One directional
 

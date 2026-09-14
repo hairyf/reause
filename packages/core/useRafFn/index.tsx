@@ -1,5 +1,4 @@
-import type { ConfigurableWindow, RefOrValue } from '@reause/shared'
-import { toValue } from '@reause/shared'
+import type { ConfigurableWindow } from '@reause/shared'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 // `Pausable`'s neutral home (upstream defines it in `@vueuse/shared`).
@@ -14,7 +13,9 @@ export interface UseRafFnCallbackArguments {
   delta: number
 
   /**
-   * Time elapsed since the creation of the web page. See {@link https://developer.mozilla.org/en-US/docs/Web/API/DOMHighResTimeStamp#the_time_origin Time origin}.
+   * Time elapsed since the creation of the web page. See {@link
+   * https://developer.mozilla.org/en-US/docs/Web/API/DOMHighResTimeStamp#the_time_origin Time
+   * origin}.
    */
   timestamp: DOMHighResTimeStamp
 }
@@ -27,12 +28,11 @@ export interface UseRafFnOptions extends ConfigurableWindow {
    */
   immediate?: boolean
   /**
-   * The maximum frame per second to execute the function.
-   * Set to `null` to disable the limit.
+   * The maximum frame per second to execute the function. Set to `null` to disable the limit.
    *
    * @default null
    */
-  fpsLimit?: RefOrValue<number | null>
+  fpsLimit?: number | null
   /**
    * After the requestAnimationFrame loop executed once, it will be automatically stopped.
    *
@@ -47,8 +47,7 @@ export interface UseRafFnReturn {
    */
   isActive: boolean
   /**
-   * Stop the loop — the pending frame is cancelled and no further frames are
-   * scheduled
+   * Stop the loop — the pending frame is cancelled and no further frames are scheduled
    */
   pause: () => void
   /**
@@ -58,13 +57,10 @@ export interface UseRafFnReturn {
 }
 
 /**
- * React port of VueUse's `useRafFn`.
- *
  * Map from @vueuse/core `useRafFn`
  * (`source/vueuse/packages/core/useRafFn/`): a self-contained
- * `requestAnimationFrame` chain that calls the callback with
- * `{ delta, timestamp }` on every frame, with controls of pausing and
- * resuming.
+ * `requestAnimationFrame` chain that calls the callback with `{ delta, timestamp }` on every frame,
+ * with controls of pausing and resuming.
  *
  * React divergences:
  * - the returned control object keeps upstream's `Pausable` members
@@ -79,12 +75,9 @@ export interface UseRafFnReturn {
  * - `fn`, `fpsLimit`, `once` and `window` are read through refs on every
  *   frame instead of from the setup closure, so the running loop always sees
  *   the latest values (upstream recomputes on watchers);
- * - `fpsLimit` is a `RefOrValue` resolved with `toValue` per frame
- *   (upstream: `MaybeRefOrGetter` + `computed`), so a React ref-like
- *   `{ current }` limit updates live without re-running the hook. The
- *   upstream getter form (`() => number | null`) is deliberately not part of
- *   `RefOrValue` — zero-argument getters were removed repo-wide (#462/#490) —
- *   so it is rejected at the type level.
+ * - `fpsLimit` is a plain `number | null`, read per frame. The upstream getter form (`() => number
+ * | null`) and a React ref are deliberately not accepted — zero-argument getters were removed
+ * repo-wide (#462/#490) — so they are rejected at the type level.
  *
  * @example
  * const { pause, resume } = useRafFn(() => setCount(c => c + 1))
@@ -127,7 +120,7 @@ export function useRafFn(
 
     const delta = timestamp - previousFrameTimestampRef.current
 
-    const limit = toValue(fpsLimitRef.current)
+    const limit = fpsLimitRef.current
     const intervalLimit = limit ? 1000 / limit : null
 
     if (intervalLimit && delta < intervalLimit) {

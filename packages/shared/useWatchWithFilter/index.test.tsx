@@ -356,24 +356,24 @@ describe('useWatchWithFilter', () => {
     expect(calls).toEqual([1, 3])
   })
 
-  it('debounceFilter re-reads a reactive ms on every call', async () => {
-    // the reactive path for a dynamic delay (a plain getter is not part of
-    // the `RefOrValue<number>` type contract — rule: pass a ref)
-    const ms = { current: 100 }
-    const filter = debounceFilter(ms)
+  it('debounceFilter uses its plain-number ms for every call', async () => {
+    // `ms` is a plain number read on every call — the same fixed delay applies
+    // to each scheduled invoke
+    const filter = debounceFilter(100)
     const calls: number[] = []
     const invoke = (n: number) => () => calls.push(n)
 
     filter(invoke(1))
-    ms.current = 50
     await vi.advanceTimersByTimeAsync(50)
     expect(calls).toEqual([])
     await vi.advanceTimersByTimeAsync(50)
     expect(calls).toEqual([1])
 
-    // the next call reads the shortened delay
+    // the next call reads the same delay again
     filter(invoke(2))
-    await vi.advanceTimersByTimeAsync(100)
+    await vi.advanceTimersByTimeAsync(50)
+    expect(calls).toEqual([1])
+    await vi.advanceTimersByTimeAsync(50)
     expect(calls).toEqual([1, 2])
   })
 

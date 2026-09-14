@@ -3,13 +3,14 @@ import { renderHook } from 'vitest-browser-react'
 import { useControllableState } from '../useControllableState'
 
 describe('useControllableState', () => {
-  it('supports toValue sources and passive local state', async () => {
-    const source = { current: 1 }
-    const { result, act } = await renderHook(() => useControllableState(source, { passive: true }))
+  it('supports getter sources and passive local state', async () => {
+    const source = 1
+    const { result, act } = await renderHook(() => useControllableState(() => source, { passive: true }))
     expect(result.current[0]).toBe(1)
     await act(async () => result.current[1](value => value + 1))
     expect(result.current[0]).toBe(2)
-    expect(source.current).toBe(1)
+    // the getter source has no write path — the update stays local
+    expect(source).toBe(1)
   })
 
   it('writes through tuple state', async () => {

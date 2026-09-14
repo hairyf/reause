@@ -1,4 +1,3 @@
-import type { RefOrValue } from '@reause/shared'
 import type { Dispatch, SetStateAction } from 'react'
 import type { UseCountdownOptions, UseCountdownReturn } from '../useCountdown'
 import { afterEach, beforeEach, describe, expect, expectTypeOf, it, vi } from 'vitest'
@@ -148,15 +147,23 @@ describe('useCountdown', () => {
     await unmount()
   })
 
-  it('initial countdown ref can be changed', async () => {
-    const countdownRef: { current: number } = { current: 3 }
+  it('a changed countdown prop does not change the setup value used by start()', async () => {
+    const { result, act, rerender, unmount } = await renderHook(
+      ({ countdown }: { countdown: number } = { countdown: 3 }) => useCountdown(countdown, options),
+      { initialProps: { countdown: 3 } },
+    )
 
-    const { result, act, unmount } = await renderHook(() => useCountdown(countdownRef, options))
-
-    countdownRef.current = 2
+    // the countdown argument is a plain value captured at setup: start() still
+    // counts down from 3, so 210ms only reaches 1 remaining
+    await rerender({ countdown: 2 })
     await act(() => result.current[2].start())
     await act(() => {
       vi.advanceTimersByTime(210)
+    })
+    expect(completeCallback).toHaveBeenCalledTimes(0)
+
+    await act(() => {
+      vi.advanceTimersByTime(interval)
     })
     expect(completeCallback).toHaveBeenCalledTimes(1)
 
@@ -294,9 +301,9 @@ describe('useCountdown', () => {
         number,
         Dispatch<SetStateAction<number>>,
         {
-          reset: (countdown?: RefOrValue<number>) => void
+          reset: (countdown?: number) => void
           stop: () => void
-          start: (countdown?: RefOrValue<number>) => void
+          start: (countdown?: number) => void
           pause: () => void
           resume: () => void
           isActive: boolean
@@ -306,7 +313,7 @@ describe('useCountdown', () => {
     expectTypeOf(result.current[0]).toEqualTypeOf<number>()
     expectTypeOf(result.current[1]).toEqualTypeOf<Dispatch<SetStateAction<number>>>()
     expectTypeOf(result.current[2].isActive).toEqualTypeOf<boolean>()
-    expectTypeOf(result.current[2].start).toEqualTypeOf<(countdown?: RefOrValue<number>) => void>()
+    expectTypeOf(result.current[2].start).toEqualTypeOf<(countdown?: number) => void>()
 
     expect(Array.isArray(result.current)).toBe(true)
     expect(result.current).toHaveLength(3)

@@ -1,12 +1,10 @@
-import type { RefOrValue } from '@reause/shared'
 import type { WebFrame } from 'electron'
-import { isRefLike, toValue } from '@reause/shared'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { resolveWebFrame } from '../_resolve'
 
 /**
- * Setter returned by `useZoomFactor`: validates the factor, writes it to
- * `WebFrame.setZoomFactor` and updates the value returned by the hook.
+ * Setter returned by `useZoomFactor`: validates the factor, writes it to `WebFrame.setZoomFactor`
+ * and updates the value returned by the hook.
  */
 export type ZoomFactorSetter = (value: number) => void
 
@@ -17,10 +15,10 @@ function assertZoomFactor(value: number): void {
     throw new Error(ZOOM_FACTOR_ERROR)
 }
 
-// upstream discriminates the overloads the same way: a number or a ref as the
-// first argument means "no explicit WebFrame".
-function isFactorArgument(value: WebFrame | RefOrValue<number> | undefined): value is RefOrValue<number> {
-  return typeof value === 'number' || isRefLike(value as RefOrValue<number> | undefined)
+// upstream discriminates the overloads the same way: a number as the first
+// argument means "no explicit WebFrame".
+function isFactorArgument(value: WebFrame | number | undefined): value is number {
+  return typeof value === 'number'
 }
 
 /**
@@ -28,11 +26,10 @@ function isFactorArgument(value: WebFrame | RefOrValue<number> | undefined): val
  *
  * Map from @vueuse/electron `useZoomFactor`
  * (`source/vueuse/packages/electron/useZoomFactor/`). Upstream returns a
- * writable Vue `Ref<number>` whose setter writes to
- * `WebFrame.setZoomFactor`; this port follows the repo's state-like writable
- * rule and returns the React tuple `[factor, setFactor]` instead.
+ * writable Vue `Ref<number>` whose setter writes to `WebFrame.setZoomFactor`; this port follows the
+ * repo's state-like writable rule and returns the React tuple `[factor, setFactor]` instead.
  *
- * Adjustment for React:
+ * React divergences:
  * - the writable ref becomes `const [factor, setFactor] = useZoomFactor()` —
  *   `setFactor(value)` validates the value, calls
  *   `webFrame.setZoomFactor(value)` and updates the returned factor;
@@ -50,7 +47,7 @@ function isFactorArgument(value: WebFrame | RefOrValue<number> | undefined): val
  *   so it can be read from `window.require('electron').webFrame`;
  * - `useZoomFactor()` reads the current factor from `getZoomFactor()`, while
  *   `useZoomFactor(2)` / `useZoomFactor(webFrame, 2)` apply the factor given
- *   as a plain number or a React ref.
+ *   as a plain number (upstream accepts a ref).
  *
  * @see https://www.electronjs.org/docs/api/web-frame#webframesetzoomfactorfactor
  * @see https://vueuse.org/useZoomFactor
@@ -65,18 +62,18 @@ function isFactorArgument(value: WebFrame | RefOrValue<number> | undefined): val
  *
  * @__NO_SIDE_EFFECTS__
  */
-export function useZoomFactor(factor?: RefOrValue<number>): [number, ZoomFactorSetter]
-export function useZoomFactor(webFrame: WebFrame, factor?: RefOrValue<number>): [number, ZoomFactorSetter]
+export function useZoomFactor(factor?: number): [number, ZoomFactorSetter]
+export function useZoomFactor(webFrame: WebFrame, factor?: number): [number, ZoomFactorSetter]
 export function useZoomFactor(
-  webFrameOrFactor?: WebFrame | RefOrValue<number>,
-  factor?: RefOrValue<number>,
+  webFrameOrFactor?: WebFrame | number,
+  factor?: number,
 ): [number, ZoomFactorSetter] {
   const webFrame = isFactorArgument(webFrameOrFactor) ? undefined : webFrameOrFactor
   const externalFactor = isFactorArgument(webFrameOrFactor) ? webFrameOrFactor : factor
 
   const instance = resolveWebFrame(webFrame)
 
-  const resolvedFactor = externalFactor === undefined ? undefined : toValue(externalFactor)
+  const resolvedFactor = externalFactor
   if (resolvedFactor !== undefined)
     assertZoomFactor(resolvedFactor)
 

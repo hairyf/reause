@@ -3,21 +3,18 @@ import * as QRCode from 'qrcode'
 import { useEffect, useState } from 'react'
 
 /**
- * React port of VueUse's `useQRCode`.
- *
  * Map from @vueuse/integrations `useQRCode`
  * (`source/vueuse/packages/integrations/useQRCode/`), a reactive wrapper
  * around the `qrcode` package: it encodes `text` into a PNG data URL.
  *
- * Adjustment for React:
+ * React divergences:
  * - upstream returns a `shallowRef<string>` holding the data URL; in React the
  *   asynchronous result is state, so the hook returns the plain `string` data
  *   URL directly (no `.value`, no tuple) — `''` until the first encode
  *   resolves. Exactly like upstream, an empty `text` never encodes, so the
  *   previous data URL is kept (it is not cleared);
- * - `text` is the hook's **read-only value source** and takes a plain string
- *   (upstream: `MaybeRefOrGetter<string>`); a changed `text` prop re-encodes
- *   on the next render;
+ * - `text` is the hook's **read-only value source** and takes a plain string; a changed `text` prop
+ * re-encodes on the next render;
  * - the encode is `await`-free but guarded by a `cancelled` flag: when `text`
  *   (or `options`) changes or the component unmounts while an encode is still
  *   pending, the stale promise is ignored, so the last write always wins;

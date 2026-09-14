@@ -7,16 +7,15 @@ import { BehaviorSubject } from 'rxjs'
 /**
  * Options for `useSubject`.
  *
- * Upstream `UseSubjectOptions` is `useObservable`'s options minus
- * `initialValue`: a `BehaviorSubject` seeds the state with its own current
- * value and a plain `Subject` starts out `undefined`, so there is nothing for
- * the caller to supply.
+ * Upstream `UseSubjectOptions` is `useObservable`'s options minus `initialValue`: a
+ * `BehaviorSubject` seeds the state with its own current value and a plain `Subject` starts out
+ * `undefined`, so there is nothing for the caller to supply.
  */
 export type UseSubjectOptions<I = undefined> = Omit<UseObservableOptions<I>, 'initialValue'>
 
 /**
- * Return of `useSubject`: a writable `[value, setValue]` tuple (upstream
- * returns a single `Ref<H>` / `Ref<H | undefined>`).
+ * Return of `useSubject`: a writable `[value, setValue]` tuple (upstream returns a single `Ref<H>`
+ * / `Ref<H | undefined>`).
  */
 export type UseSubjectReturn<H> = [
   value: H,
@@ -24,22 +23,21 @@ export type UseSubjectReturn<H> = [
 ]
 
 /**
- * Runtime counterpart of the `BehaviorSubject` overload: only a
- * `BehaviorSubject` replays a current value, so only it can seed the state.
+ * Runtime counterpart of the `BehaviorSubject` overload: only a `BehaviorSubject` replays a current
+ * value, so only it can seed the state.
  */
 function isBehaviorSubject<H>(subject: Subject<H>): subject is BehaviorSubject<H> {
   return subject instanceof BehaviorSubject
 }
 
 /**
- * Bind an RxJS [`Subject`](https://rxjs.dev/guide/subject) to a controllable
- * state and propagate value changes both ways.
+ * Bind an RxJS [`Subject`](https://rxjs.dev/guide/subject) to a controllable state and propagate
+ * value changes both ways.
  *
  * Map from @vueuse/rxjs `useSubject`
  * (`source/vueuse/packages/rxjs/useSubject/`): the state is initialized from a
- * `BehaviorSubject`'s current value (or `undefined` for a plain `Subject`),
- * every emission is written into the state, and writing through the returned
- * setter is pushed back into the subject.
+ * `BehaviorSubject`'s current value (or `undefined` for a plain `Subject`), every emission is
+ * written into the state, and writing through the returned setter is pushed back into the subject.
  *
  * React divergences:
  * - upstream returns a `Ref<H>` / `Ref<H | undefined>` that the caller mutates
@@ -58,8 +56,8 @@ function isBehaviorSubject<H>(subject: Subject<H>): subject is BehaviorSubject<H
  *   it is resolved against the latest value seen by the hook, so two functional
  *   updates in the same tick compose instead of both reading the same stale
  *   value.
- * - upstream's `tryOnScopeDispose` becomes the effect cleanup: the subscription
- *   is created once when the component mounts and unsubscribed on unmount.
+ * - the effect cleanup: the subscription is created once when the component mounts and unsubscribed
+ * on unmount.
  * - the `subject` argument is deliberately **not** an effect dependency — a new
  *   identity on a later render neither re-subscribes (Vue's `tryOnScopeDispose`
  *   also registers exactly once, during `setup`) nor re-targets `setValue`,

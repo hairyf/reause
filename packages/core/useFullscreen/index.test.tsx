@@ -37,7 +37,7 @@ describe('useFullscreen', () => {
   })
 
   it('initializes with isFullscreen false and resolves isSupported in a mount effect', async () => {
-    const { result } = await renderHook(() => useFullscreen(targetEl))
+    const { result } = await renderHook(() => useFullscreen({ current: targetEl }))
 
     expect(result.current.isFullscreen).toBe(false)
     expect(result.current.enter).toBeTypeOf('function')
@@ -52,7 +52,7 @@ describe('useFullscreen', () => {
   it('enter requests fullscreen on the target element', async () => {
     const requestFullscreen = vi.spyOn(targetEl, 'requestFullscreen').mockResolvedValue(undefined)
 
-    const { result, act } = await renderHook(() => useFullscreen(targetEl))
+    const { result, act } = await renderHook(() => useFullscreen({ current: targetEl }))
 
     await act(async () => {
       await result.current.enter()
@@ -66,7 +66,7 @@ describe('useFullscreen', () => {
     vi.spyOn(targetEl, 'requestFullscreen').mockResolvedValue(undefined)
     const exitFullscreen = vi.spyOn(document, 'exitFullscreen').mockResolvedValue(undefined)
 
-    const { result, act } = await renderHook(() => useFullscreen(targetEl))
+    const { result, act } = await renderHook(() => useFullscreen({ current: targetEl }))
 
     await act(async () => {
       await result.current.enter()
@@ -85,7 +85,7 @@ describe('useFullscreen', () => {
     vi.spyOn(targetEl, 'requestFullscreen').mockResolvedValue(undefined)
     const exitFullscreen = vi.spyOn(document, 'exitFullscreen').mockResolvedValue(undefined)
 
-    const { result, act } = await renderHook(() => useFullscreen(targetEl))
+    const { result, act } = await renderHook(() => useFullscreen({ current: targetEl }))
 
     await act(async () => {
       await result.current.toggle()
@@ -100,7 +100,7 @@ describe('useFullscreen', () => {
   })
 
   it('follows the fullscreenchange event on the document', async () => {
-    const { result, act } = await renderHook(() => useFullscreen(targetEl))
+    const { result, act } = await renderHook(() => useFullscreen({ current: targetEl }))
 
     setDocumentFullscreenElement(targetEl)
     await act(async () => {
@@ -116,7 +116,7 @@ describe('useFullscreen', () => {
   })
 
   it('follows the fullscreenchange event on the target element', async () => {
-    const { result, act } = await renderHook(() => useFullscreen(targetEl))
+    const { result, act } = await renderHook(() => useFullscreen({ current: targetEl }))
 
     setDocumentFullscreenElement(targetEl)
     await act(async () => {
@@ -161,7 +161,7 @@ describe('useFullscreen', () => {
     vi.spyOn(targetEl, 'requestFullscreen').mockResolvedValue(undefined)
     const exitFullscreen = vi.spyOn(document, 'exitFullscreen').mockResolvedValue(undefined)
 
-    const { result, act, unmount } = await renderHook(() => useFullscreen(targetEl, { autoExit: true }))
+    const { result, act, unmount } = await renderHook(() => useFullscreen({ current: targetEl }, { autoExit: true }))
 
     await act(async () => {
       await result.current.enter()
@@ -187,7 +187,7 @@ describe('useFullscreen', () => {
       webkitExitFullscreen: exitFullscreen,
     } as unknown as Document
 
-    const { result, act } = await renderHook(() => useFullscreen(target, { document: fakeDoc }))
+    const { result, act } = await renderHook(() => useFullscreen({ current: target }, { document: fakeDoc }))
 
     await vi.waitFor(() => {
       expect(result.current.isSupported).toBe(true)
@@ -222,7 +222,7 @@ describe('useFullscreen', () => {
       webkitIsFullScreen: false,
     } as unknown as Document
 
-    const { result, act } = await renderHook(() => useFullscreen(target, { document: fakeDoc }))
+    const { result, act } = await renderHook(() => useFullscreen({ current: target }, { document: fakeDoc }))
 
     await vi.waitFor(() => {
       expect(result.current.isSupported).toBe(true)

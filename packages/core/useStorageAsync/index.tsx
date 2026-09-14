@@ -6,8 +6,8 @@ import { guessSerializerType, StorageSerializers } from '../useStorage'
 type Awaitable<T> = T | Promise<T>
 
 /**
- * Custom data serialization with async support — `read`/`write` may return a
- * promise for backends that need asynchronous (de)serialization.
+ * Custom data serialization with async support — `read`/`write` may return a promise for backends
+ * that need asynchronous (de)serialization.
  */
 export interface SerializerAsync<T> {
   read: (raw: string) => Awaitable<T>
@@ -15,9 +15,8 @@ export interface SerializerAsync<T> {
 }
 
 /**
- * Minimal async storage backend contract — like `StorageLike`, but every
- * operation may return a promise (IndexedDB, remote key-value stores, async
- * wrappers around `localStorage`, …).
+ * Minimal async storage backend contract — like `StorageLike`, but every operation may return a
+ * promise (IndexedDB, remote key-value stores, async wrappers around `localStorage`, …).
  */
 export interface StorageLikeAsync {
   getItem: (key: string) => Awaitable<string | null>
@@ -27,8 +26,7 @@ export interface StorageLikeAsync {
 
 export interface UseStorageAsyncOptions<T> extends Omit<UseStorageOptions<T>, 'serializer'> {
   /**
-   * Custom data serialization — same as `useStorage`, but the serializer may
-   * be asynchronous.
+   * Custom data serialization — same as `useStorage`, but the serializer may be asynchronous.
    */
   serializer?: SerializerAsync<T>
 
@@ -58,16 +56,14 @@ export function useStorageAsync<T>(key: string, initialValue: T | (() => T), sto
 export function useStorageAsync<T = unknown>(key: string, initialValue: null, storage?: StorageLikeAsync, options?: UseStorageAsyncOptions<T>): UseStorageAsyncReturn<T>
 
 /**
- * Reactive Storage with async support — React port of VueUse's
- * `useStorageAsync`.
+ * Reactive Storage with async support — React port of VueUse's `useStorageAsync`.
  *
  * Map from @vueuse/core `useStorageAsync`
  * (`source/vueuse/packages/core/useStorageAsync/`). Like `useStorage`, but the
- * backend is an async `StorageLikeAsync` — every operation may return a
- * promise — so the stored value is loaded after mount: the value starts as the
- * initial default and is replaced once the async storage is ready (upstream
- * returns a ref that doubles as a Promise; the React tuple cannot be awaited,
- * so the value simply updates itself and the `onReady` option fires).
+ * backend is an async `StorageLikeAsync` — every operation may return a promise — so the stored
+ * value is loaded after mount: the value starts as the initial default and is replaced once the
+ * async storage is ready (upstream returns a ref that doubles as a Promise; the React tuple cannot
+ * be awaited, so the value simply updates itself and the `onReady` option fires).
  *
  * React divergences:
  * - the Vue `RemovableRef<T> & Promise<RemovableRef<T>>` return becomes a
@@ -88,7 +84,7 @@ export function useStorageAsync<T = unknown>(key: string, initialValue: null, st
  *   storage, reading `window.localStorage` directly instead of going through
  *   upstream's `getSSRHandler('getDefaultStorageAsync')` indirection;
  * - `key` is a plain React string; changing it between renders re-reads the
- *   new key (upstream takes a reactive `RefOrValue` key). Writes always
+ *   new key (upstream takes a reactive `MaybeRefOrGetter` key). Writes always
  *   go to the key of the current render, and when `writeDefaults` is on, a
  *   new key with no stored value is seeded with the initial value;
  * - real `storage` events are listened to when `listenToStorageChanges` is on

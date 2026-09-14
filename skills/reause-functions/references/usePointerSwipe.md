@@ -88,7 +88,7 @@ export interface UsePointerSwipeReturn {
  *   pointer listeners live in a self-contained `useEffect` (upstream composes
  *   `useEventListener`) and are removed on unmount;
  * - `target` accepts an element or a ref-like `{ current }` object
- *   (React equivalent of `RefOrValue`). It is re-resolved on every
+ *   (React equivalent of `MaybeRefOrGetter`). It is re-resolved on every
  *   render and the listeners re-bind when the resolved element changes;
  *   ref-likes are re-read at bind time, so a `useRef` target that is `null`
  *   during first render still binds once React attaches the element;
@@ -118,7 +118,7 @@ export interface UsePointerSwipeReturn {
  * })
  */
 export declare function usePointerSwipe(
-  target: RefOrValue<HTMLElement | null | undefined>,
+  target: RefObject<HTMLElement | null | undefined>,
   options?: UsePointerSwipeOptions,
 ): UsePointerSwipeReturn
 ```

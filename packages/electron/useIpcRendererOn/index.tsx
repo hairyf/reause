@@ -4,8 +4,10 @@ import { useEffect } from 'react'
 import { resolveIpcRenderer } from '../_resolve'
 
 /**
- * Listens to channel, when a new message arrives listener would be called with `listener(event, args...)`.
- * [`ipcRenderer.removeListener`](https://www.electronjs.org/docs/api/ipc-renderer#ipcrendererremovelistenerchannel-listener) automatically on unmounted.
+ * Listens to channel, when a new message arrives listener would be called with `listener(event,
+ * args...)`.
+ * [`ipcRenderer.removeListener`](https://www.electronjs.org/docs/api/ipc-renderer#ipcrendererremovelistenerchannel-listener)
+ * automatically on unmounted.
  *
  * You need to provide `ipcRenderer` to this function.
  *
@@ -36,10 +38,13 @@ import { resolveIpcRenderer } from '../_resolve'
 export function useIpcRendererOn(ipcRenderer: IpcRenderer, channel: string, listener: IpcRendererListener): IpcRenderer
 
 /**
- * Listens to channel, when a new message arrives listener would be called with `listener(event, args...)`.
- * [`ipcRenderer.removeListener`](https://www.electronjs.org/docs/api/ipc-renderer#ipcrendererremovelistenerchannel-listener) automatically on unmounted.
+ * Listens to channel, when a new message arrives listener would be called with `listener(event,
+ * args...)`.
+ * [`ipcRenderer.removeListener`](https://www.electronjs.org/docs/api/ipc-renderer#ipcrendererremovelistenerchannel-listener)
+ * automatically on unmounted.
  *
- * `ipcRenderer` will be automatically gotten (`window.require('electron')`, i.e. `nodeIntegration`).
+ * `ipcRenderer` will be automatically gotten (`window.require('electron')`, i.e.
+ * `nodeIntegration`).
  *
  * Map from @vueuse/electron `useIpcRendererOn`
  * (`source/vueuse/packages/electron/useIpcRendererOn/`).

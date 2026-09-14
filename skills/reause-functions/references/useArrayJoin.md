@@ -74,7 +74,7 @@ export type UseArrayJoinReturn = string
  *
  * Map from @vueuse/shared `useArrayJoin`
  * Mapping: upstream wraps `toValue(list).map(i => toValue(i)).join(toValue(separator))`
- * in `computed(...)` and accepts a `RefOrValue`; React has no reactive
+ * in `computed(...)` and accepts a `MaybeRefOrGetter`; React has no reactive
  * value tracking, so this is a plain function that recomputes the join on
  * every render — pass a state array (upstream: reactive array) and re-render
  * with new state to see the updated result. The return is a plain string,

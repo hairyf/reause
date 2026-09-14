@@ -3,9 +3,8 @@ import { noop, useControllableState } from '@reause/shared'
 import { useEffect, useRef } from 'react'
 
 /**
- * Upstream re-exports `Fn` from `@vueuse/shared` types; `@reause/shared`
- * does not export it, so it is declared locally here (same pattern as
- * `packages/shared/useIntervalFn/index.tsx`).
+ * Upstream re-exports `Fn` from `@vueuse/shared` types; `@reause/shared` does not export it, so it
+ * is declared locally here (same pattern as `packages/shared/useIntervalFn/index.tsx`).
  */
 type Fn = () => void
 
@@ -18,20 +17,19 @@ export type UseAsyncOnCancel = (cancelCallback: Fn) => void
 
 export interface UseAsyncOptions {
   /**
-   * React dependency array driving re-evaluation (replaces upstream's
-   * automatic reactive-dep tracking). Defaults to `[]` = evaluate once on
-   * mount.
+   * React dependency array driving re-evaluation (replaces upstream's automatic reactive-dep
+   * tracking). Defaults to `[]` = evaluate once on mount.
    */
   deps?: unknown[]
   /** Called with `true` when an evaluation starts, `false` when it settles. Replaces upstream's `evaluating` ref. */
   onEvaluating?: (value: boolean) => void
   /**
-   * When true, skip the initial mount evaluation; evaluate only when `deps`
-   * change. With the default `[]` deps the hook then never evaluates.
+   * When true, skip the initial mount evaluation; evaluate only when `deps` change. With the
+   * default `[]` deps the hook then never evaluates.
    *
-   * This is the reause replacement for upstream's `lazy`. Upstream's `lazy`
-   * starts evaluation on the first access to the returned computed; React has
-   * no first-access hook, so that semantic has no equivalent here.
+   * This is the reause replacement for upstream's `lazy`. Upstream's `lazy` starts evaluation on
+   * the first access to the returned computed; React has no first-access hook, so that semantic has
+   * no equivalent here.
    *
    * @default false
    */
@@ -48,9 +46,9 @@ export interface UseAsyncOptions {
 }
 
 /**
- * Default `onError` — mirrors upstream's `globalThis.reportError` fallback.
- * `reportError` must be invoked with the global object as `this`, otherwise
- * Chromium throws "Illegal invocation" for a detached call.
+ * Default `onError` — mirrors upstream's `globalThis.reportError` fallback. `reportError` must be
+ * invoked with the global object as `this`, otherwise Chromium throws "Illegal invocation" for a
+ * detached call.
  */
 function defaultOnError(e: unknown) {
   if (typeof globalThis.reportError === 'function')
@@ -64,16 +62,15 @@ function isPromiseLike<T>(value: T | Promise<T>): value is Promise<T> {
 const EMPTY_DEPS: unknown[] = []
 
 /**
- * Create an asynchronous computed dependency — React port of VueUse's
- * `computedAsync`, renamed `useAsync` for the React port.
+ * Create an asynchronous computed dependency — React port of VueUse's `computedAsync`, renamed
+ * `useAsync` for the React port.
  *
  * Map from @vueuse/core `computedAsync`
  * (`source/vueuse/packages/core/computedAsync/`), renamed `useAsync` for the
- * React port: re-evaluates an async
- * function when its inputs change, exposes the in-flight state, supports
- * cancellation through the `onCancel` callback handed to
- * `evaluationCallback`, and protects against stale out-of-order resolutions
- * — only the latest evaluation may update the state.
+ * React port: re-evaluates an async function when its inputs change, exposes the in-flight state,
+ * supports cancellation through the `onCancel` callback handed to `evaluationCallback`, and
+ * protects against stale out-of-order resolutions — only the latest evaluation may update the
+ * state.
  *
  * React adaptation:
  *
@@ -118,8 +115,8 @@ const EMPTY_DEPS: unknown[] = []
  *   `Ref<boolean>`-as-`evaluating` overload are not portable and are
  *   collapsed into `options` only.
  *
- * The upstream `asyncComputed` deprecated alias is intentionally not ported
- * (upstream-only; use `useAsync`).
+ * The upstream `asyncComputed` deprecated alias is intentionally not ported (upstream-only; use
+ * `useAsync`).
  *
  * @__NO_SIDE_EFFECTS__
  * @example

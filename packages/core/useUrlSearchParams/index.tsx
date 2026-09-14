@@ -20,17 +20,16 @@ export interface UseUrlSearchParamsOptions<T> extends ConfigurableWindow {
   removeFalsyValues?: boolean
 
   /**
-   * Fallback params used when the URL carries none (URL params win when
-   * present, like upstream) and written back to the URL on hydration.
+   * Fallback params used when the URL carries none (URL params win when present, like upstream) and
+   * written back to the URL on hydration.
    *
    * @default {}
    */
   initialValue?: T
 
   /**
-   * Write back to `window.history` automatically when the params state
-   * changes. As upstream, this only gates the popstate/hashchange → state
-   * sync, not the state → URL write-back.
+   * Write back to `window.history` automatically when the params state changes. As upstream, this
+   * only gates the popstate/hashchange → state sync, not the state → URL write-back.
    *
    * @default true
    */
@@ -45,8 +44,8 @@ export interface UseUrlSearchParamsOptions<T> extends ConfigurableWindow {
   writeMode?: 'replace' | 'push'
 
   /**
-   * Custom function to serialize URL parameters. When provided, this function
-   * is used instead of the default `URLSearchParams.toString()`.
+   * Custom function to serialize URL parameters. When provided, this function is used instead of
+   * the default `URLSearchParams.toString()`.
    *
    * @param params The URLSearchParams object to serialize
    * @returns The serialized query string (should not include the leading '?' or '#')
@@ -84,8 +83,8 @@ function constructQuery(
 }
 
 /**
- * Flatten a URLSearchParams into a plain record — repeated keys become
- * arrays, single keys become strings (upstream's `updateState`).
+ * Flatten a URLSearchParams into a plain record — repeated keys become arrays, single keys become
+ * strings (upstream's `updateState`).
  */
 function paramsToRecord(params: URLSearchParams): Record<string, any> {
   const record: Record<string, any> = {}
@@ -97,13 +96,10 @@ function paramsToRecord(params: URLSearchParams): Record<string, any> {
 }
 
 /**
- * React port of VueUse's `useUrlSearchParams`.
- *
  * Map from @vueuse/core `useUrlSearchParams`
  * (`source/vueuse/packages/core/useUrlSearchParams/`). Reactive
- * [URLSearchParams](https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams)
- * as a plain record of params, kept in sync with the URL in `history`,
- * `hash` or `hash-params` mode.
+ * [URLSearchParams](https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams) as a plain
+ * record of params, kept in sync with the URL in `history`, `hash` or `hash-params` mode.
  *
  * React divergences:
  * - the Vue deep-reactive record becomes an immutable React state record

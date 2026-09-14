@@ -35,7 +35,7 @@ const { isFullscreen, enter, exit, toggle } = useFullscreen(el)
  * (e.g. the result of `useRef`) — the React equivalent of upstream's
  * `ElementRef`.
  */
-export type FullscreenTarget = RefOrValue<
+export type FullscreenTarget = RefObject<
   HTMLElement | SVGElement | null | undefined
 >
 export interface UseFullscreenOptions {
@@ -103,7 +103,7 @@ export interface UseFullscreenReturn {
  *   browser's current fullscreen state after mount, and
  *   `tryOnScopeDispose(exit)` with `autoExit` becomes an unmount cleanup (the
  *   option is read once at mount, as upstream destructures it at setup);
- * - rendering never touches the DOM: the target unwraps to a ref-like
+ * - rendering never touches the DOM: the target is read from its ref's
  *   `.current` and the global `document` is only read through
  *   a guarded `typeof document === 'undefined'` check, so server rendering is
  *   safe and the state keeps its defaults until the mount effect;

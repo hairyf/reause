@@ -29,7 +29,6 @@
     "./useNProgress": "./dist/useNProgress.js",
     "./useQRCode": "./dist/useQRCode.js",
     "./useSortable": "./dist/useSortable.js",
-    "./useSpring": "./dist/useSpring.js",
     "./package.json": "./package.json"
   },
   "main": "./dist/index.js",
@@ -45,7 +44,6 @@
     "prepack": "pnpm run build"
   },
   "peerDependencies": {
-    "@react-spring/web": "^10",
     "async-validator": "^4",
     "axios": "^1",
     "change-case": "^5",
@@ -61,7 +59,6 @@
     "universal-cookie": "^7 || ^8"
   },
   "peerDependenciesMeta": {
-    "@react-spring/web": { "optional": true },
     "async-validator": { "optional": true },
     "axios": { "optional": true },
     "change-case": { "optional": true },
@@ -76,6 +73,7 @@
     "universal-cookie": { "optional": true }
   },
   "dependencies": {
+    "@reause/core": "workspace:*",
     "@reause/shared": "workspace:*"
   }
 }

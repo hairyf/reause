@@ -7,16 +7,18 @@ import { unrefElement } from '../unrefElement'
 
 // Upstream's browser test also unwraps Vue component instances via `$el`;
 // React has no component-instance analog (refs hold DOM nodes directly via
-// `{ current }`), so those cases are intentionally not ported.
+// `{ current }`), so those cases are intentionally not ported. Upstream's
+// `unrefElement` also accepts a plain element / getter; reause binds DOM
+// targets to React refs only, so those inputs are rejected at the type level.
 
 describe('unrefElement', () => {
   it('should be defined', () => {
     expect(unrefElement).toBeDefined()
   })
 
-  it('return the input if it is not an element ref nor an element', () => {
-    expect(unrefElement(null)).toBeNull()
-    expect(unrefElement(undefined)).toBeUndefined()
+  it('returns undefined for an empty ref', () => {
+    expect(unrefElement({ current: null })).toBeUndefined()
+    expect(unrefElement({ current: undefined })).toBeUndefined()
   })
 
   it('return the element if it is an element ref', async () => {
@@ -35,28 +37,28 @@ describe('unrefElement', () => {
     expect(unrefElementReturn!.textContent).toBe('Node 2')
   })
 
-  it('return the element if it is an element', () => {
-    const el = document.createElement('div')
-    el.textContent = 'Node 2'
-    expect(unrefElement(el)).toBe(el)
-  })
-
-  it('return null if the ref-like current is null', () => {
+  it('return null if the ref current is null', () => {
     const targetNodeRef = createRef<HTMLDivElement>()
-    expect(unrefElement(targetNodeRef)).toBeNull()
+    expect(targetNodeRef.current).toBeNull()
+    expect(unrefElement(targetNodeRef)).toBeUndefined()
   })
 
-  it('rejects React callback refs at the type level', () => {
-    // A callback ref is a function, and `toValue` *invokes* functions instead
-    // of resolving them — so it must not be assignable to the accepted input.
+  it('accepts only React ref objects, never plain elements or callback refs', () => {
+    // A plain element, a getter and a callback ref are all rejected: the input
+    // is a `RefObject` resolved to `.current`.
+    expectTypeOf<HTMLDivElement>()
+      .not
+      .toMatchTypeOf<ElementTarget<HTMLElement>>()
     expectTypeOf<RefCallback<HTMLElement>>()
       .not
       .toMatchTypeOf<ElementTarget<HTMLElement>>()
-    expectTypeOf<Parameters<typeof unrefElement<HTMLElement>>[0]>()
+    expectTypeOf<() => HTMLElement>()
       .not
-      .toMatchTypeOf<RefCallback<HTMLElement>>()
+      .toMatchTypeOf<ElementTarget<HTMLElement>>()
     // Positive control: a `{ current }` ref object is still accepted.
     expectTypeOf<RefObject<HTMLElement | null>>()
       .toMatchTypeOf<ElementTarget<HTMLElement>>()
+    expectTypeOf<Parameters<typeof unrefElement<HTMLElement>>[0]>()
+      .toEqualTypeOf<RefObject<HTMLElement | null | undefined>>()
   })
 })

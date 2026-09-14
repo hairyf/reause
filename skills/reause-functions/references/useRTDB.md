@@ -38,15 +38,15 @@ You can reuse the db reference by passing `autoDispose: false`:
 const [todos] = useRTDB(ref(db, 'todos'), { autoDispose: false })
 ```
 
-or use `createGlobalState` from the shared package
+or share one subscription between components with `createSharedHook` from the shared package — the port of `createSharedComposable`. (Upstream's page recommends `createGlobalState`, but reause's `createGlobalState` mirrors react-use: its initial state is resolved at module scope, so it cannot host a hook.)
 
 ```ts
-import { useRTDB } from '@reause/firebase'
 // store.ts
-import { createGlobalState } from '@reause/shared'
+import { useRTDB } from '@reause/firebase'
+import { createSharedHook } from '@reause/shared'
 import { ref } from 'firebase/database'
 
-export const useTodos = createGlobalState(
+export const useTodos = createSharedHook(
   () => useRTDB(ref(db, 'todos')),
 )
 ```

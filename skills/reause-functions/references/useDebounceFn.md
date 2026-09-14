@@ -141,7 +141,7 @@ export interface DebounceFilterOptions {
    * The maximum time allowed to be delayed before it's invoked.
    * In milliseconds.
    */
-  maxWait?: RefOrValue<number>
+  maxWait?: number
   /**
    * Whether to reject the last call if it's been cancelled.
    *
@@ -177,9 +177,9 @@ export interface UseDebounceFnReturn<T extends FunctionArgs> {
  * so every call returns a promise and the wrapper carries `cancel` / `flush` /
  * `isPending`. This port builds the same wrapper once (`useMemo`) so its
  * identity is stable across renders; the latest `fn` / `ms` / `options` are
- * mirrored into refs so every call sees fresh values. `ms` accepts a number or
- * a ref-like `{ current }` (upstream: `RefOrValue<number>`) and is re-read on
- * every call. `isPending` becomes a non-reactive getter (React has no reactive
+ * mirrored into refs so every call sees fresh values. `ms` is a plain number,
+ * re-read on every call (upstream: `MaybeRefOrGetter<number>`). `isPending`
+ * becomes a non-reactive getter (React has no reactive
  * refs); promise settlement mirrors upstream — a regular debounce resolves
  * with the result, a superseded/canceled call settles with `undefined` (or
  * rejects with `rejectOnCancel`), and the `maxWait` trailing edge runs the
@@ -195,7 +195,7 @@ export interface UseDebounceFnReturn<T extends FunctionArgs> {
  */
 export declare function useDebounceFn<T extends FunctionArgs>(
   fn: T,
-  ms?: RefOrValue<number>,
+  ms?: number,
   options?: DebounceFilterOptions,
 ): UseDebounceFnReturn<T>
 ```

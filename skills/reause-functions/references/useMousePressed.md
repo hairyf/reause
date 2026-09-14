@@ -57,7 +57,7 @@ export interface UseMousePressedOptions extends ConfigurableWindow {
   /**
    * Element target to be capture the click
    */
-  target?: RefOrValue<EventTarget | null | undefined>
+  target?: RefObject<EventTarget | null | undefined>
   /**
    * Callback to be called when the mouse is pressed
    *
@@ -97,7 +97,7 @@ export interface UseMousePressedReturn {
  * - `onPressed`/`onReleased` are read through a latest-value ref, so the
  *   listeners always call the newest callbacks without re-binding on renders;
  * - `target` accepts an element or a ref-like `{ current }` object
- *   (React equivalent of `RefOrValue`). It is re-resolved on every
+ *   (React equivalent of `MaybeRefOrGetter`). It is re-resolved on every
  *   render and the listeners re-bind when the resolved element changes;
  * - SSR-safe: nothing touches `window` during render — the listeners attach
  *   in the mount effect only, and `initialValue` seeds `useState` so SSR

@@ -32,7 +32,7 @@ const upstreamReady = existsSync(join(upstreamRoot, 'packages', 'core'))
 const reactUseReady = existsSync(join(root, 'source', 'react-use', 'src'))
 
 /** The statuses `scripts/update.ts` can emit — and only those. */
-const STATUS_RE = /^✅ (?:ported|ported \(not in pinned submodule\)|reause-only export|re-exported)$/
+const STATUS_RE = /^✅ (?:ported|ported \(not in pinned submodule\)|reause-only export)$/
 
 interface TableRow {
   source: string
@@ -94,7 +94,7 @@ describe('meta/functions.md resolution', () => {
     }
   })
 
-  it('labels every row ported, outside-the-pin, re-exported, or reause-only', () => {
+  it('labels every row ported, outside-the-pin, or reause-only', () => {
     // Exactly the statuses `scripts/update.ts` can emit. The retired
     // `ported (no upstream match)` label is deliberately *not* accepted here: it
     // is what the removed same-name-directory probe reported for every renamed

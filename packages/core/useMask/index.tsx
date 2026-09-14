@@ -1,17 +1,15 @@
 /**
  * Map from @mantine/hooks `useMask` (`source/mantine/packages/@mantine/hooks/src/use-mask/`)
  *
- * The `useMask` input-masking hook, ported from `@mantine/hooks`' `use-mask`.
- * The masking engine it drives lives in the sibling `./engine` module — see the
- * header there for why — and the engine's public half (the hook's options and
- * return types, `DEFAULT_TOKENS` and the four pure helpers) is re-exported from
- * this file, so those imports keep working while `meta/functions.md` only ever
+ * The `useMask` input-masking hook, ported from `@mantine/hooks`' `use-mask`. The masking engine it
+ * drives lives in the sibling `./engine` module — see the header there for why — and the engine's
+ * public half (the hook's options and return types, `DEFAULT_TOKENS` and the four pure helpers) is
+ * re-exported from this file, so those imports keep working while `meta/functions.md` only ever
  * sees `useMask` as this page's own export.
  *
- * Unlike upstream, the hook returns a callback `ref` bound to a **native**
- * `<input>`: there is no `@mantine/core` and no `TextInput` in this port, which
- * is why `use-mask.story.tsx` (the upstream demo, built on `TextInput`) is not
- * mirrored.
+ * Unlike upstream, the hook returns a callback `ref` bound to a **native** `<input>`: there is no
+ * `@mantine/core` and no `TextInput` in this port, which is why `use-mask.story.tsx` (the upstream
+ * demo, built on `TextInput`) is not mirrored.
  */
 import type { MaskSlot, UndoState, UseMaskOptions, UseMaskReturnValue } from './engine'
 import { useCallback, useEffect, useRef, useState } from 'react'
@@ -29,38 +27,35 @@ import {
 } from './engine'
 
 /**
- * Input masking hook: formats what the user types into `mask` and keeps the
- * unmasked characters in `rawValue`.
+ * Input masking hook: formats what the user types into `mask` and keeps the unmasked characters in
+ * `rawValue`.
  *
- * The returned `ref` is a **callback ref** for a native `<input>`. Attaching it
- * is what wires the hook up: `refCallback` adds the `input`, `focus`, `blur`,
- * `mousedown`, `mouseup`, `keydown` and `paste` listeners to the node,
- * initialises the field from whatever value the node already carries, applies
- * `aria-invalid`, and removes every listener again when React calls it with
- * `null`. The port deliberately stays on a native element — no `@mantine/core`,
- * no `TextInput` — so any input in any component tree can take it.
+ * The returned `ref` is a **callback ref** for a native `<input>`. Attaching it is what wires the
+ * hook up: `refCallback` adds the `input`, `focus`, `blur`, `mousedown`, `mouseup`, `keydown` and
+ * `paste` listeners to the node, initialises the field from whatever value the node already
+ * carries, applies `aria-invalid`, and removes every listener again when React calls it with
+ * `null`. The port deliberately stays on a native element — no `@mantine/core`, no `TextInput` — so
+ * any input in any component tree can take it.
  *
- * The hook owns the field: `keydown`, `paste` and `input` are intercepted
- * (`preventDefault` on the two it fully handles), the value is rebuilt through
- * the mask, and both the DOM `value` and the caret are written back directly
- * while the React state (`value` / `rawValue`) mirrors them. Typing a character
- * whose slot rejects it is a no-op rather than a rejected keystroke, and the
- * caret skips literals so it always lands on an editable slot.
+ * The hook owns the field: `keydown`, `paste` and `input` are intercepted (`preventDefault` on the
+ * two it fully handles), the value is rebuilt through the mask, and both the DOM `value` and the
+ * caret are written back directly while the React state (`value` / `rawValue`) mirrors them. Typing
+ * a character whose slot rejects it is a no-op rather than a rejected keystroke, and the caret
+ * skips literals so it always lands on an editable slot.
  *
- * Undo/redo is a two-stack history of `UndoState` entries: `Ctrl/Cmd+Z` undoes,
- * `Ctrl/Cmd+Shift+Z` and `Ctrl+Y` redo, `reset` clears both stacks, and the
- * undo stack is capped at `MAX_UNDO_HISTORY` entries. Each push records the raw
- * value and the current caret so undo restores the editing position too.
+ * Undo/redo is a two-stack history of `UndoState` entries: `Ctrl/Cmd+Z` undoes, `Ctrl/Cmd+Shift+Z`
+ * and `Ctrl+Y` redo, `reset` clears both stacks, and the undo stack is capped at `MAX_UNDO_HISTORY`
+ * entries. Each push records the raw value and the current caret so undo restores the editing
+ * position too.
  *
- * `alwaysShowMask` and `showMaskOnFocus` are separate switches: the first keeps
- * the pattern visible while the field is empty and unfocused, the second (true
- * by default) is what reveals the placeholders on focus. `autoClear` empties the
- * field on blur while the mask is incomplete; even without it, blurring a field
- * whose raw content is empty clears the display it had shown on focus.
+ * `alwaysShowMask` and `showMaskOnFocus` are separate switches: the first keeps the pattern visible
+ * while the field is empty and unfocused, the second (true by default) is what reveals the
+ * placeholders on focus. `autoClear` empties the field on blur while the mask is incomplete; even
+ * without it, blurring a field whose raw content is empty clears the display it had shown on focus.
  *
- * `isComplete` reflects the committed value — it is recomputed during render
- * from `processedRef` rather than from the `maskedValue` state, so it stays in
- * step with the DOM write in the same commit.
+ * `isComplete` reflects the committed value — it is recomputed during render from `processedRef`
+ * rather than from the `maskedValue` state, so it stays in step with the DOM write in the same
+ * commit.
  */
 export function useMask(options: UseMaskOptions): UseMaskReturnValue {
   // Written during render on purpose: every handler below is a stable callback
@@ -91,15 +86,13 @@ export function useMask(options: UseMaskOptions): UseMaskReturnValue {
   }, [rawValue])
 
   /**
-   * Commit one masked value everywhere at once: the refs, the React state, the
-   * DOM `value` and the caret. `cursorPos` is clamped to the processed length
-   * and only applied while the element is focused, so committing a value never
-   * steals the caret from somewhere else on the page.
+   * Commit one masked value everywhere at once: the refs, the React state, the DOM `value` and the
+   * caret. `cursorPos` is clamped to the processed length and only applied while the element is
+   * focused, so committing a value never steals the caret from somewhere else on the page.
    *
-   * `onChangeRaw` fires on every notified commit, while `onComplete` fires only
-   * on the transition into completeness — `wasCompleteRef` remembers the
-   * previous commit's verdict, so an already-complete field is not re-announced
-   * on each further edit.
+   * `onChangeRaw` fires on every notified commit, while `onComplete` fires only on the transition
+   * into completeness — `wasCompleteRef` remembers the previous commit's verdict, so an
+   * already-complete field is not re-announced on each further edit.
    */
   const applyValue = useCallback(
     ({
@@ -147,18 +140,16 @@ export function useMask(options: UseMaskOptions): UseMaskReturnValue {
   )
 
   /**
-   * Take a masked value, re-derive the raw characters from it, push the pair
-   * back through the mask and commit the result.
+   * Take a masked value, re-derive the raw characters from it, push the pair back through the mask
+   * and commit the result.
    *
-   * `getResolvedOptions` runs twice with different raw values on purpose: the
-   * first pair exists only to recover the raw characters out of `newMasked`
-   * (`modify` is resolved against the same value `extractRaw` will use), and
-   * the second re-resolves `modify` against that raw value, so a per-keystroke
-   * override sees the post-edit raw string.
+   * `getResolvedOptions` runs twice with different raw values on purpose: the first pair exists
+   * only to recover the raw characters out of `newMasked` (`modify` is resolved against the same
+   * value `extractRaw` will use), and the second re-resolves `modify` against that raw value, so a
+   * per-keystroke override sees the post-edit raw string.
    *
-   * Placeholders are shown when `alwaysShowMask` is set or the field is
-   * focused, and — unless `showMaskOnFocus` was switched off — only for a
-   * field that already holds something.
+   * Placeholders are shown when `alwaysShowMask` is set or the field is focused, and — unless
+   * `showMaskOnFocus` was switched off — only for a field that already holds something.
    */
   const updateValue = useCallback(
     (newMasked: string, cursorPos?: number) => {
@@ -195,12 +186,11 @@ export function useMask(options: UseMaskOptions): UseMaskReturnValue {
   )
 
   /**
-   * Adopt the value a node already carries — an uncontrolled input rendered
-   * with `defaultValue`, or a server-rendered one — by running the same
-   * two-stage resolve as `updateValue`, then commit it **without notifying**:
-   * attaching the ref is not a user edit, so `onChangeRaw` / `onComplete` stay
-   * silent. Returns whether there was anything to adopt; `refCallback` uses
-   * that to decide whether the empty-field mask still has to be painted.
+   * Adopt the value a node already carries — an uncontrolled input rendered with `defaultValue`, or
+   * a server-rendered one — by running the same two-stage resolve as `updateValue`, then commit it
+   * **without notifying**: attaching the ref is not a user edit, so `onChangeRaw` / `onComplete`
+   * stay silent. Returns whether there was anything to adopt; `refCallback` uses that to decide
+   * whether the empty-field mask still has to be painted.
    */
   const initializeInputValue = useCallback(
     (node: HTMLInputElement) => {
@@ -235,10 +225,10 @@ export function useMask(options: UseMaskOptions): UseMaskReturnValue {
   )
 
   /**
-   * Record the state an edit is about to replace. A push that would duplicate
-   * the top of the stack is dropped, so holding a key or a no-op reformat does
-   * not fill the history with identical entries. Any push discards the redo
-   * stack, which is what makes redo unavailable after a fresh edit.
+   * Record the state an edit is about to replace. A push that would duplicate the top of the stack
+   * is dropped, so holding a key or a no-op reformat does not fill the history with identical
+   * entries. Any push discards the redo stack, which is what makes redo unavailable after a fresh
+   * edit.
    */
   const pushUndoState = useCallback(() => {
     const input = inputRef.current
@@ -260,8 +250,8 @@ export function useMask(options: UseMaskOptions): UseMaskReturnValue {
   }, [])
 
   /**
-   * Replay an `UndoState`: re-mask its raw value and hand it to `updateValue`
-   * with the stored caret, so undo restores both the content and the position.
+   * Replay an `UndoState`: re-mask its raw value and hand it to `updateValue` with the stored
+   * caret, so undo restores both the content and the position.
    */
   const applyHistoryState = useCallback(
     (target: UndoState) => {
@@ -274,17 +264,15 @@ export function useMask(options: UseMaskOptions): UseMaskReturnValue {
   )
 
   /**
-   * Rebuild the mask from a native `input` event by diffing the new DOM value
-   * against the last display value: the common prefix and suffix cancel out,
-   * and whatever is left in the middle is the inserted text (empty for a
-   * deletion). The raw characters on either side are recovered from the
-   * previous* display — literals carry no raw content and placeholders are
-   * indistinguishable from typed characters — re-masked together with the
-   * inserted text, and the caret is parked after the reformatted prefix.
+   * Rebuild the mask from a native `input` event by diffing the new DOM value against the last
+   * display value: the common prefix and suffix cancel out, and whatever is left in the middle is
+   * the inserted text (empty for a deletion). The raw characters on either side are recovered from
+   * the previous* display — literals carry no raw content and placeholders are indistinguishable
+   * from typed characters — re-masked together with the inserted text, and the caret is parked
+   * after the reformatted prefix.
    *
-   * This is the path a paste, a cut, a drag-drop, `execCommand` or an IME
-   * commit takes, since none of those produce the individual keystrokes the
-   * `keydown` handler intercepts.
+   * This is the path a paste, a cut, a drag-drop, `execCommand` or an IME commit takes, since none
+   * of those produce the individual keystrokes the `keydown` handler intercepts.
    */
   const handleInput = useCallback(
     (e: Event) => {
@@ -337,16 +325,14 @@ export function useMask(options: UseMaskOptions): UseMaskReturnValue {
   )
 
   /**
-   * Pull a collapsed caret back into range: when a click or a `Tab` leaves it
-   * past the end of the masked value, or before the first editable slot, it is
-   * parked at the end of the processed value (past its trailing literals).
-   * A real selection is left untouched — dragging across the field is a
-   * selection, not a caret move.
+   * Pull a collapsed caret back into range: when a click or a `Tab` leaves it past the end of the
+   * masked value, or before the first editable slot, it is parked at the end of the processed value
+   * (past its trailing literals). A real selection is left untouched — dragging across the field is
+   * a selection, not a caret move.
    *
-   * Note the calls into `findNextEditablePosition` / `findNextTokenIndex` are
-   * always guarded by the `processed.length > 0` ternary: `findPrevTokenIndex`
-   * in the key handler throws for a caret at or past `slots.length`, and the
-   * same class of index is avoided here.
+   * Note the calls into `findNextEditablePosition` / `findNextTokenIndex` are always guarded by the
+   * `processed.length > 0` ternary: `findPrevTokenIndex` in the key handler throws for a caret at
+   * or past `slots.length`, and the same class of index is avoided here.
    */
   const clampCursorToProcessed = useCallback((input: HTMLInputElement) => {
     const start = input.selectionStart ?? 0
@@ -370,13 +356,12 @@ export function useMask(options: UseMaskOptions): UseMaskReturnValue {
   }, [])
 
   /**
-   * Reveal the placeholders on focus (unless `showMaskOnFocus: false`) and flip
-   * `isFocusedRef`, which is what lets `updateValue` show slots for an
-   * otherwise empty field. The clamp runs in a `requestAnimationFrame` so the
-   * browser has already placed the caret from the click that caused the focus
-   * (React does not control caret placement); the callback is deliberately
-   * block-bodied because it reads refs and would be rewritten into an eager
-   * `requestAnimationFrame(fn, arg)` form by the ESLint autofix.
+   * Reveal the placeholders on focus (unless `showMaskOnFocus: false`) and flip `isFocusedRef`,
+   * which is what lets `updateValue` show slots for an otherwise empty field. The clamp runs in a
+   * `requestAnimationFrame` so the browser has already placed the caret from the click that caused
+   * the focus (React does not control caret placement); the callback is deliberately block-bodied
+   * because it reads refs and would be rewritten into an eager `requestAnimationFrame(fn, arg)`
+   * form by the ESLint autofix.
    */
   const handleFocus = useCallback(() => {
     isFocusedRef.current = true
@@ -406,9 +391,9 @@ export function useMask(options: UseMaskOptions): UseMaskReturnValue {
   }, [clampCursorToProcessed])
 
   /**
-   * Re-clamp after the browser has moved the caret for a click. `mouseup` is
-   * the event that fires once the drag is finished, so a caret that was dragged
-   * into a literal (or past the typed content) is pulled back.
+   * Re-clamp after the browser has moved the caret for a click. `mouseup` is the event that fires
+   * once the drag is finished, so a caret that was dragged into a literal (or past the typed
+   * content) is pulled back.
    */
   const handleMouseUp = useCallback(() => {
     const input = inputRef.current
@@ -420,11 +405,10 @@ export function useMask(options: UseMaskOptions): UseMaskReturnValue {
   }, [clampCursorToProcessed])
 
   /**
-   * Same clamp as `handleMouseUp`, but on `mousedown`: the caret position is
-   * read from inside a `requestAnimationFrame` because at mousedown time the
-   * browser has not yet moved it. Here a click past the typed content is pushed
-   * back to the end of the processed value and nothing else is touched — this
-   * path never pulls a caret backwards, only forwards.
+   * Same clamp as `handleMouseUp`, but on `mousedown`: the caret position is read from inside a
+   * `requestAnimationFrame` because at mousedown time the browser has not yet moved it. Here a
+   * click past the typed content is pushed back to the end of the processed value and nothing else
+   * is touched — this path never pulls a caret backwards, only forwards.
    *
    * Block-bodied for the same ESLint-autofix reason as `handleFocus`.
    */
@@ -462,15 +446,14 @@ export function useMask(options: UseMaskOptions): UseMaskReturnValue {
   /**
    * Decide what the field keeps once focus leaves.
    *
-   * The DOM value is trusted only when it is still the display the hook painted
-   * on focus; otherwise the user (or the browser) changed it behind the hook's
-   * back and it is re-processed through the mask first.
+   * The DOM value is trusted only when it is still the display the hook painted on focus; otherwise
+   * the user (or the browser) changed it behind the hook's back and it is re-processed through the
+   * mask first.
    *
-   * With `autoClear`, an incomplete field is emptied — including the display
-   * the hook had shown — `onChangeRaw` is notified with two empty strings, and
-   * `alwaysShowMask` immediately repaints the empty mask. Without `autoClear`,
-   * a field whose raw content is empty is cleared and also notified, while a
-   * partially filled one just drops its placeholders (`showSlots: false`) and
+   * With `autoClear`, an incomplete field is emptied — including the display the hook had shown —
+   * `onChangeRaw` is notified with two empty strings, and `alwaysShowMask` immediately repaints the
+   * empty mask. Without `autoClear`, a field whose raw content is empty is cleared and also
+   * notified, while a partially filled one just drops its placeholders (`showSlots: false`) and
    * keeps what the user typed.
    */
   const handleBlur = useCallback(() => {
@@ -536,9 +519,8 @@ export function useMask(options: UseMaskOptions): UseMaskReturnValue {
   }, [rawValue])
 
   /**
-   * The editing core. Every branch works on the processed value and rewrites
-   * the whole field through `applyMaskToRaw`, so the mask is never edited
-   * locally:
+   * The editing core. Every branch works on the processed value and rewrites the whole field
+   * through `applyMaskToRaw`, so the mask is never edited locally:
    *
    * - `Ctrl/Cmd+Z` pops the undo stack and pushes the current state onto redo;
    *   `Ctrl/Cmd+Shift+Z` and `Ctrl+Y` do the reverse. `modifier` treats `Ctrl`
@@ -738,11 +720,10 @@ export function useMask(options: UseMaskOptions): UseMaskReturnValue {
   )
 
   /**
-   * Splice clipboard text into the raw value at the current selection, re-mask
-   * it and park the caret after the pasted prefix. The paste is always
-   * `preventDefault`ed so the browser's own insertion never reaches the field —
-   * the mask rebuild is what decides which pasted characters survive — and the
-   * caret write is skipped unless the element still holds focus.
+   * Splice clipboard text into the raw value at the current selection, re-mask it and park the
+   * caret after the pasted prefix. The paste is always `preventDefault`ed so the browser's own
+   * insertion never reaches the field — the mask rebuild is what decides which pasted characters
+   * survive — and the caret write is skipped unless the element still holds focus.
    */
   const handlePaste = useCallback(
     (e: ClipboardEvent) => {
@@ -780,9 +761,9 @@ export function useMask(options: UseMaskOptions): UseMaskReturnValue {
   )
 
   /**
-   * Reflect the `invalid` option on the element. The attribute is removed
-   * rather than set to `'false'`, so a consumer's own `aria-invalid` typing
-   * (or absence of it) is preserved when the option is off.
+   * Reflect the `invalid` option on the element. The attribute is removed rather than set to
+   * `'false'`, so a consumer's own `aria-invalid` typing (or absence of it) is preserved when the
+   * option is off.
    */
   const setAriaAttributes = useCallback((input: HTMLInputElement) => {
     const opts = optionsRef.current
@@ -796,19 +777,18 @@ export function useMask(options: UseMaskOptions): UseMaskReturnValue {
   }, [])
 
   /**
-   * The returned `ref`. Attaching a node detaches every listener from the
-   * previous one first, so a re-parented or swapped input does not keep a stale
-   * handler alive; detaching (`node === null`) only removes.
+   * The returned `ref`. Attaching a node detaches every listener from the previous one first, so a
+   * re-parented or swapped input does not keep a stale handler alive; detaching (`node === null`)
+   * only removes.
    *
-   * On attach it also adopts any existing value, applies the ARIA state, and —
-   * when `alwaysShowMask` is on and there was no value to adopt — paints the
-   * empty mask so the pattern is visible before the field is ever focused.
+   * On attach it also adopts any existing value, applies the ARIA state, and — when
+   * `alwaysShowMask` is on and there was no value to adopt — paints the empty mask so the pattern
+   * is visible before the field is ever focused.
    *
-   * `options` is read **directly** rather than through `optionsRef` here, and
-   * is therefore in this callback's dependency array: the empty-mask paint is a
-   * commit-time decision that must follow the current props, whereas the event
-   * handlers never need re-binding. That asymmetry is upstream's and is
-   * preserved.
+   * `options` is read **directly** rather than through `optionsRef` here, and is therefore in this
+   * callback's dependency array: the empty-mask paint is a commit-time decision that must follow
+   * the current props, whereas the event handlers never need re-binding. That asymmetry is
+   * upstream's and is preserved.
    */
   const refCallback = useCallback(
     (node: HTMLInputElement | null) => {
@@ -863,9 +843,8 @@ export function useMask(options: UseMaskOptions): UseMaskReturnValue {
   )
 
   /**
-   * Re-apply the ARIA state when `invalid` flips. The ref callback only runs on
-   * attach, so a later change to the option needs this effect to reach an
-   * already-mounted input.
+   * Re-apply the ARIA state when `invalid` flips. The ref callback only runs on attach, so a later
+   * change to the option needs this effect to reach an already-mounted input.
    */
   useEffect(() => {
     const input = inputRef.current
@@ -877,11 +856,10 @@ export function useMask(options: UseMaskOptions): UseMaskReturnValue {
   }, [options.invalid, setAriaAttributes])
 
   /**
-   * Completeness of the committed value, recomputed inline on every render.
-   * It reads `processedRef` rather than the `maskedValue` state because the DOM
-   * write in `applyValue` and this computation must agree within the same
-   * commit; the IIFE keeps the `getOptions()` call out of the component's
-   * top-level scope, where it would run before `processedRef` is meaningful.
+   * Completeness of the committed value, recomputed inline on every render. It reads `processedRef`
+   * rather than the `maskedValue` state because the DOM write in `applyValue` and this computation
+   * must agree within the same commit; the IIFE keeps the `getOptions()` call out of the
+   * component's top-level scope, where it would run before `processedRef` is meaningful.
    */
   const isComplete = (() => {
     const { slots } = getOptions()
@@ -889,11 +867,10 @@ export function useMask(options: UseMaskOptions): UseMaskReturnValue {
   })()
 
   /**
-   * Empty the field and drop the whole history: refs and state are cleared, the
-   * DOM value becomes `''` (or the empty mask under `alwaysShowMask`), and
-   * `onChangeRaw` is notified with two empty strings so a controlled consumer
-   * follows along. Because the undo and redo stacks are cleared too, `Ctrl+Z`
-   * after a reset has nothing to restore.
+   * Empty the field and drop the whole history: refs and state are cleared, the DOM value becomes
+   * `''` (or the empty mask under `alwaysShowMask`), and `onChangeRaw` is notified with two empty
+   * strings so a controlled consumer follows along. Because the undo and redo stacks are cleared
+   * too, `Ctrl+Z` after a reset has nothing to restore.
    */
   const reset = useCallback(() => {
     const opts = optionsRef.current

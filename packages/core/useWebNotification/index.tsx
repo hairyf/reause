@@ -2,8 +2,8 @@ import type { ConfigurableWindow } from '@reause/shared'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 /**
- * Notification display options, mirrored from upstream
- * `WebNotificationOptions` — every field maps 1:1 to the corresponding
+ * Notification display options, mirrored from upstream `WebNotificationOptions` — every field maps
+ * 1:1 to the corresponding
  * [Notification](https://developer.mozilla.org/en-US/docs/Web/API/Notification/Notification)
  * constructor option.
  */
@@ -45,29 +45,28 @@ export interface WebNotificationOptions {
    */
   icon?: string
   /**
-   * Specifies whether the user should be notified after a new notification
-   * replaces an old one.
+   * Specifies whether the user should be notified after a new notification replaces an old one.
    *
    * @default false
    */
   renotify?: boolean
   /**
-   * A boolean value indicating that a notification should remain active until
-   * the user clicks or dismisses it, rather than closing automatically.
+   * A boolean value indicating that a notification should remain active until the user clicks or
+   * dismisses it, rather than closing automatically.
    *
    * @default false
    */
   requireInteraction?: boolean
   /**
-   * Specifies whether the notification should be silent, i.e., no sounds or
-   * vibrations should be issued, regardless of the device settings.
+   * Specifies whether the notification should be silent, i.e., no sounds or vibrations should be
+   * issued, regardless of the device settings.
    *
    * @default false
    */
   silent?: boolean
   /**
-   * Specifies a vibration pattern for devices with vibration hardware to
-   * emit, as specified in the Vibration API spec.
+   * Specifies a vibration pattern for devices with vibration hardware to emit, as specified in the
+   * Vibration API spec.
    *
    * @see https://w3c.github.io/vibration/
    */
@@ -75,8 +74,8 @@ export interface WebNotificationOptions {
 }
 
 /**
- * Options for `useWebNotification` — upstream `UseWebNotificationOptions`
- * (`WebNotificationOptions` + `ConfigurableWindow` + the permission flag).
+ * Options for `useWebNotification` — upstream `UseWebNotificationOptions` (`WebNotificationOptions`
+ * + `ConfigurableWindow` + the permission flag).
  */
 export interface UseWebNotificationOptions extends ConfigurableWindow, WebNotificationOptions {
   /**
@@ -90,12 +89,10 @@ export interface UseWebNotificationOptions extends ConfigurableWindow, WebNotifi
 }
 
 /**
- * React port of VueUse's `useWebNotification`.
- *
  * Map from @vueuse/core `useWebNotification`
  * (`source/vueuse/packages/core/useWebNotification/`). Reactive
- * [Notification](https://developer.mozilla.org/en-US/docs/Web/API/notification)
- * — configure and display desktop notifications to the user.
+ * [Notification](https://developer.mozilla.org/en-US/docs/Web/API/notification) — configure and
+ * display desktop notifications to the user.
  *
  * React divergences:
  * - the Vue `isSupported` / `permissionGranted` / `notification` shallowRefs
@@ -111,8 +108,8 @@ export interface UseWebNotificationOptions extends ConfigurableWindow, WebNotifi
  *   Notification API is absent in SSR);
  * - `tryOnMounted(ensurePermissions)` becomes a mount effect honoring
  *   `requestPermissions` (default `true`);
- * - `tryOnScopeDispose(close)` becomes unmount cleanup: the current
- *   notification is closed and event subscriptions are cleared on unmount;
+ * - `tryOnScopeDispose(close)` becomes unmount cleanup: the current notification is closed and
+ * event subscriptions;
  * - the document `visibilitychange` listener (closing the now-stale
  *   notification when the tab becomes visible again) is attached in an
  *   effect gated on `isSupported`, with proper teardown.
@@ -357,16 +354,14 @@ export function useWebNotification(
 }
 
 /**
- * Return type of `useWebNotification` — upstream `UseWebNotificationReturn`
- * with the Vue shallowRefs flattened to plain values and `EventHookOn<Event>`
- * subscribe functions (same `(fn) => { off }` shape) for the Notification
- * events.
+ * Return type of `useWebNotification` — upstream `UseWebNotificationReturn` with the Vue
+ * shallowRefs flattened to plain values and `EventHookOn<Event>` subscribe functions (same `(fn) =>
+ * { off }` shape) for the Notification events.
  */
 export interface UseWebNotificationReturn {
   /**
-   * Whether the browser supports the Notification API (and can construct a
-   * Notification). `false` during render and on the server; settles after
-   * the mount effect.
+   * Whether the browser supports the Notification API (and can construct a Notification). `false`
+   * during render and on the server; settles after the mount effect.
    */
   isSupported: boolean
   /**
@@ -374,9 +369,8 @@ export interface UseWebNotificationReturn {
    */
   notification: Notification | null
   /**
-   * Request the notification permission if it's not granted (or denied)
-   * yet. Resolves the current `permissionGranted` value, or `undefined`
-   * when the Notification API is unsupported.
+   * Request the notification permission if it's not granted (or denied) yet. Resolves the current
+   * `permissionGranted` value, or `undefined` when the Notification API is unsupported.
    */
   ensurePermissions: () => Promise<boolean | undefined>
   /**
@@ -384,10 +378,9 @@ export interface UseWebNotificationReturn {
    */
   permissionGranted: boolean
   /**
-   * Show a notification built from the hook options merged with
-   * `overrides`. Resolves the created Notification, or `undefined` when
-   * unsupported / not granted. Sets the `notification` member and wires the
-   * Notification's `click`/`show`/`error`/`close` events to the on* hooks.
+   * Show a notification built from the hook options merged with `overrides`. Resolves the created
+   * Notification, or `undefined` when unsupported / not granted. Sets the `notification` member and
+   * wires the Notification's `click`/`show`/`error`/`close` events to the on* hooks.
    */
   show: (overrides?: WebNotificationOptions) => Promise<Notification | undefined>
   /**

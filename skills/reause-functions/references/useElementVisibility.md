@@ -62,7 +62,7 @@ export interface UseElementVisibilityOptions extends ConfigurableWindow {
   /**
    * The element that is used as the viewport for checking visibility of the target.
    */
-  scrollTarget?: ElementTarget | Document
+  scrollTarget?: ElementTarget | RefObject<Document | null>
   /**
    * Either a single number or an array of numbers between 0.0 and 1.
    *
@@ -72,7 +72,7 @@ export interface UseElementVisibilityOptions extends ConfigurableWindow {
   /**
    * A string which specifies a set of offsets to add to the root's bounding_box when calculating intersections.
    */
-  rootMargin?: RefOrValue<string>
+  rootMargin?: string
   /**
    * Stop tracking when element visibility changes for the first time.
    *

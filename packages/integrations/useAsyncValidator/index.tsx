@@ -35,8 +35,8 @@ export interface UseAsyncValidatorOptions {
    */
   validateOption?: ValidateOption
   /**
-   * The validation will be triggered right away for the first time.
-   * Only works when `manual` is not set to true.
+   * The validation will be triggered right away for the first time. Only works when `manual` is not
+   * set to true.
    *
    * @default true
    */
@@ -59,20 +59,16 @@ interface LiveState {
  *
  * Map from @vueuse/integrations `useAsyncValidator`
  * (`source/vueuse/packages/integrations/useAsyncValidator/`). The upstream
- * object return is preserved (`{ pass, isFinished, errors, errorInfo,
- * errorFields, execute }`) with the refs unwrapped: every member is a plain
- * value (no `.value`), `pass` starts as `!immediate || manual`, `execute()`
- * flips `isFinished` to `false`, awaits
- * `validator.validate(value, validateOption)` and settles with
- * `pass`, `errorInfo`, `errors` and `errorFields`; `errors` is
- * `errorInfo?.errors || []` and `errorFields` is `errorInfo?.fields || {}`.
- * `value` and `rules` are the hook's **read-only value sources** and take
- * plain values (`Record<string, any>` and `Rules`; upstream:
- * `MaybeRefOrGetter`); the returned
- * object is promise-like (`await useAsyncValidator(...)` resolves with the
- * current snapshot), mirroring `useAsyncState`.
+ * object return is preserved (`{ pass, isFinished, errors, errorInfo, errorFields, execute }`) with
+ * the refs unwrapped: every member is a plain value (no `.value`), `pass` starts as `!immediate ||
+ * manual`, `execute()` flips `isFinished` to `false`, awaits `validator.validate(value,
+ * validateOption)` and settles with `pass`, `errorInfo`, `errors` and `errorFields`; `errors` is
+ * `errorInfo?.errors || []` and `errorFields` is `errorInfo?.fields || {}`. `value` and `rules` are
+ * the hook's **read-only value sources** and take plain values (`Record<string, any>` and `Rules`;
+ * upstream: `MaybeRefOrGetter`); the returned object is promise-like (`await
+ * useAsyncValidator(...)` resolves with the current snapshot), mirroring `useAsyncState`.
  *
- * Adjustment for React:
+ * React divergences:
  * - upstream re-runs validation from
  *   `watch([valueRef, validator], execute, { immediate, deep: true })`. React
  *   has no deep observation, so this port re-runs from an effect keyed on the
@@ -82,9 +78,8 @@ interface LiveState {
  *   `execute()` yourself. In React StrictMode dev builds the initial
  *   validation may run twice (the effect is double-invoked); the extra run is
  *   idempotent.
- * - `errors` and `errorFields` are derived during render from `errorInfo`
- *   (upstream uses `computed`); `execute` is stable and ignores results that
- *   arrive after unmount.
+ * - `errors` and `errorFields` are derived during render from `errorInfo`; `execute` is stable and
+ * ignores results that arrive after unmount.
  *
  * @__NO_SIDE_EFFECTS__
  * @example

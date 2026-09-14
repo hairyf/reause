@@ -4,7 +4,7 @@ category: Utilities
 
 # isDefined
 
-Non-nullish checking type guard for ref-like objects
+Non-nullish checking type guard for React ref objects and plain values
 
 ## Usage
 

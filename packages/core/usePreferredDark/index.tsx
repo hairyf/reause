@@ -2,14 +2,11 @@ import type { ConfigurableWindow } from '@reause/shared'
 import { useMediaQuery } from '../useMediaQuery'
 
 /**
- * React port of VueUse's `usePreferredDark`.
- *
  * Map from @vueuse/core `usePreferredDark`
  * (`source/vueuse/packages/core/usePreferredDark/`), which is a thin wrapper
  * over `useMediaQuery('(prefers-color-scheme: dark)')`. Reactive
  * [prefers-color-scheme](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-color-scheme)
- * `dark` preference as a plain boolean — `true` when the user prefers a
- * dark theme.
+ * `dark` preference as a plain boolean — `true` when the user prefers a dark theme.
  *
  * React divergences:
  * - the Vue `computed<boolean>` return becomes a plain boolean state via the

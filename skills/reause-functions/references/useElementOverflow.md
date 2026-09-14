@@ -110,7 +110,7 @@ export interface UseElementOverflowReturn {
  * const { isXOverflowed } = useElementOverflow(el)
  */
 export declare function useElementOverflow(
-  target: RefOrValue<HTMLElement | SVGElement | null | undefined>,
+  target: RefObject<Element | null | undefined>,
   option?: UseElementOverflowOptions,
 ): UseElementOverflowReturn
 ```

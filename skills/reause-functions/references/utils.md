@@ -107,11 +107,15 @@ export declare const hasOwn: <T extends object, K extends keyof T>(
 ) => key is K
 export declare const isIOS: boolean
 export declare const hyphenate: (str: string) => string
-/** A plain value or a React ref. Zero-argument getter values are not supported. */
-export type RefOrValue<T> = T | Ref<T>
-/** Values accepted by controllable state hooks. */
+/**
+ * Values accepted by controllable state hooks: a plain value, a zero-argument
+ * getter, a `[value, setter]` tuple or a `{ value, onChange }` pair. React
+ * refs are deliberately **not** part of this union — a ref is a DOM handle,
+ * so it is passed as a `RefObject` to DOM hooks and read with `unrefElement`
+ * (`@reause/core`) instead of being treated as a state source.
+ */
 export type StateValue<T> =
-  | RefOrValue<T>
+  | T
   | (() => T)
   | readonly [T, (value: T | ((prev: T) => T)) => void]
   | {
@@ -128,26 +132,29 @@ export interface ConfigurableWindow {
 /**
  * Type guard for React ref objects (`RefObject` — `{ current }` holders).
  * Callback refs are functions and cannot be read synchronously, so they are
- * not ref-like.
+ * not ref-like. Refs are DOM handles here, never state sources: use it to
+ * detect a `RefObject` when a value may still be `undefined`/`null`.
  */
-export declare function isRefLike<T>(
-  value: RefOrValue<T> | undefined | null,
-): value is RefObject<T | null>
+export declare function isRefLike(value: unknown): value is RefObject<unknown>
 /**
- * Resolve a plain value or a React ref to its current value — the React
- * replacement for VueUse's `toValue`. Getters are not supported: pass a
- * React ref (`useRef`) when the latest value must be read lazily.
+ * Resolve a controllable-state source to its current value — the React
+ * replacement for VueUse's `toValue`. A `[value, setter]` tuple resolves to
+ * its first element, a `{ value, onChange }` pair to `.value`, a
+ * zero-argument getter is invoked, and a plain value is returned as-is.
+ *
+ * React refs are not resolved here: a `RefObject` is a DOM handle, read with
+ * `unrefElement` (`@reause/core`) instead.
  */
 export declare function toValue<T>(value: StateValue<T>): T
 export declare function toValue<T>(
   value: StateValue<T> | undefined | null,
 ): T | undefined | null
 /**
- * Write a value back through a writable `State<T>` source — a ref-like
- * `.current`, a `[value, setter]` tuple or a `{ value, onChange }` pair.
- * Plain values and getters have no write path and are skipped. This is the
- * write-side counterpart of `toValue`; hooks that push values into a
- * `State<T>` import it from here rather than re-implementing the branches.
+ * Write a value back through a writable `State<T>` source — a
+ * `[value, setter]` tuple or a `{ value, onChange }` pair. Plain values and
+ * getters have no write path and are skipped. This is the write-side
+ * counterpart of `toValue`; hooks that push values into a `State<T>` import it
+ * from here rather than re-implementing the branches.
  */
 export declare function writeState<T>(
   source: StateValue<T> | undefined | null,

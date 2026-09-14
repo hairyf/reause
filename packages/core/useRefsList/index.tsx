@@ -1,17 +1,17 @@
 import { useRef } from 'react'
 
 /**
- * A list of collected refs with an attached `set(el)` collector callback —
- * the React counterpart of upstream's `TemplateRefsList<T> = T[] & { set }`.
+ * A list of collected refs with an attached `set(el)` collector callback — the React counterpart of
+ * upstream's `TemplateRefsList<T> = T[] & { set }`.
  */
 export type TemplateRefsList<T> = T[] & {
   set: (el: T | null) => void
 }
 
 /**
- * Creates the stable, per-instance refs list: an array with the `set`
- * collector attached. `refs.set` is the same function across re-renders, so
- * it can be stored or passed around like upstream's `refs.set`.
+ * Creates the stable, per-instance refs list: an array with the `set` collector attached.
+ * `refs.set` is the same function across re-renders, so it can be stored or passed around like
+ * upstream's `refs.set`.
  */
 function createRefsList<T>(): TemplateRefsList<T> {
   const refs = [] as unknown as TemplateRefsList<T>
@@ -32,12 +32,9 @@ function createRefsList<T>(): TemplateRefsList<T> {
 }
 
 /**
- * React port of VueUse's `useTemplateRefsList`.
- *
  * Map from @vueuse/core `useTemplateRefsList`
  * (`source/vueuse/packages/core/useTemplateRefsList/`). Shorthand for
- * collecting refs to elements rendered inside a list — the `v-for` `:ref`
- * binding helper.
+ * collecting refs to elements rendered inside a list — the `v-for` `:ref` binding helper.
  *
  * React adaptation:
  *

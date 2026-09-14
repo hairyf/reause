@@ -1,13 +1,11 @@
 import { useEffect, useState } from 'react'
 
 /**
- * React port of VueUse's `useObjectUrl`.
- *
  * Map from @vueuse/core `useObjectUrl`
  * (`source/vueuse/packages/core/useObjectUrl/`). Reactive URL representing an
- * object — creates a URL for the provided `File`, `Blob`, or `MediaSource`
- * via [URL.createObjectURL()](https://developer.mozilla.org/en-US/docs/Web/API/URL/createObjectURL)
- * and automatically releases it via
+ * object — creates a URL for the provided `File`, `Blob`, or `MediaSource` via
+ * [URL.createObjectURL()](https://developer.mozilla.org/en-US/docs/Web/API/URL/createObjectURL) and
+ * automatically releases it via
  * [URL.revokeObjectURL()](https://developer.mozilla.org/en-US/docs/Web/API/URL/revokeObjectURL)
  * when the source changes or the component unmounts.
  *
@@ -23,8 +21,7 @@ import { useEffect, useState } from 'react'
  *   on that object creates
  *   the new URL and revokes the previous one, so
  *   the URL re-creates whenever the component re-renders with a new object;
- * - unmount revocation happens in the effect cleanup (upstream:
- *   `tryOnScopeDispose`);
+ * - unmount revocation happens in the effect cleanup;
  * - SSR-safe: the URL is only ever created inside an effect (effects don't
  *   run on the server), and the effect bails out when `URL.createObjectURL`
  *   is unavailable.

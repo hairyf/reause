@@ -10,15 +10,18 @@ import { resolveIpcRenderer } from '../_resolve'
  */
 export interface UseIpcRendererReturn {
   /**
-   * Listens to channel, when a new message arrives listener would be called with listener(event, args...).
-   * [ipcRenderer.removeListener](https://www.electronjs.org/docs/api/ipc-renderer#ipcrendererremovelistenerchannel-listener) automatically on unmounted.
+   * Listens to channel, when a new message arrives listener would be called with listener(event,
+   * args...).
+   * [ipcRenderer.removeListener](https://www.electronjs.org/docs/api/ipc-renderer#ipcrendererremovelistenerchannel-listener)
+   * automatically on unmounted.
    *
    * @see https://www.electronjs.org/docs/api/ipc-renderer#ipcrendereronchannel-listener
    */
   on: (channel: string, listener: IpcRendererListener) => IpcRenderer
 
   /**
-   * Adds a one time listener function for the event. This listener is invoked only the next time a message is sent to channel, after which it is removed.
+   * Adds a one time listener function for the event. This listener is invoked only the next time a
+   * message is sent to channel, after which it is removed.
    *
    * @see https://www.electronjs.org/docs/api/ipc-renderer#ipcrendereroncechannel-listener
    */
@@ -46,23 +49,24 @@ export interface UseIpcRendererReturn {
   send: (channel: string, ...args: any[]) => void
 
   /**
-   * Returns `Promise<any>` — resolves with the response from the main process.
-   * Send a message to the main process via channel and expect a result ~~asynchronously~~.
+   * Returns `Promise<any>` — resolves with the response from the main process. Send a message to
+   * the main process via channel and expect a result ~~asynchronously~~.
    *
    * @see https://www.electronjs.org/docs/api/ipc-renderer#ipcrendererinvokechannel-args
    */
   invoke: <T>(channel: string, ...args: any[]) => Promise<T>
 
   /**
-   * Returns `any` — the value sent back by the `ipcMain` handler.
-   * Send a message to the main process via channel and expect a result synchronously.
+   * Returns `any` — the value sent back by the `ipcMain` handler. Send a message to the main
+   * process via channel and expect a result synchronously.
    *
    * @see https://www.electronjs.org/docs/api/ipc-renderer#ipcrenderersendsyncchannel-args
    */
   sendSync: <T>(channel: string, ...args: any[]) => T
 
   /**
-   * Send a message to the main process, optionally transferring ownership of zero or more MessagePort objects.
+   * Send a message to the main process, optionally transferring ownership of zero or more
+   * MessagePort objects.
    *
    * @see https://www.electronjs.org/docs/api/ipc-renderer#ipcrendererpostmessagechannel-message-transfer
    */
@@ -76,7 +80,8 @@ export interface UseIpcRendererReturn {
   sendTo: (webContentsId: number, channel: string, ...args: any[]) => void
 
   /**
-   * Like `ipcRenderer.send` but the event will be sent to the `<webview>` element in the host page instead of the main process.
+   * Like `ipcRenderer.send` but the event will be sent to the `<webview>` element in the host page
+   * instead of the main process.
    *
    * @see https://www.electronjs.org/docs/api/ipc-renderer#ipcrenderersendtohostchannel-args
    */

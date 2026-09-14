@@ -122,7 +122,7 @@ export interface UseVibrateReturn {
  *   `intervalControls.pause()`, `stop()` or unmount; `intervalControls`
  *   mirrors upstream's `intervalControls?: Pausable` shape with
  *   `{ pause, resume, isActive }`;
- * - `RefOrValue` reactivity becomes plain values: options are read at
+ * - `MaybeRefOrGetter` reactivity becomes plain values: options are read at
  *   call time, so changing `pattern` affects the next `vibrate()` call or
  *   loop tick, and changing `interval` restarts the running loop.
  *

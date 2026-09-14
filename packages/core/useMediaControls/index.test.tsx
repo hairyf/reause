@@ -51,7 +51,7 @@ describe('useMediaControls', () => {
   })
 
   it('initializes with the upstream default state and exposes all controls', async () => {
-    const { result } = await renderHook(() => useMediaControls(video))
+    const { result } = await renderHook(() => useMediaControls({ current: video }))
 
     expect(result.current.currentTime).toBe(0)
     expect(result.current.duration).toBe(0)
@@ -89,7 +89,7 @@ describe('useMediaControls', () => {
     stubNumberProperty(video, 'currentTime')
     const setDuration = stubNumberProperty(video, 'duration')
 
-    const { result, act } = await renderHook(() => useMediaControls(video))
+    const { result, act } = await renderHook(() => useMediaControls({ current: video }))
 
     video.currentTime = 42
     await act(async () => {
@@ -105,7 +105,7 @@ describe('useMediaControls', () => {
   })
 
   it('mirrors play / pause / playing / ended events into state', async () => {
-    const { result, act } = await renderHook(() => useMediaControls(video))
+    const { result, act } = await renderHook(() => useMediaControls({ current: video }))
 
     await act(async () => {
       video.dispatchEvent(new Event('play'))
@@ -131,7 +131,7 @@ describe('useMediaControls', () => {
   })
 
   it('tracks waiting / loadstart / loadeddata state', async () => {
-    const { result, act } = await renderHook(() => useMediaControls(video))
+    const { result, act } = await renderHook(() => useMediaControls({ current: video }))
 
     await act(async () => {
       video.dispatchEvent(new Event('waiting'))
@@ -161,7 +161,7 @@ describe('useMediaControls', () => {
   })
 
   it('mirrors seeking / seeked / stalled events into state', async () => {
-    const { result, act } = await renderHook(() => useMediaControls(video))
+    const { result, act } = await renderHook(() => useMediaControls({ current: video }))
 
     await act(async () => {
       video.dispatchEvent(new Event('seeking'))
@@ -180,7 +180,7 @@ describe('useMediaControls', () => {
   })
 
   it('mirrors volumechange and ratechange events into state', async () => {
-    const { result, act } = await renderHook(() => useMediaControls(video))
+    const { result, act } = await renderHook(() => useMediaControls({ current: video }))
 
     await act(async () => {
       video.volume = 0.5
@@ -203,7 +203,7 @@ describe('useMediaControls', () => {
       get: () => ({ length: 1, start: () => 0, end: () => 10 }) as unknown as TimeRanges,
     })
 
-    const { result, act } = await renderHook(() => useMediaControls(video))
+    const { result, act } = await renderHook(() => useMediaControls({ current: video }))
 
     await act(async () => {
       video.dispatchEvent(new Event('progress'))
@@ -215,7 +215,7 @@ describe('useMediaControls', () => {
     const playSpy = vi.spyOn(video, 'play').mockResolvedValue(undefined)
     const pauseSpy = vi.spyOn(video, 'pause').mockImplementation(() => {})
 
-    const { result, act } = await renderHook(() => useMediaControls(video))
+    const { result, act } = await renderHook(() => useMediaControls({ current: video }))
 
     await act(async () => {
       result.current.play()
@@ -245,7 +245,7 @@ describe('useMediaControls', () => {
   it('seek / setVolume / mute / unmute / toggleMute / setRate write through to the element', async () => {
     stubNumberProperty(video, 'currentTime')
 
-    const { result, act } = await renderHook(() => useMediaControls(video))
+    const { result, act } = await renderHook(() => useMediaControls({ current: video }))
 
     await act(async () => {
       result.current.seek(60)
@@ -308,7 +308,7 @@ describe('useMediaControls', () => {
   it('removes the media listeners on unmount', async () => {
     const removeSpy = vi.spyOn(video, 'removeEventListener')
 
-    const { result, act, unmount } = await renderHook(() => useMediaControls(video))
+    const { result, act, unmount } = await renderHook(() => useMediaControls({ current: video }))
 
     await act(async () => {
       video.dispatchEvent(new Event('timeupdate'))
@@ -363,7 +363,7 @@ describe('useMediaControls', () => {
     video.volume = 0.3
     video.playbackRate = 0.5
 
-    await renderHook(() => useMediaControls(video))
+    await renderHook(() => useMediaControls({ current: video }))
 
     expect(video.muted).toBe(true)
     expect(video.volume).toBe(0.3)
@@ -397,7 +397,7 @@ describe('useMediaControls', () => {
   it('injects source elements from the src option, loads them and reports source errors', async () => {
     const loadSpy = vi.spyOn(video, 'load').mockImplementation(() => {})
 
-    const { result, act } = await renderHook(() => useMediaControls(video, {
+    const { result, act } = await renderHook(() => useMediaControls({ current: video }, {
       src: { src: 'https://example.com/media.mp4', type: 'video/mp4' },
     }))
 
@@ -421,7 +421,7 @@ describe('useMediaControls', () => {
     const loadSpy = vi.spyOn(video, 'load').mockImplementation(() => {})
 
     const { rerender } = await renderHook<{ src?: string | UseMediaSource | UseMediaSource[] }, UseMediaControlsReturn>(
-      (props?) => useMediaControls(video, { src: props?.src ?? 'https://example.com/media.mp4' }),
+      (props?) => useMediaControls({ current: video }, { src: props?.src ?? 'https://example.com/media.mp4' }),
       { initialProps: { src: 'https://example.com/media.mp4' } },
     )
 
@@ -447,7 +447,7 @@ describe('useMediaControls', () => {
   it('unsubscribes an event-hook listener via the returned off function', async () => {
     vi.spyOn(video, 'load').mockImplementation(() => {})
 
-    const { result, act } = await renderHook(() => useMediaControls(video, {
+    const { result, act } = await renderHook(() => useMediaControls({ current: video }, {
       src: { src: 'https://example.com/media.mp4' },
     }))
 
@@ -468,7 +468,7 @@ describe('useMediaControls', () => {
   })
 
   it('injects track elements from the tracks option and manages them', async () => {
-    const { result, act } = await renderHook(() => useMediaControls(video, {
+    const { result, act } = await renderHook(() => useMediaControls({ current: video }, {
       tracks: [
         { default: true, src: 'https://example.com/subtitles-en.vtt', kind: 'subtitles', label: 'English', srcLang: 'en' },
         { src: 'https://example.com/subtitles-es.vtt', kind: 'subtitles', label: 'Spanish', srcLang: 'es' },
@@ -517,7 +517,7 @@ describe('useMediaControls', () => {
   it('re-injects tracks when the tracks option changes', async () => {
     const { rerender } = await renderHook(
       (props?: { tracks?: UseMediaTextTrackSource[] }) =>
-        useMediaControls(video, { tracks: props?.tracks }),
+        useMediaControls({ current: video }, { tracks: props?.tracks }),
       {
         initialProps: {
           tracks: [
@@ -559,7 +559,7 @@ describe('useMediaControls', () => {
       removeEventListener: () => {},
     } as unknown as Document
 
-    const { result, act, unmount } = await renderHook(() => useMediaControls(video, { document: fakeDoc }))
+    const { result, act, unmount } = await renderHook(() => useMediaControls({ current: video }, { document: fakeDoc }))
     expect(result.current.supportsPictureInPicture).toBe(true)
     expect(result.current.isPictureInPicture).toBe(false)
 
@@ -591,7 +591,7 @@ describe('useMediaControls', () => {
   it('triggers onPlaybackError when el.play() rejects', async () => {
     const playSpy = vi.spyOn(video, 'play').mockRejectedValue(new Error('playback failed'))
 
-    const { result, act } = await renderHook(() => useMediaControls(video))
+    const { result, act } = await renderHook(() => useMediaControls({ current: video }))
 
     const errorHandler = vi.fn()
     result.current.onPlaybackError(errorHandler)
@@ -613,14 +613,14 @@ describe('useMediaControls', () => {
       removeEventListener: () => {},
     } as unknown as Document
 
-    const { result } = await renderHook(() => useMediaControls(video, { document: fakeDoc }))
+    const { result } = await renderHook(() => useMediaControls({ current: video }, { document: fakeDoc }))
 
     expect(result.current.supportsPictureInPicture).toBe(false)
     expect(result.current.isPictureInPicture).toBe(false)
   })
 
   it('no-ops the controls and keeps the defaults without a resolved element (target: null)', async () => {
-    const { result, act } = await renderHook(() => useMediaControls(null))
+    const { result, act } = await renderHook(() => useMediaControls({ current: null }))
 
     expect(result.current.playing).toBe(false)
     expect(result.current.currentTime).toBe(0)
@@ -639,7 +639,7 @@ describe('useMediaControls', () => {
     const snapshots: Array<{ currentTime: number, playing: boolean, volume: number }> = []
 
     function Probe() {
-      const controls = useMediaControls(null)
+      const controls = useMediaControls({ current: null })
       snapshots.push({ currentTime: controls.currentTime, playing: controls.playing, volume: controls.volume })
       return <div>{controls.playing ? 'playing' : 'paused'}</div>
     }

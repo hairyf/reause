@@ -131,13 +131,13 @@ export interface Position {
   x: number
   y: number
 }
-export type DraggableTarget = RefOrValue<
+export type DraggableTarget = RefObject<
   HTMLElement | SVGElement | null | undefined
 >
-export type DraggableElement = RefOrValue<
+export type DraggableElement = RefObject<
   HTMLElement | SVGElement | Window | Document | null | undefined
 >
-export type DraggableContainer = RefOrValue<
+export type DraggableContainer = RefObject<
   HTMLElement | SVGElement | null | undefined
 >
 export interface UseDraggableOptions {
@@ -146,19 +146,19 @@ export interface UseDraggableOptions {
    *
    * @default false
    */
-  exact?: RefOrValue<boolean>
+  exact?: boolean
   /**
    * Prevent events defaults
    *
    * @default false
    */
-  preventDefault?: RefOrValue<boolean>
+  preventDefault?: boolean
   /**
    * Prevent events propagation
    *
    * @default false
    */
-  stopPropagation?: RefOrValue<boolean>
+  stopPropagation?: boolean
   /**
    * Whether dispatch events in capturing phase
    *
@@ -194,7 +194,7 @@ export interface UseDraggableOptions {
    *
    * @default { x: 0, y: 0 }
    */
-  initialValue?: RefOrValue<Position>
+  initialValue?: Position
   /**
    * Callback when the dragging starts. Return `false` to prevent dragging.
    */
@@ -218,7 +218,7 @@ export interface UseDraggableOptions {
    *
    * @default false
    */
-  disabled?: RefOrValue<boolean>
+  disabled?: boolean
   /**
    * Mouse buttons that are allowed to trigger drag events.
    *
@@ -231,7 +231,7 @@ export interface UseDraggableOptions {
    * @see https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button#value
    * @default [0]
    */
-  buttons?: RefOrValue<number[]>
+  buttons?: number[]
   /**
    * Whether to restrict dragging within the visible area of the container.
    *
@@ -240,13 +240,13 @@ export interface UseDraggableOptions {
    *
    * @default false
    */
-  restrictInView?: RefOrValue<boolean>
+  restrictInView?: boolean
   /**
    * Whether to enable auto-scroll when dragging near the edges.
    *
    * @default false
    */
-  autoScroll?: RefOrValue<
+  autoScroll?:
     | boolean
     | {
         /**
@@ -254,13 +254,13 @@ export interface UseDraggableOptions {
          *
          * @default 2
          */
-        speed?: RefOrValue<number | Position>
+        speed?: number | Position
         /**
          * Margin from the edge to trigger auto-scroll.
          *
          * @default 30
          */
-        margin?: RefOrValue<number | Position>
+        margin?: number | Position
         /**
          * Direction of auto-scroll.
          *
@@ -268,7 +268,6 @@ export interface UseDraggableOptions {
          */
         direction?: "x" | "y" | "both"
       }
-  >
 }
 export interface UseDraggableReturn {
   x: number
@@ -317,7 +316,7 @@ export interface UseDraggableReturn {
  * - `target`, `handle`, `draggingElement` and `containerElement` accept a
  *   plain element or a ref-like `{ current }` object (e.g. the result of
  *   `useRef`) — the React equivalent of upstream's
- *   `RefOrValue`. They are re-resolved on every render and the
+ *   `MaybeRefOrGetter`. They are re-resolved on every render and the
  *   listeners re-bind when the resolved element changes;
  * - every remaining option (`disabled`, `buttons`, `exact`, `axis`,
  *   `restrictInView`, `autoScroll`, `onStart` / `onMove` / `onEnd`, …) is

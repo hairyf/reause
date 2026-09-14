@@ -3,11 +3,8 @@ import { useEffect, useRef, useState } from 'react'
 
 export interface UseActiveElementOptions extends ConfigurableWindow {
   /**
-   * Custom `document` or open `ShadowRoot` to read `activeElement` from, e.g.
-   * working with iframes or in testing environments (upstream:
-   * `ConfigurableDocumentOrShadowRoot`). Inlined here —
-   * `ConfigurableDocument` is not ported to `@reause/shared`, so `document?`
-   * mirrors the option `useDocumentVisibility` exposes.
+   * Custom `document` or open `ShadowRoot` to read `activeElement` from, e.g. working with iframes
+   * or in testing environments.
    *
    * @default the resolved `window`'s `document` on the client
    */
@@ -19,8 +16,7 @@ export interface UseActiveElementOptions extends ConfigurableWindow {
    */
   deep?: boolean
   /**
-   * Track the active element when it is removed from the DOM. Uses a
-   * `MutationObserver` under the hood.
+   * Track active element when it's removed from the DOM (a `MutationObserver` under the hood)
    *
    * @default false
    */
@@ -28,39 +24,16 @@ export interface UseActiveElementOptions extends ConfigurableWindow {
 }
 
 /**
- * React port of VueUse's `useActiveElement`.
+ * Reactively track `document.activeElement` — the focused element, falling back to `document.body`
+ * — re-read on focus, blur and pointer presses, descending into open shadow roots.
  *
  * Map from @vueuse/core `useActiveElement`
- * (`source/vueuse/packages/core/useActiveElement/`). Reactively track
- * `document.activeElement` — the focused element, falling back to
- * `document.body` when nothing is focused — re-reading it when focus changes,
- * the window loses focus, or a pointer is pressed (`deep`, default `true`,
- * descends into open shadow roots). The Vue `ShallowRef` return becomes a
- * plain `T | undefined` state value.
- *
- * React divergences:
- * - the Vue `ShallowRef<T | null | undefined>` return becomes a plain
- *   `T | undefined` value — `undefined` wherever upstream would hold `null`
- *   (e.g. nothing focused inside a shadow root);
- * - the `focus` / `blur` / `pointerdown` listeners (upstream composes
- *   `useEventListener`) attach in an effect and are removed on unmount.
- *   `pointerdown` is kept as an additional trigger for environments where
- *   `activeElement` changes without a `focus` event — the current upstream
- *   relies on `focus` / `blur` alone (the listener, in `{ capture: true,
- *   passive: true }`, mirrors upstream);
- * - the `blur` handler re-reads only when `event.relatedTarget === null`, so
- *   focus moving inside the page is handled by the `focus` listener, exactly
- *   as upstream;
- * - the initial `document.activeElement` read happens in the mount effect
- *   instead of during setup, so SSR renders `undefined` without touching
- *   `window` or the DOM;
- * - `triggerOnRemoval` (upstream composes `onElementRemoval`, which wraps
- *   `useMutationObserver`) observes the resolved `document` / `shadowRoot`
- *   directly and re-triggers when the tracked element is removed from the
- *   tree, disconnecting the observer on unmount.
- *
- * SSR-safe: nothing touches `window` or the DOM during render — all reads
- * happen in effects.
+ * (`source/vueuse/packages/core/useActiveElement/`). React divergences: the
+ * `ShallowRef<T | null | undefined>` return becomes a plain `T | undefined`; `pointerdown` joins
+ * the `focus` / `blur` listeners as a trigger, so a change of `activeElement` without a `focus`
+ * event is still seen; `triggerOnRemoval` observes the resolved `document` / `shadowRoot` directly
+ * and disconnects on unmount. Reads happen in the mount effect, so a server render yields
+ * `undefined` without touching the DOM.
  *
  * @see https://vueuse.org/core/useActiveElement/
  * @param options - UseActiveElementOptions

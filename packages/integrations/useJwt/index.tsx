@@ -17,9 +17,8 @@ export interface UseJwtOptions<Fallback> {
 }
 
 /**
- * React return type: a plain object with two distinct-typed named fields —
- * the value analog of the upstream `ComputedRef`s. `header` and `payload` are
- * decoded values (or `Fallback`), NOT refs.
+ * React return type: a plain object with two distinct-typed named fields — the value analog of the
+ * upstream `ComputedRef`s. `header` and `payload` are decoded values (or `Fallback`), NOT refs.
  */
 export interface UseJwtReturn<Payload, Header, Fallback> {
   header: Header | Fallback
@@ -27,16 +26,13 @@ export interface UseJwtReturn<Payload, Header, Fallback> {
 }
 
 /**
- * React port of VueUse's `useJwt`.
- *
  * Map from @vueuse/integrations `useJwt`
  * (`source/vueuse/packages/integrations/useJwt/`), a wrapper for
- * [`jwt-decode`](https://github.com/auth0/jwt-decode). `encodedJwt` is the
- * hook's **read-only value source** and takes a plain string (upstream:
- * `MaybeRefOrGetter<string>`); the decode is memoized on the token, so a
- * stable token keeps `header`/`payload` referentially stable across renders.
+ * [`jwt-decode`](https://github.com/auth0/jwt-decode). `encodedJwt` is the hook's **read-only value
+ * source** and takes a plain string; the decode is memoized on the token, so a stable token keeps
+ * `header`/`payload` referentially stable across renders.
  *
- * Adjustment for React:
+ * React divergences:
  * - upstream returns `{ header, payload }` as `ComputedRef`s; here the two
  *   fields are plain decoded values (the issue's own `const { header, payload }
  *   = useJwt(encodedJwt)` shape), so read them directly instead of `.value`;

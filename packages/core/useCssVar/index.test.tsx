@@ -44,7 +44,7 @@ describe('useCssVar', () => {
     const el = document.createElement('div')
 
     const color = '--color'
-    const { result } = await renderHook(() => useCssVar(color, el, { initialValue: 'red' }))
+    const { result } = await renderHook(() => useCssVar(color, { current: el }, { initialValue: 'red' }))
 
     expect(result.current[0]).toBe('red')
     expect(el.style.getPropertyValue(color)).toBe('red')
@@ -68,7 +68,7 @@ describe('useCssVar', () => {
   it('should handle null and undefined', async () => {
     const el = document.createElement('div')
     const property = '--color'
-    const { result, act } = await renderHook(() => useCssVar(property, el))
+    const { result, act } = await renderHook(() => useCssVar(property, { current: el }))
 
     expect(el.getAttribute('style')).toBeNull()
     await act(() => {
@@ -82,7 +82,7 @@ describe('useCssVar', () => {
 
     try {
       const color = '--color'
-      const { result } = await renderHook(() => useCssVar(color, el, { initialValue: 'red', observe: true }))
+      const { result } = await renderHook(() => useCssVar(color, { current: el }, { initialValue: 'red', observe: true }))
 
       expect(result.current[0]).toBe('red')
       expect(el.style.getPropertyValue(color)).toBe('red')
@@ -113,7 +113,7 @@ describe('useCssVar', () => {
     } as unknown as Window
 
     const { result } = await renderHook(() =>
-      useCssVar('--color', el, { initialValue: 'red', observe: true, window: fakeWindow }),
+      useCssVar('--color', { current: el }, { initialValue: 'red', observe: true, window: fakeWindow }),
     )
 
     expect(result.current[0]).toBe('red')
@@ -136,7 +136,7 @@ describe('useCssVar', () => {
     try {
       // no throw even though the configured window lacks MutationObserver
       const { result } = await renderHook(() =>
-        useCssVar('--color', el, { initialValue: 'red', observe: true, window: fakeWindow }),
+        useCssVar('--color', { current: el }, { initialValue: 'red', observe: true, window: fakeWindow }),
       )
 
       expect(result.current[0]).toBe('red')
@@ -157,7 +157,7 @@ describe('useCssVar', () => {
     function Probe() {
       const elRef = useRef<HTMLDivElement>(null)
       const [el, setEl] = useState<HTMLDivElement | null>(null)
-      const [, setColor] = useCssVar('--color', el)
+      const [, setColor] = useCssVar('--color', { current: el })
 
       // onMounted: attach the element and change the color
       useEffect(() => {
@@ -179,7 +179,7 @@ describe('useCssVar', () => {
     const el = appendElement()
     el.style.setProperty('--color', 'red')
 
-    const { result } = await renderHook(() => useCssVar('--color', el))
+    const { result } = await renderHook(() => useCssVar('--color', { current: el }))
 
     expect(result.current[0]).toBe('red')
     expect(window.getComputedStyle(el).getPropertyValue('--color')).toBe('red')
@@ -191,7 +191,7 @@ describe('useCssVar', () => {
     const el2 = document.createElement('div')
 
     const { result, rerender } = await renderHook(
-      (props?: { target?: HTMLDivElement }) => useCssVar('--color', props?.target, { initialValue: 'red' }),
+      (props?: { target?: HTMLDivElement }) => useCssVar('--color', { current: props?.target }, { initialValue: 'red' }),
       { initialProps: {} },
     )
 
@@ -214,7 +214,7 @@ describe('useCssVar', () => {
     el.style.setProperty('--color-one', 'blue')
 
     const { result, rerender } = await renderHook(
-      (props?: { key: string }) => useCssVar(props?.key, el),
+      (props?: { key: string }) => useCssVar(props?.key, { current: el }),
       { initialProps: { key: '--color' } },
     )
 
@@ -238,11 +238,11 @@ describe('useCssVar', () => {
     expect(el.style.getPropertyValue('--color-one')).toBe('')
   })
 
-  it('supports a ref-like target and re-reads on key change', async () => {
+  it('supports a ref target and re-reads on key change', async () => {
     const el = appendElement()
     el.style.setProperty('--color', 'red')
     const target = { current: el as HTMLDivElement | null }
-    const key = { current: '--color' }
+    let key = '--color'
 
     const { result, rerender } = await renderHook(
       (_props?: { force: number }) => useCssVar(key, target),
@@ -251,7 +251,7 @@ describe('useCssVar', () => {
 
     expect(result.current[0]).toBe('red')
 
-    key.current = '--color-one'
+    key = '--color-one'
     el.style.setProperty('--color-one', 'blue')
     await rerender({ force: 1 })
 

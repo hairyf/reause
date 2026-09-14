@@ -33,12 +33,10 @@ export type UseTimestampReturn<Controls extends boolean> = Controls extends true
   : number
 
 /**
- * React port of VueUse's `useTimestamp`.
- *
  * Map from @vueuse/core `useTimestamp`
  * (`source/vueuse/packages/core/useTimestamp/`). Reactive current timestamp
- * (`Date.now() + offset`), updated on every animation frame — upstream's
- * default scheduler is `useRafFn`.
+ * (`Date.now() + offset`), updated on every animation frame — upstream's default scheduler is
+ * `useRafFn`.
  *
  * React divergences:
  * - the upstream `ShallowRef<number>` return becomes a plain `number`

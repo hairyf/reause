@@ -163,8 +163,8 @@ export type UseWatchWithFilterReturn = () => void
  * (`lastRejector` / `rejectOnCancel`) is dropped — the house `EventFilter`
  * contract returns `void` and the watch path consumes no promise, so
  * `rejectOnCancel` has no observable effect — and `isPending` is a plain
- * getter instead of a reactive ref. `ms` accepts a plain number or a React
- * ref (upstream: `RefOrValue<number>`) and is re-read on every call. Pending
+ * getter instead of a reactive ref. `ms` is a plain number, re-read on every
+ * call (upstream: `MaybeRefOrGetter<number>`). Pending
  * timers are cleared by `cancel()` — the `useWatchWithFilter` hook calls it
  * on stop / unmount.
  *
@@ -174,7 +174,7 @@ export type UseWatchWithFilterReturn = () => void
  * ```
  */
 export declare function debounceFilter(
-  ms?: RefOrValue<number>,
+  ms?: number,
   options?: DebounceFilterOptions,
 ): CancelableEventFilter
 /**
@@ -189,8 +189,8 @@ export declare function debounceFilter(
  * parameter) is dropped — the house `EventFilter` contract returns `void` —
  * and the object options form is not ported (positional
  * `throttleFilter(ms, trailing, leading)` like the house `useThrottleFn`).
- * `ms` accepts a plain number or a React ref (upstream:
- * `RefOrValue<number>`) and is re-read on every call.
+ * `ms` is a plain number, re-read on every call (upstream:
+ * `MaybeRefOrGetter<number>`).
  *
  * @example
  * ```ts
@@ -198,7 +198,7 @@ export declare function debounceFilter(
  * ```
  */
 export declare function throttleFilter(
-  ms?: RefOrValue<number>,
+  ms?: number,
   trailing?: boolean,
   leading?: boolean,
 ): EventFilter

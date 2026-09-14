@@ -1,7 +1,18 @@
+import type { RefCallback, RefObject } from 'react'
+import type { ScrollLockElement } from '../useScrollLock'
 import { useLayoutEffect } from 'react'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, expectTypeOf, it, vi } from 'vitest'
 import { renderHook } from 'vitest-browser-react'
 import { useScrollLock } from '../useScrollLock'
+
+/**
+ * The hook binds DOM targets to React refs only — a plain element, a getter and
+ * a callback ref are not accepted, so every test wraps its element in a
+ * `{ current }` holder.
+ */
+function refOf<T>(value: T | null): RefObject<T | null> {
+  return { current: value }
+}
 
 describe('useScrollLock', () => {
   let targetEl: HTMLElement
@@ -16,7 +27,7 @@ describe('useScrollLock', () => {
   })
 
   it('should lock the scroll', async () => {
-    const { result, act } = await renderHook(() => useScrollLock(targetEl))
+    const { result, act } = await renderHook(() => useScrollLock(refOf(targetEl)))
 
     expect(result.current[0]).toBe(false)
     expect(targetEl.style.overflow).toBe('')
@@ -37,7 +48,7 @@ describe('useScrollLock', () => {
   it('should cache the initial overflow setting', async () => {
     targetEl.style.overflow = 'auto'
 
-    const { result, act } = await renderHook(() => useScrollLock(targetEl))
+    const { result, act } = await renderHook(() => useScrollLock(refOf(targetEl)))
 
     await act(() => {
       result.current[1](true)
@@ -51,7 +62,7 @@ describe('useScrollLock', () => {
   })
 
   it('locks on mount with initialState = true', async () => {
-    const { result, act } = await renderHook(() => useScrollLock(targetEl, true))
+    const { result, act } = await renderHook(() => useScrollLock(refOf(targetEl), true))
 
     expect(result.current[0]).toBe(true)
     expect(targetEl.style.overflow).toBe('hidden')
@@ -67,7 +78,7 @@ describe('useScrollLock', () => {
     // external CSS (or another hook instance) locked the element before mount
     targetEl.style.overflow = 'hidden'
 
-    const { result, act } = await renderHook(() => useScrollLock(targetEl))
+    const { result, act } = await renderHook(() => useScrollLock(refOf(targetEl)))
 
     expect(result.current[0]).toBe(true)
     expect(targetEl.style.overflow).toBe('hidden')
@@ -81,7 +92,7 @@ describe('useScrollLock', () => {
   })
 
   it('automatically unlocks on component unmount', async () => {
-    const { result, act, unmount } = await renderHook(() => useScrollLock(targetEl))
+    const { result, act, unmount } = await renderHook(() => useScrollLock(refOf(targetEl)))
 
     await act(() => {
       result.current[1](true)
@@ -99,7 +110,7 @@ describe('useScrollLock', () => {
     const addEventListener = vi.spyOn(targetEl, 'addEventListener')
     const removeEventListener = vi.spyOn(targetEl, 'removeEventListener')
 
-    const { result, act } = await renderHook(() => useScrollLock(targetEl))
+    const { result, act } = await renderHook(() => useScrollLock(refOf(targetEl)))
 
     expect(addEventListener).toHaveBeenCalledTimes(0)
 
@@ -117,8 +128,8 @@ describe('useScrollLock', () => {
   })
 
   it('multiple instances point at the same element, will share the same initialOverflow', async () => {
-    const one = await renderHook(() => useScrollLock(targetEl))
-    const two = await renderHook(() => useScrollLock(targetEl))
+    const one = await renderHook(() => useScrollLock(refOf(targetEl)))
+    const two = await renderHook(() => useScrollLock(refOf(targetEl)))
 
     await one.act(() => {
       one.result.current[1](true)
@@ -137,24 +148,26 @@ describe('useScrollLock', () => {
     expect(one.result.current[0]).toBe(true)
   })
 
-  it('accepts a ref-like { current } source', async () => {
-    const refLike: { current: HTMLElement | null } = { current: targetEl }
-
-    const { result, act } = await renderHook(() => useScrollLock(refLike))
-
-    await act(() => {
-      result.current[1](true)
-    })
-    expect(targetEl.style.overflow).toBe('hidden')
-
-    await act(() => {
-      result.current[1](false)
-    })
-    expect(targetEl.style.overflow).toBe('')
+  it('accepts only a React ref object as the DOM target', () => {
+    expectTypeOf<Parameters<typeof useScrollLock>[0]>()
+      .toEqualTypeOf<RefObject<ScrollLockElement>>()
+    // a plain element, a getter and a callback ref are deliberately rejected —
+    // a `RefObject` is the only DOM target form
+    expectTypeOf<HTMLElement>()
+      .not
+      .toMatchTypeOf<Parameters<typeof useScrollLock>[0]>()
+    expectTypeOf<() => HTMLElement>()
+      .not
+      .toMatchTypeOf<Parameters<typeof useScrollLock>[0]>()
+    expectTypeOf<RefCallback<HTMLElement>>()
+      .not
+      .toMatchTypeOf<Parameters<typeof useScrollLock>[0]>()
   })
 
-  it('accepts a plain element source', async () => {
-    const { result, act } = await renderHook(() => useScrollLock(targetEl))
+  it('accepts a React ref object as the DOM target', async () => {
+    const refLike: RefObject<HTMLElement | null> = { current: targetEl }
+
+    const { result, act } = await renderHook(() => useScrollLock(refLike))
 
     await act(() => {
       result.current[1](true)
@@ -221,38 +234,25 @@ describe('useScrollLock', () => {
     expect(targetEl.style.overflow).toBe('auto')
   })
 
-  it('treats a callback ref as unreadable instead of throwing', async () => {
-    // `Ref<T>` includes `RefCallback<T>`, which cannot be read synchronously
-    const { result, act } = await renderHook(() => useScrollLock(() => {}))
-
-    await act(() => {
-      result.current[1](true)
-    })
-    expect(result.current[0]).toBe(false)
-
-    await act(() => {
-      result.current[1](false)
-    })
-    expect(result.current[0]).toBe(false)
-  })
-
   it('re-syncs the lock when the element changes', async () => {
     const elA = document.createElement('div')
     const elB = document.createElement('div')
     document.body.appendChild(elA)
     document.body.appendChild(elB)
 
-    const { result, act, rerender } = await renderHook(
-      (props?: { target?: HTMLElement }) => useScrollLock(props?.target),
-      { initialProps: { target: elA } },
-    )
+    // target changes are modelled by swapping the ref's `current` and
+    // re-rendering — the new contract's only way to point the hook elsewhere
+    const target = refOf(elA)
+
+    const { result, act, rerender } = await renderHook(() => useScrollLock(target))
 
     await act(() => {
       result.current[1](true)
     })
     expect(elA.style.overflow).toBe('hidden')
 
-    rerender({ target: elB })
+    target.current = elB
+    await rerender()
     await expect.poll(() => elB.style.overflow).toBe('hidden')
     expect(result.current[0]).toBe(true)
     // mirrors upstream: the previous element is not restored on swap
@@ -269,7 +269,7 @@ describe('useScrollLock', () => {
     const initialOverflow = document.documentElement.style.overflow
 
     try {
-      const win = await renderHook(() => useScrollLock(window))
+      const win = await renderHook(() => useScrollLock(refOf(window)))
 
       await win.act(() => {
         win.result.current[1](true)
@@ -281,7 +281,7 @@ describe('useScrollLock', () => {
       })
       expect(document.documentElement.style.overflow).toBe(initialOverflow)
 
-      const doc = await renderHook(() => useScrollLock(document))
+      const doc = await renderHook(() => useScrollLock(refOf(document)))
 
       await doc.act(() => {
         doc.result.current[1](true)
