@@ -33,24 +33,7 @@ interface UseWebWorkerOptions {
 
 /**
  * Map from @vueuse/core `useWebWorker`
- * (`source/vueuse/packages/core/useWebWorker/`), which wraps `new Worker`
- * and exposes the instance, a `post` shortcut, `terminate`, and the latest message data. The
- * dependency-injected worker factory upstream function (`useWebWorkerFn`) is a separate mapping and
- * not part of this port.
- *
- * React divergences:
- * - the worker is created in a mount `useEffect` instead of during setup
- *   (upstream creates it synchronously behind an `if (window)` check), so
- *   SSR renders the initial `null`/`undefined` values without ever touching
- *   `Worker` — SSR-safe;
- * - `post` and `terminate` are stable callbacks reading the mounted worker through a latest-value
- * ref;
- * - the worker is terminated when the component unmounts, including an adopted `Worker` instance
- * passed as the first argument — under React StrictMode the remount cycle terminates an adopted
- * instance, so prefer the factory-function form for those;
- * - `url` and `workerOptions` are read at mount time: changing them does
- *   not recreate the worker (upstream setup runs once), only a change of
- *   the `window` option does.
+ * (`source/vueuse/packages/core/useWebWorker/`).
  *
  * @example
  * const { data, post, terminate, worker } = useWebWorker<string>('/path/to/worker.js')

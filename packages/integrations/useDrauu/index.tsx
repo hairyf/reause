@@ -170,41 +170,8 @@ function useEventHook<T extends (...args: any[]) => void>(): EventHookRegistrar<
 }
 
 /**
- * React port of VueUse's `useDrauu` — reactive instance for
- * [drauu](https://github.com/antfu/drauu).
- *
  * Map from @vueuse/integrations `useDrauu`
- * (`source/vueuse/packages/integrations/useDrauu/`), which creates a drauu
- * instance for an `<svg>` element and exposes the drawing API plus its events. Upstream has no test
- * file — the co-located `useDrauu.test.tsx` is authored for this port.
- *
- * Adjustment for React (upstream returns `Ref` / `ShallowRef` / `EventHookOn`):
- * - the return is an OBJECT with a paired setter for every caller-writable
- *   value (return-shape rule 5). `brush` is the only such value — upstream's
- *   writable `Ref<Brush>` — and it is paired with `setBrush`, the React state
- *   setter (`Dispatch<SetStateAction<Brush>>`), so `setBrush(next)` and
- *   `setBrush(prev => next)` both work; `setBrush` writes the state AND the
- *   mounted instance's brush / mode, mirroring upstream's deep watcher;
- * - `drauuInstance`, `canUndo` and `canRedo` are plain values from state
- *   instead of refs and stay read-only outputs without paired setters: the
- *   hook owns the instance lifecycle and re-reads the undo / redo status from
- *   the instance on every drauu `changed` event, so a caller write would be
- *   overwritten (upstream returns them as writable `Ref` / `ShallowRef`s;
- *   precedent: `useFileSystemAccess`'s `file`, `useAsyncState`'s `isReady` /
- *   `error`, `useTextareaAutosize`'s `textarea`);
- * - the five `on*` members are §2D registrars — `(fn) => ({ off })` typed
- *   `ListenerOn<T>` (`@reause/shared`), consumable as
- *   `useListener(onChanged, cb)` for automatic cleanup on unmount, and `off()`
- *   removes exactly that listener and is idempotent;
- * - the instance is created in an effect keyed on the resolved element's identity and unmounted on
- * cleanup (`tryOnScopeDispose`); an element-identity change destroys and recreates the instance.
- * **Divergence:** resolving to `null` — a React ref whose element left the tree — destroys the
- * instance and frees drauu's window listeners, where upstream keeps the last instance alive until
- * scope dispose. Destroying is deliberate in React: a `null` ref means the element is gone, and a
- * stale live instance would keep drawing on a detached `<svg>`; the co-located test pins this
- * behavior;
- * - the target is a React ref object (`RefObject`) resolved with `unrefElement` (`@reause/core`)
- * inside the effect. Only an `SVGSVGElement` target mounts.
+ * (`source/vueuse/packages/integrations/useDrauu/`).
  *
  * @param target - the React ref object holding the target `<svg>` element
  * @param options - drauu options (`Omit<Options, 'el'>`); `brush` is merged over the defaults

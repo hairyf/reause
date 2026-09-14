@@ -65,20 +65,7 @@ export interface UseMemoizeOptions<Result, Args extends unknown[]> {
 
 /**
  * Map from @vueuse/core `useMemoize`
- * (`source/vueuse/packages/core/useMemoize/`). Cache the results of a
- * function depending on its arguments, with an optional custom cache key generator or cache
- * container.
- *
- * Mapping: upstream's `shallowReactive` cache becomes a plain `Map` — React has no reactivity, so
- * cached results are plain values (not reactive state) and don't trigger re-renders on their own;
- * re-renders are driven by your own state, e.g. after a forced `load()`. The memoized function, the
- * cache and the helpers are built once (`useMemo`) so their identity stays stable across renders,
- * while the latest `resolver` and `getKey` are mirrored into refs so every call sees fresh values.
- * The `cache` container is resolved once at build time (upstream closes over the setup-time options
- * object): re-pointing `options.cache` on a later render is ignored, because swapping a stateful
- * cache container mid-flight would discard cached data. Async resolvers are supported too: since
- * the in-flight promise is what gets cached, concurrent calls with the same arguments reuse the
- * same pending promise.
+ * (`source/vueuse/packages/core/useMemoize/`).
  *
  * @example
  * const getUser = useMemoize(async (userId: number) => axios.get(`users/${userId}`).then(({ data }) => data))

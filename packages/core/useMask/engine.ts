@@ -1,14 +1,5 @@
 /**
- * Map from mantine `use-mask/`
- *
- * The pure masking engine behind `useMask`, ported from `@mantine/hooks`'
- * `use-mask.ts`. It lives in a sibling module rather than in `index.tsx`
- * because `scripts/update.ts` scans `packages/<pkg>/<hook>/index.tsx` for
- * `export function` / `export const` to build `meta/functions.md`: exporting
- * these helpers from the page file would mint a registry row for every one of
- * them, claiming reause an origin for symbols upstream keeps file-local.
- * Everything here is re-exported through `./index`, so the public surface is
- * unchanged, but only `useMask` itself reaches the barrel.
+ * Map from mantine `use-mask/`.
  */
 import type * as React from 'react'
 

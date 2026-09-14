@@ -23,9 +23,7 @@ export interface UseToNumberOptions {
 }
 
 /**
- * Map from @vueuse/shared `useToNumber`
- * Mapping: `ComputedRef<number>` → plain number recomputed from the current value on every render
- * (accepts `number | string`); no hook state needed.
+ * Map from @vueuse/shared `useToNumber`.
  *
  * @__NO_SIDE_EFFECTS__
  * @example

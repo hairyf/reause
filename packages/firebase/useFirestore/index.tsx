@@ -74,34 +74,8 @@ export function useFirestore<T extends DocumentData>(
 ): T[] | undefined
 
 /**
- * React port of VueUse's `useFirestore`.
- *
  * Map from @vueuse/firebase/useFirestore
- * (`source/vueuse/packages/firebase/useFirestore/`). Reactive
- * [Firestore](https://firebase.google.com/docs/firestore) binding — it keeps local state in sync
- * with a document reference or a query, so a component always renders the freshest remote data.
- *
- * React divergences:
- * - `maybeDocRef` is a plain value (upstream accepts `MaybeRef`): read-only
- *   value-source parameters take plain `T`. Pass a new reference/query
- *   identity to re-subscribe — **keep it stable across renders** (memoize
- *   `doc`/`collection`/`query` results): a fresh identity on every render
- *   re-subscribes on every render;
- * - the return is the plain state VALUE (not a tuple, not an object) —
- *   upstream exposes no setter (0 writable values), so the shape mirrors the
- *   read side of upstream's `Ref<T | null>` / `Ref<T[]>`; a document resolves
- *   to `T | null` (a deleted document becomes `null`), a query to `T[]`;
- * - the subscription lives in an effect keyed on `maybeDocRef`, so a new
- *   ref/query identity re-subscribes and closes the previous `onSnapshot`
- *   (upstream's immediate watch); a falsy docRef resets `data` to
- *   `initialValue`;
- * - `firebase/firestore` is loaded through a guarded **dynamic** import, so
- *   this module never throws at import time when `firebase` is missing — a
- *   missing module or a failed `onSnapshot` call surfaces through
- *   `errorHandler` instead, and `data` stays at `initialValue`;
- * - the latest `errorHandler` is read from a ref, so passing an inline handler
- *   does not re-subscribe;
- * - nothing runs while rendering, so server rendering is safe.
+ * (`source/vueuse/packages/firebase/useFirestore/`).
  *
  * @see https://vueuse.org/firebase/useFirestore/
  *

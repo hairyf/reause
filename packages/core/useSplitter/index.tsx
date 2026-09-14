@@ -185,55 +185,8 @@ function createInitialInternalState(): SplitterInternalState {
 }
 
 /**
- * React port of `@mantine/hooks`' `useSplitter` — a resizable panel layout with draggable,
- * keyboard-accessible separators.
- *
  * Map from @mantine/hooks `useSplitter`
- * (`source/mantine/packages/@mantine/hooks/src/use-splitter/`)
- *
- * Direct mirror, not a React-ified variant: upstream's option bag, its eleven return members and
- * its named export are kept exactly, and `useSplitter` is exported as a function declaration with
- * no companion default export (mantine named-exports its hooks). The pure sizing math lives in the
- * sibling `./engine` module; this file owns the React and DOM half — the container/handle refs,
- * pointer drag, keyboard navigation, the ARIA prop bag and the reactive state.
- *
- * ### The unit model is global, not per-panel
- *
- * A bare `number` or a `%` string is a *flexible* size that shares the leftover space by weight;
- * `px`/`rem` is a *fixed* size. `pixelMode` (returned, so a consumer can render accordingly) flips
- * to `true` when **any** pane size, `min`, `max`, `collapseThreshold`, `step`, `shiftStep` or
- * controlled size uses a fixed unit — one fixed unit anywhere re-interprets every size in the
- * layout, and a bare number then means *percent of the container* rather than a relative weight.
- * All drag and keyboard math therefore runs on `resolveWorkingSizes` pixels and is encoded back
- * through `encodeWorkingSizes`, which preserves each pane's declared unit.
- *
- * ### Pointer drag
- *
- * `pointerdown` on a handle (left button only, and only while `enabled`) starts a drag: the body's
- * `userSelect`/`cursor` are suppressed, `activeHandle` is published, listeners are attached to
- * `document`, and the starting working sizes are snapshotted. `pointermove` is coalesced through
- * `requestAnimationFrame`; `pointerup`/`pointercancel` flush once more, restore the body styles,
- * and report through `onResizeEnd`. Listeners are torn down per handle element with an
- * `AbortController` that the stable ref callback owns, so re-attaching a handle releases the
- * previous element's listeners.
- *
- * ### Keyboard and accessibility
- *
- * `getHandleProps` returns a `role="separator"` bag with `aria-orientation`, `aria-valuenow` (the
- * before-panel's working size, rounded), `aria-valuemin` / `aria-valuemax`, `tabIndex: 0`,
- * `data-active` / `data-orientation` and the `onKeyDown` / `onDoubleClick` handlers. Arrow keys
- * step the adjacent pair by `step` (`shiftStep` with Shift) and respect `dir: 'rtl'`; `Home` /
- * `End` drive the before-panel to its minimum / maximum; `Enter` collapses the before-panel when it
- * is the smaller of the two and collapsible, else the after-panel, else the before-panel. Arrow
- * keys on the wrong axis return without `preventDefault`, so page scrolling still works.
- *
- * ### Collapse, expand and reset
- *
- * `collapse` / `expand` / `toggleCollapse` move a panel's whole working size to its neighbour
- * (panel 0's neighbour is panel 1; any other panel's neighbour is the one before it) and restore it
- * from the pre-collapse snapshot — the *raw* size, so a fixed `240px` pane comes back as `240px`
- * rather than as a percentage of the container. `reset(handleIndex)` restores the two adjacent
- * panels to their declared default ratio while preserving their combined size.
+ * (`source/mantine/packages/@mantine/hooks/src/use-splitter/`).
  *
  * @example
  * const { ref, sizes, getHandleProps, reset } = useSplitter({

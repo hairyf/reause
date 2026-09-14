@@ -5,20 +5,7 @@ import { noop } from '../index'
 export type PromisifyFn<T extends FunctionArgs> = (...args: Parameters<T>) => Promise<Awaited<ReturnType<T>>>
 
 /**
- * Throttle execution of a function — React port of VueUse's `useThrottleFn`. Especially useful for
- * rate limiting execution of handlers on events like resize and scroll.
- *
- * Map from @vueuse/shared `useThrottleFn`
- * Mapping: upstream builds `createFilterWrapper(throttleFilter(ms, trailing, leading,
- * rejectOnCancel), fn)` and returns a plain `PromisifyFn<T>` — the throttled wrapper carries no
- * `cancel` / `flush` / `isPending` (unlike the debounce filter, upstream's `throttleFilter` is not
- * cancelable), so this port mirrors that: the return value is the wrapped function and nothing
- * more. The wrapper is built once (`useMemo`) so its identity is stable across renders — safe to
- * add/remove in effects; the latest `fn` / `ms` / `trailing` / `leading` / `rejectOnCancel` are
- * mirrored into refs so every call sees fresh values (upstream captures the flags once, at filter
- * creation). `ms` is a plain number, re-read on every call. The throttle filter logic is inlined.
- * The wrapper; upstream registers no disposal at all (`@__NO_SIDE_EFFECTS__`), so a pending call
- * would still fire there after teardown.
+ * Map from @vueuse/shared `useThrottleFn`.
  *
  * @param   fn             A function to be executed after delay milliseconds. The `this` context and all arguments are passed through, as-is,
  *                                    to `callback` when the throttled-function is executed.

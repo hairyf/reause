@@ -163,33 +163,7 @@ function defaultParse<Raw, Serialized>(clone?: boolean | ((value: Raw) => Raw)) 
 
 /**
  * Map from @vueuse/core `useThrottledRefHistory`
- * (`source/vueuse/packages/core/useThrottledRefHistory/`). Shorthand for the
- * manual history machinery with a throttled filter: track the change history of a state
- * automatically, committing at most once per throttle duration — the first change after a quiet
- * window commits immediately (leading edge) and changes inside the window collapse into a single
- * trailing commit that carries the latest value.
- *
- * The return object mirrors VueUse's `UseRefHistoryReturn` (refs flattened to plain values): `const
- * { history, undo, redo, canUndo, canRedo... } = useStateThrottledHistory([source, setSource])`.
- *
- * 1. Source: upstream tracks a writable Vue `Ref<Raw>` and commits through a watcher; React state
- * lives in the component, so the source is the controlled tuple `[state, setState]` of an existing
- * `useState`; commits are driven by an effect on state changes. The `deep` and `flush` options
- * don't apply — replace the state instead of mutating it, a mutated object does not re-render and
- * is invisible to the history (`clone` / custom `dump` still support mutation-style sources). 2.
- * Throttle filter: upstream composes `throttleFilter` from `@vueuse/shared`; the filter logic is
- * inlined here (same algorithm as `useThrottleFn`, see `packages/shared/src/useThrottleFn.ts`) with
- * the leading edge fixed to `true` — upstream's shorthand only forwards `throttle` and `trailing`.
- * `throttle` is re-read on every change. 3. History operations supersede pending trailing commits:
- * `undo` / `redo` / `reset` / `clear` and a manual `commit()` cancel a scheduled trailing commit
- * (upstream's `ignorePrevAsyncUpdates` only cancels the queued watcher callback, so its trailing
- * timer can still fire afterwards and re-record the restored record — the port keeps the history
- * free of duplicates). A pending trailing commit still fires while tracking is paused, mirroring
- * upstream. 4. Same-tick changes: use `controls.setSource()` (value or updater form) for updates
- * that must be visible to a manual `commit()` in the same tick — see `useStateManualHistory` for
- * the full explanation. 5. Storage: snapshots live in refs and a version counter triggers
- * re-renders; records are plain objects and timestamps use `Date.now()`. is not ported — disposal
- * follows the component lifecycle and pending timers. is not ported.
+ * (`source/vueuse/packages/core/useThrottledRefHistory/`).
  *
  * @example
  * const [count, setCount] = useState(0)

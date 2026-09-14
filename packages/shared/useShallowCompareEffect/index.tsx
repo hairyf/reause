@@ -74,50 +74,7 @@ function shallowEqualDepsList(prevDeps: DependencyList, nextDeps: DependencyList
 }
 
 /**
- * React port of react-use's `useShallowCompareEffect` — `useEffect` whose dependency list is
- * compared by one-level (shallow) equality instead of reference identity, so a caller may rebuild a
- * deps object every render without re-running the effect as long as no top-level field changed.
- *
- * Map from react-use `useShallowCompareEffect`
- * (source/react-use/src/useShallowCompareEffect.ts).
- *
- * Mapping: react-use is mirrored directly (AGENTS.md §1.1) — same signature `(effect:
- * EffectCallback, deps: DependencyList) => void`, `deps` stays **required** (there is no
- * `useEffect`-style optional list, because the whole point is comparing one), and the
- * `shallowEqual` comparator the pinned module imports from `fast-shallow-equal` is reimplemented
- * locally instead of adding that dependency (issue #922; no new dependencies). Upstream
- * default-exports the hook; reause exports it as a named export, the convention for these mirrors.
- *
- * The generic primitive upstream wraps — `useCustomCompareEffect`, from
- * `source/react-use/src/useCustomCompareEffect.ts` — is **inlined privately**
- * below (a private `useRef<DependencyList | undefined>` plus the conditional assignment and
- * `useEffect(effect, ref.current)`) rather than imported from the sibling `useDeepCompareEffect`
- * port, even though upstream shares it between the two hooks: both mapping issues require the logic
- * to stay private, and exporting a public `useCustomCompareEffect` would grow the public API beyond
- * what either issue asked for. The duplication is one ref and one conditional; a future extraction
- * into a shared private primitive could unify them without changing either hook's public surface.
- *
- * The dev-only `console.warn` guards are upstream's, with the same conditions: an empty (or
- * non-array) deps list, and a deps list whose entries are all primitives. Both cases mean plain
- * `useEffect` is the right hook. The gate is the pin's bare form — `process.env.NODE_ENV !==
- * 'production'` — and rests on the same assumption React's own source makes: the bundler replaces
- * `process.env.NODE_ENV` with a string literal at build time, which is what keeps the reference
- * safe in the browser and the warnings live (a production build inlines `'production'` and drops
- * the branch entirely). The `node/prefer-global/process` disable comment records that contract. The
- * `typeof process !== 'undefined' &&` variant used elsewhere
- * (`packages/core/createPortalSlot/index.tsx`) closes the gate in every browser bundle that does
- * not define a `process` global — verified under vitest's chromium project, where `typeof process`
- * is `'undefined'` — which would make these two warnings dead code exactly where a browser consumer
- * needs them.
- *
- * The effect runs on mount and then whenever `shallowEqualDepsList` says the list changed; cleanups
- * run before the next invocation and on unmount, exactly as `useEffect` does. As upstream, the ref
- * is written during render so React can be handed a referentially stable array; the ref guard makes
- * that write idempotent across React's double-invoked StrictMode renders.
- *
- * Boundary: shallow compares one level. A changed nested field behind an unchanged parent reference
- * will **not** re-run the effect (see {@link shallowEqual}); use `useWatchDeep` — or a deep-compare
- * effect — when nesting has to be seen.
+ * Map from react-use `useShallowCompareEffect` (source/react-use/src/useShallowCompareEffect.ts).
  *
  * @example
  * ```tsx

@@ -65,30 +65,8 @@ function resolveTargets(target: ElementTargetOrArray): Element[] {
 }
 
 /**
- * Reports changes to the dimensions of an Element's content or the border-box
- *
  * Map from @vueuse/core `useResizeObserver`
- * (`source/vueuse/packages/core/useResizeObserver/`), which wraps a platform
- * `ResizeObserver`, observes every resolved target, and tracks target changes with
- * `watch(computed(() =>...)..., { immediate: true, flush: 'post' })`.
- *
- * React divergences:
- * - the Vue `watch` over the targets computed becomes an effect that
- *   re-resolves the targets after every render and re-observes only when the
- *   resolved element set or the resolved `window` actually changed — a
- *   re-render that swaps `target.current` re-observes (mirroring the
- *   upstream reactivity) while unchanged renders never do, because every
- *   `observe()` re-delivers the current sizes;
- * - `callback` is read through a ref, so changing it does not re-observe
- *   and the returned `stop` stays referentially stable;
- * - `isSupported` is plain `boolean` state settled in the mount effect;
- * - `tryOnScopeDispose(stop)` becomes an unmount effect that disconnects;
- * - the observer is constructed through the resolved `window`, and a changed
- *   `window` option re-observes (upstream destructures it once at setup;
- *   this matches this repo's `useOnline`).
- *
- * SSR-safe: nothing touches `window` during render — support detection and observation both happen
- * in effects.
+ * (`source/vueuse/packages/core/useResizeObserver/`).
  *
  * @example
  * const el = useRef<HTMLTextAreaElement | null>(null)

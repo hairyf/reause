@@ -206,24 +206,8 @@ function createZonedDateTimeISO(timezone: string, calendar: string, impl: Tempor
 }
 
 /**
- * Reactive Temporal API with timezone and calendar support.
- *
  * Map from @vueuse/core `useTemporalNow`
  * (`source/vueuse/packages/core/useTemporalNow/`).
- *
- * 1. `now` is React state refreshed by the scheduler, so reading it re-renders the component on
- * every tick. 2. Upstream's writable `timezone`/`calendar` refs become plain values plus
- * `setTimezone`/`setCalendar` setters; changing either refreshes `now` immediately. 3. The
- * `scheduler` option is called during render to compose the update loop, so it must be passed
- * consistently across renders (Rules of Hooks). The default is this package's `useRafFn` — the same
- * default upstream uses — starting the loop immediately on mount. 4. This repo's TypeScript libs do
- * not ship `Temporal` types, so the Temporal surface is described with minimal inline structural
- * types (`TemporalZonedDateTime`, `TemporalImplementation`...). Any spec-compliant implementation
- * works as the `temporal` option — for `@js-temporal/polyfill` cast it: `temporal: Temporal as
- * unknown as TemporalImplementation`. 5. Like upstream, the implementation is not bundled: the
- * global `Temporal` object is read (native or polyfilled), and calling this hook throws when no
- * implementation is available — resolve + validate happen before the first hook call, so the error
- * surfaces deterministically.
  *
  * @example
  * const { now, timezone, calendar, format } = useTemporalNow()

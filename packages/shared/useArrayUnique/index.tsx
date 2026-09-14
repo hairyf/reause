@@ -1,16 +1,7 @@
 export type UseArrayUniqueReturn<T = any> = T[]
 
 /**
- * Reactive `Array.unique`
- *
- * Map from @vueuse/shared `useArrayUnique`
- *
- * Mapping: upstream wraps `toValue(list)` in `computed(() =>...)` and returns a `ComputedRef`;
- * React has no reactive value tracking, so this is a plain function recomputed on every render over
- * the plain `list` array the caller passes — the result is a deduped plain array (no `.value`, no
- * caching). Duplicate detection uses a `Set` of the values (reference identity for objects) unless
- * a custom `compareFn` is given —. Hold the array in `useState` and pass a new array to observe a
- * change.
+ * Map from @vueuse/shared `useArrayUnique`.
  *
  * @see https://vueuse.org/shared/useArrayUnique/
  *

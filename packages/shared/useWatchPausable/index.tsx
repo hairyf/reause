@@ -44,41 +44,7 @@ export interface UseWatchPausableReturn {
 }
 
 /**
- * Pausable watch — a watched value whose updates can be paused and resumed — React
- * port of VueUse's `watchPausable`.
- *
- * Map from @vueuse/shared watchPausable. Upstream wraps `watchWithFilter` with
- * `pausableFilter`: while paused the event filter drops invocations, and `resume()` only
- * re-activates the filter — changes made while paused are never replayed, so the first change after
- * resuming fires the callback with the last change's value — the dropped one, if any — as
- * `oldValue`: the watch's tracked previous value advances through paused changes, where the filter
- * swallows the invocation but the underlying watch's `oldValue` still moves. This port keeps those
- * semantics on house primitives: `useWatch` tracks the source across renders (Vue's reactive
- * dependency tracking becomes the effect dependency list, firing in the effect after commit —
- * upstream `flush: 'pre'` timing) and the callback is skipped whenever the watcher is paused or
- * stopped.
- *
- * The API follows the maintainer-directed watch-wrapper convention of issue #263: the source is the
- * caller's own state value (house `useWatch` source convention) and the return is the upstream
- * `WatchPausableReturn` object shape.
- *
- * React divergences:
- * - `isActive` is a plain boolean state instead of a readonly ref — it updates
- *   across renders, and `pause()` / `resume()` made in the same batch as a
- *   source change are still honoured (the pause state is mirrored into a ref
- *   read by the effect).
- * - Changes made while paused are dropped — upstream `pausableFilter` defers
- *   nothing, so `resume()` does not replay them and never fires the callback
- *   by itself.
- * - The `deep`, `flush`, `eventFilter` watch options and the `onTrack` /
- *   `onTrigger` callbacks are not ported — tracking is by `Object.is`
- *   identity, like a Vue ref reassignment (upstream `WatchPausableOptions` is
- *   `WatchWithFilterOptions & PausableFilterOptions`; the `pausableFilter`
- *   half carries no options of its own, so there is no `eventFilterOptions`
- *   member).
- * - `stop()` keeps the effect registered but the callback becomes a no-op —
- *   observable behavior is identical (the callback never fires again), and
- *   `isActive` is unaffected, like upstream.
+ * Map from @vueuse/shared `watchPausable`.
  *
  * @example
  * ```ts

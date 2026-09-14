@@ -87,22 +87,8 @@ function isControlledSource<T>(state: State<T>): boolean {
 }
 
 /**
- * Fine-grained controls over a state and its re-renders — React port of VueUse's `refWithControl`.
- *
  * Map from @vueuse/shared `refWithControl`
- * (`source/vueuse/packages/shared/refWithControl/`). Upstream returns a single
- * writable Vue `Ref` extended with `get` / `set` / `untrackedGet` / `silentSet` / `peek` / `lay`.
- * This port owns the state like a `useState` and returns the React tuple `const [num, setNum,
- * control] = useStateWithControl(0)` — the name follows this repo's `ref*` → `useState*` mapping
- * rule. `setNum` behaves like a normal `setState` (value or updater form — the updater base is the
- * current internal value, which may be ahead of the rendered value after a silent write), while
- * `control` keeps the fine-grained get/set pair: `set(value, false)` (and `lay` / `silentSet`)
- * updates the value without re-rendering, and `peek` / `untrackedGet` read it back — in React there
- * is no dependency tracking during render, so those are plain aliases for the current value.
- * `reset()` (a small addition, upstream has no equivalent) restores the initial value and
- * participates in the change callbacks (`onBeforeChange` can dismiss it, `onChanged` fires when
- * accepted). Option names are kept from upstream: `onBeforeChange` can dismiss a change by
- * returning `false`, and `onChanged` fires synchronously after an accepted change.
+ * (`source/vueuse/packages/shared/refWithControl/`).
  *
  * @param   state    State source: a plain value, getter, state tuple, or
  *                   `{ value, onChange }` controllable state.

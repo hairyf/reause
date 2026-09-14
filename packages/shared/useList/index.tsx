@@ -121,54 +121,7 @@ export interface ListActions<T> {
 }
 
 /**
- * Tracks an array and returns it with a stable set of immutable mutators — React port of
- * react-use's `useList`.
- *
- * Map from react-use `useList`
- * Mapping: mirrored 1:1 — upstream's argument type, its `[list, actions]` tuple and all thirteen
- * actions (`set`, `push`, `updateAt`, `insertAt`, `update`, `updateFirst`, `upsert`, `sort`,
- * `filter`, `removeAt`, `remove`, `clear`, `reset`) keep their names, parameter lists and
- * semantics, and the deprecated `remove` is kept rather than dropped: it is a straight alias of
- * `removeAt` in the pin (assigned after the action object is built, so `remove === removeAt`), and
- * a port that omitted it would break API parity for the sake of a deprecation notice. react-use's
- * standalone `useUpsert` is **not** ported — upstream itself marks it `@deprecated Use useList
- * hook's upsert action instead`; `upsert(predicate, item)` below is that supersession.
- *
- * **Action identity is part of the contract.** The list lives in a `useRef` (`list.current`) and
- * every action writes the resolved next list into that ref and *then* asks for a re-render, while
- * the action object comes from a `useMemo(…, [])`. That is what makes the actions referentially
- * stable across renders and what lets `updateFirst` / `upsert` read the freshest list
- * synchronously, in the same event handler, before React has re-rendered. The actions are therefore
- * safe to pass to children or to omit from a `useEffect` dependency array. Do not "improve" this
- * into `useState`: with state in the render slot, `useMemo` would have to depend on the list (so
- * the actions would change identity) and a sequenced `set(…)` then `upsert(…)` inside one handler
- * would read the *stale* list — both are asserted in the tests. The re-render request is
- * `@reause/shared`'s `useUpdate` (react-use ships its own `useUpdate`, reused here rather than
- * duplicated, the same disposition the `useSet` / `useMap` ports took).
- *
- * Consequence of the ref design, measured rather than assumed: `set` resolves and stores its next
- * list **synchronously**, so two actions inside one handler observe each other's writes, while the
- * two `useUpdate` dispatches they issue are batched by React into a single re-render.
- *
- * Resolution follows react-use's `resolveHookState`: an action may be a value, a `prev => next`
- * updater, or a `() => next` factory (upstream's arity rule — see `resolveHookState` above).
- * `reset` re-resolves the **first render's** `initialList` (the `useMemo(…, [])` closure of the
- * pin) and `.slice()`s it, so a later change to the argument neither affects `reset` nor aliases
- * the caller's array. The initial list itself is *not* copied:, on the first render `list` **is**
- * the array passed in, so mutating that array directly mutates the returned list without a
- * re-render (the hook's contract is to go through the actions) — callers who care should pass a
- * factory or a spread.
- *
- * `filter` mirrors the pin's declared `ListActions<T>` member, not the pin's internal generic
- * implementation: upstream types it `(callbackFn: (value: T, index?: number, array?: T[]) =>
- * boolean, thisArg?: any) => void` and casts the implementation to that interface, so a type
- * predicate such as `filter((x): x is S => …)` compiles (a predicate is assignable to `boolean`)
- * but cannot narrow anything — the action returns `void` and the list stays `T[]`. The `thisArg`
- * parameter is passed straight to `Array.prototype.filter`.
- *
- * Nothing touches `window` or `document` at import time or on the first render, so the hook is
- * SSR-safe. Upstream default-exports `useList` (and its root barrel re-exports only the default,
- * not `ListActions`); reause exports the hook and its types by name from `@reause/shared`.
+ * Map from react-use `useList`.
  *
  * @param initialList Initial list, or a zero-argument factory producing one.
  * Read only on the first render: a later, changed argument is ignored (upstream

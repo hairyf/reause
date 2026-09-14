@@ -56,31 +56,8 @@ export type UseClickOutsideReturn<Controls extends boolean = false> = Controls e
 let _iOSWorkaround = false
 
 /**
- * Listen for clicks outside of an element. Useful for modals or dropdowns.
- *
  * Map from @vueuse/core `onClickOutside`
- * (`source/vueuse/packages/core/onClickOutside/`). Attaches `click`,
- * `pointerdown` (and — when `detectIframe` is enabled — `blur`) listeners to the window, and calls
- * the handler when a click lands outside the resolved `target` element. The `ignore` option
- * suppresses the handler for matching elements (elements or CSS selectors), `capture` controls the
- * phase of the internal `click` listener (default `true`), and `detectIframe` also fires the
- * handler when focus moves to an iframe.
- *
- * React divergences:
- * - React has no composable-function API, so this is a hook: the listeners bind in effects;
- * - the target is a React ref object (`RefObject`); a plain element, getter or callback ref is not
- * accepted;
- * - the return is a single stop function (`() => void`) by default; with
- *   `controls: true` it is upstream's `{ stop, cancel, trigger }` object —
- *   `cancel()` suppresses the next click, `trigger(event)` force-fires the
- *   handler (and re-arms cancellation afterwards) and `stop()` removes every
- *   registered listener. All three are stable across renders;
- * - the target/handler/options are read through latest-value refs, so new
- *   inline targets or handlers never cause re-subscription — only changes to
- *   the resolved window, `capture` or the bound event options re-bind;
- * - SSR-safe: nothing touches `window` during render — the window target only resolves when
- * `window` is defined ands. The one-time iOS Safari click workaround also runs inside an effect
- * instead of during setup.
+ * (`source/vueuse/packages/core/onClickOutside/`).
  *
  * @see https://vueuse.org/core/onClickOutside/
  *

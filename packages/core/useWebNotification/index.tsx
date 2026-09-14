@@ -90,29 +90,7 @@ export interface UseWebNotificationOptions extends ConfigurableWindow, WebNotifi
 
 /**
  * Map from @vueuse/core `useWebNotification`
- * (`source/vueuse/packages/core/useWebNotification/`). Reactive
- * [Notification](https://developer.mozilla.org/en-US/docs/Web/API/notification) — configure and
- * display desktop notifications to the user.
- *
- * React divergences:
- * - the Vue `isSupported` / `permissionGranted` / `notification` shallowRefs
- *   become plain state values (no `.value`);
- * - `createEventHook` on* members become stable subscribe functions with the
- *   same `(fn) => { off }` shape — identity is stable across renders while
- *   the underlying state/options are read through refs, so re-renders are
- *   honored;
- * - capability detection (including the `new Notification('')` constructability
- *   probe for the Android Chrome illegal-constructor quirk) and the initial
- *   `permissionGranted` read run in a mount effect instead of during setup,
- *   so flags stay `false` during render and on the server (SSR-safe — the
- *   Notification API is absent in SSR);
- * - `tryOnMounted(ensurePermissions)` becomes a mount effect honoring
- *   `requestPermissions` (default `true`);
- * - `tryOnScopeDispose(close)` becomes unmount cleanup: the current notification is closed and
- * event subscriptions;
- * - the document `visibilitychange` listener (closing the now-stale
- *   notification when the tab becomes visible again) is attached in an
- *   effect gated on `isSupported`, with proper teardown.
+ * (`source/vueuse/packages/core/useWebNotification/`).
  *
  * @example
  * const {

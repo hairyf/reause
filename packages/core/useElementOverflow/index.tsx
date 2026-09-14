@@ -58,31 +58,8 @@ export interface UseElementOverflowReturn {
 }
 
 /**
- * Reactive element's overflow state — React port of VueUse's `useElementOverflow`.
- *
  * Map from @vueuse/core `useElementOverflow`
- * (`source/vueuse/packages/core/useElementOverflow/`). Tracks whether an
- * element's content overflows its box in the x/y directions by comparing
- * `scrollWidth`/`scrollHeight` against `offsetWidth`/`offsetHeight` whenever the element or its
- * children resize and, with `observeMutation`, whenever its DOM content mutates.
- *
- * React divergences:
- * - `stop`/`update` keep the upstream member structure;
- * - `target` accepts a React ref object (`RefObject`) holding the element; a plain element, a
- * getter and a callback ref are not accepted. SVG elements are ignored;
- * - upstream's `useResizeObserver`/`useMutationObserver` composition becomes a
- *   self-contained observer effect that re-resolves the target plus its
- *   `HTMLElement` children after every render and reconciles the observers —
- *   the `ResizeObserver` is rebuilt only when the resolved element set or the
- *   `window` option changed (unchanged renders never disconnect a live
- *   observer, so pending deliveries are not dropped), while `observeMutation`
- *   is captured once at mount — upstream destructures it once at setup, so
- *   later changes (boolean flips or swapped init objects) are ignored and
- *   `stop()` is the way to halt observation;
- * - the Vue component/directive variants (`UseElementOverflow`,
- *   `vElementOverflow`) are not ported — they have no React equivalents;
- * - SSR-safe: nothing touches `window` during render, and `update()` no-ops
- *   without an element or a window.
+ * (`source/vueuse/packages/core/useElementOverflow/`).
  *
  * @param target - React ref object (`RefObject`) holding the element to
  *   watch for overflow, resolved with the shared `unrefElement`

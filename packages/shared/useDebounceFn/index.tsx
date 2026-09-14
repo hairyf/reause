@@ -38,18 +38,7 @@ export interface UseDebounceFnReturn<T extends FunctionArgs> {
 }
 
 /**
- * Debounce execution of a function — React port of VueUse's `useDebounceFn`.
- *
- * Map from @vueuse/shared `useDebounceFn`
- * Mapping: upstream builds `createFilterWrapper(debounceFilter(ms, options), fn)` so every call
- * returns a promise and the wrapper carries `cancel` / `flush` / `isPending`. This port builds the
- * same wrapper once (`useMemo`) so its identity is stable across renders; the latest `fn` / `ms` /
- * `options` are mirrored into refs so every call sees fresh values. `ms` is a plain number, re-read
- * on every call. `isPending` becomes a non-reactive getter (React has no reactive refs); promise
- * settlement, a superseded/canceled call settles with `undefined` (or rejects with
- * `rejectOnCancel`), and the `maxWait` trailing edge runs the latest invocation but settles the
- * pending promise without its result. Pending timers are cleared when the component unmounts
- * (upstream leaves disposal to the effect scope).
+ * Map from @vueuse/shared `useDebounceFn`.
  *
  * @example
  * const debouncedFn = useDebounceFn(() => { ... }, 1000)

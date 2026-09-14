@@ -91,32 +91,8 @@ function resolveTargets(target: ElementTargetOrArray): Element[] {
 }
 
 /**
- * Detects changes to a target element's visibility.
- *
  * Map from @vueuse/core `useIntersectionObserver`
- * (`source/vueuse/packages/core/useIntersectionObserver/`), which observes
- * every resolved target with a platform `IntersectionObserver` and rebuilds the observer through
- * `watch(...)` whenever the resolved targets, root, root margin or active state change.
- *
- * React divergences:
- * - the Vue `watch` over the targets/root/rootMargin computeds becomes an
- *   effect that re-resolves them after every render and re-observes only when
- *   something actually changed — a re-render that swaps `target.current`
- *   re-observes (mirroring the upstream reactivity), while unchanged renders
- *   never recreate the observer;
- * - `callback` is read through a ref, so changing it does not re-observe and
- *   the returned `stop` stays referentially stable;
- * - `isSupported` is plain `boolean` state settled in the mount effect;
- * - `tryOnScopeDispose(stop)` becomes an unmount effect that disconnects;
- * - the Pausable members, `pause()` disconnects the observer and sets `isActive` to `false`,
- * `resume()` re-observes the same targets, and `stop()` deactivates permanently — `immediate:
- * false` leaves the observer idle until `resume()` is called;
- * - the observer is constructed through the resolved `window`, and a changed
- *   `window` option re-observes (upstream destructures it once at setup;
- *   this matches this repo's `useResizeObserver`).
- *
- * SSR-safe: nothing touches `window` during render — support detection and observation both happen
- * in effects.
+ * (`source/vueuse/packages/core/useIntersectionObserver/`).
  *
  * @example
  * const target = useRef<HTMLDivElement | null>(null)

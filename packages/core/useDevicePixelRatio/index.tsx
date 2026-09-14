@@ -14,23 +14,8 @@ export interface UseDevicePixelRatioReturn {
 }
 
 /**
- * Reactively track `window.devicePixelRatio`.
- *
  * Map from @vueuse/core `useDevicePixelRatio`
- * (`source/vueuse/packages/core/useDevicePixelRatio/`), which keeps a
- * `shallowRef(1)` updated by a `watchImmediate` over a `useMediaQuery('(resolution: N dppx)')` —
- * when the resolution media query stops matching, the real `window.devicePixelRatio` is read into
- * the ref, which re-writes the query string so it always targets the current resolution.
- *
- * React divergences:
- * - SSR renders the `1` initial value (matching upstream's `shallowRef(1)`) without touching
- * `window`; the real value is read on mount;
- * - upstream's `stop` handle becomes a plain `stop` callback that removes
- *   the current `matchMedia` listener and stops future re-subscriptions
- *   (effect cleanup still runs on unmount);
- * - when a window exists but `matchMedia` is unavailable, the real
- *   `window.devicePixelRatio` is still read once (upstream's `watchImmediate`
- *   reads it before the media query is involved) and then freezes.
+ * (`source/vueuse/packages/core/useDevicePixelRatio/`).
  *
  * @example
  * const { pixelRatio } = useDevicePixelRatio()

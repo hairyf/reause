@@ -121,26 +121,7 @@ export function normalizeDate(date: DateLike) {
 export type UseDateFormatReturn = string
 
 /**
- * Get the formatted date according to the string of tokens passed in.
- *
  * Map from @vueuse/shared `useDateFormat`.
- *
- * React divergence: upstream wraps the result in a Vue `computed` and returns `ComputedRef<string>`
- * — this port returns a PLAIN STRING. Call it during render and pass plain values (e.g. your
- * `useState` date); the string is recomputed on every render with fresh inputs. Do not read
- * `.value` from it.
- *
- * Inputs (`date`, `formatStr`, `options.locales`) are plain read-only values — pass `ref.current`
- * or the state value; a `MaybeRefOrGetter` source must be resolved by the caller (upstream types
- * them `MaybeRefOrGetter`).
- *
- * Supported tokens (mirroring upstream 1:1, default format `HH:mm:ss`): `Yo YY YYYY` — year · `M Mo
- * MM MMM MMMM` — month (locale-aware short/long names via `Intl`) · `D Do DD` — day of month · `H
- * Ho HH` — 24-hour clock · `h ho hh` — 12-hour clock · `m mo mm` — minutes · `s so ss` — seconds ·
- * `SSS` — milliseconds (3 digits) · `d dd ddd dddd` — weekday (locale-aware via `Intl`) · `A AA a
- * aa` — meridiem, customizable via `options.customMeridiem` · `z zz zzz zzzz` — timezone offset
- * names (`shortOffset` / `longOffset` via `toLocaleString`). Text wrapped in brackets (`[...]`) is
- * output literally as an escape sequence.
  *
  * @see https://vueuse.org/useDateFormat
  * @param date - The date to format, can either be a `Date` object, a timestamp, or a string

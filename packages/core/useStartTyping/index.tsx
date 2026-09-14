@@ -88,30 +88,8 @@ export interface UseStartTypingOptions {
 }
 
 /**
- * Fires when users start typing on non-editable elements. Useful for auto-focusing an input field
- * when the user starts typing anywhere on the page.
- *
  * Map from @vueuse/core `onStartTyping`
- * (`source/vueuse/packages/core/onStartTyping/`). Registers a passive
- * `keydown` listener on the `document` and calls `callback(event)` whenever the currently focused
- * element is not editable and the pressed key is a valid typing character. Focus is considered
- * editable when it is an `<input>`, `<textarea>` or `contenteditable` element; a key is a valid
- * typing character when it is alphanumeric (`A–Z`, `0–9` incl. numpad) and no Ctrl / Alt / Meta
- * modifier is held. Both gates are configurable via options and also exported as standalone
- * utilities.
- *
- * React divergences:
- * - the returned value is the unmount function that removes the `keydown`
- *   listener (upstream returns nothing — its listeners live in the
- *   composition scope); the listener is also removed automatically on
- *   unmount;
- * - the callback and the option functions are read through latest-value
- *   refs, so re-rendering with new inline callbacks never re-subscribes and
- *   always fires the newest callback;
- * - the upstream `ConfigurableDocument` option is inlined as `document?` and
- *   the default resolves to the global `document` behind a `typeof document`
- *   guard, so rendering on the server is safe (nothing touches `document`
- *   during render).
+ * (`source/vueuse/packages/core/onStartTyping/`).
  *
  * @example
  * const input = useRef<HTMLInputElement>(null)

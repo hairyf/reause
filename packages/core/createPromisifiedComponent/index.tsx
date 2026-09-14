@@ -60,33 +60,8 @@ export type PromisifiedComponent<Return, Args extends any[] = []> = ComponentTyp
 }
 
 /**
- * Creates a promisified component — React port of VueUse's `createTemplatePromise`.
- *
  * Map from @vueuse/core `createTemplatePromise`
- * (`source/vueuse/packages/core/createTemplatePromise/`). The factory returns
- * a component that renders one template instance per active promise: each `start(...)` call creates
- * an instance (with the passed args), mounts the template and returns a promise that settles when
- * the template calls `resolve` / `reject`. Once settled, the instance is removed and the template
- * unmounts automatically.
- *
- * React divergences:
- * - the template is a **children-as-function render prop** instead of a
- *   `v-slot`: the function receives the instance props (promise, resolve,
- *   reject, args, isResolving, options, key);
- * - the reactive instances list is backed by a `useSyncExternalStore` store in the factory closure,
- * so mutations from `start` / `resolve` / `reject` re-render the mounted templates;
- * - `resolve` / `reject` must be called from event handlers or effects, not
- *   during render (Vue's reactivity tolerates in-render mutation, React does
- *   not);
- * - `transition` is accepted for API parity but has no runtime effect — React
- *   has no built-in transition-group system;
- * - instances live in the factory closure, so an unmounted component does not
- *   settle its pending promises: they resolve once `resolve` is called, and
- *   re-mounting the component re-renders the remaining instances.
- *
- * SSR-safe: nothing touches `window` or the DOM during render — the instance list only gains
- * entries when `start()` is called (i.e. in effects or event handlers), so server renders are
- * empty.
+ * (`source/vueuse/packages/core/createTemplatePromise/`).
  *
  * @see https://vueuse.org/core/createTemplatePromise/
  *

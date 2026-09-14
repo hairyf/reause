@@ -47,23 +47,8 @@ export interface UseGeolocationReturn {
 }
 
 /**
- * Reactive Geolocation API.
- *
  * Map from @vueuse/core `useGeolocation`
- * (`source/vueuse/packages/core/useGeolocation/`). Returns an object
- * mirroring the upstream members: `{ isSupported, coords, locatedAt, error, resume, pause }`.
- * `coords` holds the latest
- * [`GeolocationCoordinates`](https://developer.mozilla.org/en-US/docs/Web/API/GeolocationCoordinates)
- * (defaults as upstream: `accuracy: 0` and infinite latitude/longitude, nulls elsewhere),
- * `locatedAt` the timestamp of the last position update, `error` the last
- * `GeolocationPositionError` if any.
- *
- * React divergences:
- * - the watcher is started in a mount effect when `immediate` (default `true`), and
- * `resume`/`pause` are stable callbacks wrapping `navigator.geolocation.watchPosition` /
- * `clearWatch`;
- * - unmount clears the active watch, and there is no `navigator` access during render, so SSR
- * renders the defaults without starting anything.
+ * (`source/vueuse/packages/core/useGeolocation/`).
  *
  * @see https://vueuse.org/core/useGeolocation/
  * @param options

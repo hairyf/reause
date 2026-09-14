@@ -23,29 +23,7 @@ export interface UseRTDBOptions {
 export type UseRTDBReturn<T> = [data: T | undefined, setData: (value: T | undefined) => void]
 
 /**
- * Map from @vueuse/firebase `useRTDB`
- *
- * Reactive [Firebase Realtime Database](https://firebase.google.com/docs/database) binding — keeps
- * local state in sync with a database reference. The listener is registered with `onValue` in a
- * mount effect and feeds `data` with `snapshot.val()` on every database change.
- *
- * React divergences:
- * - upstream returns a writable `Ref<T | undefined>`, so this port returns the
- *   `[data, setData]` tuple; `data` starts `undefined` and holds the latest
- *   snapshot value;
- * - `setData` writes **local state only** — it does not write to the Realtime
- *   Database (upstream's ref is equally local). Use the `firebase/database`
- *   write APIs (`set` / `update` / `push`) to persist;
- * - the subscription lives in a `useEffect` keyed on `docRef` and `autoDispose`,
- *   so a new `docRef` identity re-subscribes and unsubscribes the previous
- *   listener (upstream subscribes once per `setup()` — a deliberate
- *   React-idiomatic deviation);
- * - cleanup calls the `onValue` unsubscribe only when `autoDispose` is `true`
- *   (upstream parity). `autoDispose: false` means the subscription outlives the
- *   component: the caller gets no `off` handle and must live with the leak —
- *   discouraged, kept only for upstream parity;
- * - the latest `errorHandler` is read from a ref, so passing an inline handler
- *   does not re-subscribe.
+ * Map from @vueuse/firebase `useRTDB`.
  *
  * @see https://vueuse.org/useRTDB
  *

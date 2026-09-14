@@ -237,39 +237,7 @@ export function useWatchWithFilter<T>(source: T, callback: UseWatchCallback<T>, 
 
 // implementation
 /**
- * `watch` with additional EventFilter control — React port of VueUse's `watchWithFilter`.
- * Map from @vueuse/shared watchWithFilter.
- *
- * Mapping: upstream builds `watch(source, createFilterWrapper(eventFilter, cb), watchOptions)` —
- * the event filter wraps the watch trigger, so every source change hands an `invoke` closure to the
- * filter, which decides whether and when the callback actually runs. This port builds the same
- * wrapper on the house `useWatch` (Vue's reactive dependency tracking becomes the effect dependency
- * list): every source change invokes the captured `eventFilter` with an `invoke` closure carrying
- * the latest `(value, oldValue)` pair. The hook holds no state of its own — the source is the
- * caller's own value — and returns a `stop` function (upstream's `WatchHandle`, reduced to the stop
- * capability): after `stop()`, further source changes and any pending filtered invocation no longer
- * fire the callback, and cancelable filters (`debounceFilter`) are cancelled outright.
- *
- * React divergences:
- * - React batching: source changes made in the same tick collapse into a
- *   single effect run, so the filter sees ONE trigger where Vue's watcher
- *   would fire per mutation. For a trailing filter the collapsed call is
- *   identical (the latest `(value, oldValue)` pair); a leading-edge filter
- *   fires at most once per tick instead of once per mutation.
- * - `deep` is not ported: React values are not deeply reactive. The source is
- *   tracked by reference across renders (the effect dependency list), so
- *   mutating an object in place is invisible and `deep: true` would have
- *   nothing to recurse into — watch a derived primitive (or key) instead.
- *   The same applies to the `flush` watch option: React effects always run
- *   after the commit, there is no pre/post/sync choice.
- * - The filter instance is captured once on mount (upstream evaluates watch
- *   options once during setup) — an inline `debounceFilter(ms)` is safe; use
- *   a getter-based delay for dynamic values.
- * - `stop()` also suppresses a pending filtered invocation, and pending timers are cancelled when
- * the component unmounts (upstream leaves disposal to the effect scope).
- * - The promise-settlement plumbing of upstream filters (`lastRejector` /
- *   `rejectOnCancel`) is dropped — the house `EventFilter` contract returns
- *   `void`, so `rejectOnCancel` has no observable effect.
+ * Map from @vueuse/shared `watchWithFilter`.
  *
  * @example
  * ```ts

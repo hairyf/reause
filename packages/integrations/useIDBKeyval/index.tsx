@@ -112,37 +112,8 @@ function defaultSerializer<T>(): UseIDBKeyvalSerializer<T> {
 }
 
 /**
- * Reactive [IndexedDB](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API) store —
- * React port of VueUse's `useIDBKeyval`.
- *
  * Map from @vueuse/integrations `useIDBKeyval`
- * (`source/vueuse/packages/integrations/useIDBKeyval/`), a reactive wrapper
- * around [`idb-keyval`](https://github.com/jakearchibald/idb-keyval). The value is persisted under
- * `key`, read once on mount and kept in sync across tabs through a `BroadcastChannel`.
- *
- * React divergences:
- * - the upstream object return `{ data, isFinished, isSupported, set }` becomes
- *   the state-like tuple `[data, setData, controls]` (§2B), mirroring
- *   `useStorage`: `data` is `T | null` (`null` = removed) and `setData(null)`
- *   deletes the key through `del`;
- * - **there is no deep watcher.** Upstream writes on *any* mutation of
- *   `data.value` (`watchPausable(data, write, { deep: true })`), so
- *   `data.value.count++` persists by itself. React state has no deep
- *   observation, so writes happen **explicitly through `setData`** — that is
- *   the React contract. Mutating an object held in `data` in place does *not*
- *   persist; call `setData(next)` with a new value instead. The `deep` /
- *   `shallow` / `flush` options are accepted for parity and have no effect;
- * - `isFinished` / `isSupported` live in the third tuple slot as plain booleans, and `isSupported`
- * is computed synchronously (`typeof window !== 'undefined' && 'BroadcastChannel' in window`)
- * instead of going through `useSupported`, so a `BroadcastChannel` is available on the first mount
- * effect;
- * - `initialValue` is the hook's **read-only value source** and takes a plain `T`; it is resolved
- * once at mount, as upstream's `toValue(initialValue)` is — the hook owns writes, so later prop
- * changes are ignored;
- * - a `delete` message from another tab resets `data` to the initial value
- *   (upstream parity) but does not re-write the store: incoming syncs never
- *   write back, mirroring upstream's paused watcher;
- * - the async read and the channel listener never set state after unmount.
+ * (`source/vueuse/packages/integrations/useIDBKeyval/`).
  *
  * @__NO_SIDE_EFFECTS__
  * @example

@@ -70,35 +70,8 @@ function getSwipeDirection(start: Position, end: Position, threshold: number): U
 }
 
 /**
- * Reactive swipe detection based on
- * [`PointerEvents`](https://developer.mozilla.org/en-US/docs/Web/API/PointerEvent).
- *
  * Map from @vueuse/core `usePointerSwipe`
- * (`source/vueuse/packages/core/usePointerSwipe/`), which tracks
- * `pointerdown` / `pointermove` / `pointerup` + `pointercancel` on the target and derives the swipe
- * `direction` once `max(|dx|, |dy|)` crosses `threshold` (default `50`), comparing the axes: `|dx|
- * > |dy|` decides `left`/`right`, otherwise `up`/`down`. Below the threshold the direction stays
- * `'none'` and `isSwiping` stays `false` — `onSwipeEnd` only fires for swipes that actually crossed
- * the threshold (like upstream).
- *
- * - the Vue return object (`isSwiping` shallow ref, `direction` / `distanceX` / `distanceY`
- * computeds, reactive `posStart` / `posEnd`) becomes a plain object of plain values backed by
- * state, derived during render —;
- * - `target` accepts a React ref object (`RefObject`) holding the element (React equivalent of
- * `MaybeRefOrGetter`). It is re-resolved on every render and the listeners re-bind when the
- * resolved element changes; the ref's `.current` is re-read at bind time, so a `useRef` target that
- * is `null` during first render still binds once React attaches the element.
- * - `onSwipeStart` / `onSwipe` / `onSwipeEnd` are read through latest-value
- *   refs, so the listeners always call the newest callbacks without
- *   re-binding on renders;
- * - `pointerTypes` filters events like upstream (`eventIsAllowed`), but unlike
- *   upstream the pointer listeners are removed by `stop()` too;
- * - `stop()` permanently detaches the listeners for this hook instance
- *   (upstream stops the `useEventListener` watcher too); a fresh mount
- *   starts listening again;
- * - SSR-safe: nothing touches `window` or the DOM during render — listeners
- *   attach and the `touch-action` / `user-select` styles are applied in the
- *   mount effect only.
+ * (`source/vueuse/packages/core/usePointerSwipe/`).
  *
  * @param target - React ref object (`RefObject`) holding the element to
  *   listen on, resolved with the shared `unrefElement`

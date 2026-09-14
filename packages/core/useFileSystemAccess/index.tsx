@@ -160,30 +160,8 @@ export type UseFileSystemAccessReturn<T = string> = readonly [
 ]
 
 /**
- * Create and read and write local files with the [FileSystemAccess
- * API](https://developer.mozilla.org/en-US/docs/Web/API/File_System_Access_API).
- *
  * Map from @vueuse/core `useFileSystemAccess`
- * (`source/vueuse/packages/core/useFileSystemAccess/`), which returns an
- * object `{ isSupported, data, file, fileName, fileMIME, fileSize, fileLastModified, open, create,
- * save, saveAs, updateData }` with a writable `data` shallow ref. The hook wraps the browser's
- * `showOpenFilePicker` / `showSaveFilePicker` and keeps the picked file's content (`data`, as
- * `Text` / `ArrayBuffer` / `Blob` per the `dataType` option) plus its `File` snapshot fresh.
- *
- * React divergences:
- * - the return is the React tuple `[data, setData, controls]` instead of
- *   upstream's object: `data` is plain state (upstream's writable
- *   `ShallowRef<T | undefined>`) and `setData` replaces it with the React
- *   immutable-update protocol (`setData(next)` / `setData(prev => next)`);
- *   every other upstream member lives on `controls`, and the Vue shallow
- *   refs become plain state / derived values, so read them directly (no
- *   `.value`);
- * - `isSupported` (upstream `useSupported`) becomes a plain boolean that
- *   starts `false` and is computed in a mount effect, so nothing touches
- *   `window` during render (SSR-safe);
- * - the picked `FileSystemFileHandle` stays internal; the control functions read it through a ref,
- * so `open` / `create` / `save` / `saveAs` / `updateData` are identity-stable across renders;
- * - an effect re-running `updateData` only when the resolved `dataType` changes.
+ * (`source/vueuse/packages/core/useFileSystemAccess/`).
  *
  * @see https://vueuse.org/core/useFileSystemAccess/
  *

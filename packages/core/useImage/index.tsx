@@ -153,33 +153,8 @@ async function loadImage(options: UseImageOptions): Promise<HTMLImageElement> {
 }
 
 /**
- * Reactive load an image in the browser — React port of VueUse's `useImage`.
- *
  * Map from @vueuse/core `useImage`
- * (`source/vueuse/packages/core/useImage/`). Asynchronously loads an image
- * (accepting every `<img>` attribute) and exposes the state of that load so you can render a
- * loading fallback, an error state, or the image once ready.
- *
- * React divergences:
- * - upstream composes `useAsyncState` with a deep `watch` on the options and
- *   returns its full object (`state`, `isReady`, `isLoading`, `error`,
- *   `execute`, `executeImmediate`); here the async state is implemented
- *   inline with React state, so the return is `{ isLoaded, error, url,
- *   isLoading, execute }` — `isLoaded` is upstream's `isReady`, `url` the
- *   `currentSrc` of the last successfully loaded image (upstream's `state`
- *   holds the loaded element itself), and `executeImmediate` is dropped in
- *   favor of `execute(0)`;
- * - `options` is a plain object (upstream `MaybeRefOrGetter<UseImageOptions>`)
- *   — pass a new options object to load a different image. The mount effect is
- *   keyed on a stable `JSON.stringify` of the options, mirroring upstream's
- *   deep `watch`, so changing any attribute reloads the image;
- * - `asyncStateOptions` is read once at mount (upstream destructures it at
- *   setup); `shallow` is meaningless in React and omitted;
- * - rendering never touches the DOM: the load starts in the mount effect, so
- *   server rendering is safe (on the server `execute` rejects with the
- *   unavailable-`Image` error, which is captured in `error`);
- * - unmounting (or a newer `execute`/options change) invalidates the in-flight load via an
- * execution counter, so a stale load can no longer update state execution guard.
+ * (`source/vueuse/packages/core/useImage/`).
  *
  * @example
  * const avatarUrl = 'https://place.dog/300/200'

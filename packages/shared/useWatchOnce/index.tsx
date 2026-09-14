@@ -16,23 +16,7 @@ export function useWatchOnce<T>(source: T, callback: UseWatchCallback<T>, option
 
 // implementation
 /**
- * Shorthand for watching value with `{ once: true }` — the callback fires at most once (the first
- * matching change) and the watcher stops afterwards — React port of VueUse's `watchOnce`.
- *
  * Map from @vueuse/shared `watchOnce`.
- *
- * Mapping: upstream is a shorthand for `watch(source, cb, {...options, once: true })`. This port
- * builds the same shorthand on the house `useWatch` (like `useWatchAtMost` does with `count: 1`):
- * the callback is wrapped with a `stopped` ref — the first invocation forwards `(value, oldValue)`
- * and marks the watcher stopped, so every further source change is ignored. An `immediate: true`
- * call counts toward the once.
- *
- * React divergences:
- * - Returns `{ stop }` instead of the full Vue `WatchHandle` — `stop` disables further fires early
- * (matching upstream's `stop()`); disposal otherwise follows the component lifecycle.
- * - The source is a plain value (or array of values) tracked across renders —
- *   Vue's `WatchSource` forms (ref / getter / reactive) have no React
- *   equivalent, and the `deep` / `flush` watch options don't apply.
  *
  * @example
  * ```ts

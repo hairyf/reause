@@ -150,24 +150,8 @@ function resolveWindow(custom?: Window): Window | undefined {
 }
 
 /**
- * Reactive window scroll.
- *
  * Map from @vueuse/core `useWindowScroll`
- * (`source/vueuse/packages/core/useWindowScroll/`), which delegates to
- * upstream `useScroll(window)`: reactive `x` / `y` scroll position, `isScrolling` with an `idle`
- * timeout, `arrivedState` within `offset` pixels of the edges and per-axis `directions`.
- *
- * 1. Refs → plain state values: upstream returns a writable `computed` for `x` / `y` and
- * `ShallowRef` / `reactive` objects for the rest; here every value is React state that updates on
- * re-render. Scroll events are batched by React, so all values settle together. 2. Writable refs →
- * setter functions: scroll with the `setX` / `setY` callbacks instead of assigning `x.value`; both
- * are stable (`useCallback`) and call `window.scrollTo` honoring the `behavior` option. 3. The
- * `scroll` / `scrollend` listeners (passive, non-capturing per upstream's `eventListenerOptions`
- * default) are registered inline in a `useEffect` with cleanup; the idle reset is a plain
- * `setTimeout` instead of upstream's `useDebounceFn`, and the `throttle` option is a small trailing
- * throttle (upstream `useThrottleFn(..., { trailing: true, leading: false })`). 4. The `observe`
- * option is accepted for signature parity but inert: upstream never registers the MutationObserver
- * when the target is the window.
+ * (`source/vueuse/packages/core/useWindowScroll/`).
  *
  * @example
  * const { x, y, isScrolling, arrivedState, directions, measure, setX, setY } = useWindowScroll()

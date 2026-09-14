@@ -132,27 +132,8 @@ export interface UseScrollReturn {
 }
 
 /**
- * Reactive scroll position and state.
- *
  * Map from @vueuse/core `useScroll`
- * (`source/vueuse/packages/core/useScroll/`): tracks the scroll position of an
- * element (or `window` / `document`), whether it is currently scrolling, which edges it has arrived
- * at within `offset` pixels and the per-axis scroll `directions`. The optional `observe` flag
- * registers a MutationObserver that re-measures after DOM changes (attribute, child or subtree
- * mutations).
- *
- * 1. Upstream's writable `x` / `y` computed refs become plain `number` state plus the `setX` /
- * `setY` callbacks that scroll the element (write the refs instead). Scroll events are batched by
- * React, so all values settle together. 2. The `scroll` / `scrollend` listeners are registered
- * inline in a `useEffect` with cleanup, and the idle reset is a `useDebounceFn` from
- * `@reause/shared`. The scroll handler is wrapped in a shared `useThrottleFn` when `throttle > 0`;
- * at `throttle = 0` the raw handler is registered instead, mirroring upstream. 3. The optional
- * MutationObserver is a self-contained observer inside the same effect, disconnected on unmount. 4.
- * `element` accepts a React ref object (`RefObject`) holding the element. It is re-resolved on
- * every render and the listeners re-bind when the resolved element changes, so a `useRef` target
- * that is `null` during first render still binds once React attaches the element. A plain element,
- * a getter and a callback ref are not accepted. 5. SSR-safe: nothing touches `window` or the DOM
- * during render — the initial measure and only.
+ * (`source/vueuse/packages/core/useScroll/`).
  *
  * @example
  * const el = useRef<HTMLDivElement>(null)

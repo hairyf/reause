@@ -33,24 +33,7 @@ export interface UseWatchThrottledOptions {
 }
 
 /**
- * Throttled watch — the callback is invoked at most once per specified duration — React
- * port of VueUse's `watchThrottled`.
- * Map from @vueuse/shared watchThrottled.
- *
- * Mapping: upstream is a shorthand for `watchWithFilter(source, cb, { eventFilter:
- * throttleFilter(throttle, trailing, leading) })`. This port composes the same pieces from house
- * primitives: `useWatch` tracks the source across renders (Vue's reactive dependency tracking
- * becomes the effect dependency list) and hands every change to `useThrottleFn`, which implements
- * the upstream `throttleFilter` (leading/trailing edges with a trailing invoke on window end).
- * Changes inside the throttle window collapse into a single call carrying the latest `(value,
- * oldValue)` pair captured at the last change.
- *
- * React divergences:
- * - Returns `void` — upstream returns a `WatchHandle`; here disposal follows the component
- * lifecycle and pending timers.
- * - The source is a plain value (or array of values) tracked across renders —
- *   deep-reactive object sources and `deep` / `flush` watch options don't apply.
- * - upstream's deprecated `throttledWatch` alias is not ported.
+ * Map from @vueuse/shared `watchThrottled`.
  *
  * @example
  * ```ts

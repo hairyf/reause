@@ -45,19 +45,7 @@ export interface UseCycleListReturn<T> {
 
 /**
  * Map from @vueuse/core `useCycleList`
- * (`source/vueuse/packages/core/useCycleList/`). Cycle through a list of
- * items — `next`/`prev` move forward/backward wrapping around, `go` jumps to a specific index and
- * the current item is exposed as `state` with its position as `index`.
- *
- * 1. `state` and `index` are plain React values. They are writable through the returned
- * `setState`/`setIndex` setters (React additions — upstream assigns `state.value`/`index.value`
- * directly): `setIndex` is the same as `go`, while `setState` writes the item directly and `index`
- * re-derives from `getIndexOf ?? list.indexOf`. 2. `list` is a read-only value source and takes a
- * plain `T[]`. It is re-read on every render, so a new array from React state is picked up like any
- * other argument (upstream's `watch(listRef...)` only fires for a reactive ref, which this port
- * does not accept). 3. `next`/`prev`/`go` are stable callbacks that return the would-be value
- * synchronously (upstream returns the new state from the `set` helper); the state commit itself is
- * asynchronous (React `setState`).
+ * (`source/vueuse/packages/core/useCycleList/`).
  *
  * @example
  * const { state, next, prev, go } = useCycleList([

@@ -13,14 +13,7 @@ export interface UseWatchOptions {
 }
 
 /**
- * Map from @vueuse/shared `watch`
- * Mapping: Vue's reactive dependency tracking becomes a `useEffect` whose dependency list is the
- * source itself — `[source]` for a single value, the source's elements for an array source — so the
- * callback re-fires whenever any watched part changes. The previous value is tracked in a ref
- * updated by the effect (inlined `usePrevious`), and the callback never fires on the first render
- * unless `immediate: true`.
- *
- * This is the parent of all `useWatch*` variants.
+ * Map from @vueuse/shared `watch`.
  *
  * @example
  * ```ts

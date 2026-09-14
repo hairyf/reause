@@ -61,29 +61,7 @@ function resolveElementRef(value: ElementRef): Element | null {
 
 /**
  * Map from @vueuse/core `usePointerLock`
- * (`source/vueuse/packages/core/usePointerLock/`). Reactive
- * [pointer lock](https://developer.mozilla.org/en-US/docs/Web/API/Pointer_Lock_API): `element`
- * mirrors `document.pointerLockElement` for the lock held through this hook, `lock()` requests it,
- * `unlock()` releases it.
- *
- * React divergences:
- * - the Vue `element`/`triggerElement` refs become plain `Element | null`
- *   state; `isSupported` is resolved in a mount effect so both SSR and the
- *   first client render report `false` (hydration-safe) and the capability
- *   probe never runs during render;
- * - the document `pointerlockchange`/`pointerlockerror` listeners live in a self-contained
- * `useEffect`; the effect re-binds when the `document` option changes;
- * - `lock()` accepts React synthetic events next to native `Event`s —
- *   upstream's `e instanceof Event` check misses them, which would break the
- *   `onMouseDown={lock}` handler idiom;
- * - Vue's `until(element).toBe(...)` becomes a waiter queue resolved by the
- *   `pointerlockchange` handler; on `pointerlockerror` the pending
- *   `lock()`/`unlock()` promise rejects with upstream's
- *   `Failed to {acquire,release} pointer lock.` message (upstream throws
- *   inside the event listener, which leaves the promise pending and cannot
- *   reject the caller);
- * - the `target` argument is read at `lock()` call time (upstream resolves it inside `lock()` too —
- * it is not watched); unmount removes the listeners but never releases an active lock.
+ * (`source/vueuse/packages/core/usePointerLock/`).
  *
  * @example
  * const targetRef = useRef<HTMLDivElement>(null)

@@ -41,25 +41,7 @@ interface UseShareNavigatorOptions {
 
 /**
  * Map from @vueuse/core `useShare`
- * (`source/vueuse/packages/core/useShare/`). Reactive
- * [Web Share API](https://developer.mozilla.org/en-US/docs/Web/API/Navigator/share).
- *
- * React divergences:
- * - upstream derives `isSupported` through its `useSupported` helper (a
- *   computed re-evaluated on mount); here it is a plain boolean state
- *   resolved in a mount effect — `false` during render and on the server
- *   (SSR-safe), `true` afterwards when the navigator exposes `canShare`
- *   (upstream's exact check — note: `canShare`, not `navigator.share`);
- * - upstream accepts `MaybeRefOrGetter<UseShareOptions>`; React has no
- *   reactive refs, so options are plain values. The latest options and
- *   navigator live in refs synced each render, keeping `share` a stable
- *   callback that always reads the newest values — inline option objects
- *   and later changes are picked up without invalidating it;
- * - upstream's `ConfigurableNavigator` option is declared inline
- *   (`UseShareNavigatorOptions`, not exported) to avoid same-name barrel
- *   collisions;
- * - the `share` promise is not wrapped or caught: rejections (including the user-cancel AbortError)
- * propagate to the caller.
+ * (`source/vueuse/packages/core/useShare/`).
  *
  * @example
  * const { share, isSupported } = useShare()

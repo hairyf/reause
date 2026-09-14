@@ -36,24 +36,7 @@ export interface Pausable {
 
 /**
  * Map from @vueuse/core `useTimeoutPoll`
- * (`source/vueuse/packages/core/useTimeoutPoll/`): a timeout-based poll chain
- * that triggers the callback one `interval` after activation and re-schedules only after the
- * previous run has finished, so a slow poll never overlaps itself. Self-contained `setTimeout`
- * chain; there is no document-visibility gating in upstream, so none here either.
- *
- * React divergences:
- * - `fn` and `interval` are plain values kept in refs, so `pause` / `resume` stay referentially
- * stable and a changing (typically stable) callback identity never restarts the chain. Like
- * upstream, the `interval` is only read when a run is scheduled — a changed `interval` does not
- * re-arm the pending timeout, which keeps its old cadence until the next schedule;
- * - the `isActive` shallow ref becomes a plain boolean state, flipped by
- *   `resume` / `pause` (upstream sets it synchronously during setup);
- * - the setup-time auto `resume()` (`immediate`, client-only) becomes a mount
- *   `useEffect`, and `tryOnScopeDispose(pause)` becomes its cleanup — timers
- *   only ever run inside effects, so SSR renders never touch them;
- * - upstream does not fire the callback synchronously on `resume`: the first
- *   run is scheduled one `interval` after activation. Pass
- *   `immediateCallback: true` to also fire it immediately on (re)activation.
+ * (`source/vueuse/packages/core/useTimeoutPoll/`).
  *
  * @example
  * const { isActive, pause, resume } = useTimeoutPoll(fetchData, 1000)

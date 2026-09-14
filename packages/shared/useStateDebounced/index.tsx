@@ -12,30 +12,7 @@ export type UseStateDebouncedReturn<T = any> = [
 ]
 
 /**
- * Debounce updates of a state value — React port of VueUse's `refDebounced`.
- *
- * Map from @vueuse/shared `refDebounced`
- * Mapping: upstream takes a Vue `Ref<T>` and returns a readonly ref that only flips to the latest
- * source value once it stops changing for `ms` (a watcher hands every change to `useDebounceFn`).
- * The naming follows this repo's `ref* → useState*` rule (`refDebounced` → `useStateDebounced`),
- * the Vue `Ref<T>` input becomes a plain initial value, and the readonly ref becomes an extra state
- * slot — so the hook returns the tuple `[value, setValue, debounced]`:
- *
- * ```ts
- * const [input, setInput, debounced] = useStateDebounced('foo', 1000)
- *
- * setInput('bar')
- * console.log(debounced) // 'foo' — flips to 'bar' once the debounce elapses
- * ```
- *
- * `value` is the source state, `setValue` its setter, and `debounced` lags behind it by `ms`.
- * Writes settle through a `useDebounceFn` updater, so a burst of writes collapses into a single
- * trailing update carrying the last written value. `ms` (and `options.maxWait`) are plain numbers,
- * read on every write; pending timers are cleared when the component unmounts (upstream disposes
- * with the effect scope). Note: a write only schedules the debounce when the value actually changes
- * — writing the same value is skipped by `useControllableState`'s `Object.is` guard, so the pending
- * timer is not re-delayed (upstream's `watch` re-delays on every source write, even unchanged
- * ones).
+ * Map from @vueuse/shared `refDebounced`.
  *
  * @example
  * ```ts

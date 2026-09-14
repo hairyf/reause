@@ -156,37 +156,7 @@ function defaultParse<Raw, Serialized>(clone?: boolean | ((value: Raw) => Raw)) 
 
 /**
  * Map from @vueuse/core `useDebouncedRefHistory`
- * (`source/vueuse/packages/core/useDebouncedRefHistory/`). Shorthand for the
- * manual history machinery with a debounced filter: track the change history of a state
- * automatically, committing only after `debounce` milliseconds of no changes — every change resets
- * the window and only the last one inside it is recorded once the window closes (no leading edge),
- * providing undo and redo functionality.
- *
- * The return object mirrors VueUse's `UseRefHistoryReturn` (refs flattened to plain values): `const
- * { history, undo, redo, canUndo, canRedo... } = useStateDebouncedHistory([source, setSource])`.
- *
- * 1. Naming + return shape: `useDebouncedRefHistory` becomes `useStateDebouncedHistory` (`ref*`
- * family → `useState*`, see `useStateManualHistory`) and the return object mirrors the upstream
- * object (`{ history, undo, redo... }`) with refs flattened to plain values — `history` is a plain
- * snapshots array and `undo` / `redo` are stable callbacks driving the state setter. 2. Source:
- * upstream tracks a writable Vue `Ref<Raw>` and commits through a watcher; React state lives in the
- * component, so the source is the controlled tuple `[state, setState]` of an existing `useState`;
- * commits are driven by an effect on state changes. The `deep` and `flush` watch options don't
- * apply — replace the state instead of mutating it, a mutated object does not re-render and is
- * invisible to the history (`clone` / custom `dump` still support mutation-style sources). 3.
- * Debounce filter: upstream composes `debounceFilter` from `@vueuse/shared`; the filter logic is
- * inlined here (same algorithm as `useDebounceFn`, see `packages/shared/src/useDebounceFn.ts`).
- * `debounce` is re-read on every change; `undefined` or `<= 0` commits immediately. is not
- * forwarded by the shorthand and so not ported. 4. History operations supersede pending debounced
- * commits: `undo` / `redo` / `reset` / `clear` and a manual `commit()` cancel a scheduled debounced
- * commit (upstream's `ignorePrevAsyncUpdates` only cancels the queued watcher callback, so its
- * debounce timer can still fire afterwards and re-record the restored record — the port keeps the
- * history free of duplicates). A pending debounced commit still fires while tracking is paused,
- * mirroring upstream. 5. Same-tick changes: use `controls.setSource()` (value or updater form) for
- * updates that must be visible to a manual `commit()` in the same tick — see
- * `useStateManualHistory` for the full explanation. 6. Storage: snapshots live in refs and a
- * version counter triggers re-renders; records are plain objects and timestamps use `Date.now()`.
- * is not ported — disposal follows the component lifecycle and pending timers. is not ported.
+ * (`source/vueuse/packages/core/useDebouncedRefHistory/`).
  *
  * @example
  * const [count, setCount] = useState(0)

@@ -43,52 +43,8 @@ export type ExtractedObservableExtractor<Value, E> = (
 const EMPTY_DEPS: unknown[] = []
 
 /**
- * Use an RxJS [`Observable`](https://rxjs.dev/guide/observable) as extracted from one or more
- * hooks, and automatically unsubscribe from it when the component is unmounted.
- *
  * Map from @vueuse/rxjs `useExtractedObservable`
- * (`source/vueuse/packages/rxjs/useExtractedObservable/`): whenever the
- * resolved source value changes, the previous subscription is unsubscribed and `extractor` derives
- * a new `Observable` from the new value, whose emissions become the hook's value. Unsubscribing
- * happens both on a source change and on unmount.
- *
- * React adaptation (upstream's Vue reactivity graph is replaced):
- *
- * - `value` is a read-only value source and takes a plain `Value | null | undefined`. Resolve a
- * React ref or getter at the call site; a list of sources is passed as a plain array and
- * re-extracts when a new array identity arrives. There is no reactive graph: the effect re-runs
- * when the value's identity changes **or** when `options.deps` change (upstream re-runs whenever
- * any tracked source mutates), so a source object mutated **in place** needs a new identity or the
- * mutation inputs listed in `deps`.
- * - the extractor is `(value, onCleanup) => Observable<E>`: upstream also
- *   passes Vue's `oldValue` as the second argument, which has no React
- *   equivalent (React keeps no previous-value tracking) and is dropped.
- * - upstream returns a `DeepReadonly<ShallowRef<E>>`; the React port returns
- *   the value directly (a readonly ref holds no writable value, so the
- *   structure is mirrored — §2 return rules). `initialValue` narrows the
- *   returned type to `E | I` (`I` being the `initialValue` type and
- *   defaulting to `undefined`), the same trick as `useObservable`.
- * - upstream's `watch` options (`immediate` / `deep` / `flush`) are dropped:
- *   the effect always extracts on mount (`immediate: true`, upstream's
- *   default) and re-extracts on identity / `deps` changes — React has no
- *   flush scheduler to configure. Pass `initialValue` to seed the value
- *   before the first extraction settles.
- * - `initialValue` is the `useState` initial value, so it only applies to the
- *   first render — a later source change keeps the last emitted value
- *   (upstream's `obsRef` is never reset either), and a nullish source
- *   subscribes to nothing and drops the previous subscription.
- * - `onCleanup` parity: callbacks registered through the `onCleanup` argument
- *   are collected per run and invoked before the next subscription is created,
- *   before the previous subscription is unsubscribed (upstream's Vue `watch`
- *   runs the previous cleanup before the watcher body), and on unmount.
- * - `extractor`, `onError` and `onComplete` are read through latest-value refs,
- *   so inline identities never re-subscribe; only the resolved source value
- *   and `deps` do.
- * - the option values are handed to the observer directly, so an absent
- *   `onError` leaves the error slot `undefined` and RxJS reports the error as
- *   unhandled instead of swallowing it (upstream parity).
- * - SSR-safe: nothing touches `window` / `document`, and the subscription only
- *   exists inside the mount effect.
+ * (`source/vueuse/packages/rxjs/useExtractedObservable/`).
  *
  * @see https://vueuse.org/rxjs/useExtractedObservable/
  * @example

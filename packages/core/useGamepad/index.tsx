@@ -99,12 +99,8 @@ export interface Xbox360Controller {
 }
 
 /**
- * Map a standard-mapping gamepad to an Xbox 360 Controller layout.
- *
  * Map from @vueuse/core `mapGamepadToXbox360Controller`
- * (`source/vueuse/packages/core/useGamepad/`). React divergence: upstream
- * takes a `Ref<Gamepad | undefined>` and returns a `ComputedRef`; here the gamepad is a plain value
- * and the mapped layout (or `null` when no gamepad is passed) is returned directly.
+ * (`source/vueuse/packages/core/useGamepad/`).
  */
 export function mapGamepadToXbox360Controller(gamepad: Gamepad | undefined): Xbox360Controller | null {
   if (!gamepad)
@@ -191,35 +187,7 @@ function stateFromGamepad(gamepad: Gamepad): Gamepad {
 
 /**
  * Map from @vueuse/core `useGamepad`
- * (`source/vueuse/packages/core/useGamepad/`). Provides reactive bindings
- * for the Gamepad API — the `gamepads` snapshot, `onConnected` / `onDisconnected` events and
- * `pause` / `resume` control over the polling loop.
- *
- * React divergences:
- * - the return is the React tuple `[gamepads, setGamepads, controls]` instead
- *   of upstream's object `{ isSupported, onConnected, onDisconnected,
- *   gamepads: Ref<Gamepad[]>, pause, resume, isActive }`. `gamepads` is plain
- *   state and `setGamepads` follows the React immutable-update protocol —
- *   `setGamepads(next)` or `setGamepads(prev => next)` — replacing upstream's
- *   writable `gamepads` ref. `setGamepads` refreshes the internal latest-value
- *   ref synchronously, so the rAF poller and the connect/disconnect handlers
- *   always build on the newest list;
- * - the Vue `gamepads` ref becomes a plain `Gamepad[]` state refreshed by an
- *   rAF poller (upstream `updateGamepadState`), so read it directly from the
- *   first tuple slot instead of `.value`;
- * - upstream's `createEventHook()` on* members become stable subscribe functions with the same
- * `(fn) => { off }` shape, managed with Sets, so they are identity-stable across renders and
- * compatible with the `useListener` protocol; the Sets;
- * - `isSupported` (upstream `useSupported`) is a plain boolean resolved in
- *   the mount effect — nothing touches `navigator` during render (SSR-safe);
- * - `isActive` (upstream `useRafFn`'s shallow ref, missing from the earlier
- *   reause port) is a plain boolean in `controls`;
- * - the polling loop starts paused (`useRafFn` with `immediate: false`, mirroring upstream's
- * post-setup `pause()`) and is resumed the first time a gamepad connects; disconnecting never
- * pauses it;
- * - the `gamepadconnected` / `gamepaddisconnected` listeners register via
- *   `useEventListener` (window target) and the initial `getGamepads()` poll
- *   (upstream `tryOnMounted`) runs in a mount effect.
+ * (`source/vueuse/packages/core/useGamepad/`).
  *
  * @example
  * const [gamepads, setGamepads, { isSupported, onConnected, pause, resume }] = useGamepad()

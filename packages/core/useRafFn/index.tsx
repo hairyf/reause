@@ -58,26 +58,7 @@ export interface UseRafFnReturn {
 
 /**
  * Map from @vueuse/core `useRafFn`
- * (`source/vueuse/packages/core/useRafFn/`): a self-contained
- * `requestAnimationFrame` chain that calls the callback with `{ delta, timestamp }` on every frame,
- * with controls of pausing and resuming.
- *
- * React divergences:
- * - the returned control object keeps upstream's `Pausable` members
- *   (`isActive` / `pause` / `resume`), but the `isActive` shallow ref becomes
- *   a plain boolean state flipped by `resume` / `pause`;
- * - the setup-time auto `resume()` (`immediate`, client-only) becomes a
- *   mount `useEffect`, and `tryOnScopeDispose(pause)` becomes its cleanup —
- *   `immediate` is read exactly once on mount, like upstream reads it once
- *   during setup: a later change to the option neither restarts nor stops the
- *   loop. Frames are only ever scheduled inside effects, so SSR renders never
- *   touch `window.requestAnimationFrame`;
- * - `fn`, `fpsLimit`, `once` and `window` are read through refs on every
- *   frame instead of from the setup closure, so the running loop always sees
- *   the latest values (upstream recomputes on watchers);
- * - `fpsLimit` is a plain `number | null`, read per frame. The upstream getter form (`() => number
- * | null`) and a React ref are deliberately not accepted — zero-argument getters were removed
- * repo-wide (#462/#490) — so they are rejected at the type level.
+ * (`source/vueuse/packages/core/useRafFn/`).
  *
  * @example
  * const { pause, resume } = useRafFn(() => setCount(c => c + 1))

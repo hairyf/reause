@@ -76,30 +76,7 @@ function tryRequestAnimationFrame(window: Window | undefined, fn: () => void) {
 
 /**
  * Map from @vueuse/core `useTextareaAutosize`
- * (`source/vueuse/packages/core/useTextareaAutosize/`) — automatically update
- * the height of a textarea depending on the content.
- *
- * React divergences:
- * - upstream returns `{ textarea, input, triggerResize }` with writable refs;
- *   this port returns the object `{ input, setInput, textarea, triggerResize }`
- *   — the content is a plain value paired with the `setInput` setter (the React
- *   mapping of upstream's writable `input` ref), and `textarea` stays an
- *   element ref;
- * - the `element` and `styleTarget` options take React ref objects
- *   (`RefObject`, read with the shared `unrefElement`); a plain element, a
- *   getter and a callback ref are not accepted. The textarea is resolved at
- *   commit time, so an element attached after mount (conditional or async
- *   render) still triggers the resize and the `ResizeObserver`;
- * - upstream's `watch([input, textarea], () => nextTick(triggerResize), {
- *   immediate: true })` and `watch(options.watch, triggerResize, { immediate:
- *   true, deep: true })` become one commit-time effect that resizes on mount
- *   and whenever the resolved element, the content or the `watch` values
- *   change — the mount resize therefore runs once, not twice;
- * - the `watch` values are compared with the shared structural `deepEqual`
- *   (functions by reference; `Map` / `Set` / `Date` / `RegExp` by contents)
- *   instead of a `JSON.stringify` key, so non-serializable values re-trigger;
- * - upstream's `useResizeObserver` composition becomes a self-contained `ResizeObserver` effect
- * that re-measures when the element's width changes.
+ * (`source/vueuse/packages/core/useTextareaAutosize/`).
  *
  * @example
  * const { input, setInput, textarea } = useTextareaAutosize()

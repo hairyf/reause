@@ -71,28 +71,7 @@ export interface UseWakeLockReturn {
 
 /**
  * Map from @vueuse/core `useWakeLock`
- * (`source/vueuse/packages/core/useWakeLock/`). Reactive Screen Wake Lock
- * API — prevents devices from dimming or locking the screen.
- *
- * The upstream return shape is mirrored 1:1 as a plain object: `sentinel`, `isSupported` and
- * `isActive` are plain values, while `request`, `forceRequest` and `release` are stable functions.
- *
- * React divergences:
- * - `request`/`forceRequest`/`release` are stable `useCallback` functions reading sync refs
- * (`sentinelRef`/`visibilityRef`/`navigatorRef`) the way upstream reads its refs at call time;
- * - `isSupported` is computed in a mount effect, so SSR renders `false` and the global `navigator`
- * is never touched during render;
- * - `document.visibilityState` tracking and the queued-request replay live in self-contained
- * `useEffect`s; the initial visibility defaults to `'visible'` (upstream's server default) and
- * syncs on mount;
- * - the sentinel `release` listener re-queues the released sentinel's type
- *   only while it is still the current sentinel — upstream achieves the
- *   same by re-binding its listener through the sentinel ref;
- * - auto-release on unmount;
- * - `WakeLockSentinel`/`WakeLockType` are defined locally and re-exported,
- *   mirroring upstream's own interfaces (defined for older TS libs rather
- *   than referenced from lib.dom directly), so `import type {
- *   WakeLockSentinel } from '@reause/core'` keeps parity.
+ * (`source/vueuse/packages/core/useWakeLock/`).
  *
  * @example
  * const { isSupported, isActive, request, release } = useWakeLock()

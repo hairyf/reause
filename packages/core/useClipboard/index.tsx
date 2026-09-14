@@ -107,23 +107,7 @@ function createClipboardItem(
 
 /**
  * Map from @vueuse/core `useClipboard`
- * (`source/vueuse/packages/core/useClipboard/`). Reactive
- * [Clipboard API](https://developer.mozilla.org/en-US/docs/Web/API/Clipboard_API) — copy text to
- * the system clipboard (native Async Clipboard API with an `execCommand` legacy fallback) and, with
- * `read: true`, track clipboard text on `copy`/`cut` events.
- *
- * React divergences:
- * - the `ComputedRef<boolean>` isSupported becomes plain boolean state
- *   resolved through `useSupported` in a mount effect — `false` during the
- *   first render and on the server (SSR-safe);
- * - the `source` option is a plain string (upstream accepts a ref); the `copy`
- *   callback is stable and
- *   reads the latest `source`/`navigator`/permission state through refs;
- * - the `copy`/`cut` listeners are wired in a `useEffect` guarded by
- *   `isSupported && read` with proper cleanup (upstream registers them
- *   synchronously during setup under the same condition);
- * - upstream's `useTimeoutFn` resets `copied`; here the same shared helper
- *   resets the plain boolean state.
+ * (`source/vueuse/packages/core/useClipboard/`).
  *
  * @example
  * const { text, copy, copied, isSupported } = useClipboard({ source: 'Hello' })

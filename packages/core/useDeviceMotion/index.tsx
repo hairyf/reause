@@ -73,29 +73,7 @@ const DEFAULT_ROTATION_RATE: DeviceMotionEventRotationRate = { alpha: null, beta
 
 /**
  * Map from @vueuse/core `useDeviceMotion`
- * (`source/vueuse/packages/core/useDeviceMotion/`). Reactive
- * [DeviceMotionEvent](https://developer.mozilla.org/en-US/docs/Web/API/DeviceMotionEvent) —
- * information about the speed of changes for the device's position and orientation.
- *
- * React divergences:
- * - upstream derives `isSupported` and `requirePermissions` through its
- *   `useSupported` helper (computed refs); here they are resolved once in the
- *   same mount effect that attaches the `devicemotion` listener, so nothing
- *   touches `DeviceMotionEvent` during render (SSR-safe) and the
- *   `requirePermissions` probe sees the fresh `isSupported` result;
- * - upstream's `useEventListener` + `createFilterWrapper` become a
- *   self-contained `init` inside a mount effect that registers the passive
- *   `devicemotion` listener and removes it on unmount; the optional
- *   `eventFilter` is captured once on mount, like upstream's setup-time read;
- * - the iOS permission flow (`requestPermissions: true`) mirrors upstream: `ensurePermissions`
- * requests the permission when the platform requires it and the mount effect starts the listener
- * once it resolves (upstream double-calls `init` — inside `ensurePermissions` and in
- * `ensurePermissions().then(() => init())` — which this port dedupes into the single `.then()`
- * re-add; `init` is idempotent, so behavior is identical). Without `requestPermissions`, call
- * `ensurePermissions` from a user interaction — the listener is attached at mount already;
- * - `permissionGranted` defaults to `false` (upstream's `shallowRef(false)`),
- *   even when the API requires no permission — it only flips via
- *   `ensurePermissions`.
+ * (`source/vueuse/packages/core/useDeviceMotion/`).
  *
  * @example
  * const { acceleration, accelerationIncludingGravity, rotationRate, interval, isSupported } = useDeviceMotion()

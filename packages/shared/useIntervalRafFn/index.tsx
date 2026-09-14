@@ -88,77 +88,8 @@ export interface UseIntervalRafFnOptions {
 }
 
 /**
- * Fire `fn` repeatedly, on animation frames, once at least `delay` milliseconds have elapsed since
- * the last fire; return a stable `clear` that cancels the running loop.
- *
  * Map from ahooks `useRafInterval`
- * (`source/ahooks/packages/hooks/src/useRafInterval/`). Mirrored directly
- * (AGENTS.md §1.1, React source ⇒ direct mirror) apart from the required rename to
- * `useIntervalRafFn`, which aligns the export with the existing `useIntervalFn` in
- * `@reause/shared`; the JSDoc marker keeps upstream's symbol name. Upstream ships this hook as a
- * default export with an inline options type, reause exports it by name behind
- * `UseIntervalRafFnOptions`.
- *
- * Semantics worth stating, because they differ from the timeout sibling:
- * - **repeating.** `start` is captured when the loop is armed and then reset to
- *   `Date.now()` after every callback, so the deadline advances and the loop
- *   fires again and again until `clear()` (or unmount, or a `delay` change)
- *   stops it. `useTimeoutRafFn` is the one-shot sibling: there `startTime` is
- *   captured once and never reset, so it fires exactly once and schedules no
- *   further frame. Same frame loop shell, opposite loop body — the reason the
- *   two are not sharing a helper (see below).
- * - **period is `delay` rounded up to the next frame boundary.** Because the
- *   clock is only read once per frame and the deadline restarts after the fire,
- *   a `delay` that is not a whole multiple of the frame period produces an
- *   effective period of the next whole frame boundary, never a shorter one.
- *   Measured here: with 16ms frames, `delay: 50` fires on frames 4, 8, 12 … —
- *   every 64ms, not every 50ms.
- * - **clock source: `Date.now()`.** The elapsed time is measured with
- *   `Date.now()`, deliberately *not* with `performance.now()` and not with the
- *   frame timestamp `requestAnimationFrame` passes to its callback. The
- *   deadline is therefore wall-clock-ish and keeps counting while frames are
- *   throttled, and the callback fires on the first frame delivered after it.
- * - **the comparison is `>=`**, so a `delay` of `0` fires on every frame.
- * - **disabling condition: `!isNumber(delay) || delay < 0`.** `undefined`,
- *   `NaN` and any negative number return before arming anything, so nothing is
- *   scheduled and nothing can fire. Changing `delay` to such a value cancels
- *   the loop armed by the previous value (effect cleanup).
- * - **`immediate`.** When true, `fn` runs once synchronously inside the arming
- *   effect, before the first frame is requested. It is read on every render but
- *   the arming effect depends on `delay` alone, so flipping `immediate` on a
- *   later render neither fires again nor restarts the loop — upstream behaves
- *   the same way.
- * - **dual branch.** With no `requestAnimationFrame` (a server render, or any frame-less host) the
- * loop downgrades to `setInterval(fn, delay)`. The clear path, so an environment that has one
- * global but not the other mis-classifies the handle, not a divergence.
- * - **`fn` is read through `@reause/shared`'s `useLatest`** (the merged
- *   react-use port), and the arming effect depends on `delay` alone. A
- *   re-render carrying a new inline callback therefore neither restarts the
- *   loop nor fires a stale closure: the newest `fn` runs on the next fire. No
- *   copy of `useLatest` is inlined here.
- * - **shared plumbing is deliberately local.** The frame loop lives in this
- *   file, next to the timeout sibling's, because the two bodies do opposite
- *   things with the same shell: this one re-arms unconditionally and resets the
- *   deadline after firing, `useTimeoutRafFn` re-arms only while the deadline is
- *   unmet and never resets it. The genuinely shared part is two calls — the
- *   `typeof requestAnimationFrame === 'undefined'` branch and the
- *   `cancelAnimationFrameIsNotDefined` classifier — which is roughly ten lines
- *   of straight-line code. A helper covering those two calls would need a
- *   callback or a `repeat` flag to carry the difference that matters, and
- *   `useTimeoutRafFn`'s suite would have to keep passing through an indirection
- *   it does not currently have. Measured against the real code, the extraction
- *   buys nothing: it trades ten duplicated lines for an abstraction with a mode
- *   flag and an extra sanctioned import path. Not extracted; both hooks stay
- *   self-contained. (The `packages/core` option is not available anyway —
- *   `core` depends on `shared`, so a helper there could not be imported from
- *   here.)
- *
- * Not a duplicate of `useIntervalFn` (VueUse's `useIntervalFn`, also in `@reause/shared`): that one
- * is a plain `setInterval` returning controls (`{ isActive, pause, resume }`) and fires on the wall
- * clock even in a hidden tab, while this is frame-aligned — it only runs when the page actually
- * renders — and returns a single stable `clear`. It is also not `packages/core`'s `useRafFn`
- * (VueUse's per-frame callback with pause/resume): that one runs on *every* frame with no delay at
- * all.
+ * (`source/ahooks/packages/hooks/src/useRafInterval/`).
  *
  * @example
  * const clear = useIntervalRafFn(() => setCount(c => c + 1), 1000)

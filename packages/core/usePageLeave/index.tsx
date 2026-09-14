@@ -3,15 +3,7 @@ import { useEffect, useState } from 'react'
 
 /**
  * Map from @vueuse/core `usePageLeave`
- * (`source/vueuse/packages/core/usePageLeave/`). Reactive state showing
- * whether the mouse has left the page, as a plain boolean — `true` when the pointer exits the
- * window/document boundary, `false` otherwise.
- *
- * React divergences:
- * - the `mouseout`/`mouseleave`/`mouseenter` listeners live in a self-contained `useEffect`;
- * - the handler reads `event.relatedTarget`/`event.toElement` directly — the
- *   legacy `window.event` fallback is dropped since the DOM always passes
- *   the event object to the listener.
+ * (`source/vueuse/packages/core/usePageLeave/`).
  *
  * @example
  * const isLeft = usePageLeave()

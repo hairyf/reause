@@ -56,28 +56,8 @@ function resolveTargets(target: ElementTargetOrArray): Element[] {
 }
 
 /**
- * Watch for changes being made to the DOM tree
- *
  * Map from @vueuse/core `useMutationObserver`
- * (`source/vueuse/packages/core/useMutationObserver/`), which wraps a
- * platform `MutationObserver`, observes every resolved target, and tracks target changes with
- * `watch(computed(() =>...)..., { immediate: true, flush: 'post' })`.
- *
- * React divergences:
- * - the Vue `watch` over the targets computed becomes an effect that
- *   re-resolves the targets after every render and re-observes only when the
- *   resolved element set or the resolved `window` actually changed — a
- *   re-render that swaps `target.current` re-observes (mirroring the
- *   upstream reactivity) while unchanged renders never do, so pending
- *   mutation records are never dropped on an unnecessary reconnect;
- * - `isSupported` is plain `boolean` state settled in the mount effect;
- * - `tryOnScopeDispose(stop)` becomes an unmount effect that disconnects;
- * - the observer is constructed through the resolved `window`, and a changed
- *   `window` option re-observes (upstream destructures it once at setup;
- *   this matches this repo's `useOnline`).
- *
- * SSR-safe: nothing touches `window` during render — support detection and observation both happen
- * in effects.
+ * (`source/vueuse/packages/core/useMutationObserver/`).
  *
  * @see https://vueuse.org/core/useMutationObserver/
  * @see https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver

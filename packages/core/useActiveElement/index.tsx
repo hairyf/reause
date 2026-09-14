@@ -24,16 +24,8 @@ export interface UseActiveElementOptions extends ConfigurableWindow {
 }
 
 /**
- * Reactively track `document.activeElement` — the focused element, falling back to `document.body`
- * — re-read on focus, blur and pointer presses, descending into open shadow roots.
- *
  * Map from @vueuse/core `useActiveElement`
- * (`source/vueuse/packages/core/useActiveElement/`). React divergences: the
- * `ShallowRef<T | null | undefined>` return becomes a plain `T | undefined`; `pointerdown` joins
- * the `focus` / `blur` listeners as a trigger, so a change of `activeElement` without a `focus`
- * event is still seen; `triggerOnRemoval` observes the resolved `document` / `shadowRoot` directly
- * and disconnects on unmount. Reads happen in the mount effect, so a server render yields
- * `undefined` without touching the DOM.
+ * (`source/vueuse/packages/core/useActiveElement/`).
  *
  * @see https://vueuse.org/core/useActiveElement/
  * @param options - UseActiveElementOptions

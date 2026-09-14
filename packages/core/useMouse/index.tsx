@@ -76,30 +76,8 @@ const UseMouseBuiltinExtractors: Record<UseMouseCoordType, UseMouseEventExtracto
 }
 
 /**
- * Reactive mouse position.
- *
  * Map from @vueuse/core `useMouse`
- * (`source/vueuse/packages/core/useMouse/`), which listens to
- * `mousemove` / `dragover` (+ `touchstart` / `touchmove` when `touch` is enabled, `touchend` reset
- * when `resetOnTouchEnds` is set) on the `target` option (default `window`), extracts the cursor
- * coordinates with the `type` extractor (`page` by default, or `client` / `screen` / `movement` / a
- * custom `UseMouseEventExtractor`) and tracks which input produced the last position in
- * `sourceType`. A `scroll` listener on `window` compensates the `page` coordinates while the page
- * scrolls.
- *
- * React divergences:
- * - a self-contained mount `useEffect` that re-subscribes when the resolved `target` / the resolved
- * `window` option / the `type` mode / the `touch` / `scroll` / `resetOnTouchEnds` flags change and
- * removes all listeners on unmount;
- * - `target` accepts a React ref object (`RefObject`) holding the element; it is re-resolved on
- * every render and the listeners re-bind when the resolved element changes. Not passing `target`
- * listens on the `window` option (default the global `window`), while a ref whose `.current` is
- * `null` attaches nothing — exactly like upstream.
- * - `initialValue` is folded into the `useState` initializers and read back
- *   by the `touchend` reset through a latest-value ref, so SSR renders the
- *   defaults (`x: 0`, `y: 0`, `sourceType: null`) without touching `window`;
- * - the `eventFilter` wrapper forwards upstream's placeholder second argument (`{}`) so a chained
- * filter reads an object instead of `undefined`.
+ * (`source/vueuse/packages/core/useMouse/`).
  *
  * @example
  * const { x, y, sourceType } = useMouse()

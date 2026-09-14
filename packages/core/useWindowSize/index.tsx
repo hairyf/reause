@@ -32,29 +32,8 @@ export interface UseWindowSizeReturn {
 }
 
 /**
- * Reactive window size.
- *
  * Map from @vueuse/core `useWindowSize`
- * (`source/vueuse/packages/core/useWindowSize/`), which keeps `width` and
- * `height` shallow refs and refreshes them on window `resize` (plus the `orientation: portrait`
- * media query when `listenOrientation`, and the `visualViewport` when `type: 'visual'`).
- *
- * React divergences:
- * - the initial `update()` and the listeners move into a self-contained `useEffect` (upstream uses
- * `useEventListener` and calls `update()` during setup), so SSR renders the
- * `initialWidth`/`initialHeight` defaults (`Number.POSITIVE_INFINITY`, matching upstream) without
- * touching `window`;
- * - upstream's `useMediaQuery('(orientation: portrait)')` watch becomes a
- *   `matchMedia` `change` listener, guarded for environments without
- *   `matchMedia`;
- * - the `resize` listener attaches to the resolved window target — the
- *   `options.window` instance when given, otherwise the global window —
- *   while upstream always listens on the global window and only *reads* the
- *   custom window; listening where we read means a custom target (e.g. an
- *   iframe) receives its own resize events;
- * - like upstream, the options are captured once on the first render: a
- *   mid-life change to `window` / `type` / `includeScrollbar` /
- *   `listenOrientation` does not re-subscribe the listeners.
+ * (`source/vueuse/packages/core/useWindowSize/`).
  *
  * @example
  * const { width, height } = useWindowSize()

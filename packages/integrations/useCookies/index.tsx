@@ -73,9 +73,6 @@ export interface CreateCookiesRequest {
 }
 
 /**
- * React port of VueUse's `createCookies` — creates a `universal-cookie` instance from a request
- * (default is `window.document.cookie`) and returns a {@link useCookies} bound to that instance.
- *
  * Map from @vueuse/integrations `createCookies`
  * (`source/vueuse/packages/integrations/useCookies/index.ts`).
  *
@@ -103,22 +100,8 @@ export function createCookies(
 }
 
 /**
- * React port of VueUse's `useCookies` — reactive methods to work with cookies (use {@link
- * createCookies} instead if you are using SSR).
- *
  * Map from @vueuse/integrations `useCookies`
  * (`source/vueuse/packages/integrations/useCookies/index.ts`).
- *
- * React divergences:
- * - upstream returns a **method object** (`get`, `getAll`, `set`, `remove`,
- *   `addChangeListener`, `removeChangeListener`), not a piece of writable
- *   state, so the port returns the same object instead of a tuple (§2B);
- * - upstream's `shallowRef(0)` "touches" counter is a `useState` counter read
- *   in the render body, so a watched cookie change re-renders the component
- *   and the `get`/`getAll` closures from that render observe the new value;
- * - `previousCookies` and the mutable watch list live in refs so they persist across renders;
- * - upstream's `tryOnScopeDispose` maps to a `useEffect` cleanup that removes
- *   the change listener.
  *
  * @param dependencies - array of watching cookie's names. Pass empty array if don't want to watch cookies changes.
  * @param options

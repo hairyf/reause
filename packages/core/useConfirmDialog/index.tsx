@@ -54,33 +54,7 @@ export interface UseConfirmDialogReturn<RevealData, ConfirmData, CancelData> {
 
 /**
  * Map from @vueuse/core `useConfirmDialog`
- * (`source/vueuse/packages/core/useConfirmDialog/`). Creates event hooks to
- * support modals and confirmation dialog chains.
- *
- * The hook exposes `isRevealed` (boolean state), the `reveal` / `confirm` / `cancel` controls and
- * three listener registration functions (`onReveal` / `onConfirm` / `onCancel`) following the
- * `useListener` protocol.
- *
- * React divergences:
- * - upstream's `isRevealed` computed ref becomes plain boolean state; the
- *   optional external `shallowRef` parameter becomes a React ref object
- *   (`RefObject<boolean>`) that the controls keep in sync when provided.
- *   Upstream's computed reads `revealed.value` live, so an out-of-band write
- *   is visible immediately; React state re-syncs on the next render only
- *   (render-time comparison), so a write with no subsequent re-render cannot
- *   be observed;
- * - `reveal()` still returns a promise that resolves with `{ data,
- *   isCanceled }` when `confirm()` / `cancel()` is called;
- * - upstream's `createEventHook()` on* members become stable subscribe
- *   functions with the `(fn) => { off }` shape, managed with Sets, so they
- *   are identity-stable across renders and compatible with the `useListener`
- *   protocol;
- * - listener return values are collected with `Promise.all`, mirroring
- *   upstream `createEventHook().trigger()`: a rejected async listener surfaces
- *   as an unhandled rejection on the discarded aggregate promise, while a
- *   synchronous throw propagates to the `reveal()` / `confirm()` / `cancel()`
- *   caller in both implementations;
- * - the event subscriptions.
+ * (`source/vueuse/packages/core/useConfirmDialog/`).
  *
  * @example
  * const { isRevealed, reveal, confirm, cancel, onReveal, onConfirm, onCancel } = useConfirmDialog()

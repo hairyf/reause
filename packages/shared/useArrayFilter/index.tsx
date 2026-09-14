@@ -1,13 +1,7 @@
 export type UseArrayFilterReturn<T = any> = T[]
 
 /**
- * Reactive `Array.filter`
- *
- * Map from @vueuse/shared `useArrayFilter`
- *
- * Mapping: Vue's `computed` → recompute per render and return a plain array (no `.value`) over the
- * plain `list` array the caller passes. Pass a `useState` array directly — the filtered result
- * updates on the next render.
+ * Map from @vueuse/shared `useArrayFilter`.
  *
  * @see https://vueuse.org/useArrayFilter
  *

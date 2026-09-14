@@ -50,28 +50,8 @@ export function useBase64<T extends Map<string, unknown>>(target: T, options?: U
 export function useBase64<T extends Set<unknown>>(target: T, options?: UseBase64ObjectOptions<T>): UseBase64Return
 export function useBase64<T>(target: T[], options?: UseBase64ObjectOptions<T[]>): UseBase64Return
 /**
- * Reactive base64 transforming. Supports plain text, blobs/files, buffers, canvas, images, and
- * JSON-serializable objects/maps/sets.
- *
  * Map from @vueuse/core `useBase64`
- * (`source/vueuse/packages/core/useBase64/`), which returns an object
- * mirroring the upstream `{ base64, promise, execute }` members. The target is transformed to a
- * base64 data URL automatically and the result lands in `base64`; `promise` holds the promise of
- * the current transformation and `execute` re-triggers it manually.
- *
- * React divergences:
- * - the Vue `ShallowRef<string>` returns (`base64`, `promise`) become plain
- *   state values read directly — `promise` is `undefined` until the first
- *   transformation starts;
- * - upstream watches the source (`watch(target, execute, { immediate: true
- *   })` for reactive sources, a single setup call for plain values); here the
- *   source is a plain value and a `useEffect` keyed on
- *   the resolved value re-runs the transformation whenever it changes across
- *   renders;
- * - `execute` is a stable callback that always transforms the latest target
- *   and latest options. It is SSR-safe like upstream: it no-ops (resolving
- *   `undefined`) outside a browser, and the automatic first transform only
- *   runs in a mount effect, so nothing touches the DOM during render.
+ * (`source/vueuse/packages/core/useBase64/`).
  *
  * @see https://vueuse.org/core/useBase64/
  *

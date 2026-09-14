@@ -60,20 +60,7 @@ function resolveScreenOrientation(customWindow?: Window): { win: Window, screenO
 
 /**
  * Map from @vueuse/core `useScreenOrientation`
- * (`source/vueuse/packages/core/useScreenOrientation/`). Reactive Screen
- * Orientation API — the current orientation type and angle, plus lock/unlock controls.
- *
- * React divergences:
- * - the Vue `orientation`/`angle` shallowRefs become plain state values;
- * - `isSupported` (upstream `useSupported`) starts `false` and is computed in
- *   the mount effect, so nothing touches `screen` during render (SSR-safe);
- * - the initial `screen.orientation` read happens in the same mount effect
- *   (upstream reads it during setup);
- * - the window `orientationchange` listener (upstream `useEventListener`, passive) lives in a
- * self-contained `useEffect`;
- * - `lockOrientation`/`unlockOrientation` use the `screen.orientation` instance captured once by
- * that mount effect, mirroring upstream's setup-time capture (gated on `isSupported`): a later
- * replacement or polyfill of `screen.orientation` is ignored and lock rejects `'Not supported'`.
+ * (`source/vueuse/packages/core/useScreenOrientation/`).
  *
  * @example
  * const { isSupported, orientation, angle, lockOrientation, unlockOrientation } = useScreenOrientation()

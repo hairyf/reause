@@ -42,20 +42,8 @@ export interface UseEyeDropperReturn {
 }
 
 /**
- * Reactive [EyeDropper API](https://developer.mozilla.org/en-US/docs/Web/API/EyeDropper_API).
- *
  * Map from @vueuse/core `useEyeDropper`
- * (`source/vueuse/packages/core/useEyeDropper/`), which returns an object
- * mirroring the upstream `{ isSupported, open, sRGBHex }` members. `open` launches the browser's
- * native eye dropper picker, resolves with `{ sRGBHex }` and keeps the `sRGBHex` state fresh.
- *
- * React divergences:
- * - `isSupported` (upstream `useSupported`) becomes a plain boolean that
- *   starts `false` and is computed in the mount effect, so nothing touches
- *   `window` during render (SSR-safe);
- * - `open` is a stable callback that checks the mount-resolved support flag
- *   at call time (upstream reads the `isSupported` computed) and resolves
- *   `undefined` when the API is unavailable.
+ * (`source/vueuse/packages/core/useEyeDropper/`).
  *
  * @see https://vueuse.org/core/useEyeDropper/
  * @param options

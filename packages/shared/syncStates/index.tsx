@@ -36,23 +36,8 @@ export interface SyncStatesOptions {
 const neverObserved = Symbol('reause.syncStates.neverObserved')
 
 /**
- * Keep target state(s) in sync with a source value — React port of VueUse's `syncRefs`.
- *
  * Map from @vueuse/shared `syncRefs`
- * (`source/vueuse/packages/shared/syncRefs/`), renamed `syncStates` for the
- * React port: the source is a `State<T>` — a plain value, getter, `[value, setter]` tuple or `{
- * value, onChange }` pair — resolved with `toValue`; the targets are writable `State<T>` sources
- * written back through their writable form (tuple setter / `onChange`); upstream's `flush` / `deep`
- * / `immediate` options are kept for signature compatibility.
- *
- * React Hook adaptation: upstream syncs through Vue's reactive `watch`, and React has no reactive
- * system — so `syncStates` is implemented as a hook (call it unconditionally at the top of a
- * component). Internally a `useEffect` that runs after every commit compares the resolved source
- * value with the last observed one via `Object.is`; a change is written through to all targets.
- * Because the observation happens post-commit, the caller must re-render (e.g. `setState`) for a
- * new source value to reach the targets — a bare mutation outside of React is never observed (see
- * the maintainer notes on reause #40 / #41). The returned `stop` function tears the synchronization
- * down; the effect also stops doing any work once the owning component unmounts.
+ * (`source/vueuse/packages/shared/syncRefs/`).
  *
  * @example
  * function Form() {

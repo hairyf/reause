@@ -43,29 +43,7 @@ export type UseFocusReturn = readonly [
 
 /**
  * Map from @vueuse/core `useFocus`
- * (`source/vueuse/packages/core/useFocus/`). Reactive utility to track or set
- * the focus state of a DOM element. Listens to the target's `focus` / `blur` events and exposes the
- * state as the first element of a React tuple; calling `setFocused(true)` / `setFocused(false)`
- * focuses / blurs the target. As upstream, the setter itself only calls `focus()` / `blur()` on the
- * element — the state is then updated by the `focus` / `blur` events.
- *
- * React divergences:
- * - upstream returns `{ focused: WritableComputedRef<boolean> }`, so consumers
- *   read and write `focused.value`; reause returns the React tuple
- *   `[isFocused, setFocused]` (array destructuring, no `.value`) — read the
- *   state from element 0 and focus / blur the target with element 1
- *   (`Dispatch<SetStateAction<boolean>>`, so the functional updater
- *   `setFocused(prev => !prev)` is supported);
- * - upstream composes `useEventListener` + `computed` + `watch`; here the
- *   `focus` / `blur` listeners live in a `useEffect` that re-attaches when
- *   the resolved target changes, and upstream's immediate
- *   `watch(targetElement, …)` that applies `initialValue` becomes a mount /
- *   target-change effect. Options are read through latest-value refs, so the
- *   listeners and the setter stay stable and never re-subscribe (upstream
- *   reads the options once in setup);
- * - the target is during render (a React ref object (`RefObject`) holding the element), so SSR
- * renders the default `false` state without touching the DOM; a plain element, a getter and a
- * callback ref are not accepted.
+ * (`source/vueuse/packages/core/useFocus/`).
  *
  * @example
  * const input = useRef<HTMLInputElement>(null)

@@ -96,21 +96,7 @@ function createWorkerBlobUrl(fn: (...args: any[]) => any, deps: string[], localD
 
 /**
  * Map from @vueuse/core `useWebWorkerFn`
- * (`source/vueuse/packages/core/useWebWorkerFn/`), which runs an expensive
- * function inside a dedicated Web Worker spawned from a blob URL, so the UI is not blocked. The
- * worker code is built by stringifying `fn` and the helper `lib/` functions (`createWorkerBlobUrl`,
- * `depsParser`, `jobRunner`), which are inlined below.
- *
- * React divergences:
- * - a worker is spawned per `workerFn()` call and terminated when the promise settles or
- * `workerTerminate()` runs, and the mount `useEffect` cleanup terminates any still-running worker
- * on unmount — including the `workerStatus` being reset to `PENDING`;
- * - the "one instance at a time" guard reads a synchronous ref mirror of the
- *   status (React state updates are async), so two back-to-back `workerFn()`
- *   calls cannot spawn overlapping workers;
- * - `workerFn` throws synchronously when no `window` is available (SSR),
- *   mirroring upstream, which reaches `new Worker` / `new Blob` inside
- *   `workerFn` and throws there too.
+ * (`source/vueuse/packages/core/useWebWorkerFn/`).
  *
  * @example
  * const { workerFn, workerStatus, workerTerminate } = useWebWorkerFn(() => {

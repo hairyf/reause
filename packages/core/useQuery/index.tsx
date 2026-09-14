@@ -57,35 +57,8 @@ export function useQuery<T extends RouteQueryValueRaw = string, K = T>(
 ): [K, (value: K) => void]
 
 /**
- * Shorthand for a reactive query parameter in `window.location.search`.
- *
  * Map from @vueuse/router `useRouteQuery`
- * (`source/vueuse/packages/router/useRouteQuery/`), which proxies
- * `route.query[name]` through vue-router. Here `window.location.search` is the single source of
- * truth, so the router dependency is dropped entirely: the hook reads and writes `window.location`
- * / `history` directly.
- *
- * Reading:
- *
- * - repeated occurrences a `string[]`, and an absent key falls back to `defaultValue`. The
- * `transformGet` (default identity) applies to whichever one wins.
- * - Writing, when it strictly equals `defaultValue`, the key is removed from the URL instead of
- * being written (upstream drops keys equal to the default).
- *
- * 1. The `route` / `router` options are gone — `window.location.search` and `history` are the
- * driver, and `mode` picks `history.replaceState` (default, mirroring upstream's `'replace'`) or
- * `history.pushState`. 2. The value is React state rather than a `customRef`, so it settles on the
- * next render after `setValue` instead of upstream's synchronous `trigger()`; the URL write itself
- * is still synchronous. 3. Neither `replaceState` nor `pushState` fires a `hashchange`/`popstate`
- * event, so the setter refreshes its own state. `popstate` (back/forward) and `hashchange` (manual
- * edits, anchor navigation) are subscribed in an effect and removed on unmount. `pushState` by
- * other code fires neither, matching how `useHash` handles it. 4. Upstream batches multi-key writes
- * per tick through a queue and pushes a single router navigation; here each `setValue` performs its
- * own history update immediately. 5. There is no multi-page router context to resolve — the hook is
- * scoped to the current `window.location` only. 6. SSR-safe: render never touches `window` (state
- * starts at `defaultValue`), the URL is first read in a mount effect, and `setValue` is a no-op
- * without a `window`. 7. A `defaultValue` that changes across renders is re-synced while the key is
- * absent from the URL (the React equivalent of upstream's reactive `toValue(defaultValue)`).
+ * (`source/vueuse/packages/router/useRouteQuery/`).
  *
  * @see https://vueuse.org/router/useRouteQuery/
  *

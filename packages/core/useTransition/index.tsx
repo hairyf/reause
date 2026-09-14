@@ -150,30 +150,8 @@ export function useTransition(source: number, options?: UseTransitionOptions): n
 export function useTransition(source: readonly number[], options?: UseTransitionOptions): number[]
 
 /**
- * Follow value with a transition — React port of VueUse's `useTransition`.
- *
  * Map from @vueuse/core `useTransition`
- * (`source/vueuse/packages/core/useTransition/`): a rAF-driven tween that
- * interpolates the output between source changes. Every source change starts a transition from the
- * currently displayed values, and a newer change cancels the pending one — a generation counter
- * invalidates the previous rAF loop, mirroring upstream's `currentId` guard.
- *
- * React divergences:
- * - the returned `ComputedRef` becomes a plain value (`number` for a scalar
- *   source, `number[]` for an array source) backed by `useState`; the calling
- *   component re-renders on every animation frame while a transition runs;
- * - the source is a plain number or a `number[]` (upstream's
- *   `MaybeRefOrGetter<number>` / `MaybeRefOrGetter<number[]>` overloads map to the same
- *   forms);
- * - options are plain values read when a transition starts — upstream keeps
- *   `duration` / `easing` / `delay` / `disabled` reactive via `MaybeRefOrGetter`,
- *   which has no React equivalent;
- * - the deprecated `transition` option, the deprecated `executeTransition`
- *   function and the `interpolation` option are not ported: sources are
- *   numeric, so the default lerp interpolation covers every case;
- * - NOTE: this hook tweens values, it is unrelated to React 19's built-in
- *   `React.useTransition` (concurrent rendering API). The name matches
- *   upstream VueUse, the behavior does not overlap — mind the import source.
+ * (`source/vueuse/packages/core/useTransition/`).
  *
  * @example
  * const [target, setTarget] = useState(0)

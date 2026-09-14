@@ -46,27 +46,7 @@ export interface UseUserMediaReturn {
 
 /**
  * Map from @vueuse/core `useUserMedia`
- * (`source/vueuse/packages/core/useUserMedia/`), which wraps
- * `mediaDevices.getUserMedia` into a stream ref with `start`/`stop`/ `restart` controls and an
- * `enabled` flag whose watcher auto-starts and auto-stops the stream.
- *
- * React divergences:
- * - the Vue `stream`/`enabled`/`isSupported` refs become plain state values;
- *   `start`/`stop`/`restart` are stable callbacks reading the latest state
- *   and options through refs;
- * - the writable `enabled` ref becomes state mutated through `start`/`stop`;
- *   `autoSwitch` and `constraints` are read-only snapshots of the latest
- *   options (re-render with new options to change them);
- * - the supported check runs in a mount effect, so `isSupported` stays
- *   `false` during render and on the server (SSR-safe);
- * - upstream deep-watches its `constraints` ref: here a changed
- *   `constraints` option (compared structurally, since React hands the hook
- *   new option objects) recreates the stream while streaming when
- *   `autoSwitch` is on;
- * - concurrent `start()` calls share one pending acquisition (React effects
- *   can re-run; upstream's watcher fires once), while `stop()`/`restart()`
- *   drop it so a late resolve cannot re-enable a stream that was stopped;
- * - `tryOnScopeDispose(stop)` becomes an unmount cleanup.
+ * (`source/vueuse/packages/core/useUserMedia/`).
  *
  * @example
  * const { stream, start } = useUserMedia()

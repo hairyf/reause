@@ -30,22 +30,7 @@ export interface UseDeviceOrientationReturn {
 
 /**
  * Map from @vueuse/core `useDeviceOrientation`
- * (`source/vueuse/packages/core/useDeviceOrientation/`). Reactive
- * [DeviceOrientationEvent](https://developer.mozilla.org/en-US/docs/Web/API/DeviceOrientationEvent)
- * — information about the physical orientation of the device.
- *
- * React divergences:
- * - the Vue (shallow) refs returned by upstream become plain values read off
- *   the result object (no `.value`): `isAbsolute` holds a
- *   `boolean | null` state starting at `false` (upstream's `shallowRef(false)`;
- *   events may still report `null`), and `alpha` / `beta` / `gamma` hold
- *   `number | null` states starting `null` until the first
- *   `deviceorientation` event;
- * - `isSupported`, gated by the upstream capability probe `'DeviceOrientationEvent' in window` — on
- * browsers without the API (or when a custom `window` lacks it) the listener is never attached and
- * `isSupported` stays `false`. Nothing touches `window` during render (SSR-safe), and a falsy
- * custom `window` (e.g. `{ window: null }` in tests) is treated as "no window" — upstream's
- * destructuring default only replaces `undefined`.
+ * (`source/vueuse/packages/core/useDeviceOrientation/`).
  *
  * @example
  * const { isSupported, isAbsolute, alpha, beta, gamma } = useDeviceOrientation()

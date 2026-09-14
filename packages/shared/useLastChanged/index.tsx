@@ -16,8 +16,7 @@ export interface UseLastChangedOptions<InitialValue extends number | null | unde
 export type UseLastChangedReturn = number | null
 
 /**
- * Map from @vueuse/shared `useLastChanged`
- * Records the timestamp of the last change
+ * Map from @vueuse/shared `useLastChanged`.
  *
  * @see https://vueuse.org/shared/useLastChanged
  */

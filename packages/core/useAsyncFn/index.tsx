@@ -98,54 +98,8 @@ function depsEqual(prev: DependencyList, next: DependencyList, deep: boolean): b
 }
 
 /**
- * React hook that returns state and a callback for an `async` function or a function that returns a
- * promise.
- *
  * Map from react-use `useAsyncFn`
- * (`source/react-use/src/useAsyncFn.ts`, 67 LOC; the `PromiseType` /
- * `FunctionReturningPromise` helpers come from
- * `source/react-use/src/misc/types.ts`, and the upstream docs page is
- * `docs/useAsyncFn.md`). Mirrored 1:1: the positional signature (`fn`, `deps`, `initialState`), the
- * `[state, callback]` tuple and the `AsyncState` / `AsyncFnReturn` types are upstream's, and
- * `callback` is memoised per `deps` (upstream passes `deps` straight to `useCallback`).
- *
- * This hook is the **imperative** half of the async trio, not a variant of the other two: it
- * drives* an async function and exposes that call's state machine. The VueUse-derived `useAsync`
- * is a derived value re-evaluated from its inputs, and `useAsyncState` is an `execute()` shell
- * around a promise; both stay `execute()`-based and separate. `useAsyncFn` is kept as the react-use
- * mirror rather than folded into either, so react-use users get the API they know.
- *
- * Invoking `callback(...)`:
- *
- * - flips the state to `{...prev, loading: true }` (only when it is not already loading, upstream's
- * guard) and returns the **raw promise** — the result of `fn(...args)`, so callers can `await` it;
- * - on resolution stores `{ value, loading: false }` and resolves with
- *   `value`;
- * - on rejection stores `{ error, loading: false }` and **resolves with the
- *   error** instead of rejecting (`return error` from the rejection handler is
- *   upstream's deliberate behaviour, kept here). `await callback()` therefore
- *   never throws; read `state.error` to detect failures;
- * - only the newest call may write state: a monotonically increasing
- *   `lastCallId` ref discards the response of any call superseded by a later
- *   one, so a slow call #1 that resolves after call #2 cannot overwrite call
- *   #2's result. The write is additionally gated on the mount check.
- *
- * Mount guard: upstream uses react-use's `useMountedState()`, which returns a getter reading a ref
- * that flips to `false` on unmount. reause uses **`useMounted` from `@reause/core`** (the VueUse
- * port) and bridges its boolean into the memoised callback through `useLatest` — the callback is
- * created once per `deps` and outlives the render that created it, so reading the boolean directly
- * would freeze it at its first-render value (`false`). `useMounted` never flips back on unmount, so
- * the guard protects against callbacks invoked before the mount effect has run, while the
- * `lastCallId` ref is what actually stops a stale response from winning. (It is deliberately not
- * the sibling `useUnmountedRef` from this batch — see the PR.)
- *
- * `options.deep` (reause-only, opt-in): `deep: true` compares `deps` structurally, so an
- * equal-but-new reference (a freshly built array or object) no longer re-memoises the callback. The
- * default remains reference-based, i.e. upstream behaviour.
- *
- * `fn` itself is captured when the callback is created, exactly like upstream's `useCallback(…,
- * deps)` closure: if the function identity changes without the listed `deps` changing, list it in
- * `deps` or the callback keeps calling the older one.
+ * (`source/react-use/src/useAsyncFn.ts`).
  *
  * @example
  * const [state, doFetch] = useAsyncFn(async (id: string) => {

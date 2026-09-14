@@ -64,24 +64,7 @@ const UNITS: TimeAgoUnit[] = [
 
 /**
  * Map from @vueuse/core `useTimeAgoIntl`
- * (`source/vueuse/packages/core/useTimeAgoIntl/`). A wrapper for the
- * browser-native `Intl.RelativeTimeFormat` API — reactive time ago with i18n supported.
- *
- * React divergences:
- * - upstream returns `ComputedRef<string>`, or `{ timeAgoIntl, parts,
- *   pause, resume, isActive }` with `controls: true`; this port returns a
- *   **plain string** recomputed on every render (house pattern, see
- *   `useDateFormat`), and the `controls: true` variant is intentionally not
- *   ported, consistent with `useTimeAgo` — raw
- *   `Intl.RelativeTimeFormatPart[]` access is available through
- *   `formatTimeAgoIntlParts`. A `controls: true` passed by JS callers is a
- *   no-op (the option is not read).
- * - the refresh timer lives in the house `useNow`, driven by a `useIntervalFn` scheduler that, the
- * interval keeps the result fresh in between.
- * - upstream `ConfigurableScheduler` → `updateInterval` option (default `30_000` ms, matching
- * upstream's default `useIntervalFn(cb, 30_000)`).
- * - upstream `MaybeRefOrGetter<Date | number | string>` → plain
- *   `Date | number | string`.
+ * (`source/vueuse/packages/core/useTimeAgoIntl/`).
  *
  * @example
  * const timeAgoIntl = useTimeAgoIntl(new Date(2021, 0, 1), { locale: 'en' })

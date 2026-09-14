@@ -53,42 +53,8 @@ export interface UseWatchExtractedObservableReturn {
 const EMPTY_DEPS: unknown[] = []
 
 /**
- * Watch the values of an RxJS [`Observable`](https://rxjs.dev/guide/observable) extracted from a
- * source value — React port of VueUse's `watchExtractedObservable`.
- *
  * Map from @vueuse/rxjs `watchExtractedObservable`
- * (`source/vueuse/packages/rxjs/watchExtractedObservable/`): whenever the
- * resolved source value changes, the previous subscription is unsubscribed and `extractor` derives
- * a new `Observable`, whose emissions are forwarded to `callback`. Automatically unsubscribes when
- * the source changes and when the component unmounts.
- *
- * React adaptation (upstream's Vue reactivity graph is replaced):
- *
- * - `value` is a read-only value source and takes a plain `Value | null | undefined`. There is no
- * reactive graph: the effect re-runs when the value's identity changes **or** when `options.deps`
- * change (upstream re-runs whenever the tracked source mutates). A source object mutated **in
- * place** therefore does not re-trigger — pass a new identity or list the mutation inputs in
- * `deps`. `deps` is the React substitute for Vue's reactive tracking, the same convention as
- * `useAsync`'s `options.deps` (`packages/core/useAsync/index.tsx`).
- * - The extractor is `(value, onCleanup) => Observable<E>`: upstream also
- *   passes Vue's `oldValue` as the second argument, which has no React
- *   equivalent (React keeps no previous-value tracking) and is dropped.
- * - Upstream returns a `WatchHandle` function; the React hook returns
- *   `{ stop }` (§2B object return — no state-like writable pair). `stop` is a
- *   stable `useCallback`, idempotent, and — like the `WatchHandle` — permanent:
- *   it tears down the current subscription, runs the pending `onCleanup`
- *   callbacks, and prevents later `deps` / source changes from subscribing
- *   again.
- * - `onCleanup` parity: callbacks registered through the `onCleanup` argument
- *   are collected per run and invoked before the next subscription is created
- *   (upstream's Vue `watch` runs the previous cleanup before the watcher body
- *   unsubscribes) and on unmount / `stop()`. They run before the subscription
- *   is unsubscribed, mirroring upstream's ordering.
- * - A `null` / `undefined` resolved value subscribes to nothing and drops any
- *   previous subscription (upstream parity).
- * - `extractor`, `callback`, `onError` and `onComplete` are read through
- *   latest-value refs, so inline identities never re-subscribe; only the
- *   resolved source value and `deps` do.
+ * (`source/vueuse/packages/rxjs/watchExtractedObservable/`).
  *
  * @see https://vueuse.org/watchExtractedObservable/
  * @example

@@ -68,31 +68,8 @@ export interface UseClipboardItemsReturn<Optional> {
 }
 
 /**
- * Reactive [Clipboard API](https://developer.mozilla.org/en-US/docs/Web/API/Clipboard_API).
- *
  * Map from @vueuse/core `useClipboardItems`
- * (`source/vueuse/packages/core/useClipboardItems/`). Provides the ability
- * to respond to clipboard commands (cut, copy and paste) as well as to asynchronously read from and
- * write to the system clipboard. Access to the contents of the clipboard is gated behind the
- * [Permissions API](https://developer.mozilla.org/en-US/docs/Web/API/Permissions_API).
- *
- * React divergences:
- * - the Vue `content` / `copied` shallow refs become plain state values read
- *   directly, and `isSupported` (upstream `useSupported` computed) becomes a
- *   plain boolean resolved once in a mount effect — nothing touches
- *   `window` or `navigator` during render, so SSR renders the defaults;
- * - upstream binds the copy/cut listeners once at setup (after the support
- *   check passes); here a self-contained effect (the pattern of
- *   `useMagicKeys` / `useNetwork`) binds `copy` / `cut` on `window` while
- *   `read` is enabled and the Clipboard API is supported, so toggling `read`
- *   after mount re-binds or removes them (strictly more reactive than
- *   upstream's freeze-in), and removes them on unmount;
- * - `copy` is a stable callback that resolves the `source` option at call
- *   time (a plain value; upstream accepts a ref), writes no-op when
- *   the API is unsupported or no value is available, and sets `content` +
- *   `copied` after a successful write;
- * - the `copiedDuring` reset timer composes `@reause/shared` `useTimeoutFn` with `immediate:
- * false`, and the pending timer.
+ * (`source/vueuse/packages/core/useClipboardItems/`).
  *
  * @example
  * const source = [

@@ -73,26 +73,8 @@ function supportsVibration(nav: Navigator | undefined): nav is Navigator {
 }
 
 /**
- * Reactive vibrate — React port of VueUse's `useVibrate`.
- *
  * Map from @vueuse/core `useVibrate`
- * (`source/vueuse/packages/core/useVibrate/`). Reactive
- * [Vibration API](https://developer.mozilla.org/en-US/docs/Web/API/Vibration_API): start the device
- * vibration with a pattern (alternating vibrate/pause durations in ms) and stop it manually.
- *
- * React divergences:
- * - the Vue `isSupported` ref becomes a plain boolean state, resolved in a
- *   mount effect — `false` during render and on the server (SSR-safe), with
- *   no `navigator` access before mount;
- * - upstream's `scheduler` option (a `useIntervalFn` factory returning a `Pausable`) is ported
- * inline as the upstream `interval` option, driven by a self-contained `useEffect` + `setInterval`
- * (reause core has no `useIntervalFn` yet): the loop is inert until `intervalControls.resume()` is
- * called — a bare `vibrate()` is one-shot like upstream — re-triggers the pattern every `interval`
- * ms, and is cancelled by `intervalControls.pause()`, `stop()` or unmount; `intervalControls`
- * mirrors upstream's `intervalControls?: Pausable` shape with `{ pause, resume, isActive }`;
- * - `MaybeRefOrGetter` reactivity becomes plain values: options are read at
- *   call time, so changing `pattern` affects the next `vibrate()` call or
- *   loop tick, and changing `interval` restarts the running loop.
+ * (`source/vueuse/packages/core/useVibrate/`).
  *
  * @see https://vueuse.org/useVibrate
  * @see https://developer.mozilla.org/en-US/docs/Web/API/Vibration_API

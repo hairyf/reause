@@ -89,25 +89,8 @@ export interface UseIpcRendererReturn {
 }
 
 /**
- * Get the `ipcRenderer` module with all APIs.
- *
  * Map from @vueuse/electron `useIpcRenderer`
  * (`source/vueuse/packages/electron/useIpcRenderer/`).
- *
- * React deviations:
- * - upstream implements `on` by calling the `useIpcRendererOn` composable
- *   inside the method. Hooks cannot be called from callbacks, so `on`
- *   registers directly and tracks `{ ipc, channel, listener }` pairs; a mount
- *   effect's cleanup removes every tracked listener from **its captured
- *   instance** on unmount (the same auto-cleanup guarantee upstream gets from
- *   the effect scope). Like upstream, listeners are not re-registered when the
- *   instance changes — each stays on the instance it was registered with;
- * - upstream `invoke` returns a `ShallowRef<T | null>`; this port returns the
- *   raw `Promise<T>`. Declarative async state is the job of the
- *   `useIpcRendererInvoke` hook — a method on a returned object cannot own
- *   component state;
- * - upstream `sendSync` wraps the synchronous return in a `ShallowRef`; this
- *   port returns the value `T` directly.
  *
  * @see https://www.electronjs.org/docs/api/ipc-renderer#ipcrenderersendtohostchannel-args
  * @see https://vueuse.org/useIpcRenderer

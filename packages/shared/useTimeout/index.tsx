@@ -45,13 +45,7 @@ export interface UseTimeoutReturn {
 }
 
 /**
- * Map from @vueuse/shared `useTimeout`
- * Mapping: upstream `useTimeout` wraps `useTimeoutFn` and derives `ready` as `!isPending`; since
- * `useTimeoutFn` is mapped in its own module, this port inlines the timer logic to stay
- * self-contained — `ref` → `useState` for `isPending`, `ready` derived as `!isPending` like
- * upstream, the setup-time `start()` (immediate) becomes an empty-dependency `useEffect` on mount,
- * and `tryOnScopeDispose(stop)` becomes the effect cleanup. `interval` is a plain number; `start` /
- * `stop` are stable `useCallback`s.
+ * Map from @vueuse/shared `useTimeout`.
  *
  * @example
  * const ready = useTimeout(1000) // boolean, becomes true after 1s

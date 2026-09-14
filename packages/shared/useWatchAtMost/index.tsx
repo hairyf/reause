@@ -40,27 +40,7 @@ export function useWatchAtMost<T>(source: T, callback: UseWatchCallback<T>, opti
 
 // implementation
 /**
- * React port of VueUse's `watchAtMost` — `watch` with the number of times triggered.
- *
- * Map from @vueuse/shared `watchAtMost`
- * Mapping: built on the house `useWatch`. The callback is wrapped with a fire counter: each
- * invocation increments the `count` state (exposed in the return so components re-render), and once
- * the limit — `options.count` — is reached the wrapper marks the watcher as stopped so further
- * source changes are ignored. A manual `stop()` has the same effect before the limit.
- *
- * React divergences:
- * - upstream stops the underlying watcher via `stop()` scheduled on
- *   `nextTick`; this port keeps the effect registered but the wrapped callback
- *   becomes a no-op — observable behavior is identical (the callback fires at
- *   most `count` times).
- * - `pause` / `resume` are ported as a skip flag on the wrapped callback — React has no watcher to
- * detach, but the observable behavior matches the Pausable controls.
- * - upstream's `count` return is a shallow ref; here it is React state so
- *   reads re-render.
- * - upstream's `WatchWithFilterOptions` members beyond `immediate` (`deep`,
- *   `flush`, `onTrack`, `onTrigger`) are not accepted — they are not
- *   expressible in React (no reactive graph, no configurable commit, no
- *   reactivity bookkeeping), and the option type rejects them.
+ * Map from @vueuse/shared `watchAtMost`.
  *
  * @example
  * ```tsx

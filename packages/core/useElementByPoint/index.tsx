@@ -63,30 +63,8 @@ export interface UseElementByPointReturn<Multiple extends boolean = false> {
 type ElementByPointElement<M extends boolean> = M extends true ? HTMLElement[] : HTMLElement | null
 
 /**
- * Reactive element by point.
- *
  * Map from @vueuse/core `useElementByPoint`
- * (`source/vueuse/packages/core/useElementByPoint/`), which hit-tests the
- * element under the `x` / `y` point with `document.elementFromPoint` (or
- * `document.elementsFromPoint` when `multiple` is enabled) on every scheduler tick — upstream
- * default `useRafFn`, so the element follows the coordinates live.
- *
- * React divergences:
- * - the Vue `ComputedRef<boolean>` `isSupported` becomes a plain boolean
- *   probed in an effect after every render (the repo's `useSupported` probe
- *   is one-shot, so it is not reused here) — flipping `multiple` or swapping
- *   `document` re-evaluates support, like upstream's computed; SSR-safe:
- *   `false` during render and until the first effect run;
- * - `x` and `y` are read-only value sources and take plain numbers. They are re-read on every tick
- * through latest-value refs, so e.g. a `useMouse` position updates the hit element without
- * re-running the hook; `multiple` stays a plain `Multiple` (a behavior toggle, not a value source);
- * - the `document` option is inlined and defaults to the global `document` only on the client, so
- * SSR renders never touch the DOM; a document missing `elementFromPoint`/`elementsFromPoint`
- * reports `isSupported: false` and the hit-test degrades to `null`/`[]` instead of throwing;
- * - the `scheduler` option is called during render to compose the update loop
- *   (Rules of Hooks) and defaults to `useRafFn`, mirroring upstream; its
- *   `Pausable` return type is imported from `useRafFn` (upstream sources it
- *   from `@vueuse/shared` — `useRafFn` re-exports the shared type).
+ * (`source/vueuse/packages/core/useElementByPoint/`).
  *
  * @see https://vueuse.org/core/useElementByPoint/
  * @param options - UseElementByPointOptions

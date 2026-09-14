@@ -2,22 +2,8 @@ import type { ConfigurableWindow } from '@reause/shared'
 import { useEffect, useState } from 'react'
 
 /**
- * Reactive Navigator Languages.
- *
  * Map from @vueuse/core `usePreferredLanguages`
- * (`source/vueuse/packages/core/usePreferredLanguages/`), which returns a
- * shallow ref of `navigator.languages` kept fresh by a `languagechange` listener. Reactive
- * preferred languages as a plain `readonly string[]`.
- *
- * React divergences:
- * - the initial `navigator.languages` sync happens in the mount effect
- *   instead of during setup, so SSR renders the upstream `['en']` fallback
- *   without touching `navigator`;
- * - `window` is a read-only option (upstream `ConfigurableWindow`) that
- *   defaults to the global `window` — substitution happens only for
- *   `undefined`, so an explicit `window: null` keeps the hook at the
- *   `['en']` fallback (upstream returns `shallowRef(['en'])` when there is
- *   no window).
+ * (`source/vueuse/packages/core/usePreferredLanguages/`).
  *
  * @see https://vueuse.org/core/usePreferredLanguages/
  * @param options

@@ -248,35 +248,7 @@ function isPointerNearEdge(
 
 /**
  * Map from @vueuse/core `useDraggable`
- * (`source/vueuse/packages/core/useDraggable/`), which makes an element
- * draggable with the pointer: a `pointerdown` on the `handle` (default the `target`) starts the
- * drag, `pointermove` / `pointerup` / `pointercancel` on the `draggingElement` (default `window`)
- * move and end it, and `x` / `y` track the element's position. The drag position is clamped to the
- * `containerElement` bounds when one is given, and `autoScroll` scrolls a scrollable container
- * while the pointer is near its edges.
- *
- * - the Vue refs returned by upstream (`x`, `y`, `position`, `isDragging`,
- *   `style`) become a plain object backed by React state: `x` / `y` are
- *   numbers, `position` the `{ x, y }` pair, `isDragging` a boolean and
- *   `style` a ready-to-use CSS string (`left: ?px; top: ?px;`); `x` and `y`
- *   are writable through the paired `setX` / `setY` setters (the React
- *   equivalent of assigning upstream's writable refs), which update the
- *   returned state and the internal drag position together;
- * - a self-contained mount `useEffect` that re-subscribes when the resolved `handle` /
- * `draggingElement` or the `capture` / `preventDefault` flags change, and removes all listeners on
- * unmount;
- * - `target`, `handle`, `draggingElement` and `containerElement` accept a React ref object
- * (`RefObject`) holding the element (e.g. the result of `useRef`). They are re-resolved on every
- * render and the listeners re-bind when the resolved element changes; a plain element, a getter and
- * a callback ref are not accepted;
- * - every remaining option (`disabled`, `buttons`, `exact`, `axis`,
- *   `restrictInView`, `autoScroll`, `onStart` / `onMove` / `onEnd`, …) is
- *   read through a latest-value ref, so the stable listeners always see the
- *   newest options without re-subscribing on renders;
- * - a `useEffect` keyed on the position state; the auto-scroll `setInterval` is stopped on drag end
- * and on unmount;
- * - SSR-safe: nothing touches `window` or the DOM during render — only, and `initialValue` seeds
- * the state so SSR renders the same initial position.
+ * (`source/vueuse/packages/core/useDraggable/`).
  *
  * @example
  * const el = useRef<HTMLDivElement>(null)

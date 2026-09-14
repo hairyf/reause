@@ -106,42 +106,8 @@ const inertStorage: StorageLike = {
 }
 
 /**
- * Reactive color mode (dark / light / customs) with auto data persistence — React
- * port of VueUse's `useColorMode`.
- *
  * Map from @vueuse/core `useColorMode`
- * (`source/vueuse/packages/core/useColorMode/`), which composes
- * `useStorage` + `usePreferredDark` and keeps the `html` (or a custom target) element's
- * `class`/attribute in sync with the resolved mode. By default the mode starts `auto` — matching
- * the user's browser preference through `usePreferredDark` — and is persisted under the
- * `storageKey` ('vueuse-color-scheme') in `localStorage` (or a custom `storage`). Writing
- * `dark`/`light`/custom modes persists them and updates the DOM; writing `auto` switches back to
- * following the system preference.
- *
- * React divergences:
- * - the Vue `Ref<T | BasicColorSchema> & { store, system, state }` return
- *   becomes a `useState`-backed tuple `[mode, setMode]` — `mode` is the
- *   resolved mode ('dark' | 'light' | 'auto' with `emitAuto`, or custom
- *   modes), `setMode` writes and persists it. The `store` (raw persisted
- *   value) and `system` (raw system preference) surfaces are not exposed —
- *   the storage key can be read directly and `usePreferredDark` composes, and
- *   `mode` already reflects both through the `auto` translation;
- * - the DOM `class`/attribute update and the initial storage read run in a `useEffect` (upstream's
- * `watch(state..., { immediate: true })` + `tryOnMounted`), so SSR renders the translated
- * `initialValue` and only touches `window`/`document`/storage after mount. `state` changes only
- * re-run the effect when the resolved mode actually changed (upstream's `flush: 'post'` watch);
- * - options are captured once at mount (upstream destructures them once at
- *   setup) — changing them between renders has no effect;
- * - `initialValue` is resolved once at mount; `storageRef` accepts a
- *   ref-like `{ current }` object as the external store, mirroring upstream's
- *   `Ref` — writes go to `storageRef.current` and trigger a re-render through
- *   internal state, and the current value is re-read on every render. When
- *   `storageRef` is provided the persistence layer is skipped entirely (no
- *   localStorage read/write, no storage-event listener); a `null`
- *   `storageRef.current` falls back to `initialMode`, whereas upstream's raw
- *   `store.value` passthrough would expose `null`;
- * - `selector` accepts a string (queried on every update) or a React ref object (`RefObject`)
- * holding the target element (upstream's `ElementRef`).
+ * (`source/vueuse/packages/core/useColorMode/`).
  *
  * @example
  * const [mode, setMode] = useColorMode()

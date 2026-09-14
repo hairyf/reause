@@ -86,41 +86,7 @@ function isReactiveState<T>(source: State<T>): boolean {
 
 /**
  * Map from @vueuse/core `useCloned`
- * (`source/vueuse/packages/core/useCloned/`). Returns a deep clone of the
- * source as React state. The clone follows the source automatically: it re-syncs whenever the
- * resolved source changes, unless `manual` is set.
- *
- * `source` accepts a React `State<T>` — a plain value, a getter (`() => value`), a `[value,
- * setter]` tuple, or a `{ value, onChange }` pair. React refs are not accepted: a ref is a DOM
- * handle, read with `unrefElement` in DOM hooks, never a state source. The tuple and `{ value,
- * onChange }` forms are the React state protocol and have no upstream equivalent (upstream takes
- * `MaybeRefOrGetter<T>` — `T | Ref<T> | (() => T)`); every form is resolved through `toValue`.
- *
- * React divergences:
- * - the return is a React tuple `[cloned, setCloned, { isModified, sync }]`
- *   instead of upstream's object `{ cloned: Ref<T>, isModified, sync }`.
- *   `cloned` is plain state and `setCloned` replaces it with the React
- *   immutable-update protocol — `setCloned(next)` or
- *   `setCloned(prev => next)`. `setCloned` never re-syncs from the source
- *   (use `sync()` for that); it recomputes `isModified` against the last
- *   synced source (`deepEqual` for `deep: true`, `Object.is` for
- *   `deep: false`). The `controls` object keeps a stable identity while
- *   `isModified` and `sync` are unchanged;
- * - `setCloned` is the idiomatic way to edit the clone. In-place mutation of `cloned` is still
- * detected on the next render as a legacy fallback (structural comparison — upstream:
- * `watch(cloned..., { deep: true })`), flipping `isModified` to `true`; `sync()` re-clones from the
- * source and resets it;
- * - the source watcher becomes an effect comparing the resolved source
- *   against an isolated snapshot of the last synced source on every render:
- *   `deep: true` re-syncs on structural change, `deep: false` only when the
- *   reference was replaced. A plain value is re-evaluated every render like
- *   any React argument, so it re-syncs when it changes between renders
- *   (upstream only watches refs — plain values are static there);
- * - `immediate: false` skips the initial sync and `cloned` starts as `{}`
- *   (upstream initializes the clone ref to `{}` and lets the watch fill it);
- * - Vue watch options with no React equivalent are omitted (`flush`,
- *   `onTrack`, `onTrigger`). A getter source should return a stable reference
- *   — with `deep: false` a new object per call re-syncs on every render.
+ * (`source/vueuse/packages/core/useCloned/`).
  *
  * @example
  * const [cloned, setCloned, { isModified, sync }] = useCloned(original)

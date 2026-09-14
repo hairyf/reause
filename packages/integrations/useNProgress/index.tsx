@@ -58,43 +58,7 @@ export interface UseNProgressReturn {
 
 /**
  * Map from @vueuse/integrations `useNProgress`
- * (`source/vueuse/packages/integrations/useNProgress/index.ts`), a reactive
- * wrapper around the [`nprogress`](https://github.com/rstacruz/nprogress) progress bar.
- * `currentProgress` is the hook's **read-only value source** and takes a plain `number | null |
- * undefined`.
- *
- * React divergences:
- * - the writable `WritableComputedRef<boolean>` `isLoading` and the `Ref<number | null |
- * undefined>` `progress` become plain state: `isLoading` is derived (`typeof progress === 'number'
- * && progress < 1`) and written through `setIsLoading`, `progress` is a plain number written
- * through `setProgress`; the object return mirrors upstream's object of refs with every writable
- * value paired with its setter — `{ progress, setProgress, isLoading, setIsLoading, start, done,
- * remove }`;
- * - the setters are React `Dispatch<SetStateAction<...>>`: each accepts a plain
- *   value or a functional updater (`prev => next`), like a `useState` setter;
- * - upstream monkey-patches the module-singleton `nprogress.set` so that its internal `set` calls
- * (`start` → `set(0)`, `done` → `set(1)`) write back into `progress.value`, which is what makes
- * `isLoading` flip. This port never touches the global `nprogress.set`: `setProgress(n)` only sets
- * the state and the progress effect pushes the number into the bar once per render, while `start` /
- * `done` / `setIsLoading` mirror the same write-back by hand (upstream's `start` only calls
- * `set(0)` when the bar was idle, and `done` only calls `set(1)` when it actually progresses) — so
- * `isLoading` flips, without global pollution and safely with concurrent hook instances;
- * - `options` are applied once on mount (`nprogress.configure`), like
- *   upstream's setup-time `if (options) nprogress.configure(options)`; later
- *   `options` changes are not re-applied, matching the upstream setup
- *   semantics;
- * - a provided `currentProgress` is mirrored into the internal state (upstream's
- *   `toRef`): a changed plain number re-syncs between renders, and a write
- *   through `setProgress` / `start` / `done` is only superseded by a genuine
- *   external change. Writes are **not** propagated back to the caller
- *   (upstream's `toRef` writes through to a ref input); the source is
- *   read-only here;
- * - unmount runs `nprogress.remove()`, mirroring upstream's
- *   `tryOnScopeDispose(nprogress.remove)`. `nprogress` is a module singleton,
- *   so unmounting one hook instance removes the shared bar — the same
- *   semantics as upstream.
- *
- * SSR-safe: `nprogress.set` is only called when `isClient` (upstream's `watchEffect` guard).
+ * (`source/vueuse/packages/integrations/useNProgress/index.ts`).
  *
  * @param currentProgress - initial progress percentage (`0..1`); a changed
  *   plain value re-syncs on the next render

@@ -27,34 +27,8 @@ export interface UseElementHoverOptions extends ConfigurableWindow {
 }
 
 /**
- * Reactive element's hover state.
- *
  * Map from @vueuse/core `useElementHover`
- * (`source/vueuse/packages/core/useElementHover/`), which attaches
- * `mouseenter` / `mouseleave` listeners to the target element and reports whether the pointer
- * currently hovers it. `delayEnter` / `delayLeave` defer the state flip with a debounced timer (a
- * new event cancels any pending one), and `triggerOnRemoval` forces the state back to `false` when
- * the element is removed from the DOM.
- *
- * React divergences:
- * - upstream's `ShallowRef<boolean>` return becomes a plain boolean backed by
- *   React state, so the hook reads as `const isHovered = useElementHover(el)`;
- * - `target` accepts a React ref object (`RefObject`) holding the element (the React analog of
- * upstream's `MaybeRefOrGetter`); it is re-resolved on every render and re-bound whenever the
- * resolved element changes, so a `useRef` target that is `null` during the first render still
- * starts tracking once React attaches the element.
- * - the upstream `useEventListener` composition is inlined in a mount `useEffect`, and the
- * `triggerOnRemoval` `onElementRemoval` watcher is inlined as a `MutationObserver` on `document`;
- * listeners and the observer;
- * - all options are read live, uniformly: `delayEnter` / `delayLeave` are
- *   re-read on every event through latest-value refs, and `triggerOnRemoval`
- *   re-binds the removal observer when it changes — upstream freezes all
- *   three during setup (an intentional divergence, kept consistent across
- *   the options);
- * - `window: null` disables tracking entirely (no listeners, the state stays `false`); an omitted
- * `window` falls back to the global `window` only on the client;
- * - SSR-safe: nothing touches `window` or the DOM during render — listeners
- *   attach in the mount effect only and the initial state is always `false`.
+ * (`source/vueuse/packages/core/useElementHover/`).
  *
  * @param target - React ref object (`RefObject`) holding the element whose
  *   hover state is tracked, resolved with the shared `unrefElement`

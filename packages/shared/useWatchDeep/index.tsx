@@ -109,22 +109,7 @@ export function deepClone<T>(value: T): T {
 }
 
 /**
- * React port of VueUse's `watchDeep`watching a value with `{ deep: true }`. Built on top of {@link
- * useWatch}.
- *
- * Map from @vueuse/shared `watchDeep`
- * Mapping: Vue's deep watcher traverses reactive proxies and fires on in-place mutation of any
- * nested property. React state is immutable — a nested change always arrives as a new top-level
- * value — so `useWatchDeep` deep-compares the newly rendered value against the previously rendered
- * one and invokes the callback only when they differ deeply. A re-render that replaces the value
- * with a deep-equal one stays silent (unlike `useWatch`, which fires on every reference change).
- *
- * Documented divergences from Vue's deep watch:
- * - In-place mutation of a value that is never replaced cannot be observed
- *   (React immutability) — replace the state instead; the callback then fires
- *   when the next rendered value deep-differs from the previous one.
- * - Reassigning the state to a deep-equal value does not fire. Vue's ref-based
- *   watch fires on every reassignment of the ref, even when deeply equal.
+ * Map from @vueuse/shared `watchDeep`.
  *
  * @example
  * ```ts

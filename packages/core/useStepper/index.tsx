@@ -50,32 +50,7 @@ export type UseStepperReturn<StepName, Steps, Step> = readonly [
 
 /**
  * Map from @vueuse/core `useStepper`
- * (`source/vueuse/packages/core/useStepper/`). Provides helpers for building
- * a multi-step wizard interface.
- *
- * - the return is a React tuple `[index, setIndex, controls]` instead of
- *   upstream's object, whose `index` is a writable `Ref<number>`: `index` is
- *   plain state and `setIndex` is the React setter
- *   (`Dispatch<SetStateAction<number>>`, so it accepts an updater); every
- *   other member moves onto `controls`, where upstream's readonly
- *   refs/computeds become plain values and its functions become stable
- *   callbacks (identity never changes, always reading the latest `steps`
- *   and `index`);
- * - upstream's `MaybeRefOrGetter<T[]>` steps argument becomes a plain `T[]` — pass a
- *   new array to react to steps changes; only `index` is stateful
- *   (`useState`), every other member (`current`, `next`, `previous`,
- *   `isFirst`, `isLast`, `stepNames`) is recomputed from the latest `steps`
- *   on each render, mirroring upstream's computed refs;
- * - the object-form overload (`useStepper({ a:..., b:... })`) is not ported — the issue maps the
- * array form (`T extends string | number`) only, where step names are the steps themselves;
- * - boundary semantics are upstream's: `goToNext`/`goToPrevious` are no-ops exactly at the
- * last/first step (no wrapping, guarding on the `isLast`/ `isFirst` equality like upstream), `goTo`
- * ignores steps that do not exist and `goBackTo` only moves backwards — an out-of-range index (e.g.
- * `initialStep` not in `steps`, or steps shrunk below the index) therefore still moves, matching
- * upstream;
- * - like upstream, the initial index is `steps.indexOf(initialStep ??
- *   steps[0])` — an `initialStep` that is not in `steps` therefore starts
- *   at index `-1` (`current` reads `undefined`); pass a member of `steps`.
+ * (`source/vueuse/packages/core/useStepper/`).
  *
  * @example
  * const [index, setIndex, { steps, current, goToNext, goToPrevious, isFirst, isLast }] =

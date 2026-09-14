@@ -97,46 +97,8 @@ export function useParams<T extends RouteParamValueRaw = string, K = T>(
 ): [K, (value: K) => void]
 
 /**
- * Shorthand for a reactive path parameter, read from `window.location.pathname` against a `pattern`
- * path template.
- *
  * Map from @vueuse/router `useRouteParams`
- * (`source/vueuse/packages/router/useRouteParams/`), which proxies
- * `route.params[name]` through vue-router. Here `window.location.pathname` is the single source of
- * truth, so the router dependency is dropped entirely: the hook reads and writes `window.location`
- * / `history` directly.
- *
- * Reading:
- *
- * - `pattern` is the route config that vue-router would otherwise own — a path
- *   template (`'/users/:userId'`) whose `:name` segments capture the matching
- *   `window.location.pathname` segment. Plain segments must match literally.
- *   Without a `pattern` the hook cannot locate the param, so it exposes
- *   `defaultValue` (upstream throws without a matching route; here it never
- *   throws).
- * - A present capture is the decoded segment: the bare string, or a `string[]` when the same
- * `:name` repeats in the pattern. An absent or empty (`''`) capture counts as missing and falls
- * back to `defaultValue`. A `pattern` that does not match the current pathname also yields
- * `defaultValue`.
- * - The `transformGet` (default identity) applies to whichever value wins.
- * - Writing. A value strictly equal to `defaultValue` — or `null` — removes the param instead (the
- * segment is emptied; upstream stores `undefined`). The current search and hash are preserved.
- *
- * 1. The `route` / `router` options are gone — `window.location.pathname` and `history` are the
- * driver, and `mode` picks `history.replaceState` (default, mirroring upstream's `'replace'`) or
- * `history.pushState`. 2. The value is React state rather than a `customRef`, so it settles on the
- * next render after `setValue` instead of upstream's synchronous `trigger()`; the URL write itself
- * is still synchronous. 3. Neither `replaceState` nor `pushState` fires a `hashchange`/`popstate`
- * event, so the setter refreshes its own state. `popstate` (back/forward) and `hashchange` (manual
- * edits, anchor navigation) are subscribed in an effect and removed on unmount. `pushState` by
- * other code fires neither, matching how `useHash` handles it. 4. Upstream batches multi-key writes
- * per tick through a queue and pushes a single router navigation; here each `setValue` performs its
- * own history update immediately. 5. There is no multi-page router context to resolve — the hook is
- * scoped to the current `window.location` only. 6. SSR-safe: render never touches `window` (state
- * starts at `defaultValue`), the URL is first read in a mount effect, and `setValue` is a no-op
- * without a `window` — or without a `pattern` to place the value in. 7. A `defaultValue` that
- * changes across renders is re-synced while the capture is absent or empty (the React equivalent of
- * upstream's reactive `toValue(defaultValue)`).
+ * (`source/vueuse/packages/router/useRouteParams/`).
  *
  * @see https://vueuse.org/router/useRouteParams/
  *

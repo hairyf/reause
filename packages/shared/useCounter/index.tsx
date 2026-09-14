@@ -47,9 +47,7 @@ export interface UseCounterReturn {
 }
 
 /**
- * Map from @vueuse/shared `useCounter`
- * Mapping: `ref(initialValue)` → `useState`, mutation functions become stable `useCallback`s;
- * options are kept in refs so callbacks stay stable.
+ * Map from @vueuse/shared `useCounter`.
  *
  * @example
  * const { count, inc, dec, set, reset } = useCounter(10, { min: 0, max: 100 })

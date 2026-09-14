@@ -88,34 +88,8 @@ function sameOptions(
 }
 
 /**
- * Use EventListener with ease. Register using
- * [`addEventListener`](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener)
- * on mounted, and
- * [`removeEventListener`](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/removeEventListener)
- * automatically on unmounted.
- *
  * Map from @vueuse/core `useEventListener`
- * (`source/vueuse/packages/core/useEventListener/`). Registers one or more
- * listeners on one or more targets; the target defaults to `window` when omitted. Events, listeners
- * and options are plain values (React `Arrayable`); the target is a React ref object (`RefObject`)
- * holding the target, an array of same-typed target refs, or a ref holding an array of targets —
- * resolved through its `.current`, never a plain element, getter or callback ref.
- *
- * React divergences:
- * - re-binding follows upstream's `watchImmediate` over the resolved targets,
- *   events and options: a caller re-renders with a new target ref list / event
- *   list / options and the binding follows. The listener list is **not** part
- *   of the comparison — React cannot compare function identities across
- *   renders without looping, so one stable dispatcher per target+event is
- *   registered and it fans out to the latest listeners at dispatch time (an
- *   inline listener therefore never goes stale, unlike upstream's reactive
- *   ref comparison);
- * - the returned cleanup function detaches the currently registered listeners
- *   (upstream returns a `Fn` that stops the internal watcher); the listeners
- *   are also removed automatically on unmount;
- * - SSR-safe: nothing touches `window` during render — the default window
- *   target only resolves when `window` is defined and binding happens in the
- *   mount effect.
+ * (`source/vueuse/packages/core/useEventListener/`).
  *
  * @example
  * const root = useRef(document)

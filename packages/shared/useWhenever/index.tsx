@@ -19,26 +19,7 @@ export interface UseWheneverOptions {
 }
 
 /**
- * Map from @vueuse/shared `whenever`
- * Mapping: upstream `whenever` is Vue's `watch` plus a truthy guard — the callback runs every time
- * the source CHANGES to a truthy value (a re-render with the same truthy value never fires). In
- * React this becomes a `useEffect` watching `[value]`: the initial mount is skipped unless
- * `immediate` (which fires with `oldValue` `undefined`), later runs fire when the value is truthy
- * and actually changed, and the previous value is tracked in a ref updated on every run — mirroring
- * `watch`'s `oldValue`, which advances through falsy values too. The callback is kept in a ref so
- * re-renders always invoke the newest one.
- *
- * The `once` option stops the watch after the first truthy fire — expressible in React as a
- * one-shot flag consulted by the effect, mirroring upstream's `if (options?.once) nextTick(() =>
- * stop())`.
- *
- * The return value is a `stop` function — upstream's `WatchHandle`, reduced to the stop capability
- * (house `useWatch` has no stop-handle infrastructure). `stop()` is also called when the component
- * unmounts.
- *
- * The upstream 3-arg callback `(value, oldValue, onInvalidate)` becomes a 2-arg `(value, oldValue)`
- * in this port — `onInvalidate` (Vue's effect invalidation registration) has no React equivalent,
- * so it is dropped.
+ * Map from @vueuse/shared `whenever`.
  *
  * @see https://vueuse.org/shared/whenever/
  *

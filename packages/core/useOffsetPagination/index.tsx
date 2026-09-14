@@ -100,28 +100,7 @@ export type UseOffsetPaginationInfinityPageReturn = Omit<UseOffsetPaginationRetu
 
 /**
  * Map from @vueuse/core `useOffsetPagination`
- * (`source/vueuse/packages/core/useOffsetPagination/`). Reactive offset
- * pagination — navigate a page window over a `total` item count with `prev`/`next`, read the
- * derived `pageCount` / `isFirstPage` / `isLastPage`, and observe changes through the
- * `onPageChange` / `onPageSizeChange` / `onPageCountChange` callbacks.
- *
- * 1. The returned object mirrors `UseOffsetPaginationReturn` member for member and pairs every
- * writable value with its setter — `currentPage` and `currentPageSize` are `useState` state exposed
- * as plain numbers alongside `setCurrentPage` / `setCurrentPageSize` (upstream writes
- * `currentPage.value` / `currentPageSize.value` on writable Vue refs), while `pageCount` /
- * `isFirstPage` / `isLastPage` are derived on every render. 2. `total` and `pageSize` are read-only
- * value sources and take plain numbers — only their initial value is adopted. `page` is
- * controllable (the hook writes it), so it accepts a React `State<number>` — a plain number, a
- * getter, a `[value, setter]` state tuple or a `{ value, onChange }` pair — all resolved with
- * `toValue`. A reactive `page` is kept in two-way sync with the internal state, mirroring
- * upstream's `syncRef` (including writing the clamped value back through the tuple setter or the
- * pair's `onChange`); external mutations are adopted on the next render. 3. Change callbacks fire
- * when the corresponding value actually changes (never on the initial render), receiving a
- * `UseOffsetPaginationCallbackReturn` snapshot of the pagination state — upstream fires them
- * through `watch` with the reactive return object. The snapshot contains the upstream members only
- * (no setters). 4. Upstream's `useClamp` (packages/math) is inlined — the page/pageSize clamp to
- * `[1, pageCount]` / `[1, Infinity]`, and when `total` is omitted `pageCount` is `Infinity`
- * (`isLastPage` stays `false`).
+ * (`source/vueuse/packages/core/useOffsetPagination/`).
  *
  * @example
  * const {

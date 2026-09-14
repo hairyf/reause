@@ -134,34 +134,8 @@ function supportsElementAnimate(win: Window | undefined): boolean {
 }
 
 /**
- * Reactive [Web Animations
- * API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Animations_API).
- *
  * Map from @vueuse/core `useAnimate`
- * (`source/vueuse/packages/core/useAnimate/`): creates an `Animation` on the
- * target element via `Element.animate(keyframes, options)` and mirrors its mutable attributes
- * (`playState`, `currentTime`, `playbackRate`...) into state on every animation frame through a
- * `useRafFn` loop, while exposing stable controls (`play` / `pause` / `reverse` / `finish` /
- * `cancel`).
- *
- * React divergences:
- * - upstream's Vue watch (target + keyframes) / `tryOnMounted` / scope-dispose
- *   become `useEffect`s: the mount effect creates the animation (and re-creates
- *   it when the resolved target element appears or changes, keeping it paused
- *   when `immediate: false`), the keyframes effect swaps the animation's
- *   `effect` when the resolved keyframes change, and the unmount cleanup calls
- *   `cancel`;
- * - the returned `ComputedRef` / `WritableComputedRef` members become plain
- *   values re-rendered per frame — the writable setters (e.g. seeking through
- *   `currentTime`) are dropped, use the returned `animate` object for that;
- * - `keyframes` is re-read on every render and is compared with deep equality, so a deep-equal
- * reassignment (e.g. reordered keys) stays silent;
- * - `isSupported` is plain `boolean` state settled in the mount effect
- *   (re-probing when the resolved `window` option changes), and internal
- *   gating reads a ref mirror so effects decide synchronously (upstream
- *   `useSupported` computed);
- * - the `finish` / `cancel` / `remove` event listeners are bound to the `Animation` object through
- * `useEventListener`, which rebinds when the animation is replaced.
+ * (`source/vueuse/packages/core/useAnimate/`).
  *
  * @example
  * const el = useRef<HTMLSpanElement>(null)

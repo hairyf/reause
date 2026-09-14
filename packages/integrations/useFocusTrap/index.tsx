@@ -110,24 +110,8 @@ function resolveElement(value: FocusTrapTarget): string | HTMLElement | SVGEleme
 }
 
 /**
- * React port of VueUse's `useFocusTrap` — trap focus within one or more elements.
- *
  * Map from @vueuse/integrations `useFocusTrap`
- * (`source/vueuse/packages/integrations/useFocusTrap/`), a reactive wrapper
- * around the [`focus-trap`](https://github.com/focus-trap/focus-trap) library that keeps focus
- * trapped inside the target element(s) while the trap is active.
- *
- * React divergences: upstream creates the trap inside a `watch` over the resolved targets and
- * exposes `ShallowRef`s for `hasFocus` / `isPaused`. The React port creates the `createFocusTrap`
- * instance in an effect keyed on the resolved targets (mirroring the `watch`), keeps it for the
- * lifetime of the component — target changes go through `updateContainerElements` — and deactivates
- * it on unmount (`tryOnScopeDispose`). `hasFocus` / `isPaused` are plain booleans driven by
- * focus-trap's `onActivate` / `onDeactivate` events plus the pause / unpause calls, and `activate`
- * / `deactivate` / `pause` / `unpause` are stable callbacks delegating to the current trap
- * instance. The `immediate` option activates the trap as soon as the target elements are available.
- *
- * SSR-safe: no `window` or DOM access at module scope — the trap is created lazily inside the
- * effect.
+ * (`source/vueuse/packages/integrations/useFocusTrap/`).
  *
  * @param target - React ref object (`RefObject`) holding the element, a
  *   selector string, or an array of them

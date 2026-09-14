@@ -47,15 +47,8 @@ function createKeyPredicate(keyFilter: KeyFilter): KeyPredicate {
 }
 
 /**
- * Listen for keyboard keystrokes. By default, listens on `keydown` events on `window`.
- *
  * Map from @vueuse/core `onKeyStroke`
- * (`source/vueuse/packages/core/onKeyStroke/`). React divergences: this is a
- * hook whose listener binds in the mount effect and unbinds on unmount; the handler is read through
- * a latest-value ref, so new inline handler identities never re-subscribe — only a changed target,
- * event name or `passive` flag re-binds; the returned `stop` function removes the registered
- * listener (upstream returns a Vue `Fn` that stops its internal watcher). Nothing touches `window`
- * during render.
+ * (`source/vueuse/packages/core/onKeyStroke/`).
  *
  * @see https://vueuse.org/core/onKeyStroke/
  *
@@ -129,11 +122,8 @@ export function useKeyStroke(
 }
 
 /**
- * Listen to the `keydown` event of the given key.
- *
  * Map from @vueuse/core `onKeyDown`
- * (`source/vueuse/packages/core/onKeyStroke/`) — shorthand for
- * `useKeyStroke(key, handler, {...options, eventName: 'keydown' })`.
+ * (`source/vueuse/packages/core/onKeyStroke/`).
  *
  * @see https://vueuse.org/onKeyStroke
  *
@@ -151,11 +141,8 @@ export function useKeyDown(
 }
 
 /**
- * Listen to the `keypress` event of the given key.
- *
  * Map from @vueuse/core `onKeyPressed`
- * (`source/vueuse/packages/core/onKeyStroke/`) — shorthand for
- * `useKeyStroke(key, handler, {...options, eventName: 'keypress' })`.
+ * (`source/vueuse/packages/core/onKeyStroke/`).
  *
  * @see https://vueuse.org/onKeyStroke
  *
@@ -173,11 +160,8 @@ export function useKeyPressed(
 }
 
 /**
- * Listen to the `keyup` event of the given key.
- *
  * Map from @vueuse/core `onKeyUp`
- * (`source/vueuse/packages/core/onKeyStroke/`) — shorthand for
- * `useKeyStroke(key, handler, {...options, eventName: 'keyup' })`.
+ * (`source/vueuse/packages/core/onKeyStroke/`).
  *
  * @see https://vueuse.org/onKeyStroke
  *

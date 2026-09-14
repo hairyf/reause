@@ -70,33 +70,7 @@ function getSwipeDirection(start: Position, end: Position, threshold: number): U
 }
 
 /**
- * Reactive swipe detection based on
- * [`TouchEvents`](https://developer.mozilla.org/en-US/docs/Web/API/TouchEvent).
- *
- * Map from @vueuse/core `useSwipe`
- * React port of VueUse's `useSwipe` (`source/vueuse/packages/core/useSwipe/`), which tracks
- * `touchstart` / `touchmove` / `touchend` + `touchcancel` on the target and derives the swipe
- * `direction` once `max(|dx|, |dy|)` crosses `threshold` (default `50`), comparing the axes: `|dx|
- * > |dy|` decides `left`/`right`, otherwise `up`/`down`. Below the threshold the direction stays
- * `'none'` and `isSwiping` stays `false` — `onSwipeEnd` only fires for touches that actually
- * crossed the threshold (like upstream).
- *
- * - the Vue return object (`isSwiping` ref, `direction` / `lengthX` / `lengthY` computeds, reactive
- * coords) becomes plain values backed by state, derived during render —;
- * - `target` accepts a React ref object (`RefObject`) holding the event target (React equivalent of
- * `MaybeRefOrGetter`). The resolved element is re-read after every commit and the listeners re-bind
- * when it changes, so a `useRef` target that is `null` during first render still binds once React
- * attaches the element. A `ref.current` write that causes no re-render cannot be observed — React
- * refs are not reactive like upstream's Vue ref — so re-render (e.g. through state) after mutating
- * it;
- * - `onSwipeStart` / `onSwipe` / `onSwipeEnd` are read through latest-value
- *   refs, so the listeners always call the newest callbacks without
- *   re-binding on renders;
- * - `stop()` permanently detaches the listeners for this hook instance
- *   (upstream stops the `useEventListener` watcher too); a fresh mount
- *   starts listening again;
- * - SSR-safe: nothing touches `window` or the DOM during render — listeners
- *   attach in the mount effect only.
+ * Map from @vueuse/core `useSwipe`.
  *
  * @param target - React ref object (`RefObject`) holding the event target to
  *   listen on, resolved with the shared `unrefElement`

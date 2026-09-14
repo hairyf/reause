@@ -156,30 +156,7 @@ function defaultParse<Raw, Serialized>(clone?: boolean | ((value: Raw) => Raw)) 
 
 /**
  * Map from @vueuse/core `useRefHistory`
- * (`source/vueuse/packages/core/useRefHistory/`). Track the change history of
- * a state automatically — every change to the source commits a history record — also provides undo
- * and redo functionality.
- *
- * The return object mirrors VueUse's `UseRefHistoryReturn` (refs flattened to plain values): `const
- * { history, undo, redo, canUndo, canRedo... } = useStateHistory([source, setSource])`.
- *
- * 1. Source: upstream tracks a writable Vue `Ref<Raw>` and commits through a watcher; React state
- * lives in the component, so the source is the controlled tuple `[state, setState]` of an existing
- * `useState` and commits are driven by an effect on state changes. The `deep` and `flush` watch
- * options don't apply — replace the state instead of mutating it, a mutated object does not
- * re-render and is invisible to the history (`clone` / custom `dump` still support mutation-style
- * sources). Multiple state updates in the same tick render once and collapse into a single commit
- * carrying the final value; there is no per-assignment `flush: 'sync'` timing. 2. Event filter:
- * upstream composes `pausableFilter(eventFilter)`; only the pausable half is ported (`pause` /
- * `resume` / `isTracking`) — the generic `eventFilter` option has no React translation (use
- * `useStateThrottledHistory` for time-based throttling of the commits). 3. Programmatic
- * applications (undo / redo / reset / manual `commit()` / `batch`) mark the applied value and the
- * effect run carrying it is skipped, so restoring never records a new commit. 4. Same-tick changes:
- * use `controls.setSource()` (value or updater form) for updates that must be visible to a manual
- * `commit()` in the same tick — see `useStateManualHistory` for the full explanation. 5. Storage:
- * snapshots live in refs and a version counter triggers re-renders; records are plain objects and
- * timestamps use `Date.now()`. is not ported — disposal follows the component lifecycle (use
- * `clear()`).
+ * (`source/vueuse/packages/core/useRefHistory/`).
  *
  * @example
  * const [count, setCount] = useState(0)

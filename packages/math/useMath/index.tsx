@@ -25,18 +25,7 @@ type PlainMathMethod<T> = T extends (...args: infer A) => infer R
 
 /**
  * Map from @vueuse/math `useMath`
- * (`source/vueuse/packages/math/useMath/`). Reactive `Math` methods — pass a
- * `Math` method name as the key and its plain numeric arguments; the result is recomputed on every
- * render and returned directly, with no `.value` wrapper and no effects (SSR-safe).
- *
- * React divergences: upstream wraps the computation in `computed(() =>...)` via `reactify` and
- * returns a `ComputedRef<number>`; the reause version is a pure derived hook — `key` and every
- * argument are read at render time and `Math[key]` is invoked immediately, so the returned number
- * always reflects the latest values.
- *
- * React divergence: arguments are plain numbers, not upstream's `MaybeRefOrGetter`. In particular
- * the getter form (`() => number`) is NOT accepted — getters as data sources are rejected repo-wide
- * (issue #462). The caller re-renders with new values (e.g. from `useState`).
+ * (`source/vueuse/packages/math/useMath/`).
  *
  * @see https://vueuse.org/math/useMath/
  *

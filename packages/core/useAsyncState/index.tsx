@@ -96,42 +96,8 @@ export interface UseAsyncStateOptions<Shallow extends boolean = true, D = any> {
 }
 
 /**
- * Reactive async state. Will not block your component and will trigger changes once the promise is
- * ready.
- *
  * Map from @vueuse/core `useAsyncState`
- * (`source/vueuse/packages/core/useAsyncState/`). Mirrors the upstream object
- * return: `{ state, setState, isReady, isLoading, error, execute, executeImmediate }`. `state`
- * holds the resolved result of the async function, `setState` writes it directly (the React
- * equivalent of upstream's writable `state` ref, see below), `isReady` becomes `true` when the
- * latest execution resolved (reset to `false` on each execution and stays `false` when it rejects),
- * `isLoading` is `true` while a promise is pending and `error` holds the rejection reason.
- * `execute(delay?...args)` re-runs the promise (waiting for `delay` ms first) and
- * `executeImmediate(...args)` is shorthand for `execute(0...args)`. `onSuccess`/`onError` callbacks
- * fire for every settled execution and `throwError` re-throws the rejection from `execute`.
- *
- * React divergences:
- * - upstream exposes refs (`state.value`, `isLoading.value`...); this port is an object mirror
- * whose members are live React state values — the members render as plain values (no `.value`) and
- * re-reading them yields the latest committed state (getters over the current render state);
- * - upstream's `state` ref is writable, so this port pairs it with
- *   `setState(next)` / `setState(prev => next)` (the React equivalent of
- *   `state.value = next`). `setState` updates `state` only and never triggers
- *   an execution; `isReady`, `isLoading` and `error` are left untouched;
- * - `initialState` is a read-only plain value (upstream `MaybeRef<Data>`):
- *   it is read once when the hook is created and again by each
- *   `resetOnExecute` reset, and is never written back to;
- * - the initial execution fires from a mount effect (upstream fires during
- *   setup), honoring `delay`; subsequent executions run from
- *   `execute`/`executeImmediate` with an execution counter guarding against
- *   outdated executions mutating the state. `resetOnExecute` resets `state`
- *   to the initial value at the start of each execution;
- * - the thenable contract is preserved: the returned object carries a `then`
- *   that resolves with the current result object once the latest execution
- *   finished, so `const { state } = await useAsyncState(...)` works;
- * - `shallow` is accepted for API parity but has no React equivalent — React
- *   state is never deep-wrapped, so the option is a no-op; the `Shallow`
- *   generic is likewise kept for type-arity parity only.
+ * (`source/vueuse/packages/core/useAsyncState/`).
  *
  * @example
  * const { state, setState, isReady, isLoading, error, execute } = useAsyncState(

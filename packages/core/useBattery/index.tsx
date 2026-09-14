@@ -56,21 +56,8 @@ type NavigatorWithBattery = Navigator & {
 }
 
 /**
- * Reactive Battery Status API.
- *
  * Map from @vueuse/core `useBattery`
- * (`source/vueuse/packages/core/useBattery/`). Reactive
- * [Battery Status API](https://developer.mozilla.org/en-US/docs/Web/API/Battery_Status_API):
- * returns an object mirroring the upstream members — `isSupported`, `charging`, `chargingTime`,
- * `dischargingTime`, `level` — as plain values held in `useState`s.
- *
- * React divergences:
- * - `isSupported` comes from `useSupported` (resolves after mount, stays `false` on the server) and
- * gates a mount effect that acquires the battery manager, reads its initial state and registers the
- * four battery event listeners (`chargingchange`, `chargingtimechange`, `dischargingtimechange`,
- * `levelchange`), removed again in cleanup on unmount;
- * - there is no `navigator` access during render, so SSR renders the
- *   defaults without acquiring anything.
+ * (`source/vueuse/packages/core/useBattery/`).
  *
  * @see https://vueuse.org/core/useBattery/
  * @param options

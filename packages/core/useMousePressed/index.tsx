@@ -65,23 +65,7 @@ export interface UseMousePressedReturn {
 
 /**
  * Map from @vueuse/core `useMousePressed`
- * (`source/vueuse/packages/core/useMousePressed/`), which tracks a reactive
- * pressing state — `pressed` flips on `mousedown`/`touchstart` (optionally `dragstart`) on the
- * `target` option (default `window`) and back off on
- * `mouseup`/`mouseleave`/`touchend`/`touchcancel` (optionally `drop`/ `dragend`) on `window`,
- * recording the `sourceType` of the press.
- *
- * - the Vue `pressed`/`sourceType` shallow refs become plain values in a
- *   `{ pressed, sourceType }` object backed by React state;
- * - a self-contained mount `useEffect` that re-subscribes when `target`/`capture`/`drag`/`touch`
- * change and removes all listeners on unmount;
- * - `onPressed`/`onReleased` are read through a latest-value ref, so the
- *   listeners always call the newest callbacks without re-binding on renders;
- * - `target` accepts a React ref object (`RefObject`) holding the element (React equivalent of
- * `MaybeRefOrGetter`). It is re-resolved on every render and the listeners re-bind when the
- * resolved element changes; a plain element, a getter and a callback ref are not accepted;
- * - SSR-safe: nothing touches `window` during render — only, and `initialValue` seeds `useState` so
- * SSR renders the same initial state.
+ * (`source/vueuse/packages/core/useMousePressed/`).
  *
  * @example
  * const { pressed, sourceType } = useMousePressed()

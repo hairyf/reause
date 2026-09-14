@@ -171,23 +171,8 @@ export interface UseBluetoothReturn {
 }
 
 /**
- * Reactive [Web Bluetooth API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Bluetooth_API).
- *
  * Map from @vueuse/core `useBluetooth`
- * (`source/vueuse/packages/core/useBluetooth/`). Returns an object
- * mirroring the upstream members: `{ isSupported, isConnected, device, requestDevice, server, error
- * }`. `requestDevice` opens the browser's device chooser and stores the picked `BluetoothDevice` in
- * `device`; the device then auto-connects to its GATT server (`server`, `isConnected`), and a
- * `gattserverdisconnected` event resets the connection state.
- *
- * React divergences:
- * - the upstream `watch(device)` auto-connect becomes an effect keyed on
- *   `device`, the mount-registered `gattserverdisconnected` listener becomes
- *   a per-device effect (re-bound whenever `device` changes), and the
- *   `tryOnScopeDispose` GATT disconnect becomes an unmount cleanup;
- * - `requestDevice` is a stable callback reading the latest options through
- *   refs; upstream's in-place `acceptAllDevices = false` mutation (when
- *   filters are provided) is evaluated per call instead.
+ * (`source/vueuse/packages/core/useBluetooth/`).
  *
  * @see https://vueuse.org/core/useBluetooth/
  * @param options

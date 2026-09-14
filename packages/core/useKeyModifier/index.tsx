@@ -29,17 +29,7 @@ export type UseKeyModifierReturn<Initial> = Initial extends boolean ? boolean : 
 
 /**
  * Map from @vueuse/core `useKeyModifier`
- * (`source/vueuse/packages/core/useKeyModifier/`). Reactive
- * [Modifier State](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/getModifierState)
- * — tracks the state of any supported modifier key (`CapsLock`, `NumLock`, `Shift`, `Ctrl`, `Alt`,
- * `Meta`...) by reading `event.getModifierState()` on the configured events.
- *
- * React divergences:
- * - upstream's `useEventListener` composition becomes a self-contained mount
- *   `useEffect` that binds the configured events on the (optionally custom)
- *   `document` and removes them on unmount;
- * - the `initial` option feeds `useState`, so SSR renders the `null` default
- *   without touching the DOM.
+ * (`source/vueuse/packages/core/useKeyModifier/`).
  *
  * @example
  * const capsLockState = useKeyModifier('CapsLock') // boolean | null

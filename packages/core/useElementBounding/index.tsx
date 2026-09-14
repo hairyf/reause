@@ -69,26 +69,8 @@ export interface UseElementBoundingReturn {
 }
 
 /**
- * Reactive bounding box of an HTML element.
- *
  * Map from @vueuse/core `useElementBounding`
- * (`source/vueuse/packages/core/useElementBounding/`), which measures the
- * target with `getBoundingClientRect()` and re-measures on window `scroll`/`resize`, on
- * `style`/`class` mutations (MutationObserver) and on element size changes (ResizeObserver).
- *
- * React divergences:
- * - `target` accepts a React ref object (`RefObject`) holding the element; a plain element, a
- * getter and a callback ref are not accepted;
- * - an effect that re-resolves the target after every render and re-measures only when the resolved
- * element actually became `null`;
- * - upstream's `tryOnMounted` immediate measurement happens in a mount-only
- *   effect, so the values are correct before the first async observer
- *   delivery;
- * - the window `scroll`/`resize` listeners attach in a mount effect; the component and directive
- * variants (`UseElementBounding` / `v-element-bounding`) are not ported — they have no React
- * equivalents;
- * - SSR-safe: nothing touches `window` or the DOM during render — all
- *   measurements happen in effects.
+ * (`source/vueuse/packages/core/useElementBounding/`).
  *
  * @param target - React ref object (`RefObject`) holding the element to
  *   measure the bounding box of, resolved with the shared `unrefElement`

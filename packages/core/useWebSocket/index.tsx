@@ -175,30 +175,7 @@ function defaultScheduler(fn: () => void): { pause: () => void, resume: () => vo
 
 /**
  * Map from @vueuse/core `useWebSocket`
- * (`source/vueuse/packages/core/useWebSocket/`), a reactive
- * [WebSocket](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/WebSocket) client: it
- * wraps the browser `WebSocket` constructor and exposes the current instance, the connection
- * status, the latest received message and `open` / `close` / `send` shortcuts, with optional
- * auto-reconnect, heartbeat pings and URL-driven reconnection.
- *
- * React divergences:
- * - the socket is created in a mount `useEffect` instead of during setup
- *   (upstream opens synchronously behind an `if (isClient)` check), so SSR
- *   renders the initial `CLOSED`/`null`/`undefined` values without ever
- *   touching `WebSocket` — SSR-safe;
- * - `open`, `close` and `send` are stable callbacks reading the mounted socket and status through
- * latest-value refs, and `close()` runs on unmount when `autoClose` is on, including the
- * `beforeunload` listener;
- * - `url` is a plain value (`string | URL | undefined`) — a React ref or a getter is not accepted;
- * when `autoConnect` is on, a URL change between renders reconnects, mirroring upstream's
- * `watch(urlRef, open)` — the initial connection is still only opened once by `immediate`;
- * - `heartbeat.message` / `responseMessage` accept a plain value or a message factory function,
- * resolved on every tick via `toValue`; the default scheduler is a local `setInterval`-based `{
- * pause, resume }` pair instead of upstream's `useIntervalFn` default (which is a hook and cannot
- * be created lazily), and — like upstream's `{ immediate: false }` default — it stays inert until
- * the socket opens (`ws.onopen` calls `resume`), so no pings (or the pong-timeout force-close) fire
- * while the socket is still `CONNECTING`; a custom `scheduler` option returns the same `{ pause,
- * resume }` controls.
+ * (`source/vueuse/packages/core/useWebSocket/`).
  *
  * @example
  * const { status, data, send, open, close, ws } = useWebSocket('ws://websocketurl')

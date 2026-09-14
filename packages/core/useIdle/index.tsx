@@ -42,25 +42,8 @@ export interface UseIdleReturn {
 }
 
 /**
- * React port of VueUse's `useIdle` — tracks whether the user is being inactive.
- *
  * Map from @vueuse/core `useIdle`
- * (`source/vueuse/packages/core/useIdle/`). Returns an object mirroring the
- * upstream members: `{ idle, lastActive, isPending, reset, stop, start }`. `idle` is a plain
- * boolean state (user inactive), `lastActive` the timestamp of the latest activity, and `reset`
- * restarts the idle timer (without touching `lastActive`). Every activity event (default:
- * `mousemove`/`mousedown`/`resize`/`keydown`/`touchstart`/`wheel` on the window, plus document
- * `visibilitychange`) refreshes `lastActive` and restarts the timer — after `timeout` ms without
- * activity `idle` flips to `true`.
- *
- * React divergences:
- * - upstream's `useEventListener` + `createFilterWrapper` become a
- *   self-contained mount `useEffect` that registers the listeners (passive)
- *   and removes them on unmount, with each event flowing through the 50ms
- *   `throttleFilter` (options are evaluated once, like upstream's setup);
- * - the idle timer is a `setTimeout` held in a ref and cleared on unmount;
- *   there is no window access during render, so SSR renders the defaults
- *   without starting anything.
+ * (`source/vueuse/packages/core/useIdle/`).
  *
  * @example
  * const { idle, lastActive, reset } = useIdle(5 * 60 * 1000) // 5 min

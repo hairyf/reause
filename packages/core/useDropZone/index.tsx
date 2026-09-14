@@ -71,25 +71,7 @@ export interface UseDropZoneReturn {
 
 /**
  * Map from @vueuse/core `useDropZone`
- * (`source/vueuse/packages/core/useDropZone/`). Create a zone where files can
- * be dropped.
- *
- * React divergences:
- * - the Vue `isOverDropZone` and `files` shallowRefs become plain state:
- *   `files` holds the files of the last valid drop (`null` until then), and
- *   dropped files also flow through the `onDrop` callback (option and/or
- *   returned subscription);
- * - upstream's per-option callbacks (`onDrop` / `onEnter` / `onLeave` /
- *   `onOver`) are kept, and the returned `onDrop` / `onDragEnter` /
- *   `onDragLeave` are stable subscribe functions with the `(fn) => { off }`
- *   shape, managed with Sets, so they are identity-stable across renders and
- *   compatible with the `useListener` protocol;
- * - the drag listeners (`dragenter` / `dragover` / `dragleave` / `drop`) are
- *   attached in a mount effect (re-bound when the resolved target changes)
- *   instead of a `useEventListener` watcher, so nothing touches the DOM or
- *   `navigator` during render (SSR-safe);
- * - the internal enter/leave counter is scoped to each binding, so drags over
- *   nested children don't flicker `isOverDropZone`.
+ * (`source/vueuse/packages/core/useDropZone/`).
  *
  * @example
  * const zoneRef = useRef<HTMLDivElement>(null)

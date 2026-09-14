@@ -25,25 +25,8 @@ export interface UseNavigatorLanguageReturn {
 }
 
 /**
- * Reactive useNavigatorLanguage
- *
- * Detects the currently selected user language and returns a reactive language
- *
  * Map from @vueuse/core `useNavigatorLanguage`
- * (`source/vueuse/packages/core/useNavigatorLanguage/`), which reads
- * `navigator?.language` and keeps it fresh via a `languagechange` listener. Reactive
- * `navigator.language` as an object mirroring the upstream `{ isSupported, language }` members —
- * the component re-renders when the user's language preference changes.
- *
- * React divergences:
- * - the Vue `ShallowRef<string | undefined>` return becomes a plain
- *   `string | undefined` state, so read `language` directly instead of
- *   `watch`ing it;
- * - `isSupported` (upstream `useSupported`) becomes a plain boolean that
- *   starts `false` and is computed in the mount effect, so nothing touches
- *   `navigator` during render (SSR-safe);
- * - the initial `navigator.language` read happens in the mount effect
- *   (upstream reads it during setup);
+ * (`source/vueuse/packages/core/useNavigatorLanguage/`).
  *
  * @see https://vueuse.org/core/useNavigatorLanguage/
  * @param options

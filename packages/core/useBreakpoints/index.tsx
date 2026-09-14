@@ -182,40 +182,7 @@ export type UseBreakpointReturn<K extends string = string> = Record<K, boolean> 
 
 /**
  * Map from @vueuse/core `useBreakpoints`
- * (`source/vueuse/packages/core/useBreakpoints/`), which composes
- * `useMediaQuery` per breakpoint key and returns an object of shortcut methods (`.sm`, `.md`...)
- * plus comparison helpers. Reactively viewport breakpoints — an object mirror (not a tuple): every
- * breakpoint key becomes a plain boolean, e.g. `breakpoints.md` is `true` while the viewport is `>=
- * 768px` (with the default `min-width` strategy).
- *
- * React divergences:
- * - upstream's shortcut properties are `Object.defineProperty` getters that lazily create a
- * `useMediaQuery` `ComputedRef`; React hooks cannot be created at property-read time, so
- * `useBreakpoints` eagerly creates four `useMediaQuery` queries per key (min/max, each with the
- * ±0.1 delta that separates strict/equal comparisons) and exposes the resulting plain booleans. The
- * dynamic-key methods (`greaterOrEqual('sm')`...) return booleans from the current render, so the
- * `breakpoints` map and the keys passed to the methods must stay stable across renders (the number
- * of media queries cannot change between renders);
- * - upstream's `current()`/`active()` `computed` values become plain
- *   functions recomputed from the current render's booleans, so they stay
- *   in sync with media query changes (components re-render when the
- *   underlying `useMediaQuery` state flips);
- * - the `is*` helpers evaluate `window.matchMedia().matches` synchronously (non-reactive, matching
- * upstream) and fall back to `ssrWidth` comparisons while the `matchMedia` query is unavailable
- * (SSR / custom `window: null`);
- * - SSR via the `ssrWidth` option is evaluated inside the `useMediaQuery`
- *   mount effects, so the server renders the `false`/empty default without
- *   touching `window` and the simulated values appear after hydration —
- *   same caveat as `useMediaQuery`;
- * - `ssrWidth` comes from the per-hook `ssrWidth` option or, when that is
- *   omitted, from the closest `SSRWidthProvider` above the caller (read
- *   through `useSSRWidth()`, upstream's `provideSSRWidth`); the resolved
- *   width is then forwarded to every `useMediaQuery` this hook composes. The
- *   per-hook option takes precedence over the provided width, exactly like
- *   upstream's `const { ssrWidth = useSSRWidth() } = options`. Without a
- *   provider and without the option the hook keeps its plain client
- *   behaviour and never throws, so no `undefined` reaches the returned
- *   booleans.
+ * (`source/vueuse/packages/core/useBreakpoints/`).
  *
  * @example
  * const breakpoints = useBreakpoints(breakpointsTailwind)

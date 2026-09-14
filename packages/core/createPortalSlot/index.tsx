@@ -69,33 +69,8 @@ export interface CreatePortalSlotOptions<Bindings extends Record<string, any>> {
 }
 
 /**
- * Define and reuse a template inside the component scope — React
- * port of VueUse's `createReusableTemplate`.
- *
  * Map from @vueuse/core `createReusableTemplate`
- * (`source/vueuse/packages/core/createReusableTemplate/`). The factory creates
- * a pair of components sharing one captured template: `PortalSlot` (the "define" side) captures the
- * render function passed as its children and renders nothing; `SlotTarget` (the "reuse" side)
- * renders that template with the props passed to it. The pair supports array destructuring
- * (`[PortalSlot, SlotTarget]`), object destructuring (`{ define, reuse }`) and property access
- * (`pair.define` / `pair.reuse`) through `makeDestructurable`, exactly like upstream.
- *
- * React divergences:
- * - the template is a **children-as-function** render prop instead of a
- *   `v-slot`: the bindings object replaces the slot props (the `<SlotTarget>`
- *   props), and `$slots.default` — a function returning the `<SlotTarget>`
- *   children — replaces the `$slots` map. React components expose a single
- *   slot, so only the `default` slot is provided at runtime;
- * - `props` is a list of prop keys instead of Vue's `ComponentObjectPropsOptions`;
- * - `inheritAttrs` is a no-op: React has no attribute-inheritance system;
- * - the template is captured **during render** (like upstream's define render
- *   assigns `render.value = slots.default`), so `<PortalSlot>` must render
- *   before `<SlotTarget>` in the same commit for the target to pick up the
- *   template;
- * - prop keys are camelized (`my-msg` → `myMsg`) only when no `props` option
- *   is given, mirroring upstream's attrs path.
- *
- * SSR-safe: nothing touches `window` or the DOM.
+ * (`source/vueuse/packages/core/createReusableTemplate/`).
  *
  * @see https://vueuse.org/core/createReusableTemplate/
  *

@@ -43,32 +43,8 @@ export interface UseFuseReturn<DataItem> {
 }
 
 /**
- * React port of VueUse's `useFuse` — easily implement fuzzy search with
- * [Fuse.js](https://github.com/krisk/fuse).
- *
  * Map from @vueuse/integrations `useFuse`
- * (`source/vueuse/packages/integrations/useFuse/`), a reactive wrapper around
- * a `Fuse` instance. `search` and `data` are the hook's **read-only value sources** and take plain
- * values (`string` and `readonly DataItem[]`; upstream: `MaybeRefOrGetter`). `options` is a plain
- * config object (upstream `MaybeRefOrGetter`).
- *
- * React divergences:
- * - upstream returns `{ fuse: Ref<Fuse>, results: ComputedRef<FuseResult[]> }`;
- *   here both are plain values read during render — `fuse` is the `Fuse`
- *   instance itself (no `.value`), `results` is a plain array;
- * - upstream rebuilds the index in `watch(() => toValue(options)?.fuseOptions,
- *   …, { deep: true })` and refreshes the collection in `watch(() => toValue(data), …)`.
- *   React has no deep watcher, and serializing `fuseOptions` to compare them by
- *   value would break function-valued options (`sortFn`, `getFn`, `keys[].getFn`),
- *   so the `Fuse` instance is memoized on the identity of the `data`
- *   array and of `fuseOptions` instead: pass a NEW array reference when the data
- *   changes, and a memoized `fuseOptions` object for best performance. Mutating
- *   the data array in place is not detected (upstream's deep watch was);
- * - `results` is memoized on the search string and the `data` identity, so a
- *   changed `search`/`data` prop recomputes on the next render;
- * - `options` is NOT widened: it is a config object (upstream
- *   `MaybeRefOrGetter`, a maintainer decision), so a plain options object is
- *   the only accepted form — resolve a React ref or getter at the call site.
+ * (`source/vueuse/packages/integrations/useFuse/`).
  *
  * @param search - the search query
  * @param data - the collection to search

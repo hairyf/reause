@@ -107,28 +107,8 @@ function resolveNestedOptions<T>(options: T | true): T {
 const DEFAULT_EVENT = 'message'
 
 /**
- * Reactive wrapper for EventSource.
- *
  * Map from @vueuse/core `useEventSource`
- * (`source/vueuse/packages/core/useEventSource/`), a reactive wrapper around
- * the browser
- * [EventSource](https://developer.mozilla.org/en-US/docs/Web/API/EventSource/EventSource)
- * (Server-Sent Events) client: it opens a persistent connection to an HTTP server, exposes the
- * current instance, the connection status, the latest received data / named event / last event ID,
- * and `open` / `close` shortcuts, with optional auto-reconnect and custom data serialization.
- *
- * React divergences:
- * - the EventSource is created in a mount `useEffect` instead of during setup
- *   (upstream opens synchronously behind an `if (isClient)` check), so SSR
- *   renders the initial `CONNECTING`/`null` values without ever touching
- *   `EventSource` — SSR-safe;
- * - `open`, `close` are stable callbacks reading the mounted EventSource through a latest-value
- * ref, and `close()` runs on unmount;
- * - `url` is a read-only value source and takes a plain `string | URL | undefined`; when
- * `autoConnect` is on, a URL change between renders reconnects, mirroring upstream's `watch(urlRef,
- * open)` — the initial connection is still only opened once by `immediate`;
- * - the per-event message listeners are registered with the raw `addEventListener` inside the
- * connection effect and are cleaned up together with the EventSource on close/unmount.
+ * (`source/vueuse/packages/core/useEventSource/`).
  *
  * @example
  * const { status, data, error, close } = useEventSource('https://event-source-url')

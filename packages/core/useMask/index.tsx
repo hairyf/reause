@@ -1,15 +1,6 @@
 /**
- * Map from @mantine/hooks `useMask` (`source/mantine/packages/@mantine/hooks/src/use-mask/`)
- *
- * The `useMask` input-masking hook, ported from `@mantine/hooks`' `use-mask`. The masking engine it
- * drives lives in the sibling `./engine` module — see the header there for why — and the engine's
- * public half (the hook's options and return types, `DEFAULT_TOKENS` and the four pure helpers) is
- * re-exported from this file, so those imports keep working while `meta/functions.md` only ever
- * sees `useMask` as this page's own export.
- *
- * Unlike upstream, the hook returns a callback `ref` bound to a **native** `<input>`: there is no
- * `@mantine/core` and no `TextInput` in this port, which is why `use-mask.story.tsx` (the upstream
- * demo, built on `TextInput`) is not mirrored.
+ * Map from @mantine/hooks `useMask`
+ * (`source/mantine/packages/@mantine/hooks/src/use-mask/`).
  */
 import type { MaskSlot, UndoState, UseMaskOptions, UseMaskReturnValue } from './engine'
 import { useCallback, useEffect, useRef, useState } from 'react'

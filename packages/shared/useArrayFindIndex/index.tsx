@@ -1,11 +1,7 @@
 export type UseArrayFindIndexReturn = number
 
 /**
- * Map from @vueuse/shared `useArrayFindIndex`
- * Mapping: upstream wraps `toValue(list).findIndex(...)` in `computed(...)` and accepts a
- * `MaybeRefOrGetter`; React has no reactive value tracking, so this is a plain function that
- * recomputes the index on every render — pass a state array and re-render with new state to see the
- * updated result. The return is a plain number, no `.value`.
+ * Map from @vueuse/shared `useArrayFindIndex`.
  *
  * @example
  * const [list, setList] = useState([0, 2, 4, 6, 8])

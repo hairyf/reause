@@ -3,19 +3,7 @@ import { useCallback, useRef, useState } from 'react'
 import { useUnmount } from '../useUnmount'
 
 /**
- * React port of react-use's `useRafState`.
- *
- * Map from react-use `useRafState`
- * Mapping:, and `setRafState` is a `useCallback(…, [])` that **cancels the previously scheduled
- * frame** before requesting a new one, so any number of calls inside one frame collapses into a
- * single commit that carries the last scheduled `value`. That coalescing is the entire contract of
- * the hook. `value` is forwarded to `setState` unchanged from inside the frame callback, so the
- * updater form (`setRafState(prev => prev + 1)`) is a React functional update that sees the state
- * committed by the previous frame; since each new call cancels the frame scheduled before it, two
- * updater calls before a frame runs apply the updater **once** — upstream's semantics, the
- * superseded callback never reaches `setState`. The pending frame, and the initial state may be a
- * lazy factory because it is passed straight to `useState`. Upstream ships this hook as a default
- * export; reause exports it by name.
+ * Map from react-use `useRafState`.
  *
  * @example
  * const [state, setRafState] = useRafState(0)

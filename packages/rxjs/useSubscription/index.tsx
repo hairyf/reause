@@ -12,25 +12,8 @@ export interface UnsubscribableLike {
 }
 
 /**
- * Use an RxJS [`Subscription`](https://rxjs.dev/guide/subscription) without worrying about
- * unsubscribing from it or creating memory leaks.
- *
  * Map from @vueuse/rxjs `useSubscription`
- * (`source/vueuse/packages/rxjs/useSubscription/`): the subscription is handed
- * to the hook and torn down automatically when the component unmounts, so the call site never needs
- * its own cleanup.
- *
- * React divergences:
- * - the effect cleanup: the subscription lives from mount until unmount. There is no state, so the
- * hook returns nothing (upstream parity).
- * - like `useObservable` (`packages/rxjs/useObservable/index.tsx`), the
- *   argument is deliberately **not** an effect dependency — a new `subscription`
- *   identity on a later render does not re-subscribe (Vue's
- *   `tryOnScopeDispose` also registers exactly once, during `setup`). Create
- *   the subscription with `useState`'s lazy initializer, `useRef` or a module
- *   scope when the surrounding component re-renders.
- * - SSR-safe: nothing touches `window` / `document`, and the cleanup only runs
- *   on real unmount.
+ * (`source/vueuse/packages/rxjs/useSubscription/`).
  *
  * @see https://vueuse.org/rxjs/useSubscription/
  * @example

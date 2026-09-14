@@ -66,27 +66,8 @@ function getMemory(): MemoryInfo | undefined {
 }
 
 /**
- * Reactive Memory Info.
- *
  * Map from @vueuse/core `useMemory`
- * (`source/vueuse/packages/core/useMemory/`), which reads the Chromium-only
- * non-standard `performance.memory` and keeps it fresh through a scheduler (upstream default:
- * `useIntervalFn`, 1000 ms). Reactive memory info as an object mirroring the upstream `{
- * isSupported, memory }` members.
- *
- * React divergences:
- * - the Vue `ShallowRef<MemoryInfo | undefined>` return becomes a plain
- *   `MemoryInfo | undefined` state, so read `memory` directly instead of
- *   `watch`ing it;
- * - `isSupported` (upstream `useSupported`) becomes a plain boolean that
- *   starts `false` and is computed in the mount effect, so nothing touches
- *   `performance` during render (SSR-safe);
- * - the first memory read happens in the mount effect;
- * - the `scheduler` option is called during render to compose the polling
- *   loop, so it must be passed consistently across renders (Rules of Hooks);
- *   the loop it returns is paused in an effect while the API is unsupported
- *   and resumed once support is detected, so an unsupported environment never
- *   keeps a timer polling (upstream instead skips composing the scheduler).
+ * (`source/vueuse/packages/core/useMemory/`).
  *
  * @see https://vueuse.org/core/useMemory/
  * @param options

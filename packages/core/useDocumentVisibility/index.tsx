@@ -11,13 +11,7 @@ export interface UseDocumentVisibilityOptions {
 
 /**
  * Map from @vueuse/core `useDocumentVisibility`
- * (`source/vueuse/packages/core/useDocumentVisibility/`). Reactively track
- * `document.visibilityState` — `'visible'` or `'hidden'` — by subscribing to the document
- * `visibilitychange` event.
- *
- * React divergences: the initial `document.visibilityState` read happens in the mount effect
- * instead of during setup, so SSR renders the `'visible'` default without touching `document`
- * (matching upstream's no-document value).
+ * (`source/vueuse/packages/core/useDocumentVisibility/`).
  *
  * @example
  * const visibility = useDocumentVisibility()

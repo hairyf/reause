@@ -1,10 +1,7 @@
 export type UseArraySomeReturn = boolean
 
 /**
- * Map from @vueuse/shared `useArraySome`
- * Mapping: `computed(() =>...)` → recompute on every render — the result is a plain `boolean` (no
- * `.value`, no caching) computed from the plain `list` array the caller passes. Hold the array in
- * `useState` and pass a new array to observe a change; the result recomputes on the next render.
+ * Map from @vueuse/shared `useArraySome`.
  *
  * @see https://vueuse.org/shared/useArraySome/
  * @param list - the array was called upon.

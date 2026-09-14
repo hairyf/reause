@@ -22,40 +22,8 @@ function isPromiseLike(value: unknown): boolean {
 }
 
 /**
- * Create an [`Observable`](https://rxjs.dev/guide/observable) from either an rxjs `ObservableInput`
- * (forwarded to RxJS's [`from()`](https://rxjs.dev/api/index/function/from) unchanged) or a plain
- * value that re-emits whenever it changes across renders.
- *
  * Map from @vueuse/rxjs `from`
- * (`source/vueuse/packages/rxjs/from/`): upstream branches on Vue's `isRef`
- * and `watch`es the ref; React has no reactive refs, so the port branches on
- * observable-/promise-likeness and pushes plain values through an internal effect instead.
- *
- * Branch discriminator (runtime):
- * - a value with a `subscribe` function (Observable-like) or a `then` function
- *   (Promise-like) is passed straight to rxjs `from(value)` — upstream parity.
- * - any other plain value is wrapped in a `BehaviorSubject` seeded with the
- *   current render value: subscribing immediately receives the current value
- *   (the mapped `immediate` semantics), and the Observable re-emits whenever
- *   the value changes across renders.
- *
- * React divergences:
- * - upstream's `Ref<T>` branch becomes the plain-value re-emit branch. The
- *   subject and its `asObservable()` wrapper are held in refs, so the returned
- *   Observable keeps a stable identity across renders and downstream
- *   subscriptions are not rebuilt by re-renders.
- * - upstream's `WatchOptions` (`immediate` / `deep` / `flush`) is dropped —
- *   React has no Vue `watch`. `immediate` is covered by the seeded
- *   `BehaviorSubject` (subscribing receives the current value immediately);
- *   `deep` / `flush` are not mapped — handle extra control at the call site
- *   with rxjs operators or effect dependencies.
- * - the value source is a plain `T` only — never a getter, `State<T>` or
- *   `MaybeRefOrGetter` (AGENTS.md §2).
- * - on unmount the subject is completed: subscriptions stop and no further
- *   emissions are delivered. In dev, React StrictMode remounts effects and
- *   runs that cleanup, which completes the subject; the mount effect detects
- *   the stopped subject and reseeds it, so re-emission survives the simulated
- *   unmount/remount cycle.
+ * (`source/vueuse/packages/rxjs/from/`).
  *
  * @see https://vueuse.org/rxjs/from/
  * @example

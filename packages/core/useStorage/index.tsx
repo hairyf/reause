@@ -168,40 +168,8 @@ export function useStorage<T>(key: string, defaults: T | (() => T), storage?: St
 export function useStorage<T = unknown>(key: string, defaults: null, storage?: StorageLike, options?: UseStorageOptions<T>): UseStorageReturn<T>
 
 /**
- * Reactive LocalStorage/SessionStorage — React port of VueUse's `useStorage`.
- *
  * Map from @vueuse/core `useStorage`
- * (`source/vueuse/packages/core/useStorage/`). Create a state tuple synced to
- * [LocalStorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage) (or a custom
- * `StorageLike` backend): the value is persisted under `key`, re-read on mount and key change, and
- * kept in sync across tabs and across hook instances sharing the same key.
- *
- * React divergences:
- * - the Vue `RemovableRef<T>` return becomes a `useState`-backed tuple;
- *   `setValue` also accepts a function updater. `setValue(null)` removes the
- *   entry from storage and the state falls back to the initial value,
- *   mirroring upstream where the self storage-event echo restores the raw
- *   defaults;
- * - `key` and `defaults` are plain values (upstream takes `MaybeRefOrGetter`);
- *   changing `key` between renders re-reads the new key, and writes always go
- *   to the key of the current render. A function `defaults` is a lazy
- *   initializer (React `useState` convention, like upstream's getter form)
- *   and is resolved once at mount;
- * - storage is never touched during render: the first read happens in the
- *   mount effect (SSR-safe — the server renders the initial value). When no
- *   storage is available the hook degrades to in-memory state without
- *   touching storage, mirroring upstream's early return; the fallback reads
- *   `window.localStorage` directly instead of going through upstream's
- *   `getSSRHandler('getDefaultStorage')` indirection;
- * - real `storage` events only fire across documents, so same-document sync
- *   re-dispatches a synthetic event on `window` — a real `StorageEvent` for
- *   `Storage` backends, `customStorageEventName` for custom `StorageLike`
- *   ones (mirroring upstream);
- * - Vue reactivity options have no React equivalent and are omitted:
- *   `flush`/`deep`/`eventFilter` (writes happen synchronously inside
- *   `setValue`), `shallow` (React state is replaced wholesale) and
- *   `initOnMounted` (effectively always on — the first read happens in the
- *   mount effect).
+ * (`source/vueuse/packages/core/useStorage/`).
  *
  * @example
  * const [state, setState] = useStorage('my-store', { hello: 'hi', greeting: 'Hello' })

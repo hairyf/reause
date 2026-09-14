@@ -78,25 +78,7 @@ const _refCount = new WeakMap<HTMLStyleElement, number>()
 
 /**
  * Map from @vueuse/core `useStyleTag`
- * (`source/vueuse/packages/core/useStyleTag/`). Injects a `<style>` element
- * into `document.head` and keeps its text in sync with the given CSS.
- *
- * React divergences:
- * - the return is a React tuple `[css, setCss, { id, load, unload, isLoaded }]` instead of
- * upstream's object `{ id, css: ShallowRef<string>, load, unload, isLoaded }` — `css` is plain
- * state and `setCss` replaces it with the React immutable-update protocol, `setCss('...')` or
- * `setCss(prev => '...')`. The `controls` object keeps a stable identity while `load`, `unload` and
- * `isLoaded` are unchanged;
- * - the initial `css` argument seeds that state once, like upstream's
- *   `shallowRef(css)`; later updates go through `setCss`;
- * - the `isLoaded` ref return becomes a plain boolean state;
- * - an initial `el.textContent` write in `load()` plus direct writes from `setCss` while loaded;
- * - `tryOnMounted(load)` / `tryOnScopeDispose(unload)` become a mount
- *   `useEffect` whose cleanup calls `unload` (skipped with `manual: true`);
- * - SSR-safe: `document` is only touched inside the mount effect and the
- *   callbacks, never during render — with no `document` available `load()`
- *   and `unload()` are no-ops (upstream's `defaultDocument` guard);
- * - auto-generated ids use the `reause_styletag_` prefix.
+ * (`source/vueuse/packages/core/useStyleTag/`).
  *
  * @example
  * const [css, setCss, { id, load, unload, isLoaded }] = useStyleTag('.foo { margin-top: 32px; }')

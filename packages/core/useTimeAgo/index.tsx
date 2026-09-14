@@ -179,21 +179,7 @@ export function formatTimeAgo<UnitNames extends string = UseTimeAgoUnitNamesDefa
 
 /**
  * Map from @vueuse/core `useTimeAgo`
- * (`source/vueuse/packages/core/useTimeAgo/`). Reactive time ago formatter.
- *
- * React divergences:
- * - upstream returns `ComputedRef<string>`; this port returns a **plain string** recomputed on
- * every render (house pattern, see `useTimeAgoIntl`). The refresh timer lives in the house
- * `useNow`, driven by a `useIntervalFn` scheduler that, the interval keeps the result fresh in
- * between.
- * - upstream `ConfigurableScheduler` → `updateInterval` option (default `30_000` ms, matching
- * upstream's default `useIntervalFn(cb, 30_000)`).
- * - upstream `controls: true` variant (`Pausable` pause/resume) is not
- *   ported, so `UseTimeAgoOptions` drops the `Controls` boolean generic and
- *   `UseTimeAgoReturn` is not ported (plain string return).
- * - upstream `MaybeRefOrGetter<Date | number | string>` → plain
- *   `Date | number | string`.
- * - the non-reactive `formatTimeAgo` helper is mirrored 1:1.
+ * (`source/vueuse/packages/core/useTimeAgo/`).
  *
  * @see https://vueuse.org/useTimeAgo
  *
