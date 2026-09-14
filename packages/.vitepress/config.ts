@@ -219,10 +219,13 @@ export default withPwa(defineConfig({
   // cards (types, signatures, JSDoc) on the docs site — mirrors VueUse's
   // `markdown.codeTransformers` wiring, with the React-specific bits below.
   //
-  // Only blocks whose meta carries `twoslash` are processed
-  // (`explicitTrigger`); `MarkdownTransform` adds that meta to every ts/tsx
-  // block and prepends `// @include: imports`, so authors keep writing plain
-  // ```tsx fences.
+  // Only blocks whose meta carries `twoslash` are processed — this transformer
+  // defaults to `explicitTrigger: true`. `MarkdownTransform` deliberately does
+  // NOT add that meta for every ts/tsx block the way VueUse does: upstream only
+  // injects `vue`, while reause injects the whole function registry, and
+  // defaulting every snippet on exhausted the heap on Netlify. A block opts in
+  // by writing `twoslash` in its fence meta, and then gets `// @include:
+  // imports` prepended. See `resolveTwoslashMeta` for the full rationale.
   markdown: {
     // Shiki resolves languages lazily, but hover cards are rendered *through*
     // shiki while the markdown is transformed, and a popup fence in an

@@ -12,8 +12,9 @@ import { findSourceFile, getTypeDefinitions, resetTypeCache } from './type-defin
  * - every function page gets VueUse's `<FunctionInfo>` block right after its H1
  *   (Category / Export Size / Package / Last Changed / Alias / Related), read
  *   from the generated registry and `packages/export-size.json`;
- * - `ts`/`tsx` blocks are switched on for twoslash (type-checked at build time,
- *   with the reause imports injected) so the docs site shows type hovers;
+ * - `ts`/`tsx` blocks that opt in with a `twoslash` fence meta are type-checked
+ *   at build time with the reause imports injected, so the docs site shows type
+ *   hovers (opt-in rather than VueUse's default-on — see `resolveTwoslashMeta`);
  * - function pages get VueUse's auto-generated chrome injected at build time,
  *   so `index.md` files stay minimal and uniform: a `## Demo` block right
  *   after the description (demo on top), and a footer with `## Type
@@ -58,62 +59,55 @@ function collapsible(code: string): string {
 }
 
 /**
- * Fenced blocks that get type-checked by twoslash. Mirrors VueUse's set (its
+ * Fenced blocks the twoslash pass can act on. Mirrors VueUse's set (its
  * `ts`/`typescript` handling): `tsx` is reause's example language, and `js`/`jsx`
  * deliberately stay out — twoslash compiles a `js` block as plain JS, so a
  * stray JSX fence there would fail the docs build instead of merely rendering
- * badly. Such a block can opt in by writing `twoslash` in its own meta.
+ * badly. This is the set of *eligible* fences: a block in it is only actually
+ * type-checked when its own meta asks for `twoslash` (see `resolveTwoslashMeta`).
  */
 const TWOSLASH_LANGS = 'typescript|tsx|ts'
 const TS_CODE_BLOCK_RE = new RegExp(`(^|\\n)\`\`\`(${TWOSLASH_LANGS})([^\\n]*)\\n([\\s\\S]*?)\\n\`\`\`(?=\\n|$)`, 'g')
 
-/** Line-highlight-only meta, e.g. `{5}` or `{1,3-5}` (mirrors VueUse). */
-const reLineHighlightMeta = /^\{[\d\-,]*\}$/
-
 /**
- * Replaces the given meta string with a default "twoslash" if it is empty or modifies it based on certain conditions.
+ * Resolve a fence meta into the meta the fence is rendered with.
  *
- * @param meta - The meta string to be processed.
- * @returns The processed meta string.
+ * Deliberate deviation from VueUse's `replaceToDefaultTwoslashMeta`, which
+ * switches twoslash on for every `ts`/`vue` block that does not opt out. That is
+ * affordable upstream because `packages/.vitepress/twoslash.ts` there injects
+ * only `vue`; reause injects the whole function registry — every hook of all
+ * seven `@reause/*` packages, i.e. the entire monorepo plus its third-party
+ * typings (firebase, rxjs, axios, electron, …) — into every snippet. Deep paths
+ * are no escape hatch either: each package bundles to a single `dist/index.d.ts`
+ * (so `@reause/core/useMouse` does not resolve) and a barrel import always drags
+ * the package's whole type graph in. Defaulting the ~690 docs snippets on made
+ * the docs build exhaust the heap on Netlify even at
+ * `--max-old-space-size=8192`, so twoslash is opt-in: a block is type-checked
+ * only when its own meta carries `twoslash`.
  *
- * If the meta string is empty or only contains whitespace, it returns "twoslash".
- * If the meta string contains "no-twoslash" (case insensitive), it removes "no-twoslash" and returns the remaining string.
- * If the remaining string is empty after removing "no-twoslash", it returns an empty string.
- * If the meta string matches the `reLineHighlightMeta` regex, it appends "twoslash" to the meta string.
- * Otherwise, it returns the trimmed meta string.
+ * `no-twoslash` is stripped, so a meta carrying it can never be read as an
+ * opt-in.
  */
-function replaceToDefaultTwoslashMeta(meta: string) {
+function resolveTwoslashMeta(meta: string) {
   const trimmed = meta.trim()
-  if (!trimmed) {
-    return 'twoslash'
-  }
-  const hasNoTwoslash = /no-twoslash/i.test(trimmed)
-  if (hasNoTwoslash) {
-    const leftover = trimmed.replace(/no-twoslash/i, '').trim()
-    if (!leftover) {
-      return ''
-    }
-    return leftover
-  }
-  if (reLineHighlightMeta.test(trimmed)) {
-    return `${trimmed} twoslash`
-  }
-  return trimmed
+  if (!/no-twoslash/i.test(trimmed))
+    return trimmed
+  return trimmed.replace(/no-twoslash/i, '').trim()
 }
 
 /** Whether a resolved meta asks the twoslash transformer to run. */
 function isMetaTwoslash(meta: string) {
-  return meta.includes('twoslash') && !meta.includes('no-twoslash')
+  return meta.includes('twoslash')
 }
 
 /**
- * Make every `ts`/`tsx`/`typescript` block on a page type-checked by twoslash
- * (mirrors VueUse's `replaceToDefaultTwoslashMeta` + `// @include: imports`
- * pass, applied to the whole page instead of only the function-page branch):
+ * Type-check the `ts`/`tsx`/`typescript` blocks on a page that opt in to
+ * twoslash (VueUse's `// @include: imports` pass, applied to the whole page
+ * instead of only the function-page branch):
  *
- * - the fence meta defaults to `twoslash` when it is empty, keeps line
- *   highlights (`{5}` → `{5} twoslash`) and is left alone otherwise, so
- *   `no-twoslash` still opts a block out;
+ * - a block is type-checked only when its own fence meta carries `twoslash`;
+ *   `no-twoslash` always opts out, since it is stripped before the meta is read
+ *   (see `resolveTwoslashMeta` for why this is opt-in, not upstream's default);
  * - twoslash-checked blocks get `// @include: imports` prepended, which expands
  *   to the `@reause/*` hook imports (see `packages/.vitepress/twoslash.ts`)
  *   inside a `// ---cut-*---` region, i.e. the injected lines are never
@@ -127,7 +121,7 @@ function withTwoslash(markdown: string): string {
   return markdown.replace(
     TS_CODE_BLOCK_RE,
     (raw, lead: string, lang: string, meta: string, snippet: string) => {
-      const resolved = replaceToDefaultTwoslashMeta(meta)
+      const resolved = resolveTwoslashMeta(meta)
       const body = isMetaTwoslash(resolved)
         ? `// @include: imports\n${snippet}`
         : snippet
