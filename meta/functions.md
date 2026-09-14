@@ -31,11 +31,11 @@
 | vueuse      | `createProjection`                | packages/math/createProjection                  | `packages/math/createProjection/index.tsx`                | ✅ ported                           |
 | vueuse      | `createTemplatePromise`           | packages/core/createTemplatePromise             | `packages/core/createPromisifiedComponent/index.tsx`      | ✅ ported                           |
 | react-use   | `createReducer`                   | src/factory/createReducer.ts                    | `packages/shared/createReducer/index.tsx`                 | ✅ ported                           |
-| vueuse      | `createScopedHook`                | packages/shared/createInjectionState            | `packages/shared/createScopedHook/index.tsx`              | ✅ ported                           |
+| vueuse      | `createScopedHook`                | —                                               | `packages/shared/createScopedHook/index.tsx`              | ✅ ported (not in pinned submodule) |
 | vueuse      | `createSharedComposable`          | packages/shared/createSharedComposable          | `packages/shared/createSharedHook/index.tsx`              | ✅ ported                           |
 | vueuse      | `createSingletonPromise`          | packages/shared/utils                           | `packages/shared/utils/index.tsx`                         | ✅ ported                           |
 | vueuse      | `customStorageEventName`          | packages/core/useStorage                        | `packages/core/useStorage/index.tsx`                      | ✅ ported                           |
-| vueuse      | `debounceFilter`                  | packages/shared/dist                            | `packages/shared/useWatchWithFilter/index.tsx`            | ✅ ported                           |
+| vueuse      | `debounceFilter`                  | packages/shared/utils                           | `packages/shared/useWatchWithFilter/index.tsx`            | ✅ ported                           |
 | —           | `deepClone`                       | —                                               | `packages/shared/useWatchDeep/index.tsx`                  | ✅ reause-only export               |
 | —           | `deepEqual`                       | —                                               | `packages/shared/useWatchDeep/index.tsx`                  | ✅ reause-only export               |
 | vueuse      | `events`                          | packages/core/useEventBus                       | `packages/core/useEventBus/index.tsx`                     | ✅ ported                           |
@@ -82,7 +82,7 @@
 | vueuse      | `provideSSRWidth`                 | packages/core/useSSRWidth                       | `packages/core/useSSRWidth/index.tsx`                     | ✅ ported                           |
 | vueuse      | `syncRef`                         | packages/shared/syncRef                         | `packages/shared/syncState/index.tsx`                     | ✅ ported                           |
 | vueuse      | `syncRefs`                        | packages/shared/syncRefs                        | `packages/shared/syncStates/index.tsx`                    | ✅ ported                           |
-| vueuse      | `throttleFilter`                  | packages/shared/dist                            | `packages/shared/useWatchWithFilter/index.tsx`            | ✅ ported                           |
+| vueuse      | `throttleFilter`                  | packages/shared/utils                           | `packages/shared/useWatchWithFilter/index.tsx`            | ✅ ported                           |
 | vueuse      | `timestamp`                       | packages/shared/utils                           | `packages/shared/utils/index.tsx`                         | ✅ ported                           |
 | vueuse      | `toValueArgsFlat`                 | packages/math                                   | `packages/math/utils/index.tsx`                           | ✅ ported                           |
 | vueuse      | `toArray`                         | packages/shared/utils                           | `packages/shared/utils/index.tsx`                         | ✅ ported                           |
@@ -292,7 +292,7 @@
 | vueuse      | `useRefHistory`                   | packages/core/useRefHistory                     | `packages/core/useStateHistory/index.tsx`                 | ✅ ported                           |
 | vueuse      | `useManualRefHistory`             | packages/core/useManualRefHistory               | `packages/core/useStateManualHistory/index.tsx`           | ✅ ported                           |
 | vueuse      | `refManualReset`                  | packages/shared/refManualReset                  | `packages/shared/useStateManualReset/index.tsx`           | ✅ ported                           |
-| vueuse      | `refThrottled`                    | packages/shared/dist                            | `packages/shared/useStateThrottled/index.tsx`             | ✅ ported                           |
+| vueuse      | `refThrottled`                    | packages/shared/refThrottled                    | `packages/shared/useStateThrottled/index.tsx`             | ✅ ported                           |
 | vueuse      | `useThrottledRefHistory`          | packages/core/useThrottledRefHistory            | `packages/core/useStateThrottledHistory/index.tsx`        | ✅ ported                           |
 | vueuse      | `refWithControl`                  | packages/shared/refWithControl                  | `packages/shared/useStateWithControl/index.tsx`           | ✅ ported                           |
 | vueuse      | `useStepper`                      | packages/core/useStepper                        | `packages/core/useStepper/index.tsx`                      | ✅ ported                           |
@@ -333,7 +333,7 @@
 | vueuse      | `useVirtualList`                  | packages/core/useVirtualList                    | `packages/core/useVirtualList/index.tsx`                  | ✅ ported                           |
 | vueuse      | `useWakeLock`                     | packages/core/useWakeLock                       | `packages/core/useWakeLock/index.tsx`                     | ✅ ported                           |
 | vueuse      | `watch`                           | —                                               | `packages/shared/useWatch/index.tsx`                      | ✅ ported (not in pinned submodule) |
-| vueuse      | `watchArray`                      | packages/shared/dist                            | `packages/shared/useWatchArray/index.tsx`                 | ✅ ported                           |
+| vueuse      | `watchArray`                      | packages/shared/watchArray                      | `packages/shared/useWatchArray/index.tsx`                 | ✅ ported                           |
 | vueuse      | `watchAtMost`                     | packages/shared/watchAtMost                     | `packages/shared/useWatchAtMost/index.tsx`                | ✅ ported                           |
 | vueuse      | `watchDebounced`                  | packages/shared/watchDebounced                  | `packages/shared/useWatchDebounced/index.tsx`             | ✅ ported                           |
 | vueuse      | `watchDeep`                       | packages/shared/watchDeep                       | `packages/shared/useWatchDeep/index.tsx`                  | ✅ ported                           |

@@ -343,7 +343,12 @@ function collectUpstreamModules() {
   const files = globSync('packages/{shared,core,integrations,math,rxjs,electron,firebase,router}/**/*.ts', {
     cwd: UPSTREAM_ROOT,
     absolute: true,
-    ignore: ['**/*.test.ts'],
+    // `dist`/`node_modules` are build output, not sources: a locally built
+    // submodule exposes `dist/index.d.ts`, which matched `**/*.ts` and made the
+    // index claim a module the pin does not have (`debounceFilter` →
+    // `packages/shared/dist`), so the committed table pointed at paths that do
+    // not exist in the pinned tree.
+    ignore: ['**/*.test.ts', '**/dist/**', '**/node_modules/**'],
   })
   for (const file of files) {
     // The module directory owns its files: `packages/core/useBreakpoints`
