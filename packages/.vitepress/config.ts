@@ -17,7 +17,7 @@ import { ChangeLog, getChangeLog } from './plugins/changelog'
 import { Contributors } from './plugins/contributors'
 import { MarkdownTransform } from './plugins/markdownTransform'
 import { PWAVirtualModule } from './plugins/pwa-virtual'
-import { FILE_IMPORTS, stripPopupImages } from './twoslash'
+import { stripPopupImages, TWOSLASH_PATHS } from './twoslash'
 
 /**
  * VitePress config for the reause docs site (docs root = `packages/`,
@@ -220,12 +220,12 @@ export default withPwa(defineConfig({
   // `markdown.codeTransformers` wiring, with the React-specific bits below.
   //
   // Only blocks whose meta carries `twoslash` are processed — this transformer
-  // defaults to `explicitTrigger: true`. `MarkdownTransform` deliberately does
-  // NOT add that meta for every ts/tsx block the way VueUse does: upstream only
-  // injects `vue`, while reause injects the whole function registry, and
-  // defaulting every snippet on exhausted the heap on Netlify. A block opts in
-  // by writing `twoslash` in its fence meta, and then gets `// @include:
-  // imports` prepended. See `resolveTwoslashMeta` for the full rationale.
+  // defaults to `explicitTrigger: true` — and `MarkdownTransform` adds that meta
+  // to every ts/tsx block (as VueUse does), then prepends the import preamble for
+  // the hooks that block mentions. Unlike upstream's single `vue` list, that
+  // preamble is computed per block: reause's seven packages each bundle to one
+  // `dist/index.d.ts`, so importing the barrels would put the whole monorepo's
+  // type graph into every snippet and exhaust the heap on Netlify.
   markdown: {
     // Shiki resolves languages lazily, but hover cards are rendered *through*
     // shiki while the markdown is transformed, and a popup fence in an
@@ -237,10 +237,17 @@ export default withPwa(defineConfig({
         twoslashOptions: {
           compilerOptions: {
             // Match tsconfig.json: snippets are .tsx with the automatic JSX
-            // runtime (`jsx: react-jsx`), and `@reause/*` resolves through the
-            // workspace package manifests, i.e. Bundler resolution.
+            // runtime (`jsx: react-jsx`), and Bundler resolution.
             jsx: ts.JsxEmit.ReactJSX,
             moduleResolution: ts.ModuleResolutionKind.Bundler,
+            // `baseUrl`/`paths` mirror tsconfig.json's `@reause/*` subpath
+            // entries, so the injected `@reause/<pkg>/<hook>` specifiers resolve
+            // to the hook's *source* module rather than to the package barrel.
+            // Each package's `dist/index.d.ts` bundles every hook, so one barrel
+            // import would drag the package — plus its third-party typings —
+            // into the snippet's program. See `TWOSLASH_PATHS`.
+            baseUrl: resolve(__dirname, '../..'),
+            paths: TWOSLASH_PATHS,
           },
           handbookOptions: {
             // Docs snippets are intentionally partial (continuation examples,
@@ -249,7 +256,6 @@ export default withPwa(defineConfig({
             noErrors: true,
           },
         },
-        includesMap: new Map([['imports', `// ---cut-start---\n${FILE_IMPORTS}\n// ---cut-end---`]]),
         typesCache: createFileSystemTypesCache({
           dir: resolve(__dirname, 'cache', 'twoslash'),
         }),

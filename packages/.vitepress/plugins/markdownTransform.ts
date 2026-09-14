@@ -1,6 +1,7 @@
 import type { Plugin } from 'vite'
 import { existsSync } from 'node:fs'
 import { upstreamPaths, upstreamSources } from '../../metadata/src/upstream'
+import { REACT_IMPORTS } from '../twoslash'
 import { findSourceFile, getTypeDefinitions, resetTypeCache } from './type-definitions'
 
 /**
@@ -12,9 +13,10 @@ import { findSourceFile, getTypeDefinitions, resetTypeCache } from './type-defin
  * - every function page gets VueUse's `<FunctionInfo>` block right after its H1
  *   (Category / Export Size / Package / Last Changed / Alias / Related), read
  *   from the generated registry and `packages/export-size.json`;
- * - `ts`/`tsx` blocks that opt in with a `twoslash` fence meta are type-checked
- *   at build time with the reause imports injected, so the docs site shows type
- *   hovers (opt-in rather than VueUse's default-on — see `resolveTwoslashMeta`);
+ * - every `ts`/`tsx` block is type-checked by twoslash at build time, with a
+ *   per-block preamble of just the hooks that snippet mentions injected into its
+ *   program, so the docs site shows type hovers without the whole registry
+ *   landing in every snippet;
  * - function pages get VueUse's auto-generated chrome injected at build time,
  *   so `index.md` files stay minimal and uniform: a `## Demo` block right
  *   after the description (demo on top), and a footer with `## Type
@@ -59,71 +61,113 @@ function collapsible(code: string): string {
 }
 
 /**
- * Fenced blocks the twoslash pass can act on. Mirrors VueUse's set (its
+ * Fenced blocks that get type-checked by twoslash. Mirrors VueUse's set (its
  * `ts`/`typescript` handling): `tsx` is reause's example language, and `js`/`jsx`
  * deliberately stay out — twoslash compiles a `js` block as plain JS, so a
  * stray JSX fence there would fail the docs build instead of merely rendering
- * badly. This is the set of *eligible* fences: a block in it is only actually
- * type-checked when its own meta asks for `twoslash` (see `resolveTwoslashMeta`).
+ * badly. Such a block can opt in by writing `twoslash` in its own meta.
  */
 const TWOSLASH_LANGS = 'typescript|tsx|ts'
 const TS_CODE_BLOCK_RE = new RegExp(`(^|\\n)\`\`\`(${TWOSLASH_LANGS})([^\\n]*)\\n([\\s\\S]*?)\\n\`\`\`(?=\\n|$)`, 'g')
 
+/** Line-highlight-only meta, e.g. `{5}` or `{1,3-5}` (mirrors VueUse). */
+const reLineHighlightMeta = /^\{[\d\-,]*\}$/
+
 /**
- * Resolve a fence meta into the meta the fence is rendered with.
+ * Resolve a fence meta into the meta the fence is rendered with (mirrors
+ * VueUse's `replaceToDefaultTwoslashMeta`): a block is type-checked unless it
+ * opts out, and a line-highlight meta keeps the highlight and gains `twoslash`
+ * (`{5}` → `{5} twoslash`).
  *
- * Deliberate deviation from VueUse's `replaceToDefaultTwoslashMeta`, which
- * switches twoslash on for every `ts`/`vue` block that does not opt out. That is
- * affordable upstream because `packages/.vitepress/twoslash.ts` there injects
- * only `vue`; reause injects the whole function registry — every hook of all
- * seven `@reause/*` packages, i.e. the entire monorepo plus its third-party
- * typings (firebase, rxjs, axios, electron, …) — into every snippet. Deep paths
- * are no escape hatch either: each package bundles to a single `dist/index.d.ts`
- * (so `@reause/core/useMouse` does not resolve) and a barrel import always drags
- * the package's whole type graph in. Defaulting the ~690 docs snippets on made
- * the docs build exhaust the heap on Netlify even at
- * `--max-old-space-size=8192`, so twoslash is opt-in: a block is type-checked
- * only when its own meta carries `twoslash`.
- *
- * `no-twoslash` is stripped, so a meta carrying it can never be read as an
- * opt-in.
+ * React adaptation: upstream can default every block on because its injected
+ * payload is the single `vue` module. Here the payload is computed per block —
+ * see `twoslashImports` — which is what keeps defaulting on affordable.
  */
 function resolveTwoslashMeta(meta: string) {
   const trimmed = meta.trim()
-  if (!/no-twoslash/i.test(trimmed))
-    return trimmed
-  return trimmed.replace(/no-twoslash/i, '').trim()
+  if (!trimmed)
+    return 'twoslash'
+  if (/no-twoslash/i.test(trimmed))
+    return trimmed.replace(/no-twoslash/i, '').trim()
+  if (reLineHighlightMeta.test(trimmed))
+    return `${trimmed} twoslash`
+  return trimmed
 }
 
 /** Whether a resolved meta asks the twoslash transformer to run. */
 function isMetaTwoslash(meta: string) {
-  return meta.includes('twoslash')
+  return meta.includes('twoslash') && !meta.includes('no-twoslash')
+}
+
+/** `name` → the module that exports it (`useMouse` → `@reause/core/useMouse`). */
+function hookModules(functions: FunctionRef[]): Map<string, string> {
+  const modules = new Map<string, string>()
+  for (const fn of functions) {
+    if (!modules.has(fn.name))
+      modules.set(fn.name, `@reause/${pageOf(fn)}`)
+  }
+  return modules
 }
 
 /**
- * Type-check the `ts`/`tsx`/`typescript` blocks on a page that opt in to
- * twoslash (VueUse's `// @include: imports` pass, applied to the whole page
- * instead of only the function-page branch):
+ * Build the invisible import preamble for one snippet.
  *
- * - a block is type-checked only when its own fence meta carries `twoslash`;
- *   `no-twoslash` always opts out, since it is stripped before the meta is read
- *   (see `resolveTwoslashMeta` for why this is opt-in, not upstream's default);
- * - twoslash-checked blocks get `// @include: imports` prepended, which expands
- *   to the `@reause/*` hook imports (see `packages/.vitepress/twoslash.ts`)
- *   inside a `// ---cut-*---` region, i.e. the injected lines are never
- *   rendered. That is what lets a continuation snippet like
+ * VueUse injects one static list into every block, which is affordable because
+ * that list is the `vue` module. reause's hooks live in seven packages that each
+ * bundle to a single `dist/index.d.ts`, so a barrel import pulls a package's
+ * whole type graph — plus its third-party typings (firebase, rxjs, axios,
+ * electron, …) — into the snippet's program. Injecting the registry into all
+ * ~690 blocks that way made `docs:build` exhaust the heap on Netlify even at
+ * `--max-old-space-size=8192`.
+ *
+ * So the preamble names only the hooks this snippet actually mentions, and each
+ * one resolves through its own source module (`@reause/core/useMouse`, see
+ * `TWOSLASH_PATHS`). A block's program stays around one hook plus `react` — the
+ * same order of magnitude as VueUse's `vue`-only injection.
+ *
+ * The region is wrapped in `// ---cut-*---` so twoslash keeps the injected
+ * imports out of the rendered code.
+ */
+function twoslashImports(snippet: string, modules: Map<string, string>, nameRe: RegExp): string {
+  const used = new Set<string>()
+  for (const match of snippet.matchAll(nameRe))
+    used.add(match[1])
+  const lines = [...used].sort().flatMap((name) => {
+    const specifier = modules.get(name)
+    return specifier ? [`import { ${name} } from '${specifier}';`] : []
+  })
+  lines.push(REACT_IMPORTS)
+  return `// ---cut-start---\n${lines.join('\n')}\n// ---cut-end---`
+}
+
+/**
+ * Type-check every `ts`/`tsx`/`typescript` block on a page with twoslash
+ * (VueUse's pass, applied to the whole page instead of only the function-page
+ * branch):
+ *
+ * - the fence meta defaults to `twoslash` when it is empty, keeps line highlights
+ *   (`{5}` → `{5} twoslash`) and is left alone otherwise, so `no-twoslash` still
+ *   opts a block out;
+ * - each checked block gets the preamble for the hooks it mentions
+ *   (`twoslashImports`), which is what lets a continuation snippet like
  *   `const { x, y } = useMouse()` hover as the real signature instead of `any`.
  *
  * Runs last, so the auto-generated `## Type Declarations` block is covered too
  * (hovering a type there prints its definition, as on the VueUse site).
  */
-function withTwoslash(markdown: string): string {
+function withTwoslash(markdown: string, modules: Map<string, string>): string {
+  const names = [...modules.keys()].sort((a, b) => b.length - a.length)
+  if (!names.length)
+    return markdown
+  // Longest-first plus `\b` keeps prefixes apart: `useMouse` must not match
+  // inside `useMouseInElement`.
+  const nameRe = new RegExp(`\\b(${names.join('|')})\\b`, 'g')
   return markdown.replace(
     TS_CODE_BLOCK_RE,
     (raw, lead: string, lang: string, meta: string, snippet: string) => {
       const resolved = resolveTwoslashMeta(meta)
       const body = isMetaTwoslash(resolved)
-        ? `// @include: imports\n${snippet}`
+        ? `${twoslashImports(snippet, modules, nameRe)}\n${snippet}`
         : snippet
       const fenceMeta = resolved ? ` ${resolved}` : ''
       return `${lead}\`\`\`${lang}${fenceMeta}\n${body}\n\`\`\``
@@ -172,6 +216,8 @@ function sourceLinks(pkg: string, dir: string, source?: string): string {
 
 export function MarkdownTransform(functions: FunctionRef[]): Plugin {
   const registered = new Map(functions.map(fn => [fn.name, `/${pageOf(fn)}/`]))
+  // Hooks the twoslash preamble can import, per snippet.
+  const modules = hookModules(functions)
   // Upstream source id per docs page, straight from the registry's `source`
   // column (the provenance of record); a reause-only page has none and so gets
   // no upstream link.
@@ -214,7 +260,7 @@ export function MarkdownTransform(functions: FunctionRef[]): Plugin {
       }).join('\n')
 
       if (!page)
-        return withTwoslash(linked)
+        return withTwoslash(linked, modules)
 
       const [, pkg, dir] = page
 
@@ -260,7 +306,7 @@ export function MarkdownTransform(functions: FunctionRef[]): Plugin {
       // unconditionally like upstream: the component renders
       // "No recent changes" when the page has no recorded commits.
       footer.push('## Changelog', '', `<Changelog dir="${dir}" />`)
-      return withTwoslash(`${out.trimEnd()}\n\n${footer.join('\n')}\n`)
+      return withTwoslash(`${out.trimEnd()}\n\n${footer.join('\n')}\n`, modules)
     },
   }
 }

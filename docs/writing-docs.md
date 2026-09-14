@@ -21,7 +21,7 @@ Hook 页面在构建期由插件 `packages/.vitepress/plugins/markdownTransform.
 | `## Changelog` 时间线（内含 `<Changelog />`）                                                                | 同上，由 `theme/components/Changelog.vue` 渲染，数据来自 `getChangeLog()`（`plugins/changelog.ts`）  | 总是                                                |
 | 函数信息块（Category / Export Size / Package / Last Changed / Alias / Related） | 同上，由 `theme/components/FunctionInfo.vue` 渲染，数据取自 registry 与 `packages/export-size.json` | 总能生成                                            |
 | 反引号函数名自动链接                                                            | 同上（`` `useToggle` `` → ``[`useToggle`](/core/useToggle)``）                                      | 名称在 registry 中存在；代码块与 `<` 开头的行不处理 |
-| 代码块 twoslash（构建期类型检查 → 悬停卡片）                                    | 同上（围栏 meta 显式写 `twoslash` 时才注入 `// @include: imports`）              | 块自身写了 `twoslash` 且没写 `no-twoslash`                            |
+| 代码块 twoslash（构建期类型检查 → 悬停卡片）                                    | 同上（按块注入该块引用到的 hook，import 指向 hook 源码模块）              | 块自身没写 `no-twoslash`                            |
 | 首页 / 侧边栏 / 分类筛选                                                        | `packages/.vitepress/config.ts` + `packages/metadata/src/functions.ts`                              | `category` frontmatter 合法                         |
 | Skill 参考副本                                                                  | `packages/skills/build.ts`（`npm run update:skills`）                                               | 对应 `packages/**/index.md` 存在                    |
 | `meta/functions.md` 移植登记表                                                  | `scripts/update.ts`                                                                                 | 总是                                                |
@@ -31,7 +31,7 @@ Hook 页面在构建期由插件 `packages/.vitepress/plugins/markdownTransform.
 - **不要**手写 `## Type Declarations`、`## Source`、`## Demo`、`## Contributors`、`## Changelog`、`## Install`、`Map from` 之类的整节。
 - **不要**手写"该函数在 VueUse 里叫什么/在哪个文件"——这属于 JSDoc 注解与 registry，属于 §7。
 - **不要**在正文里手打函数列表表格：`/functions` 由 registry 生成。
-- 想让某个代码块带悬停类型卡片，就在围栏 meta 显式写 `twoslash`（默认不参与，见 §2.1）；不要为了别的原因手写它。
+- **不要**在代码围栏上手写 `twoslash`：`ts`/`tsx`/`typescript` 块在构建期自动加上（见 §2.1）。
 
 ## 2. `index.md` 模板
 
@@ -85,13 +85,13 @@ import { useXxx } from '@reause/core'
 
 ### 2.1 代码块与 twoslash（悬停类型）
 
-文档站与 VueUse 一样带 twoslash：悬停变量/函数会弹出真实类型与 JSDoc。但**类型检查是显式 opt-in 的**：
+文档站与 VueUse 一样带 twoslash：悬停变量/函数会弹出真实类型与 JSDoc。
 
-- **默认不参与**：`ts` / `tsx` / `typescript` 块只有在自己围栏 meta 里显式写了 `twoslash`（如 ``` ```tsx twoslash ```）时，才会被 `markdownTransform.ts` 注入 `// @include: imports` 并交给 twoslash 编译。
-- **为什么默认关**：注入的是 registry 里**全部七个 `@reause/*` 包**的 Hook 名（+ 常用 React Hook），而每个包只产出单个 `dist/index.d.ts`（`@reause/core/useMouse` 这类深路径不存在），所以一个块的 TS program 会把整个 monorepo 连同第三方类型（firebase、rxjs、axios、electron…）全部拉进来。让 ~690 个代码块全都参与会让 `docs:build` 在 Netlify 上堆溢出（`--max-old-space-size=8192` 也不够），因此只有确实需要悬停签名的**续写型示例**才加 `twoslash`。
-- 注入内容被 `// ---cut-*---` 裁掉，读者看不到；正因为注入了 Hook 名，不写 import 的 `const { x, y } = useMouse()` 才能悬停出真实签名。
-- 注入只覆盖 Hook 名；示例里引用**类型**（`UseXxxOptions` 等）时仍要自己写 `import type`。
-- 关掉单块的类型检查（伪代码、故意不成立的写法）就在 meta 写 `no-twoslash`：它会被 `markdownTransform.ts` 先剥掉，保证 twoslash transformer 的 `\btwoslash\b` 触发器不命中。`js` / `jsx` 块不在自动处理的语言集内。
+- 围栏**不需要**写 `twoslash`：`ts` / `tsx` / `typescript` 块由 `markdownTransform.ts` 在构建期自动处理。
+- 注入的是**该块真正引用到的 hook**：`markdownTransform.ts` 拿 registry 匹配块里的标识符，逐个生成 `import { useMouse } from '@reause/core/useMouse'`，再由 `TWOSLASH_PATHS`（`config.ts` 里 twoslash 的 `paths`）解析到该 hook 的**源码模块**。注入内容被 `// ---cut-*---` 裁掉，读者看不到；也正因为注入了 hook 名，不写 import 的 `const { x, y } = useMouse()` 才能悬停出真实签名。
+- **为什么按块注入，而不是像 VueUse 那样注入一个静态列表**：VueUse 的列表只有 `vue` 一个模块；reause 的 hook 分散在七个包里，而每个包只产出单个 `dist/index.d.ts`（`@reause/core/useMouse` 这类深路径不存在），所以任何 barrel import（`import ... from '@reause/core'`）都会把整包的**全部类型图 + 第三方类型**（firebase、rxjs、axios、electron…）拉进这个块的 TS program。把 registry 全量注入 ~690 个块，会让 `docs:build` 在 Netlify 上堆溢出（`--max-old-space-size=8192` 也不够）；按块注入后，一个块的 program 大致只有「它引用的那个 hook + react」，与 VueUse 的量级相当。
+- 注入只覆盖 registry 里的 hook；工具函数（`unrefElement`、`toValue`…）和**类型**（`UseXxxOptions` 等）仍要自己写 import。
+- 关掉单块的类型检查（伪代码、故意不成立的写法）就在 meta 写 `no-twoslash`：它会被 `markdownTransform.ts` 先剥掉，保证 twoslash transformer 的 `\btwoslash\b` 触发器不命中。行高亮照常可用（meta 写 `{5}`，会被补成 `{5} twoslash`）。`js` / `jsx` 块默认不参与，需要时手写 `twoslash`。
 - 编译选项与 `tsconfig.json` 对齐（自动 JSX runtime、Bundler 解析、`noErrors: true`）：示例允许残缺，但**语法必须合法**，否则生产构建（Netlify 的 `npm run docs:build`）会直接失败。
 - 悬停卡片由 `@shikijs/vitepress-twoslash` 在浏览器端渲染，`npm run docs` 预览即可验证。
 
@@ -242,7 +242,7 @@ Array, Time, Utilities, Factory, Lifecycle, Side-effects, Uncategorized,
 - [ ] 示例代码的返回值形态（元组/对象）与 `index.tsx` 的真实签名一致。
 - [ ] 可选小节（含 `### Key Options` / `## Behavior` / `## Internal Technical Notes` / `> **Warning**`）按 §4.4 取舍，没有为 5 行内容拆出 6 个 `###`。
 - [ ] `##` 级小节之间用独立成行的 `---` 分隔。
-- [ ] 代码块语法合法；只有确实需要悬停签名的续写型示例才写了 `twoslash` meta（默认不开，见 §2.1）。
+- [ ] 代码块语法合法（`tsx` 块会被 twoslash 编译），没有手写多余的 `twoslash` meta。
 - [ ] 没有直接编辑 `skills/**`。
 
 发布前本地核对：

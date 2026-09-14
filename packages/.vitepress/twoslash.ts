@@ -1,19 +1,18 @@
 import type { ShikiTransformer } from 'shiki'
-import { functions } from '../metadata/src/functions'
 
 /**
  * Twoslash support data for the docs site.
  *
  * React adaptation of VueUse's `packages/.vitepress/twoslash.ts`. VueUse builds
  * the injected imports by introspecting the `vue` runtime module
- * (`getModuleExports(vue)`); reause has no single runtime module to introspect —
- * the hooks are spread over seven packages — so the injected names come from the
- * generated function registry (`@reause/metadata`), grouped by the package that
- * documents them.
+ * (`getModuleExports(vue)`) and injects that one static list into every block.
+ * reause has no single runtime module to introspect — its hooks are spread over
+ * seven packages — so the preamble is assembled per block instead, from the
+ * generated function registry plus `TWOSLASH_PATHS` below; see `twoslashImports`
+ * in `plugins/markdownTransform.ts`.
  *
- * The injected imports are what make *partial* snippets hoverable. Most reause
- * examples are continuation snippets that rely on the surrounding page for
- * context:
+ * That preamble is what makes *partial* snippets hoverable. Most reause examples
+ * are continuation snippets that rely on the surrounding page for context:
  *
  * ```tsx
  * const { x, y } = useMouse({ touch: false })
@@ -22,8 +21,6 @@ import { functions } from '../metadata/src/functions'
  * Twoslash compiles every code block as its own file, so without an injection
  * that `useMouse` is an unresolved identifier and hovering it would show `any`
  * instead of `function useMouse(options?: UseMouseOptions): UseMouseReturn`.
- * `FILE_IMPORTS` is `// @include`d into every twoslash block and cut from the
- * rendered code, so the injected lines stay invisible to readers.
  */
 
 /** `import { a, b } from 'mod'` + `import type { T } from 'mod'` (mirrors VueUse). */
@@ -37,22 +34,6 @@ export function generateFileImports(moduleName: string, exports: string[] = [], 
     output.push(`import type { ${exportTypes.join(', ')} } from '${moduleName}';`)
 
   return output.join('\n')
-}
-
-/**
- * Exported hook names per documented package, in registry order. Names are
- * unique across packages (verified by the registry generator's page model), so
- * one import statement per package is unambiguous.
- */
-export function reausePackageExports(): Map<string, string[]> {
-  const byPackage = new Map<string, string[]>()
-  for (const fn of functions) {
-    const names = byPackage.get(fn.pkg) ?? []
-    if (!names.includes(fn.name))
-      names.push(fn.name)
-    byPackage.set(fn.pkg, names)
-  }
-  return byPackage
 }
 
 /**
@@ -82,10 +63,26 @@ const REACT_TYPES = [
   'RefObject',
 ]
 
-export const FILE_IMPORTS = [
-  ...[...reausePackageExports()].map(([pkg, names]) => generateFileImports(`@reause/${pkg}`, names)),
-  generateFileImports('react', REACT_HOOKS, REACT_TYPES),
-].join('\n')
+/** The `react` half of every block's preamble — identical for all snippets. */
+export const REACT_IMPORTS = generateFileImports('react', REACT_HOOKS, REACT_TYPES)
+
+/** Documented packages whose hooks can be imported one at a time. */
+const PACKAGES = ['core', 'shared', 'math', 'integrations', 'electron', 'firebase', 'rxjs'] as const
+
+/**
+ * Twoslash's own `paths`: `@reause/core/useMouse` resolves to the hook's *source*
+ * directory instead of the package barrel.
+ *
+ * The published packages expose `"./*": "./dist/*"`, but the build emits a single
+ * bundled `dist/index.d.ts` per package — there is no `dist/useMouse.d.ts` to
+ * land on — so a bare barrel import always drags the package's entire type graph
+ * in. `tsconfig.json` maps the same subpaths for the same reason; twoslash needs
+ * its own copy because it compiles against a virtual host with no tsconfig, and
+ * `config.ts` supplies the `baseUrl` (the repo root) that anchors these.
+ */
+export const TWOSLASH_PATHS: Record<string, string[]> = Object.fromEntries(
+  PACKAGES.map(pkg => [`@reause/${pkg}/*`, [`./packages/${pkg}/*`]]),
+)
 
 /** Each hover/error/completion card is emitted as a FloatingVue popper template. */
 const POPPER_RE = /<template v-slot:popper[^>]*>[\s\S]*?<\/template>/g
