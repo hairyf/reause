@@ -14,7 +14,7 @@ import { useRound } from '@reause/math'
 const result = useRound(20.49) // 20
 ```
 
-`value` is a plain read-only `number` (upstream takes `MaybeRefOrGetter<number>`). Re-render with a
+`value` is a plain read-only `number`. Re-render with a
 new value — e.g. from `useState` — and the hook recomputes:
 
 ```tsx

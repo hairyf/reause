@@ -17,8 +17,7 @@ const isPreferredDark = useMediaQuery('(prefers-color-scheme: dark)')
 
 ### Source Forms
 
-`query` is a read-only value source and takes a plain `string` (upstream:
-`MaybeRefOrGetter<string>`). Resolve a React ref or state value at the call site:
+`query` is a read-only value source and takes a plain `string`. Resolve a React ref or state value at the call site:
 
 ```tsx
 const [query, setQuery] = useState('(min-width: 1024px)')

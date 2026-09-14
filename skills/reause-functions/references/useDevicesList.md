@@ -86,11 +86,9 @@ export interface UseDevicesListReturn {
   ensurePermissions: () => Promise<boolean>
   /**
    * Register a callback fired after every successful device enumeration (`devices` update) —
-   * `useListener` protocol `(fn) => { off }`.
+   * `useListener` protocol `(fn) => () => void` (the returned off function unsubscribes it).
    */
-  onUpdated: (fn: (devices: MediaDeviceInfo[]) => void) => {
-    off: () => void
-  }
+  onUpdated: (fn: (devices: MediaDeviceInfo[]) => void) => () => void
 }
 /**
  * Map from @vueuse/core `useDevicesList`

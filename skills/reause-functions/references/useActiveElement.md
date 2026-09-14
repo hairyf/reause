@@ -63,14 +63,6 @@ const activeElement = useActiveElement({ document: shadowRoot })
 const activeElementInFrame = useActiveElement({ window: iframe.contentWindow })
 ```
 
-### React divergences from upstream
-
-- **`undefined` instead of `null`.** The return value is `T | undefined`; upstream returns a `ShallowRef<T | null | undefined>`. The observable difference shows up only when nothing is focused inside the resolved root: upstream holds `null` (an empty `ShadowRoot` has `activeElement === null`), while this port returns `undefined`. For `document`, `activeElement` falls back to `<body>`, so both agree in the common case.
-- **Extra `pointerdown` trigger.** Upstream binds only `blur` (re-read when `event.relatedTarget === null`) and `focus`; this port adds a third window listener, `pointerdown`, that re-reads the active element. Observable difference: a pointer press re-reads `activeElement` even when no `focus` / `blur` event follows, so the value can update earlier than upstream would. When the element is unchanged, React bails out of the same-value state update, so no extra re-render occurs.
-- **Initial read on mount.** `document.activeElement` is read in the mount effect rather than during setup, so the first render (and SSR) returns `undefined`; upstream reads during setup.
-- **Listeners attach in an effect** (upstream composes `useEventListener`) and are removed on unmount.
-- **`triggerOnRemoval`** observes the resolved `document` / `ShadowRoot` with a `MutationObserver` directly (upstream composes `onElementRemoval`) and disconnects it on unmount.
-
 ## Type Declarations
 
 ```ts

@@ -99,26 +99,6 @@ console.log(controller?.buttons.y.pressed)
 
 Currently there are only mappings for the Xbox 360 controller. If you have controller you want to add mappings for, feel free to open a PR for more controller mappings!
 
-## Return Values
-
-The return is a React tuple `[gamepads, setGamepads, controls]` — upstream returns the object
-`{ isSupported, onConnected, onDisconnected, gamepads: Ref<Gamepad[]>, pause, resume, isActive }`.
-
-- `gamepads` — the current snapshot of connected gamepads, refreshed by the `requestAnimationFrame`
-  poller (upstream: a writable `gamepads` ref).
-- `setGamepads(next | prev => next)` — replaces the snapshot with the React immutable-update protocol.
-  It also refreshes the internal latest-value ref synchronously, so the poller and the
-  connect/disconnect handlers always build on the newest list.
-- `controls.isSupported` — `true` when the resolved navigator exposes `getGamepads` (plain boolean,
-  resolved in a mount effect, so it stays `false` on the first render and on the server).
-- `controls.onConnected(fn)` / `controls.onDisconnected(fn)` — subscribe to the connect/disconnect
-  events; each returns an `off` handle to unsubscribe (upstream: `createEventHook()`).
-- `controls.pause()` / `controls.resume()` — control the `requestAnimationFrame` poller.
-- `controls.isActive` — `true` while the poller is running (upstream `useRafFn`'s `isActive`
-  shallow ref as a plain boolean).
-
-The `controls` object keeps a stable identity while its members are unchanged.
-
 ## Type Declarations
 
 ```ts
@@ -148,19 +128,15 @@ export interface UseGamepadControls {
    */
   isSupported: boolean
   /**
-   * Register a callback fired with the `index` of a newly connected gamepad. Returns an `off`
-   * handle to unsubscribe — compatible with the `useListener` protocol.
+   * Register a callback fired with the `index` of a newly connected gamepad. Returns the off
+   * function that unsubscribes it — compatible with the `useListener` protocol.
    */
-  onConnected: (fn: (index: number) => void) => {
-    off: () => void
-  }
+  onConnected: (fn: (index: number) => void) => () => void
   /**
-   * Register a callback fired with the `index` of a disconnected gamepad. Returns an `off` handle
-   * to unsubscribe — compatible with the `useListener` protocol.
+   * Register a callback fired with the `index` of a disconnected gamepad. Returns the off function
+   * that unsubscribes it — compatible with the `useListener` protocol.
    */
-  onDisconnected: (fn: (index: number) => void) => {
-    off: () => void
-  }
+  onDisconnected: (fn: (index: number) => void) => () => void
   /**
    * Pause the `requestAnimationFrame` poller — the `gamepads` snapshot stops updating.
    */

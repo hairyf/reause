@@ -198,14 +198,6 @@ function App() {
 }
 ```
 
-### React divergences from upstream
-
-- **children-as-function replaces `v-slot`.** The template is a render function passed as the children of `<PortalSlot>`; it receives the bindings object (the props passed to `<SlotTarget>`) plus `$slots`.
-- **Single slot.** React components expose only the `default` slot: `$slots.default` is a function returning the children passed to `<SlotTarget>` (upstream exposes an arbitrary `$slots` map).
-- **No attribute inheritance.** React has no attrs/props split, so every prop except `children` is forwarded to the template as a binding — camelized (`my-msg` → `myMsg`) when no `props` option is given, mirroring upstream's attrs path. `inheritAttrs` is therefore a no-op.
-- **Capture during render.** The template is captured when `<PortalSlot>` renders (like upstream's define render assigns the slot), so `<PortalSlot>` must render before `<SlotTarget>` in the same commit.
-- **`props` option shape.** A list of prop keys instead of Vue's runtime props definition.
-
 ## Type Declarations
 
 ```ts

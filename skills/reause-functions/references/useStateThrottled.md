@@ -18,7 +18,10 @@ The first argument is a `State<T>` source. Besides a plain value, you can pass a
 
 ```tsx
 const [value, setValue] = useState('')
-const [input, setInput, throttled] = useStateThrottled([value, setValue], 1000)
+const [input, setInput, throttled] = useStateThrottled(
+  { value, onChange: setValue },
+  1000
+)
 // or: useStateThrottled({ value, onChange: setValue }, 1000)
 ```
 
@@ -27,10 +30,10 @@ An example with an object value.
 ```tsx
 import { useStateThrottled } from '@reause/shared'
 
-const [data, setData, throttled] = useStateThrottled({
-  count: 0,
-  name: 'foo',
-}, 1000)
+const [data, setData, throttled] = useStateThrottled(
+  { count: 0, name: 'foo', },
+  1000
+)
 
 setData({ count: 1, name: 'foo' })
 console.log(throttled) // { count: 1, name: 'foo' } (immediate, leading edge)

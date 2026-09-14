@@ -38,15 +38,6 @@ HTML matches the pre-hydration client render:
 const { isSupported } = useCssSupports('display: flex', { ssrValue: false })
 ```
 
-### React divergences
-
-- **Return shape**: `isSupported` is a plain `boolean` (upstream returns a `ComputedRef<boolean>`), so the hook
-  re-renders the component whenever a resolved input changes.
-- **Falsy custom `window`**: passing a falsy `window` option (for example `useCssSupports('display: flex', { window: null, ssrValue: true })`)
-  is treated as "no window available": `CSS.supports` is never evaluated and `isSupported` stays at `options.ssrValue`.
-  Upstream only defaults an `undefined` `window` to `defaultWindow`, so a `null` window reaches `window?.CSS.supports(...)`
-  and yields `undefined`; reause keeps the declared `boolean` state instead. This is reause-specific, non-upstream behavior.
-
 ## Type Declarations
 
 ```ts

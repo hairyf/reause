@@ -55,7 +55,7 @@ exported from the package (`@reause/core`, `@reause/shared`, …) named by its
 | [`createGlobalState`](references/createGlobalState.md) | Keep state in the global scope | AUTO |
 | [`createScopedHook`](references/createScopedHook.md) | Create global state that can be injected into components | AUTO |
 | [`createSharedHook`](references/createSharedHook.md) | Make a composable function usable with multiple React components | AUTO |
-| [`useAsyncFn`](references/useAsyncFn.md) | Returns state and a callback for an `async` function (or any function returning a promise) — React port of react-use's [`useAsyncFn`](https://github.com/streamich/react-use/blob/master/docs/useAsyncFn.md) (upstream mapping files: `source/react-use/src/useAsyncFn.ts` | AUTO |
+| [`useAsyncFn`](references/useAsyncFn.md) | Returns state and a callback for an `async` function (or any function returning a promise) | AUTO |
 | [`useAsyncState`](references/useAsyncState.md) | Reactive async state | AUTO |
 | [`useControllableState`](references/useControllableState.md) | A hook for combining controlled and uncontrolled state sources | AUTO |
 | [`useCounter`](references/useCounter.md) | A basic counter with `inc` / `dec` / `set` / `reset` and optional `min` / `max` bounds | AUTO |
@@ -68,7 +68,7 @@ exported from the package (`@reause/core`, `@reause/shared`, …) named by its
 | [`useMethods`](references/useMethods.md) | `useReducer` sugar — turn an object of pure state transitions into a state value plus one callable method per transition | AUTO |
 | [`usePreviousDistinct`](references/usePreviousDistinct.md) | Just like `usePrevious` | AUTO |
 | [`useQueue`](references/useQueue.md) | State hook that implements a simple FIFO queue — React port of react-use's `useQueue` | AUTO |
-| [`useSafeState`](references/useSafeState.md) | A `useState` whose setter is a no-op once the component has unmounted — React port of ahooks' [`useSafeState`](https://ahooks.js.org/hooks/use-safe-state) (`source/ahooks/packages/hooks/src/useSafeState/`; upstream exports it as the **default** export | AUTO |
+| [`useSafeState`](references/useSafeState.md) | A `useState` whose setter is a no-op once the component has unmounted | AUTO |
 | [`useSessionStorage`](references/useSessionStorage.md) | Reactive [SessionStorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage) | AUTO |
 | [`useSet`](references/useSet.md) | A real `Set` whose mutations re-render — React port of react-hookz's `useSet` | AUTO |
 | [`useStateDebouncedHistory`](references/useStateDebouncedHistory.md) | Shorthand for `useStateHistory` with debounced filter | AUTO |
@@ -95,7 +95,6 @@ exported from the package (`@reause/core`, `@reause/shared`, …) named by its
 | [`useMutationObserver`](references/useMutationObserver.md) | Watch for changes being made to the DOM tree | AUTO |
 | [`useParentElement`](references/useParentElement.md) | Get parent element of the given element | AUTO |
 | [`useResizeObserver`](references/useResizeObserver.md) | Reports changes to the dimensions of an Element's content or the border-box | AUTO |
-| [`useSplitter`](references/useSplitter.md) | Resizable panel layout with draggable | AUTO |
 | [`useWindowFocus`](references/useWindowFocus.md) | Reactive window focus state | AUTO |
 | [`useWindowScroll`](references/useWindowScroll.md) | Reactive window scroll | AUTO |
 | [`useWindowSize`](references/useWindowSize.md) | Reactive window size | AUTO |
@@ -162,7 +161,7 @@ exported from the package (`@reause/core`, `@reause/shared`, …) named by its
 | Function | Description | Invocation |
 |----------|-------------|------------|
 | [`useBattery`](references/useBattery.md) | Reactive [Battery Status API](https://developer.mozilla.org/en-US/docs/Web/API/Battery_Status_API) | AUTO |
-| [`useClickAway`](references/useClickAway.md) | Fire a handler when a click lands outside one or more target elements — the reause port of ahooks' [`useClickAway`](https://github.com/alibaba/hooks/blob/master/packages/hooks/src/useClickAway/index.ts) (`source/ahooks/packages/hooks/src/useClickAway/index.ts`) | AUTO |
+| [`useClickAway`](references/useClickAway.md) | Fire a handler when a click lands outside one or more target elements | AUTO |
 | [`useClickOutside`](references/useClickOutside.md) | Listen for clicks outside of an element | AUTO |
 | [`useDeviceMotion`](references/useDeviceMotion.md) | Reactive [DeviceMotionEvent](https://developer.mozilla.org/en-US/docs/Web/API/DeviceMotionEvent) | AUTO |
 | [`useDeviceOrientation`](references/useDeviceOrientation.md) | Reactive [DeviceOrientationEvent](https://developer.mozilla.org/en-US/docs/Web/API/DeviceOrientationEvent) | AUTO |
@@ -216,7 +215,6 @@ exported from the package (`@reause/core`, `@reause/shared`, …) named by its
 | Function | Description | Invocation |
 |----------|-------------|------------|
 | [`useAnimate`](references/useAnimate.md) | Reactive [Web Animations API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Animations_API) | AUTO |
-| [`useCollapse`](references/useCollapse.md) | Animate an element's height between `0` and its measured content height — a four-state machine (`entered` / `entering` / `exiting` / `exited`) plus a `getCollapseProps()` bundle you spread on the collapsible element | AUTO |
 | [`useInterval`](references/useInterval.md) | Reactive counter that increases on every interval | AUTO |
 | [`useIntervalFn`](references/useIntervalFn.md) | Wrapper for `setInterval` with controls | AUTO |
 | [`useIntervalRafFn`](references/useIntervalRafFn.md) | Fire a callback repeatedly on animation frames | AUTO |
@@ -318,7 +316,7 @@ exported from the package (`@reause/core`, `@reause/shared`, …) named by its
 | [`useCycleList`](references/useCycleList.md) | Cycle through a list of items | AUTO |
 | [`useDebounceFn`](references/useDebounceFn.md) | Debounce execution of a function | AUTO |
 | [`useEventBus`](references/useEventBus.md) | A basic event bus | AUTO |
-| [`useId`](references/useId.md) | SSR-safe id with an optional static override — React port of `@mantine/hooks`' `useId` (upstream mapping files: `source/mantine/packages/@mantine/hooks/src/use-id/use-id.ts` | AUTO |
+| [`useId`](references/useId.md) | SSR-safe id with an optional static override | AUTO |
 | [`useMemoize`](references/useMemoize.md) | Cache results of functions depending on arguments | AUTO |
 | [`useOffsetPagination`](references/useOffsetPagination.md) | Reactive offset pagination | AUTO |
 | [`usePrevious`](references/usePrevious.md) | Holds the previous value of a source | AUTO |
@@ -329,7 +327,6 @@ exported from the package (`@reause/core`, `@reause/shared`, …) named by its
 | [`useToggle`](references/useToggle.md) | A boolean (or value) toggler with controllable state support | AUTO |
 | [`useToNumber`](references/useToNumber.md) | Convert a string or number value to a number | AUTO |
 | [`useToString`](references/useToString.md) | Convert a value to its string representation | AUTO |
-| [`utils`](references/utils.md) | Framework-agnostic helper functions ported 1:1 from VueUse's internal [`@vueuse/shared`](https://vueuse.org/shared/) utils group (`is.ts` / `general.ts`) — plain TypeScript with no React state | AUTO |
 
 ### @Electron
 
@@ -412,17 +409,17 @@ exported from the package (`@reause/core`, `@reause/shared`, …) named by its
 
 | Function | Description | Invocation |
 |----------|-------------|------------|
-| [`useDeepCompareEffect`](references/useDeepCompareEffect.md) | `useEffect` whose dependency comparison is **deep** — the effect re-runs only when `deps` differ structurally | AUTO |
+| [`useDeepCompareEffect`](references/useDeepCompareEffect.md) | `useEffect` whose dependency comparison is **deep** | AUTO |
 | [`useEffectOnce`](references/useEffectOnce.md) | Runs an effect once after the component mounts | AUTO |
-| [`useIsFirstRender`](references/useIsFirstRender.md) | `true` on the very first render of a component instance and `false` on every render after it — a React port of `@mantine/hooks`' `useIsFirstRender` (upstream mapping file: `source/mantine/packages/@mantine/hooks/src/use-is-first-render/use-is-first-render.ts` | AUTO |
+| [`useIsFirstRender`](references/useIsFirstRender.md) | `true` on the very first render of a component instance and `false` on every render after it | AUTO |
 | [`useIsomorphicLayoutEffect`](references/useIsomorphicLayoutEffect.md) | `useLayoutEffect` on the client | AUTO |
 | [`useLogger`](references/useLogger.md) | Console-log a component's lifecycle transitions — mount | AUTO |
 | [`useMount`](references/useMount.md) | Runs a callback once after the component mounts — React port of react-use's `useMount` | AUTO |
-| [`useShallowCompareEffect`](references/useShallowCompareEffect.md) | `useEffect` whose dependency list is compared by one-level (shallow) equality instead of reference identity — a React port of react-use's [`useShallowCompareEffect`](https://raw.githubusercontent.com/streamich/react-use/master/docs/useShallowCompareEffect.md) (docs page fetched; the rendered `https://streamich.github.io/react-use/?path=/story/lifecycle-useshallowcompareeffect--docs` page is unverified) | AUTO |
-| [`useTrackedEffect`](references/useTrackedEffect.md) | `useEffect` that also reports **which** dependencies changed — React port of ahooks' [`useTrackedEffect`](https://ahooks.js.org/hooks/use-tracked-effect) (`source/ahooks/packages/hooks/src/useTrackedEffect/`; upstream exports it as the **default** export | AUTO |
+| [`useShallowCompareEffect`](references/useShallowCompareEffect.md) | `useEffect` whose dependency list is compared by one-level (shallow) equality instead of reference identity | AUTO |
+| [`useTrackedEffect`](references/useTrackedEffect.md) | `useEffect` that also reports **which** dependencies changed | AUTO |
 | [`useUnmount`](references/useUnmount.md) | Runs a callback when the component unmounts — React port of react-use's [`useUnmount`](https://streamich.github.io/react-use/?path=/story/lifecycle-useunmount--docs) | AUTO |
-| [`useUnmountedRef`](references/useUnmountedRef.md) | A ref that reports whether the component has unmounted — React port of ahooks' [`useUnmountedRef`](https://ahooks.js.org/hooks/use-unmounted-ref) (`source/ahooks/packages/hooks/src/useUnmountedRef/`; upstream exports it as the **default** export | AUTO |
-| [`useUpdateEffect`](references/useUpdateEffect.md) | `useEffect` that skips the first render — React port of react-use's [`useUpdateEffect`](https://streamich.github.io/react-use/?path=/story/lifecycle-useupdateeffect--docs) | AUTO |
+| [`useUnmountedRef`](references/useUnmountedRef.md) | A ref that reports whether the component has unmounted | AUTO |
+| [`useUpdateEffect`](references/useUpdateEffect.md) | `useEffect` that skips the first render | AUTO |
 
 ### Side-effects
 
@@ -430,5 +427,12 @@ exported from the package (`@reause/core`, `@reause/shared`, …) named by its
 |----------|-------------|------------|
 | [`useError`](references/useError.md) | Returns a referentially stable error dispatcher whose error is re-thrown from a `useEffect` on the next render | AUTO |
 | [`useLockFn`](references/useLockFn.md) | Add a lock to an async function so overlapping calls are dropped rather than run in parallel — React port of ahooks' `useLockFn` | AUTO |
+
+### Uncategorized
+
+| Function | Description | Invocation |
+|----------|-------------|------------|
+| [`useCollapse`](references/useCollapse.md) | Animate an element's height between `0` and its measured content height | AUTO |
+| [`useSplitter`](references/useSplitter.md) | A hook for resizable panel layouts that supports dragging and keyboard interactions | AUTO |
 
 

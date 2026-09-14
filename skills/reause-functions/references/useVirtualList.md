@@ -53,8 +53,7 @@ const { list, containerProps, wrapperProps } = useVirtualList(
 
 ### Source Forms
 
-`list` is a read-only value source and takes a plain `readonly T[]` (upstream:
-`MaybeRef<readonly T[]>`). Resolve a React ref or state value at the call site:
+`list` is a read-only value source and takes a plain `readonly T[]`. Resolve a React ref or state value at the call site:
 
 ```tsx
 const [items, setItems] = useState(allItems)

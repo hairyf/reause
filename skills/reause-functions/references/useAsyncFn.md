@@ -4,9 +4,7 @@ category: State
 
 # useAsyncFn
 
-Returns state and a callback for an `async` function (or any function returning a promise) — React port of react-use's [`useAsyncFn`](https://github.com/streamich/react-use/blob/master/docs/useAsyncFn.md) (upstream mapping files: `source/react-use/src/useAsyncFn.ts`, 67 LOC, and the `PromiseType` / `FunctionReturningPromise` helpers in `source/react-use/src/misc/types.ts`). `state` is the `AsyncState` union — `{ loading: true }` while a call is in flight, then `{ loading: false, value }` or `{ loading: false, error }` — and `callback` is memoised per `deps` and returns the raw promise.
-
-This hook is the **imperative** half of the async trio: it drives the async function and reports that call's state machine. `useAsync` is a derived value re-evaluated from its inputs and `useAsyncState` is an `execute()` shell around a promise; both stay `execute()`-based and separate, so react-use users keep the API they know.
+Returns state and a callback for an `async` function (or any function returning a promise).
 
 ## Usage
 
@@ -16,7 +14,7 @@ import { useAsyncFn } from '@reause/core'
 const [state, doFetch] = useAsyncFn(async (id: string) => {
   const response = await fetch(`/api/item/${id}`)
   return response.json()
-}, [])
+})
 
 // state: { loading: true } | { loading: false, value } | { loading: false, error }
 return (
@@ -43,15 +41,10 @@ return (
 
 `doFetch` returns the raw promise, so it can be awaited directly. A failure is not thrown: the error branch **resolves with the error** and stores it in `state.error`, so `await doFetch()` never rejects — read `state.error` to detect failures.
 
-`deps` decides the callback identity and is compared by reference, exactly as upstream. Pass `{ deep: true }` as the fourth argument to compare `deps` structurally instead, so an equal-but-new array or object no longer re-memoises the callback:
+`deps` is not supported: the hook takes only the async function and an optional `initialState`. The callback is re-created on every render, so it always reads the latest `fn` and state — which also means its identity is not stable and it must not go into a dependency array.
 
 ```tsx
-const [state, search] = useAsyncFn(
-  async () => query(filters),
-  [filters], // a new-but-equal `filters` object re-memoises by default
-  { loading: false },
-  { deep: true },
-)
+const [state, search] = useAsyncFn(async () => query(filters))
 ```
 
 Calls are race-guarded: only the newest call may write state, so a slow response arriving after a newer one is discarded.
@@ -114,59 +107,38 @@ export type AsyncFnReturn<
   T extends FunctionReturningPromise = FunctionReturningPromise,
 > = [StateFromFunctionReturningPromise<T>, T]
 /**
- * reause-only options — an owner-requested, strictly opt-in extension to upstream's positional
- * signature.
- */
-export interface UseAsyncFnOptions {
-  /**
-   * Compare `deps` structurally (`@reause/shared`'s `deepEqual`, covering arrays, plain objects,
-   * `Date`, `RegExp`, `Map` and `Set`) instead of element-wise reference equality.
-   *
-   * The default is `false`: reference-based comparison is kept so upstream react-use behaviour is
-   * unchanged, and `deep: true` is always the caller's explicit choice.
-   *
-   * @default false
-   */
-  deep?: boolean
-}
-/**
  * Map from react-use `useAsyncFn`
  * (`source/react-use/src/useAsyncFn.ts`).
+ *
+ * Deviation from upstream: `deps` is not supported, and the reause-only
+ * `options.deep` extension that once replaced it is gone as well — the hook
+ * takes only `fn` and an optional `initialState`. The callback is therefore a
+ * fresh function on every render rather than a memoised one: it always reads
+ * the latest `fn` and state, at the cost of a new identity per render, so it
+ * must not be used as a dependency of `useMemo` / `useCallback` / `useEffect`.
  *
  * @example
  * const [state, doFetch] = useAsyncFn(async (id: string) => {
  *   const response = await fetch(`/api/item/${id}`)
  *   return response.json()
- * }, [])
+ * })
  *
  * // state: { loading: true } | { loading: false, value } | { loading: false, error }
  * const value = await doFetch('42') // the raw promise is returned
  *
  * @example
- * // opt-in deep comparison — an equal-but-new `filters` object keeps the
- * // callback (and therefore does not invalidate memos that depend on it)
- * const [state, search] = useAsyncFn(
- *   async () => query(filters),
- *   [filters],
- *   { loading: false },
- *   { deep: true },
- * )
+ * // the state before the first call can be seeded
+ * const [state, search] = useAsyncFn(async () => query(filters), { loading: false })
  *
  * @param fn The async function (or promise-returning function) to wrap.
- * @param deps Dependency list deciding the callback's identity. Defaults to
- * `[]` (the callback is created once).
  * @param initialState The state before the first call. Defaults to
  * `{ loading: false }` (upstream default).
- * @param options reause-only options; `deep` opts into structural `deps`
- * comparison. Omit it for exact upstream behaviour.
  * @returns The `[state, callback]` tuple — `state` is the `AsyncState` union
- * and `callback` the memoised async wrapper that also returns the raw promise.
+ * and `callback` the async wrapper that also returns the raw promise.
  * @see https://github.com/streamich/react-use/blob/master/docs/useAsyncFn.md
  */
 export declare function useAsyncFn<T extends FunctionReturningPromise>(
   fn: T,
-  deps?: DependencyList,
   initialState?: StateFromFunctionReturningPromise<T>,
-  options?: UseAsyncFnOptions,
 ): AsyncFnReturn<T>
 ```

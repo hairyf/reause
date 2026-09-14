@@ -40,8 +40,7 @@ const {
 
 ## Source Forms
 
-`total` and `pageSize` are read-only value sources and take plain numbers (upstream:
-`MaybeRefOrGetter<number>`) — only their initial value is adopted. `page` is controllable (the hook
+`total` and `pageSize` are read-only value sources and take plain numbers — only their initial value is adopted. `page` is controllable (the hook
 writes it back), so it accepts a React `State<number>`:
 
 ```tsx

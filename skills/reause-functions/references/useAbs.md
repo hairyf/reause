@@ -14,7 +14,7 @@ import { useAbs } from '@reause/math'
 const result = useAbs(-23) // 23
 ```
 
-`value` is a plain read-only `number` (upstream takes `MaybeRefOrGetter<number>`). Re-render with a
+`value` is a plain read-only `number`. Re-render with a
 new value — e.g. from `useState` — and the hook recomputes:
 
 ```tsx

@@ -49,13 +49,6 @@ as React attaches the element.
 - `lengthX` / `lengthY` (`number`): `coordsStart.x - coordsEnd.x` / `coordsStart.y - coordsEnd.y`.
 - `stop` (`() => void`): permanently detach the listeners for this hook instance.
 
-## React divergences
-
-The Vue return object (`isSwiping` ref, `direction` / `lengthX` / `lengthY` computeds, reactive
-coords) becomes plain values backed by state. React refs are not reactive like Vue's, so a
-`ref.current` write that triggers no re-render cannot be observed — re-render (for example through
-state) after mutating the ref to re-bind the listeners.
-
 ## Type Declarations
 
 ```ts

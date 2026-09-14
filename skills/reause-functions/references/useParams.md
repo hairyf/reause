@@ -76,13 +76,6 @@ setUserId('alice') // URL: /users/alice
 setUserId('guest') // URL: /users/ (no param, since it equals default)
 ```
 
-## React divergences from upstream
-
-- No router dependency: upstream proxies `route.params` through vue-router; this hook matches `window.location.pathname` against the `pattern` option and reads/writes `window.location` / `history` directly, so it needs no routing library.
-- Returns the React array tuple `[value, setValue]` (upstream returns a single writable Vue ref).
-- Upstream batches multi-key writes per tick through a queue and pushes one router navigation; here each `setValue` performs its own history update immediately.
-- There is no multi-page router context: the hook is scoped to the current `window.location` only.
-
 ## Type Declarations
 
 ```ts

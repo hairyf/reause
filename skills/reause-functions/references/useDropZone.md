@@ -101,23 +101,18 @@ export interface UseDropZoneReturn {
    */
   files: File[] | null
   /**
-   * Subscribe to the drop event — fires with the dropped files when a valid drop happens.
+   * Subscribe to the drop event — fires with the dropped files when a valid drop happens. Returns
+   * the off function that unsubscribes it.
    */
-  onDrop: (fn: UseDropZoneCallback) => {
-    off: () => void
-  }
+  onDrop: (fn: UseDropZoneCallback) => () => void
   /**
-   * Subscribe to the drag-enter event.
+   * Subscribe to the drag-enter event. Returns the off function that unsubscribes it.
    */
-  onDragEnter: (fn: UseDropZoneCallback) => {
-    off: () => void
-  }
+  onDragEnter: (fn: UseDropZoneCallback) => () => void
   /**
-   * Subscribe to the drag-leave event.
+   * Subscribe to the drag-leave event. Returns the off function that unsubscribes it.
    */
-  onDragLeave: (fn: UseDropZoneCallback) => {
-    off: () => void
-  }
+  onDragLeave: (fn: UseDropZoneCallback) => () => void
 }
 /**
  * Map from @vueuse/core `useDropZone`

@@ -21,11 +21,6 @@ useWatchArray(list, (newList, oldList, added, removed) => {
 }, { immediate: true })
 ```
 
-The list is tracked by reference identity — mutate it in place (`push`,
-`splice`, etc.) and no callback fires. Produce a new array instead
-(`setList([...list, item])`). Upstream's `{ deep: true }` option has no React
-equivalent and is not ported.
-
 ## Type Declarations
 
 ```ts

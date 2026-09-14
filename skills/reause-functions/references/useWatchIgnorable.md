@@ -64,14 +64,6 @@ ignorePrevAsyncUpdates()
 setSource('after') // logs: Changed to after!
 ```
 
-## Options
-
-`useWatchIgnorable` accepts `immediate` (fire the callback once on mount) and `once` (stop the watch after the first fired change; ignored fires do not count). Upstream's `deep`, `flush`, and `eventFilter` watch options are not supported — they are not expressible in React (no reactive graph, no configurable commit, no filter pipeline), and passing them fails type checking.
-
-## Recommended Readings
-
-- [Ignorable Watch](https://patak.dev/vue/ignorable-watch.html) - by [@patak-dev](https://github.com/patak-dev)
-
 ## Type Declarations
 
 ```ts

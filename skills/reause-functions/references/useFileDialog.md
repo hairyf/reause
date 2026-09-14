@@ -100,12 +100,8 @@ export interface UseFileDialogReturn {
   files: FileList | null
   open: (localOptions?: Partial<UseFileDialogOptions>) => void
   reset: () => void
-  onChange: (fn: (files: FileList | null) => void) => {
-    off: () => void
-  }
-  onCancel: (fn: () => void) => {
-    off: () => void
-  }
+  onChange: (fn: (files: FileList | null) => void) => () => void
+  onCancel: (fn: () => void) => () => void
 }
 /**
  * Map from @vueuse/core `useFileDialog`

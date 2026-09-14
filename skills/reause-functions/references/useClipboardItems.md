@@ -23,18 +23,26 @@ const source = [
   }),
 ]
 
-const { content, copy, copied, isSupported } = useClipboardItems({ source })
+const [content, copy, { copied, isSupported }] = useClipboardItems({ source })
 
 // by default, `copied` will be reset to `false` in 1.5s
 // (configure it with the `copiedDuring` option, in milliseconds)
 copy(source)
 ```
 
-## React divergences
+### Return Values
 
-- `copy()`'s argument is named `content`, not upstream's `text` (upstream declares `copy: Optional extends true ? (content?: ClipboardItems) => Promise<void> : (text: ClipboardItems) => Promise<void>`). Same type and semantics — kept because it matches the returned `content` value and avoids confusion with `useClipboard`'s text-only `text`.
-- Upstream binds the `copy` / `cut` listeners once at setup (when `read` is enabled and the Clipboard API is supported). reause binds them in an effect keyed on `read` and `isSupported`, so toggling `read` after mount adds or removes the listeners — strictly more reactive than upstream's freeze-in.
-- `content` and `copied` are plain state values (no `.value`), and `isSupported` is a plain boolean resolved in a mount effect: it is `false` during the first render and on the server, then flips to `true` after mount when the resolved navigator exposes the Clipboard API.
+- `content` — the clipboard items currently read from the system clipboard (plain state; updated by
+  a successful `copy`, by `controls.read()` and, when `read: true`, by `copy`/`cut` events).
+- `copy(content?)` — write `ClipboardItem`s to the clipboard; may be called without arguments to
+  copy the `source` option.
+- `controls.copied` — whether the last `copy` call succeeded, auto-resets to `false` after
+  `copiedDuring` milliseconds.
+- `controls.isSupported` — whether the resolved navigator exposes the Clipboard API.
+- `controls.read()` — manually read the current clipboard content into `content`.
+
+The `controls` object (`{ copied, isSupported, read }`) keeps a stable identity while its members
+are unchanged.
 
 ## Type Declarations
 
@@ -64,24 +72,13 @@ export interface UseClipboardItemsOptions<Source> {
    */
   navigator?: Navigator
 }
-export interface UseClipboardItemsReturn<Optional> {
-  /**
-   * `true` when the resolved navigator exposes the Clipboard API (`'clipboard' in navigator`).
-   * Resolved in a mount effect, so it stays `false` during the first render and on the server
-   * (SSR-safe).
-   */
-  isSupported: boolean
+export type UseClipboardItemsReturn<Optional> = readonly [
   /**
    * The clipboard items currently read from the system clipboard. Updated by a successful `copy`,
    * by a manual `read()` call, and automatically when `read` is enabled and a `copy` / `cut` event
    * fires.
    */
-  content: ClipboardItems
-  /**
-   * Whether the last `copy` call succeeded. Resets to `false` after `copiedDuring` milliseconds via
-   * a timeout.
-   */
-  copied: boolean
+  content: ClipboardItems,
   /**
    * Asynchronously writes `content` to the system clipboard. When the `source` option is provided
    * it may be called without arguments; it is a no-op (resolves without writing) when the Clipboard
@@ -93,12 +90,25 @@ export interface UseClipboardItemsReturn<Optional> {
    */
   copy: Optional extends true
     ? (content?: ClipboardItems) => Promise<void>
-    : (content: ClipboardItems) => Promise<void>
-  /**
-   * Manually reads the current clipboard content into `content`.
-   */
-  read: () => void
-}
+    : (content: ClipboardItems) => Promise<void>,
+  controls: {
+    /**
+     * Whether the last `copy` call succeeded. Resets to `false` after `copiedDuring` milliseconds via
+     * a timeout.
+     */
+    copied: boolean
+    /**
+     * `true` when the resolved navigator exposes the Clipboard API (`'clipboard' in navigator`).
+     * Resolved in a mount effect, so it stays `false` during the first render and on the server
+     * (SSR-safe).
+     */
+    isSupported: boolean
+    /**
+     * Manually reads the current clipboard content into `content`.
+     */
+    read: () => void
+  },
+]
 /**
  * Map from @vueuse/core `useClipboardItems`
  * (`source/vueuse/packages/core/useClipboardItems/`).
@@ -110,7 +120,7 @@ export interface UseClipboardItemsReturn<Optional> {
  *   }),
  * ]
  *
- * const { isSupported, content, copy, copied } = useClipboardItems({ source })
+ * const [content, copy, { copied, isSupported }] = useClipboardItems({ source })
  */
 export declare function useClipboardItems(
   options?: UseClipboardItemsOptions<undefined>,

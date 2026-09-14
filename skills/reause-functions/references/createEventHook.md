@@ -59,8 +59,12 @@ function MyApp() {
  *
  * @example
  * const resultEvent = createEventHook<Response>()
- * useListener(resultEvent.on, (response) => { console.log(response) })
+ * useListener(resultEvent, (response) => { console.log(response) })
  * resultEvent.trigger(response)
+ *
+ * `on` returns the `off` function itself — the cleanup is invoked directly
+ * (`const off = resultEvent.on(fn); off()`), a deliberate deviation from upstream's `{ off }`
+ * object.
  */
 type IsAny<T> = 0 extends 1 & T ? true : false
 type Callback<T> =
@@ -71,9 +75,7 @@ type Callback<T> =
       : [T] extends [any[]]
         ? (...param: T) => void
         : (...param: [T, ...unknown[]]) => void
-export type EventHookOn<T = any> = (fn: Callback<T>) => {
-  off: () => void
-}
+export type EventHookOn<T = any> = (fn: Callback<T>) => () => void
 export type EventHookOff<T = any> = (fn: Callback<T>) => void
 export type EventHookTrigger<T = any> = (
   ...param: Parameters<Callback<T>>

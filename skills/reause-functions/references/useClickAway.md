@@ -4,13 +4,7 @@ category: Sensors
 
 # useClickAway
 
-Fire a handler when a click lands outside one or more target elements — the reause port of ahooks' [`useClickAway`](https://github.com/alibaba/hooks/blob/master/packages/hooks/src/useClickAway/index.ts) (`source/ahooks/packages/hooks/src/useClickAway/index.ts`).
-
-A target is a React ref object (`RefObject`) holding the element, single or in a homogeneous array; `eventName` (default `'click'`) is one event name or an array. The listener binds on `document`, or on the shared `ShadowRoot` when **every** target lives inside one, and fires only when **every** target resolves and **none** of them contains the event target — so a target that is missing or not attached yet swallows the click rather than firing. Binding inside a shadow root makes it a separate event tree: events from the outer tree, including the host's own clicks, no longer reach the handler.
-
-The argument order is reause's, not upstream's. ahooks is `useClickAway(onClickAway, target, eventName)`; reause puts the target/ref first, so the hook reads like every other reause DOM hook.
-
-Not a duplicate of [`useClickOutside`](/core/useClickOutside/) (VueUse `onClickOutside`), which keeps the richer VueUse surface — `ignore` selectors, `capture`, `detectIframe`, a custom `window` and a returned `stop`.
+Fire a handler when a click lands outside one or more target elements.
 
 ## Usage
 

@@ -28,12 +28,6 @@ const latest = useLatest(value)
 setTimeout(() => console.log(latest.current), 1000)
 ```
 
-This works because `ref.current = value` is assigned **during render** — that
-is upstream's deliberate behaviour, and assigning it in an effect instead would
-leave the ref one commit behind. The container is typed `{ readonly current: T }`
-and returned as-is; the value is stored faithfully, so `undefined` and other
-falsy values are kept rather than gated on truthiness.
-
 ## Type Declarations
 
 ```ts

@@ -16,7 +16,11 @@ import { useStateWithControl } from '@reause/shared'
 const [num, setNum, control] = useStateWithControl(0)
 
 // State<T> sources are supported, including controlled state tuples:
-const [controlled, setControlled, controlledControl] = useStateWithControl([num, setNum])
+const [
+  controlled,
+  setControlled,
+  controlledControl
+] = useStateWithControl([num, setNum])
 
 // just like a normal useState pair
 setNum(42)

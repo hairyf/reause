@@ -16,7 +16,7 @@ Creates event hooks to support modals and confirmation dialog chains
 
 ### Using hooks
 
-The returned `onReveal` / `onConfirm` / `onCancel` are stable registration functions following the `useListener` protocol — each accepts a callback and returns an `off` handle, so listeners never leak and never fire after the component unmounts:
+The returned `onReveal` / `onConfirm` / `onCancel` are stable registration functions following the `useListener` protocol — each accepts a callback and returns the `off` function that unsubscribes it, so listeners never leak and never fire after the component unmounts:
 
 ```tsx
 import { useConfirmDialog } from '@reause/core'
@@ -85,29 +85,6 @@ const show = useRef(false)
 const { isRevealed, reveal, confirm, cancel } = useConfirmDialog(show)
 ```
 
-## Divergences from upstream
-
-- **`isRevealed` is state, not a computed ref.** Upstream returns
-  `computed(() => revealed.value)`, which reads the ref live, so writing to the
-  external ref out of band (for example closing the modal outside the controls)
-  is visible immediately. The React port keeps `isRevealed` in `useState` and
-  re-syncs it from the external ref during render, so an out-of-band write is
-  mirrored on the **next render only** — a write with no subsequent re-render
-  cannot be observed. Prefer driving the dialog through `reveal()` /
-  `confirm()` / `cancel()`, which update state and ref together.
-- **Listener return values are collected with `Promise.all`.** Upstream's
-  `createEventHook().trigger()` is
-  `Promise.all(Array.from(fns).map(fn => fn(...args)))` and the returned
-  promise is discarded, so a rejected async listener becomes an unhandled
-  rejection. The port collects return values the same way: rejections from
-  async listeners surface as unhandled rejections, while a synchronous throw
-  inside a listener propagates out of the calling `reveal()` / `confirm()` /
-  `cancel()` (identical to upstream).
-- **Subscriptions are cleared on unmount.** Upstream relies on
-  `tryOnScopeDispose` inside `createEventHook`'s `on`; React has no effect
-  scope, so the port clears its listener sets in an unmount effect. Use the
-  `off` handle or `useListener` for finer-grained cleanup.
-
 ## Type Declarations
 
 ```ts
@@ -144,23 +121,18 @@ export interface UseConfirmDialogReturn<RevealData, ConfirmData, CancelData> {
    */
   cancel: (data?: CancelData) => void
   /**
-   * Event Hook to be triggered right before dialog creating.
+   * Event Hook to be triggered right before dialog creating. Returns the off function that removes
+   * the listener.
    */
-  onReveal: (fn: (data: RevealData) => void) => {
-    off: () => void
-  }
+  onReveal: (fn: (data: RevealData) => void) => () => void
   /**
    * Event Hook to be called on `confirm()`. Gets data object from `confirm` function.
    */
-  onConfirm: (fn: (data: ConfirmData) => void) => {
-    off: () => void
-  }
+  onConfirm: (fn: (data: ConfirmData) => void) => () => void
   /**
    * Event Hook to be called on `cancel()`. Gets data object from `cancel` function.
    */
-  onCancel: (fn: (data: CancelData) => void) => {
-    off: () => void
-  }
+  onCancel: (fn: (data: CancelData) => void) => () => void
 }
 /**
  * Map from @vueuse/core `useConfirmDialog`

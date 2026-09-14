@@ -160,13 +160,6 @@ The render prop provides the following props:
 </Promisified>
 ```
 
-### React divergences from upstream
-
-- **children-as-function replaces `v-slot`.** The template is a render function passed as the children of the component; it receives the instance props (promise, resolve, reject, args, isResolving, options, key).
-- **`resolve` / `reject` from event handlers or effects.** Vue's reactivity tolerates calling `resolve` during the slot render; React does not allow store updates during render, so call them from handlers (see the demo).
-- **`transition` is a no-op.** Accepted for API parity; see the Transition section.
-- **Promises survive unmount.** Instances live in the factory closure, so unmounting the component does not settle its pending promises — they resolve once `resolve` is called, and re-mounting the component re-renders the remaining instances.
-
 ## Motivation
 
 The common approach to call a dialog or a modal programmatically would be like this:

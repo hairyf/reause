@@ -175,8 +175,8 @@ export declare function useWebNotification(
 ): UseWebNotificationReturn
 /**
  * Return type of `useWebNotification` — upstream `UseWebNotificationReturn` with the Vue
- * shallowRefs flattened to plain values and `EventHookOn<Event>` subscribe functions (same `(fn) =>
- * { off }` shape) for the Notification events.
+ * shallowRefs flattened to plain values and the `EventHookOn<Event>` subscribe functions returning
+ * the `off` function instead of upstream's `{ off }` object.
  */
 export interface UseWebNotificationReturn {
   /**
@@ -210,28 +210,20 @@ export interface UseWebNotificationReturn {
    */
   close: () => void
   /**
-   * Subscribe to the notification `click` event; returns an `off` handle.
+   * Subscribe to the notification `click` event; returns the `off` function.
    */
-  onClick: (fn: (event: Event) => void) => {
-    off: () => void
-  }
+  onClick: (fn: (event: Event) => void) => () => void
   /**
-   * Subscribe to the notification `show` event; returns an `off` handle.
+   * Subscribe to the notification `show` event; returns the `off` function.
    */
-  onShow: (fn: (event: Event) => void) => {
-    off: () => void
-  }
+  onShow: (fn: (event: Event) => void) => () => void
   /**
-   * Subscribe to the notification `error` event; returns an `off` handle.
+   * Subscribe to the notification `error` event; returns the `off` function.
    */
-  onError: (fn: (event: Event) => void) => {
-    off: () => void
-  }
+  onError: (fn: (event: Event) => void) => () => void
   /**
-   * Subscribe to the notification `close` event; returns an `off` handle.
+   * Subscribe to the notification `close` event; returns the `off` function.
    */
-  onClose: (fn: (event: Event) => void) => {
-    off: () => void
-  }
+  onClose: (fn: (event: Event) => void) => () => void
 }
 ```

@@ -29,11 +29,6 @@ Seed the returned value before any change is recorded with `initialValue`
 const lastChanged = useLastChanged(input, { initialValue: Date.now() - 1000 * 60 * 5 })
 ```
 
-Upstream's watch options have no React equivalent here: the record lands in a
-post-commit effect, so `flush: 'sync'` is not reproducible (effects always run
-after commit), `immediate: true` is redundant with `initialValue`, and `deep`
-/ `once` are watch concepts with no React equivalent — only `initialValue` is supported.
-
 ## Type Declarations
 
 ```ts

@@ -11,7 +11,7 @@ Reactive [Clipboard API](https://developer.mozilla.org/en-US/docs/Web/API/Clipbo
 ```tsx
 import { useClipboard } from '@reause/core'
 
-const { text, copy, copied, isSupported } = useClipboard({ source: 'Hello' })
+const [text, copy, { copied, isSupported }] = useClipboard({ source: 'Hello' })
 
 copy('Hello') // writes to the clipboard; `copied` auto-resets after 1.5s
 ```
@@ -20,7 +20,7 @@ Pass React state directly — the hook always reads the latest value, so reactiv
 
 ```tsx
 const [source, setSource] = useState('Hello')
-const { text, copy, copied } = useClipboard({ source })
+const [text, copy, { copied }] = useClipboard({ source })
 
 setSource('World')
 copy() // copies 'World'
@@ -37,20 +37,25 @@ copy() // copies 'World'
 
 ### Return Values
 
-| Property      | Type                               | Description                                       |
-| ------------- | ---------------------------------- | ------------------------------------------------- |
-| `isSupported` | `boolean`                          | Whether clipboard is supported (native or legacy) |
-| `text`        | `string`                           | Current clipboard content (when `read: true`)     |
-| `copied`      | `boolean`                          | `true` after successful copy, auto-resets         |
-| `copyPending` | `boolean`                          | `true` while a `copy` call is in flight           |
-| `copy`        | `(text?: string) => Promise<void>` | Copy text to clipboard                            |
+- `text` — current clipboard content (plain string state; updated by `copy` and, when `read: true`,
+  by `copy`/`cut` events on `window`).
+- `copy(text?)` — copy text to the clipboard; accepts a string or a promise producing one, and can
+  be called without arguments to copy the `source` option.
+- `controls.copied` — `true` after a successful copy, auto-resets to `false` after `copiedDuring`
+  milliseconds.
+- `controls.isSupported` — whether clipboard is supported (native Clipboard API or `legacy: true`
+  fallback).
+- `controls.copyPending` — `true` while a `copy` call is in flight.
+
+The `controls` object (`{ copied, isSupported, copyPending }`) keeps a stable identity while its
+members are unchanged.
 
 ### Legacy Mode
 
 Set `legacy: true` to keep the ability to copy if [Clipboard API](https://developer.mozilla.org/en-US/docs/Web/API/Clipboard_API) is not available. It will handle copy with [execCommand](https://developer.mozilla.org/en-US/docs/Web/API/Document/execCommand) as fallback.
 
 ```tsx
-const { copy, isSupported } = useClipboard({ legacy: true })
+const [, copy, { isSupported }] = useClipboard({ legacy: true })
 ```
 
 ## Type Declarations
@@ -85,26 +90,12 @@ export interface UseClipboardOptions<Source> {
   navigator?: Navigator
 }
 type ClipboardValue = string | (() => Promise<string | undefined>)
-export interface UseClipboardReturn<Optional> {
-  /**
-   * `true` when the resolved navigator exposes `clipboard` (native Clipboard API) or `legacy: true`
-   * opts into the `document.execCommand` fallback. Resolved in a mount effect, so it stays `false`
-   * during the first render and on the server (SSR-safe).
-   */
-  isSupported: boolean
+export type UseClipboardReturn<Optional> = readonly [
   /**
    * Current clipboard text — updated by `copy` and, when `read: true`, by `copy`/`cut` events on
    * `window`.
    */
-  text: string
-  /**
-   * `true` after a successful copy, auto-resets to `false` after `copiedDuring` milliseconds.
-   */
-  copied: boolean
-  /**
-   * `true` while a `copy` call is in flight.
-   */
-  copyPending: boolean
+  text: string,
   /**
    * Writes to the clipboard. Resolves when the write completes — through the native Async Clipboard
    * API when available, falling back to `document.execCommand('copy')` otherwise. Accepts a string
@@ -113,14 +104,30 @@ export interface UseClipboardReturn<Optional> {
    */
   copy: Optional extends true
     ? (text?: ClipboardValue) => Promise<void>
-    : (text: ClipboardValue) => Promise<void>
-}
+    : (text: ClipboardValue) => Promise<void>,
+  controls: {
+    /**
+     * `true` after a successful copy, auto-resets to `false` after `copiedDuring` milliseconds.
+     */
+    copied: boolean
+    /**
+     * `true` when the resolved navigator exposes `clipboard` (native Clipboard API) or `legacy: true`
+     * opts into the `document.execCommand` fallback. Resolved in a mount effect, so it stays `false`
+     * during the first render and on the server (SSR-safe).
+     */
+    isSupported: boolean
+    /**
+     * `true` while a `copy` call is in flight.
+     */
+    copyPending: boolean
+  },
+]
 /**
  * Map from @vueuse/core `useClipboard`
  * (`source/vueuse/packages/core/useClipboard/`).
  *
  * @example
- * const { text, copy, copied, isSupported } = useClipboard({ source: 'Hello' })
+ * const [text, copy, { copied, isSupported }] = useClipboard({ source: 'Hello' })
  *
  * copy('Hello') // writes to the clipboard; `copied` auto-resets after 1.5s
  */

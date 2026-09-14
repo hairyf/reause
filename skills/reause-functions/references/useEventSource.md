@@ -14,31 +14,6 @@ import { useEventSource } from '@reause/core'
 const { status, data, error, close } = useEventSource('https://event-source-url')
 ```
 
-### Source Forms
-
-`url` is a read-only value source and takes a plain `string | URL | undefined` (upstream:
-`MaybeRefOrGetter`). Resolve a React ref or state value at the call site:
-
-```tsx
-const [url, setUrl] = useState('https://event-source-url')
-
-useEventSource(url) // reconnects when `url` changes (with `autoConnect`)
-useEventSource(urlRef.current) // resolve a React ref at the call site
-```
-
-### Return Values
-
-| Property      | Type                                 | Description                             |
-| ------------- | ------------------------------------ | --------------------------------------- |
-| `data`        | `Data \| null`                       | Latest data received                    |
-| `status`      | `'CONNECTING' \| 'OPEN' \| 'CLOSED'` | Connection status                       |
-| `event`       | `Events[number] \| null`             | Latest named event                      |
-| `error`       | `Event \| null`                      | Current error                           |
-| `eventSource` | `EventSource \| null`                | EventSource instance (null when closed) |
-| `lastEventId` | `string \| null`                     | Last event ID string                    |
-| `open`        | `() => void`                         | Open/reopen the connection              |
-| `close`       | `() => void`                         | Close the connection                    |
-
 ### Named Events
 
 You can define named events with the second parameter:
