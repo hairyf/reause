@@ -154,9 +154,8 @@ export interface UseVirtualListScrollToOptions {
 }
 export interface UseVirtualListReturn<T> {
   /**
-   * The currently visible window of items (plus `overscan`), each with its
-   * original `data` and its absolute `index` into the source list. A plain
-   * array — there is no `.value` wrapper.
+   * The currently visible window of items (plus `overscan`), each with its original `data` and its
+   * absolute `index` into the source list. A plain array — there is no `.value` wrapper.
    */
   list: UseVirtualListItem<T>[]
   /**
@@ -165,9 +164,8 @@ export interface UseVirtualListReturn<T> {
   scrollTo: (index: number, options?: UseVirtualListScrollToOptions) => void
   containerProps: {
     /**
-     * Ref callback to attach to the scroll container element. Spread
-     * `containerProps` onto the container `<div>` — `ref` is a ref callback
-     * exposing the container element.
+     * Ref callback to attach to the scroll container element. Spread `containerProps` onto the
+     * container `<div>` — `ref` is a ref callback exposing the container element.
      */
     ref: (element: HTMLElement | null) => void
     onScroll: () => void
@@ -178,43 +176,8 @@ export interface UseVirtualListReturn<T> {
   }
 }
 /**
- * Create virtual lists with ease. Virtual lists (sometimes called
- * [_virtual scrollers_](https://vue-virtual-scroller-demo.netlify.app/)) allow
- * you to render a large number of items performantly. They only render the
- * minimum number of DOM nodes necessary to show the items within the
- * `container` element by using the `wrapper` element to emulate the container
- * element's full height.
- *
  * Map from @vueuse/core `useVirtualList`
- * (`source/vueuse/packages/core/useVirtualList/`), which renders a sliding
- * window of `source` based on the container's scroll offset and size.
- *
- * React divergences:
- *
- * - the upstream return object is preserved 1:1, with the Vue reactivity
- *   removed: `list` is a plain array (no `.value`), and `containerProps` /
- *   `wrapperProps` are plain objects meant to be spread onto JSX;
- * - the visible window is derived during render from the container's scroll
- *   offset and size (kept in state, updated by `onScroll` / `scrollTo` / the
- *   container ref callback / a `ResizeObserver`), so the source list, the
- *   item-size function and the options are re-read every render — no `watch`
- *   setup needed; `list` is a read-only value source and takes a plain
- *   `readonly T[]` (upstream: `MaybeRef<readonly T[]>`), so a React ref or
- *   state value is resolved at the call site (`useVirtualList(itemsRef.current,
- *   …)`);
- * - upstream's `watch` over the container size (via `useElementSize`) becomes
- *   the `ResizeObserver` attached to the container element, and the item-size
- *   recomputation that upstream's `totalSize` computed drives is simply a
- *   re-render;
- * - `scrollTo` reads the container element synchronously (same math as
- *   upstream: `block` / `inline` alignment options included) and then mirrors
- *   the element's new scroll position into state.
- *
- * The upstream component variant `UseVirtualList` is not ported — React has no
- * directive/component-slot equivalent; the same capability is expressed with
- * the hook and a function-as-children renderer (see the docs page).
- *
- * SSR-safe: nothing touches `window` or the DOM during render.
+ * (`source/vueuse/packages/core/useVirtualList/`).
  *
  * @param list - the source array (a read-only value source — resolve a React
  *   ref or state value at the call site); the latest value is read on every

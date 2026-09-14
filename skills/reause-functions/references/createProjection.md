@@ -25,15 +25,7 @@ setInput(10) // projected === 100 on the next render
 
 ```ts
 /**
- * React port of VueUse's `createProjection`.
- *
- * Map from @vueuse/math `createProjection`
- * Mapping: `ComputedRef<number>` → a plain projector function returning a plain
- * `number`. React has no reactive graph, so the returned projector recomputes
- * the numeric projection on every call and the caller drives re-renders; the
- * domains are plain values (`MaybeRefOrGetter` is not supported) — re-create the
- * projector when a domain changes. Delegates to `createGenericProjection` with
- * the default numeric projector.
+ * Map from @vueuse/math `createProjection`.
  *
  * @__NO_SIDE_EFFECTS__
  * @example

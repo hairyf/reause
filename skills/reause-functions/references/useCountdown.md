@@ -94,13 +94,12 @@ export interface UseCountdownOptions {
 }
 export type UseCountdownReturn = readonly [
   /**
-   * Current countdown value — plain React state (upstream: a shallow ref).
+   * Current countdown value — plain React state.
    */
   remaining: number,
   /**
-   * Update the countdown with the React state protocol:
-   * `setRemaining(next)` or `setRemaining(prev => next)`. It writes the
-   * internal remaining state directly — there is no Vue-style ref object.
+   * Update the countdown with the React state protocol: `setRemaining(next)` or `setRemaining(prev
+   * => next)`. It writes the internal remaining state directly — there is no Vue-style ref object.
    */
   setRemaining: Dispatch<SetStateAction<number>>,
   controls: {
@@ -131,39 +130,8 @@ export type UseCountdownReturn = readonly [
   },
 ]
 /**
- * React port of VueUse's `useCountdown` — a reactive countdown timer in
- * seconds.
- *
  * Map from @vueuse/core `useCountdown`
- * (`source/vueuse/packages/core/useCountdown/`). Returns a React tuple
- * `[remaining, setRemaining, { reset, stop, start, pause, resume, isActive }]`
- * (upstream: an object mirroring its members). `remaining` is a plain number
- * state (upstream: a shallow ref) that counts down one step per `interval`
- * (default `1000` ms) after `start()` — `setRemaining(next | prev => next)`
- * writes it directly, while `start(countdown?)`/`reset(countdown?)` accept a
- * number or a ref-like `{ current }` to feed a new value. A plain-number
- * `initialCountdown` is captured once at setup (upstream closes over its
- * argument), so a later no-arg `start()`/`reset()` still uses the setup value;
- * pass a ref-like `{ current }` to have it read the latest value. `stop()`
- * pauses and resets to the initial value, `pause()`/`resume()` freeze/thaw in
- * place (resume is a no-op at 0), and `onTick` fires every tick with
- * `onComplete` once the countdown reaches 0.
- *
- * React divergences:
- * - the return is a React tuple
- *   `[remaining, setRemaining, { reset, stop, start, pause, resume, isActive }]`
- *   instead of upstream's object `{ remaining: ShallowRef<number>, reset,
- *   stop, start, pause, resume, isActive }`. `remaining` is plain state and
- *   `setRemaining` is the React state setter — no `.value`, no Vue-style ref
- *   object. A manual write composes with the running interval: the next tick
- *   decrements from the written value;
- * - the ticking interval composes shared `useIntervalFn` (upstream composes
- *   `useIntervalFn` too, through its `ConfigurableScheduler` `scheduler`
- *   option); the `scheduler` option itself has no React equivalent and is not
- *   ported — the interval is fixed via an `interval` option (upstream's
- *   default scheduler ticks every `1000` ms);
- * - `start`/`resume` begin the interval only from event handlers/effects —
- *   SSR-safe, since timers never run on the server.
+ * (`source/vueuse/packages/core/useCountdown/`).
  *
  * @example
  * const countdownSeconds = 5

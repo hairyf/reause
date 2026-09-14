@@ -62,46 +62,39 @@ isMaskComplete('(123) 456-7890', options) // true
 
 ```ts
 /**
- * Map from @mantine/hooks `useMask` (`source/mantine/packages/@mantine/hooks/src/use-mask/`)
- *
- * The `useMask` input-masking hook, ported from `@mantine/hooks`' `use-mask`.
- * The masking engine it drives lives in the sibling `./engine` module — see the
- * header there for why — and the engine's public half (the hook's options and
- * return types, `DEFAULT_TOKENS` and the four pure helpers) is re-exported from
- * this file, so those ;
+ * Map from @mantine/hooks `useMask`
+ * (`source/mantine/packages/@mantine/hooks/src/use-mask/`).
+ */
 /**
- * Input masking hook: formats what the user types into `mask` and keeps the
- * unmasked characters in `rawValue`.
+ * Input masking hook: formats what the user types into `mask` and keeps the unmasked characters in
+ * `rawValue`.
  *
- * The returned `ref` is a **callback ref** for a native `<input>`. Attaching it
- * is what wires the hook up: `refCallback` adds the `input`, `focus`, `blur`,
- * `mousedown`, `mouseup`, `keydown` and `paste` listeners to the node,
- * initialises the field from whatever value the node already carries, applies
- * `aria-invalid`, and removes every listener again when React calls it with
- * `null`. The port deliberately stays on a native element — no `@mantine/core`,
- * no `TextInput` — so any input in any component tree can take it.
+ * The returned `ref` is a **callback ref** for a native `<input>`. Attaching it is what wires the
+ * hook up: `refCallback` adds the `input`, `focus`, `blur`, `mousedown`, `mouseup`, `keydown` and
+ * `paste` listeners to the node, initialises the field from whatever value the node already
+ * carries, applies `aria-invalid`, and removes every listener again when React calls it with
+ * `null`. The port deliberately stays on a native element — no `@mantine/core`, no `TextInput` — so
+ * any input in any component tree can take it.
  *
- * The hook owns the field: `keydown`, `paste` and `input` are intercepted
- * (`preventDefault` on the two it fully handles), the value is rebuilt through
- * the mask, and both the DOM `value` and the caret are written back directly
- * while the React state (`value` / `rawValue`) mirrors them. Typing a character
- * whose slot rejects it is a no-op rather than a rejected keystroke, and the
- * caret skips literals so it always lands on an editable slot.
+ * The hook owns the field: `keydown`, `paste` and `input` are intercepted (`preventDefault` on the
+ * two it fully handles), the value is rebuilt through the mask, and both the DOM `value` and the
+ * caret are written back directly while the React state (`value` / `rawValue`) mirrors them. Typing
+ * a character whose slot rejects it is a no-op rather than a rejected keystroke, and the caret
+ * skips literals so it always lands on an editable slot.
  *
- * Undo/redo is a two-stack history of `UndoState` entries: `Ctrl/Cmd+Z` undoes,
- * `Ctrl/Cmd+Shift+Z` and `Ctrl+Y` redo, `reset` clears both stacks, and the
- * undo stack is capped at `MAX_UNDO_HISTORY` entries. Each push records the raw
- * value and the current caret so undo restores the editing position too.
+ * Undo/redo is a two-stack history of `UndoState` entries: `Ctrl/Cmd+Z` undoes, `Ctrl/Cmd+Shift+Z`
+ * and `Ctrl+Y` redo, `reset` clears both stacks, and the undo stack is capped at `MAX_UNDO_HISTORY`
+ * entries. Each push records the raw value and the current caret so undo restores the editing
+ * position too.
  *
- * `alwaysShowMask` and `showMaskOnFocus` are separate switches: the first keeps
- * the pattern visible while the field is empty and unfocused, the second (true
- * by default) is what reveals the placeholders on focus. `autoClear` empties the
- * field on blur while the mask is incomplete; even without it, blurring a field
- * whose raw content is empty clears the display it had shown on focus.
+ * `alwaysShowMask` and `showMaskOnFocus` are separate switches: the first keeps the pattern visible
+ * while the field is empty and unfocused, the second (true by default) is what reveals the
+ * placeholders on focus. `autoClear` empties the field on blur while the mask is incomplete; even
+ * without it, blurring a field whose raw content is empty clears the display it had shown on focus.
  *
- * `isComplete` reflects the committed value — it is recomputed during render
- * from `processedRef` rather than from the `maskedValue` state, so it stays in
- * step with the DOM write in the same commit.
+ * `isComplete` reflects the committed value — it is recomputed during render from `processedRef`
+ * rather than from the `maskedValue` state, so it stays in step with the DOM write in the same
+ * commit.
  */
 export declare function useMask(options: UseMaskOptions): UseMaskReturnValue
 export {

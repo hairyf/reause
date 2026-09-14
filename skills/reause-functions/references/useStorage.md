@@ -161,9 +161,8 @@ interface Serializer<T> {
   write: (value: T) => string
 }
 /**
- * Minimal storage backend contract — `Storage` satisfies it structurally, so
- * `window.localStorage` / `window.sessionStorage` and custom Map-backed
- * implementations all work.
+ * Minimal storage backend contract — `Storage` satisfies it structurally, so `window.localStorage`
+ * / `window.sessionStorage` and custom Map-backed implementations all work.
  */
 export interface StorageLike {
   getItem: (key: string) => string | null
@@ -171,8 +170,8 @@ export interface StorageLike {
   removeItem: (key: string) => void
 }
 /**
- * Event payload shared by real `storage` events and the custom
- * same-document sync event dispatched for `StorageLike` backends.
+ * Event payload shared by real `storage` events and the custom same-document sync event dispatched
+ * for `StorageLike` backends.
  */
 export interface StorageEventLike {
   storageArea: StorageLike | null
@@ -181,37 +180,33 @@ export interface StorageEventLike {
   newValue: StorageEvent["newValue"]
 }
 /**
- * Event name used for same-document sync when the backend is a custom
- * `StorageLike` (a real `StorageEvent` cannot be constructed with a
- * non-built-in storage area, mirroring upstream).
+ * Event name used for same-document sync when the backend is a custom `StorageLike` (a real
+ * `StorageEvent` cannot be constructed with a non-built-in storage area, mirroring upstream).
  */
 export declare const customStorageEventName = "reause-storage"
 /**
- * Serializer registry selected automatically from the type of the default
- * value: strings stay raw, `boolean`/`number` via `String()`, objects via
- * JSON, `Map`/`Set` via JSON entries, `Date` via ISO string.
+ * Serializer registry selected automatically from the type of the default value: strings stay raw,
+ * `boolean`/`number` via `String()`, objects via JSON, `Map`/`Set` via JSON entries, `Date` via ISO
+ * string.
  */
 export declare const StorageSerializers: Record<
   "boolean" | "object" | "number" | "any" | "string" | "map" | "set" | "date",
   Serializer<any>
 >
 /**
- * Options captured from upstream's `UseStorageOptions` — only the parts that
- * translate to a React hook. Vue reactivity options (`flush`, `deep`,
- * `eventFilter`, `shallow`, `initOnMounted`) have no equivalent and are
- * omitted; see the hook's divergence notes. Upstream extends
- * `ConfigurableWindow`, but the interface stays expanded here so the option
- * can be declared inline.
+ * Options captured from upstream's `UseStorageOptions` — only the parts that translate to a React
+ * hook. Vue reactivity options (`flush`, `deep`, `eventFilter`, `shallow`, `initOnMounted`) have no
+ * equivalent and are omitted; see the hook's divergence notes. Upstream extends
+ * `ConfigurableWindow`, but the interface stays expanded here so the option can be declared inline.
  */
 export interface UseStorageOptions<T> {
   /**
-   * Specify a custom `window` instance, e.g. working with iframes or in
-   * testing environments.
+   * Specify a custom `window` instance, e.g. working with iframes or in testing environments.
    */
   window?: Window
   /**
-   * Listen to storage changes — useful for multiple tabs applications and
-   * for hook instances sharing the same key within the same document.
+   * Listen to storage changes — useful for multiple tabs applications and for hook instances
+   * sharing the same key within the same document.
    *
    * @default true
    */
@@ -225,15 +220,14 @@ export interface UseStorageOptions<T> {
   /**
    * Merge the default value with the value read from the storage.
    *
-   * When setting it to `true`, it will perform a **shallow merge** for
-   * objects. You can pass a function to perform a custom merge, for example:
+   * When setting it to `true`, it will perform a **shallow merge** for objects. You can pass a
+   * function to perform a custom merge, for example:
    *
    * @default false
    */
   mergeDefaults?: boolean | ((storageValue: T, defaults: T) => T)
   /**
-   * Custom data serialization. Defaults are selected per type from
-   * `StorageSerializers`.
+   * Custom data serialization. Defaults are selected per type from `StorageSerializers`.
    */
   serializer?: Serializer<T>
   /**

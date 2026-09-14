@@ -50,73 +50,40 @@ The window object used to read the computed style and to construct the `Mutation
 
 ```ts
 /**
- * Options for `useCssVar`: an optional `initialValue` (also the SSR default —
- * no `document` access happens during render) and an `observe` flag that
- * tracks external changes with a MutationObserver.
+ * Options for `useCssVar`: an optional `initialValue` (also the SSR default — no `document` access
+ * happens during render) and an `observe` flag that tracks external changes with a
+ * MutationObserver.
  */
 export interface UseCssVarOptions extends ConfigurableWindow {
   /**
-   * Initial value, also the SSR default — no `document` access happens during
-   * render.
+   * Initial value, also the SSR default — no `document` access happens during render.
    *
    * @default undefined
    */
   initialValue?: string
   /**
-   * Use MutationObserver to monitor variable changes. The observer is created
-   * from the configured `window`; when that window has no `MutationObserver`,
-   * observation is skipped silently.
+   * Use MutationObserver to monitor variable changes. The observer is created from the configured
+   * `window`; when that window has no `MutationObserver`, observation is skipped silently.
    *
    * @default false
    */
   observe?: boolean
 }
 /**
- * Elements accepted as the CSS variable target — a React ref object holding the
- * element (upstream: `ElementRef`).
+ * Elements accepted as the CSS variable target — a React ref object holding the element.
  */
 export type UseCssVarElement = HTMLElement | SVGElement | null | undefined
 /**
- * Return of `useCssVar`: a writable `[value, setValue]` tuple (upstream
- * returns a single `ShallowRef`).
+ * Return of `useCssVar`: a writable `[value, setValue]` tuple (upstream returns a single
+ * `ShallowRef`).
  */
 export type UseCssVarReturn = [
   value: string | null | undefined,
   setValue: Dispatch<SetStateAction<string | null | undefined>>,
 ]
 /**
- * Manipulate CSS variables.
- *
  * Map from @vueuse/core `useCssVar`
- * (`source/vueuse/packages/core/useCssVar/`). Reads the value of a CSS custom
- * property on an element (or on `document.documentElement` when no `target`
- * is given), keeps it in state and writes changes back to the element's
- * inline style. Setting `null`/`undefined` through the setter removes the
- * property.
- *
- * Return tuple follows this repo's React idiom (see hairyf/reause#100) —
- * upstream returns a single writable Vue `ShallowRef`, here it becomes
- * `const [value, setValue] = useCssVar('--color', el)`.
- *
- * React divergences:
- * - the two upstream `watch`es become `useEffect`s: the read/sync effect
- *   re-reads the computed style when the resolved target or the prop value
- *   changes (removing the previous key from the previous element first, as
- *   upstream's watcher does), and the write effect applies the state back to
- *   the element whenever the value or target changes;
- * - the prop is a plain value read on every render, so a key
- *   change is picked up on the next render (upstream re-fires its watcher via
- *   reactive refs); the target is a `RefObject` resolved with `unrefElement`;
- * - the optional MutationObserver (upstream composes `useMutationObserver`
- *   with `{ attributeFilter: ['style', 'class'] }`) is a self-contained
- *   observer inside an effect, disconnected on unmount — like upstream it only
- *   updates the state, since the DOM is already the source of the change; it is
- *   built from the configured `window` and skipped silently when that window
- *   has no `MutationObserver` (upstream's per-window support guard);
- * - SSR-safe: the value initializes from `initialValue` during render, the
- *   first DOM read happens in a mount effect, and a nullish initial value is
- *   never written back before that read ran (mirroring upstream's watcher
- *   ordering, which would have already synced the DOM value).
+ * (`source/vueuse/packages/core/useCssVar/`).
  *
  * @example
  * const el = useRef<HTMLDivElement>(null)

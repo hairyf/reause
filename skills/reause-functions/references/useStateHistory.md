@@ -211,15 +211,14 @@ export interface UseStateHistoryControls<Raw, Serialized = Raw> {
    */
   isTracking: boolean
   /**
-   * Tracked setter for the source state (value or updater form, like
-   * `setState`). Prefer it over your own setter when the update should be
-   * visible to `commit()` in the same tick — see `useStateManualHistory`.
+   * Tracked setter for the source state (value or updater form, like `setState`). Prefer it over
+   * your own setter when the update should be visible to `commit()` in the same tick — see
+   * `useStateManualHistory`.
    */
   setSource: Dispatch<SetStateAction<Raw>>
   /**
-   * Create a new history record immediately for the current value — also
-   * supersedes the effect-driven commit of the same change
-   * (upstream: `ignorePrevAsyncUpdates` + the manual commit)
+   * Create a new history record immediately for the current value — also supersedes the
+   * effect-driven commit of the same change
    */
   commit: () => void
   /**
@@ -241,9 +240,9 @@ export interface UseStateHistoryControls<Raw, Serialized = Raw> {
    */
   resume: (commitNow?: boolean) => void
   /**
-   * A sugar for pausing the recording within a function scope: changes made
-   * with `controls.setSource()` inside `fn` are not committed during `fn`, and
-   * a single commit is created after it — unless `cancel()` is called.
+   * A sugar for pausing the recording within a function scope: changes made with
+   * `controls.setSource()` inside `fn` are not committed during `fn`, and a single commit is
+   * created after it — unless `cancel()` is called.
    *
    * @param fn
    */
@@ -267,44 +266,8 @@ export interface UseStateHistoryReturn<
   redo: () => void
 }
 /**
- * React port of VueUse's `useRefHistory`.
- *
  * Map from @vueuse/core `useRefHistory`
- * (`source/vueuse/packages/core/useRefHistory/`). Track the change history of
- * a state automatically — every change to the source commits a history record
- * — also provides undo and redo functionality.
- *
- * The return object mirrors VueUse's `UseRefHistoryReturn` (refs flattened to
- * plain values):
- * `const { history, undo, redo, canUndo, canRedo, ... } = useStateHistory([source, setSource])`.
- *
- * Adjustments from upstream (Vue reactivity does not translate 1:1):
- *
- * 1. Source: upstream tracks a writable Vue `Ref<Raw>` and commits through a
- *    watcher; React state lives in the component, so the source is the
- *    controlled tuple `[state, setState]` of an existing `useState` and commits
- *    are driven by an effect on state changes (upstream: `watchIgnorable`). The
- *    `deep` and `flush` watch options don't apply — replace the state instead of
- *    mutating it, a mutated object does not re-render and is invisible to the
- *    history (`clone` / custom `dump` still support mutation-style sources).
- *    Multiple state updates in the same tick render once and collapse into a
- *    single commit carrying the final value (upstream: `flush: 'pre'` auto
- *    batching); there is no per-assignment `flush: 'sync'` timing.
- * 2. Event filter: upstream composes `pausableFilter(eventFilter)`; only the
- *    pausable half is ported (`pause` / `resume` / `isTracking`) — the generic
- *    `eventFilter` option has no React translation (use
- *    `useStateThrottledHistory` for time-based throttling of the commits).
- * 3. Programmatic applications (undo / redo / reset / manual `commit()` /
- *    `batch`) mark the applied value and the effect run carrying it is
- *    skipped, so restoring never records a new commit (upstream:
- *    `ignoreUpdates` + `ignorePrevAsyncUpdates`).
- * 4. Same-tick changes: use `controls.setSource()` (value or updater form)
- *    for updates that must be visible to a manual `commit()` in the same
- *    tick — see `useStateManualHistory` for the full explanation.
- * 5. Storage: snapshots live in refs and a version counter triggers
- *    re-renders (upstream: reactive refs + `computed`); records are plain
- *    objects and timestamps use `Date.now()`. Upstream's `dispose` is not
- *    ported — disposal follows the component lifecycle (use `clear()`).
+ * (`source/vueuse/packages/core/useRefHistory/`).
  *
  * @example
  * const [count, setCount] = useState(0)

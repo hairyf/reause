@@ -31,8 +31,8 @@ export interface UseToNumberOptions {
    */
   method?: "parseFloat" | "parseInt" | ((value: string | number) => number)
   /**
-   * The base in mathematical numeral systems passed to `parseInt`.
-   * Only works with `method: 'parseInt'`
+   * The base in mathematical numeral systems passed to `parseInt`. Only works with `method:
+   * 'parseInt'`
    */
   radix?: number
   /**
@@ -43,11 +43,7 @@ export interface UseToNumberOptions {
   nanToZero?: boolean
 }
 /**
- * React port of VueUse's `useToNumber`.
- *
- * Map from @vueuse/shared `useToNumber`
- * Mapping: `ComputedRef<number>` → plain number recomputed from the current
- * value on every render (accepts `number | string`); no hook state needed.
+ * Map from @vueuse/shared `useToNumber`.
  *
  * @__NO_SIDE_EFFECTS__
  * @example

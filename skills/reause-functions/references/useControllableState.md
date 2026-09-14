@@ -47,18 +47,15 @@ export interface UseControllableStateOptions<T> {
 /**
  * Combine controlled and uncontrolled state sources.
  *
- * `state` is resolved with `toValue` on every render. A tuple
- * `[value, setter]` or a `{ value, onChange }` pair is always controlled: the
- * current value is the resolved source and `setValue` writes through to the
- * tuple setter / `onChange`. With `passive: true` a plain value or getter
- * source is uncontrolled — the hook initializes from the source and local
- * updates persist, and external source changes are synced back (honoring
- * `shouldUpdate`). With the default `passive: false` such a source is
- * controlled (the external value wins on every render); `setValue` then has
- * no channel back to the caller, so it warns instead of silently discarding
- * the update — pass a tuple, a `{ value, onChange }` pair, or use
- * `passive: true` to write. `defaultValue` (value or lazy initializer) seeds
- * the internal state of uncontrolled sources; `shouldUpdate(prev, next)`
+ * `state` is resolved with `toValue` on every render. A tuple `[value, setter]` or a `{ value,
+ * onChange }` pair is always controlled: the current value is the resolved source and `setValue`
+ * writes through to the tuple setter / `onChange`. With `passive: true` a plain value or getter
+ * source is uncontrolled — the hook initializes from the source and local updates persist, and
+ * external source changes are synced back (honoring `shouldUpdate`). With the default `passive:
+ * false` such a source is controlled (the external value wins on every render); `setValue` then has
+ * no channel back to the caller, so it warns instead of silently discarding the update — pass a
+ * tuple, a `{ value, onChange }` pair, or use `passive: true` to write. `defaultValue` (value or
+ * lazy initializer) seeds the internal state of uncontrolled sources; `shouldUpdate(prev, next)`
  * guards every commit, including the passive sync.
  */
 export declare function useControllableState<T>(

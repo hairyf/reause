@@ -30,11 +30,11 @@ The value lives in a ref, so the hook is also safe under concurrent rendering an
 
 ```ts
 /**
- * Return a value that is computed **once**, on the first render, and then
- * returned unchanged — same reference, same value — on every later render.
+ * Return a value that is computed **once**, on the first render, and then returned unchanged — same
+ * reference, same value — on every later render.
  *
- * reause-only addition — there is no upstream VueUse or react-use counterpart
- * to map from, so this hook mirrors no upstream API.
+ * reause-only addition — there is no upstream VueUse or react-use counterpart to map from, so this
+ * hook mirrors no upstream API.
  *
  * Semantics:
  * - `initialValue` is resolved only on the **first** render. When it is a

@@ -235,8 +235,8 @@ export interface UseDraggableOptions {
   /**
    * Whether to restrict dragging within the visible area of the container.
    *
-   * If enabled, the draggable element will not leave the visible area of its container,
-   * ensuring it remains within the viewport of the container during the drag.
+   * If enabled, the draggable element will not leave the visible area of its container, ensuring it
+   * remains within the viewport of the container during the drag.
    *
    * @default false
    */
@@ -276,58 +276,19 @@ export interface UseDraggableReturn {
   isDragging: boolean
   style: string
   /**
-   * Set the x position — the React equivalent of assigning upstream's writable
-   * `x` ref. Updates the returned `x`, `position` and `style` together with
-   * the internal drag position.
+   * Set the x position — the React equivalent of assigning upstream's writable `x` ref. Updates the
+   * returned `x`, `position` and `style` together with the internal drag position.
    */
   setX: (value: number) => void
   /**
-   * Set the y position — the React equivalent of assigning upstream's writable
-   * `y` ref. Updates the returned `y`, `position` and `style` together with
-   * the internal drag position.
+   * Set the y position — the React equivalent of assigning upstream's writable `y` ref. Updates the
+   * returned `y`, `position` and `style` together with the internal drag position.
    */
   setY: (value: number) => void
 }
 /**
- * React port of VueUse's `useDraggable`.
- *
  * Map from @vueuse/core `useDraggable`
- * (`source/vueuse/packages/core/useDraggable/`), which makes an element
- * draggable with the pointer: a `pointerdown` on the `handle` (default the
- * `target`) starts the drag, `pointermove` / `pointerup` / `pointercancel`
- * on the `draggingElement` (default `window`) move and end it, and `x` / `y`
- * track the element's position. The drag position is clamped to the
- * `containerElement` bounds when one is given, and `autoScroll` scrolls a
- * scrollable container while the pointer is near its edges.
- *
- * React divergences:
- *
- * - the Vue refs returned by upstream (`x`, `y`, `position`, `isDragging`,
- *   `style`) become a plain object backed by React state: `x` / `y` are
- *   numbers, `position` the `{ x, y }` pair, `isDragging` a boolean and
- *   `style` a ready-to-use CSS string (`left: ?px; top: ?px;`); `x` and `y`
- *   are writable through the paired `setX` / `setY` setters (the React
- *   equivalent of assigning upstream's writable refs), which update the
- *   returned state and the internal drag position together;
- * - upstream's `useEventListener` becomes a self-contained mount `useEffect`
- *   that re-subscribes when the resolved `handle` / `draggingElement` or the
- *   `capture` / `preventDefault` flags change, and removes all listeners on
- *   unmount;
- * - `target`, `handle`, `draggingElement` and `containerElement` accept a
- *   plain element or a ref-like `{ current }` object (e.g. the result of
- *   `useRef`) — the React equivalent of upstream's
- *   `MaybeRefOrGetter`. They are re-resolved on every render and the
- *   listeners re-bind when the resolved element changes;
- * - every remaining option (`disabled`, `buttons`, `exact`, `axis`,
- *   `restrictInView`, `autoScroll`, `onStart` / `onMove` / `onEnd`, …) is
- *   read through a latest-value ref, so the stable listeners always see the
- *   newest options without re-subscribing on renders;
- * - upstream's `watch(position, checkAutoScroll)` becomes a `useEffect`
- *   keyed on the position state; the auto-scroll `setInterval` is stopped on
- *   drag end and on unmount;
- * - SSR-safe: nothing touches `window` or the DOM during render — the
- *   listeners attach in the mount effect only, and `initialValue` seeds the
- *   state so SSR renders the same initial position.
+ * (`source/vueuse/packages/core/useDraggable/`).
  *
  * @example
  * const el = useRef<HTMLDivElement>(null)

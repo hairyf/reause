@@ -112,11 +112,10 @@ play()
 
 ```ts
 /**
- * Options for `useAnimate`: the platform `KeyframeAnimationOptions`
- * (`duration` / `easing` / `iterations` / `direction` / `fill`, ...) plus the
- * VueUse-specific knobs — `immediate`, `commitStyles`, `persist`,
- * `playbackRate`, `onReady`, `onError` — and a custom `window` instance, e.g.
- * working with iframes or in testing environments.
+ * Options for `useAnimate`: the platform `KeyframeAnimationOptions` (`duration` / `easing` /
+ * `iterations` / `direction` / `fill`...) plus the VueUse-specific knobs — `immediate`,
+ * `commitStyles`, `persist`, `playbackRate`, `onReady`, `onError` — and a custom `window` instance,
+ * e.g. working with iframes or in testing environments.
  */
 export interface UseAnimateOptions
   extends KeyframeAnimationOptions, ConfigurableWindow {
@@ -127,8 +126,8 @@ export interface UseAnimateOptions
    */
   immediate?: boolean
   /**
-   * Whether to commit the end styling state of an animation to the element
-   * being animated. In general, you should use `fill` option with this.
+   * Whether to commit the end styling state of an animation to the element being animated. In
+   * general, you should use `fill` option with this.
    *
    * @default false
    */
@@ -155,35 +154,31 @@ export interface UseAnimateOptions
   onError?: (e: unknown) => void
 }
 /**
- * Animation keyframes — an array of keyframe objects, a keyframe object, or
- * `null` (see [Keyframe Formats](https://developer.mozilla.org/en-US/docs/Web/API/Web_Animations_API/Keyframe_Formats)),
+ * Animation keyframes — an array of keyframe objects, a keyframe object, or `null` (see [Keyframe
+ * Formats](https://developer.mozilla.org/en-US/docs/Web/API/Web_Animations_API/Keyframe_Formats)),
  * as a plain value.
  */
 export type UseAnimateKeyframes = Keyframe[] | PropertyIndexedKeyframes | null
 /**
- * Return of `useAnimate`. Mirrors the upstream `UseAnimateReturn` member by
- * member; the upstream Vue refs become plain values:
- * - `isSupported` is `boolean` state (upstream: `ComputedRef<boolean>`);
- * - `animate` is the `Animation` object or `undefined` (upstream:
- *   `ShallowRef<Animation | undefined>`);
- * - the state members `pending` / `playState` / `replaceState` /
- *   `startTime` / `currentTime` / `timeline` / `playbackRate` are plain values
- *   re-rendered on every animation frame while the animation runs —
- *   upstream's `ComputedRef`s / `WritableComputedRef`s have no setter here, so
- *   seeking (`animate.currentTime = ...`) goes through the returned `animate`
- *   object directly;
+ * Return of `useAnimate`. Mirrors the upstream `UseAnimateReturn` member by member; the upstream
+ * Vue refs become plain values:
+ * - `isSupported` is `boolean` state;
+ * - `animate` is the `Animation` object or `undefined`;
+ * - the state members `pending` / `playState` / `replaceState` / `startTime` / `currentTime` /
+ * `timeline` / `playbackRate` are plain values re-rendered on every animation frame while the
+ * animation runs — upstream's `ComputedRef`s / `WritableComputedRef`s have no setter here, so
+ * seeking (`animate.currentTime =...`) goes through the returned `animate` object directly;
  * - the controls `play` / `pause` / `reverse` / `finish` / `cancel` are stable.
  */
 export interface UseAnimateReturn {
   /**
-   * Whether the current environment supports the Web Animations API
-   * (`Element.animate`), probed on the resolved `window` option. Starts
-   * `false` and settles in a mount effect (SSR-safe).
+   * Whether the current environment supports the Web Animations API (`Element.animate`), probed on
+   * the resolved `window` option. Starts `false` and settles in a mount effect (SSR-safe).
    */
   isSupported: boolean
   /**
-   * The `Animation` instance created on the target element, `undefined` while
-   * no target is mounted or the API is unsupported.
+   * The `Animation` instance created on the target element, `undefined` while no target is mounted
+   * or the API is unsupported.
    */
   animate: Animation | undefined
   /** Start or resume playing the animation. */
@@ -212,37 +207,8 @@ export interface UseAnimateReturn {
   playbackRate: number
 }
 /**
- * Reactive [Web Animations API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Animations_API).
- *
  * Map from @vueuse/core `useAnimate`
- * (`source/vueuse/packages/core/useAnimate/`): creates an `Animation` on the
- * target element via `Element.animate(keyframes, options)` and mirrors its
- * mutable attributes (`playState`, `currentTime`, `playbackRate`, ...) into
- * state on every animation frame through a `useRafFn` loop, while exposing
- * stable controls (`play` / `pause` / `reverse` / `finish` / `cancel`).
- *
- * React divergences:
- * - upstream's Vue watch (target + keyframes) / `tryOnMounted` / scope-dispose
- *   become `useEffect`s: the mount effect creates the animation (and re-creates
- *   it when the resolved target element appears or changes, keeping it paused
- *   when `immediate: false`), the keyframes effect swaps the animation's
- *   `effect` when the resolved keyframes change, and the unmount cleanup calls
- *   `cancel`;
- * - the returned `ComputedRef` / `WritableComputedRef` members become plain
- *   values re-rendered per frame — the writable setters (e.g. seeking through
- *   `currentTime`) are dropped, use the returned `animate` object for that;
- * - `keyframes` is re-read on every render and is compared
- *   with deep equality, so a deep-equal
- *   reassignment (e.g. reordered keys) stays silent (upstream: a deep
- *   watcher);
- * - `isSupported` is plain `boolean` state settled in the mount effect
- *   (re-probing when the resolved `window` option changes), and internal
- *   gating reads a ref mirror so effects decide synchronously (upstream
- *   `useSupported` computed);
- * - the `finish` / `cancel` / `remove` event listeners are bound to the
- *   `Animation` object through `useEventListener` (upstream:
- *   `useEventListener(animate, ...)`), which rebinds when the animation is
- *   replaced.
+ * (`source/vueuse/packages/core/useAnimate/`).
  *
  * @example
  * const el = useRef<HTMLSpanElement>(null)

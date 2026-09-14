@@ -57,18 +57,16 @@ const { stop } = useIntersectionObserver(
 
 ```ts
 /**
- * Options for `useIntersectionObserver`: the platform `IntersectionObserver`
- * options (`root`/`rootMargin`/`threshold`) plus `immediate` and a custom
- * `window` instance, e.g. working with iframes or in testing environments.
- * The accepted target types (`TargetElement`/`ElementTarget`/
- * `ElementTargetOrArray`) are shared with `useResizeObserver`.
+ * Options for `useIntersectionObserver`: the platform `IntersectionObserver` options
+ * (`root`/`rootMargin`/`threshold`) plus `immediate` and a custom `window` instance, e.g. working
+ * with iframes or in testing environments. The accepted target types
+ * (`TargetElement`/`ElementTarget`/ `ElementTargetOrArray`) are shared with `useResizeObserver`.
  */
 export interface UseIntersectionObserverOptions {
   /**
-   * Custom `window` instance, e.g. working with iframes or in testing
-   * environments. Unlike `ConfigurableWindow`, an explicit `null` is honored
-   * as-is: it disables observation entirely (mirroring upstream's
-   * `window && 'IntersectionObserver' in window` support gate) — only an
+   * Custom `window` instance, e.g. working with iframes or in testing environments. Unlike
+   * `ConfigurableWindow`, an explicit `null` is honored as-is: it disables observation entirely
+   * (mirroring upstream's `window && 'IntersectionObserver' in window` support gate) — only an
    * omitted option falls back to the global `window`.
    */
   window?: Window | null
@@ -79,11 +77,13 @@ export interface UseIntersectionObserverOptions {
    */
   immediate?: boolean
   /**
-   * The Element or Document whose bounds are used as the bounding box when testing for intersection.
+   * The Element or Document whose bounds are used as the bounding box when testing for
+   * intersection.
    */
   root?: ElementTarget | RefObject<Document | null>
   /**
-   * A string which specifies a set of offsets to add to the root's bounding_box when calculating intersections.
+   * A string which specifies a set of offsets to add to the root's bounding_box when calculating
+   * intersections.
    */
   rootMargin?: string
   /**
@@ -93,18 +93,18 @@ export interface UseIntersectionObserverOptions {
   threshold?: number | number[]
 }
 /**
- * Return of `useIntersectionObserver`, mirroring upstream's `Supportable &
- * Pausable` shape: `{ isSupported, isActive, pause, resume, stop }`.
+ * Return of `useIntersectionObserver`, mirroring upstream's `Supportable & Pausable` shape: `{
+ * isSupported, isActive, pause, resume, stop }`.
  */
 export interface UseIntersectionObserverReturn {
   /**
-   * Whether the current environment supports the `IntersectionObserver` API.
-   * Starts `false` and settles in a mount effect (SSR-safe).
+   * Whether the current environment supports the `IntersectionObserver` API. Starts `false` and
+   * settles in a mount effect (SSR-safe).
    */
   isSupported: boolean
   /**
-   * Whether the observer is currently running. Starts from the `immediate`
-   * option (default `true`) and turns `false` after `pause()` or `stop()`.
+   * Whether the observer is currently running. Starts from the `immediate` option (default `true`)
+   * and turns `false` after `pause()` or `stop()`.
    */
   isActive: boolean
   /**
@@ -116,42 +116,14 @@ export interface UseIntersectionObserverReturn {
    */
   resume: () => void
   /**
-   * Disconnect the observer and stop observing permanently. Calling it again
-   * is a no-op — the hook does not restart after `stop()`.
+   * Disconnect the observer and stop observing permanently. Calling it again is a no-op — the hook
+   * does not restart after `stop()`.
    */
   stop: () => void
 }
 /**
- * Detects changes to a target element's visibility.
- *
  * Map from @vueuse/core `useIntersectionObserver`
- * (`source/vueuse/packages/core/useIntersectionObserver/`), which observes
- * every resolved target with a platform `IntersectionObserver` and rebuilds
- * the observer through `watch(...)` whenever the resolved targets, root, root
- * margin or active state change.
- *
- * React divergences:
- * - the Vue `watch` over the targets/root/rootMargin computeds becomes an
- *   effect that re-resolves them after every render and re-observes only when
- *   something actually changed — a re-render that swaps `target.current`
- *   re-observes (mirroring the upstream reactivity), while unchanged renders
- *   never recreate the observer;
- * - `callback` is read through a ref, so changing it does not re-observe and
- *   the returned `stop` stays referentially stable;
- * - `isSupported` is plain `boolean` state settled in the mount effect
- *   (upstream composes `useSupported`, a `ComputedRef<boolean>`);
- * - `tryOnScopeDispose(stop)` becomes an unmount effect that disconnects;
- * - the Pausable members mirror upstream: `isActive` is a plain boolean
- *   starting from the `immediate` option, `pause()` disconnects the observer
- *   and sets `isActive` to `false`, `resume()` re-observes the same targets,
- *   and `stop()` deactivates permanently — `immediate: false` leaves the
- *   observer idle until `resume()` is called;
- * - the observer is constructed through the resolved `window`, and a changed
- *   `window` option re-observes (upstream destructures it once at setup;
- *   this matches this repo's `useResizeObserver`).
- *
- * SSR-safe: nothing touches `window` during render — support detection and
- * observation both happen in effects.
+ * (`source/vueuse/packages/core/useIntersectionObserver/`).
  *
  * @example
  * const target = useRef<HTMLDivElement | null>(null)

@@ -48,8 +48,8 @@ export interface UsePointerOptions extends ConfigurableWindow {
    */
   initialValue?: Partial<UsePointerState>
   /**
-   * Element that listens to pointer events; an explicit `null` disables
-   * listening, while an omitted target falls back to `window`.
+   * React ref object (`RefObject`) holding the element that listens to pointer events; a ref whose
+   * `.current` is `null` disables listening, while an omitted target falls back to `window`.
    *
    * @default window
    */
@@ -59,28 +59,8 @@ export interface UsePointerReturn extends UsePointerState {
   isInside: boolean
 }
 /**
- * React port of VueUse's `usePointer`.
- *
  * Map from @vueuse/core `usePointer`
- * (`source/vueuse/packages/core/usePointer/`), which listens to
- * `pointerdown`/`pointermove`/`pointerup` on the `target` option (default
- * `window`), picks the pointer state from every event, and flips `isInside`
- * back to `false` on `pointerleave`/`pointercancel`. A `pointerTypes` filter
- * skips the state update but still marks `isInside`. Reactive pointer state.
- *
- * React divergences:
- * - the Vue refs returned by upstream become a plain object of plain values —
- *   read `x`, `y`, `pressure`, `pointerType`, ... directly off the result;
- * - upstream's `useEventListener` becomes a self-contained mount `useEffect`
- *   that re-subscribes when the resolved `target`/`pointerTypes` change and
- *   removes all listeners on unmount;
- * - `initialValue` is folded into the `useState` initializer, so SSR renders
- *   the defaults (`x: 0`, `y: 0`, ..., `pointerType: null`, `isInside: false`)
- *   without touching `window`;
- * - `target` accepts a plain `EventTarget` or a ref-like `{ current }` object
- *   (`MaybeRefOrGetter`) and an explicit `null` disables listening, while an omitted
- *   `target` falls back to the `window` option (upstream `target = defaultWindow`
- *   plus `if (target)`).
+ * (`source/vueuse/packages/core/usePointer/`).
  *
  * @param options - `pointerTypes` / `initialValue` / `target` plus a custom
  *   `window` instance (`ConfigurableWindow`) used when `target` is omitted,

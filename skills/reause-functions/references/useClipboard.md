@@ -80,28 +80,25 @@ export interface UseClipboardOptions<Source> {
    */
   legacy?: boolean
   /**
-   * Specify a custom `navigator` instance, e.g. working with iframes or in
-   * testing environments.
+   * Specify a custom `navigator` instance, e.g. working with iframes or in testing environments.
    */
   navigator?: Navigator
 }
 type ClipboardValue = string | (() => Promise<string | undefined>)
 export interface UseClipboardReturn<Optional> {
   /**
-   * `true` when the resolved navigator exposes `clipboard` (native Clipboard
-   * API) or `legacy: true` opts into the `document.execCommand` fallback.
-   * Resolved in a mount effect, so it stays `false` during the first render
-   * and on the server (SSR-safe).
+   * `true` when the resolved navigator exposes `clipboard` (native Clipboard API) or `legacy: true`
+   * opts into the `document.execCommand` fallback. Resolved in a mount effect, so it stays `false`
+   * during the first render and on the server (SSR-safe).
    */
   isSupported: boolean
   /**
-   * Current clipboard text — updated by `copy` and, when `read: true`, by
-   * `copy`/`cut` events on `window`.
+   * Current clipboard text — updated by `copy` and, when `read: true`, by `copy`/`cut` events on
+   * `window`.
    */
   text: string
   /**
-   * `true` after a successful copy, auto-resets to `false` after
-   * `copiedDuring` milliseconds.
+   * `true` after a successful copy, auto-resets to `false` after `copiedDuring` milliseconds.
    */
   copied: boolean
   /**
@@ -109,40 +106,18 @@ export interface UseClipboardReturn<Optional> {
    */
   copyPending: boolean
   /**
-   * Writes to the clipboard. Resolves when the write completes — through the
-   * native Async Clipboard API when available, falling back to
-   * `document.execCommand('copy')` otherwise. Accepts a string or a promise
-   * producing one. When `source` is provided, it can be called without an
-   * argument to copy the (resolved) source value.
+   * Writes to the clipboard. Resolves when the write completes — through the native Async Clipboard
+   * API when available, falling back to `document.execCommand('copy')` otherwise. Accepts a string
+   * or a promise producing one. When `source` is provided, it can be called without an argument to
+   * copy the (resolved) source value.
    */
   copy: Optional extends true
     ? (text?: ClipboardValue) => Promise<void>
     : (text: ClipboardValue) => Promise<void>
 }
 /**
- * React port of VueUse's `useClipboard`.
- *
  * Map from @vueuse/core `useClipboard`
- * (`source/vueuse/packages/core/useClipboard/`). Reactive
- * [Clipboard API](https://developer.mozilla.org/en-US/docs/Web/API/Clipboard_API) —
- * copy text to the system clipboard (native Async Clipboard API with an
- * `execCommand` legacy fallback) and, with `read: true`, track clipboard text
- * on `copy`/`cut` events.
- *
- * React divergences:
- * - the `ShallowRef<string>` / `ShallowRef<boolean>` returns become plain
- *   `useState` values (`text`, `copied`, `copyPending`);
- * - the `ComputedRef<boolean>` isSupported becomes plain boolean state
- *   resolved through `useSupported` in a mount effect — `false` during the
- *   first render and on the server (SSR-safe);
- * - the `source` option is a plain string (upstream accepts a ref); the `copy`
- *   callback is stable and
- *   reads the latest `source`/`navigator`/permission state through refs;
- * - the `copy`/`cut` listeners are wired in a `useEffect` guarded by
- *   `isSupported && read` with proper cleanup (upstream registers them
- *   synchronously during setup under the same condition);
- * - upstream's `useTimeoutFn` resets `copied`; here the same shared helper
- *   resets the plain boolean state.
+ * (`source/vueuse/packages/core/useClipboard/`).
  *
  * @example
  * const { text, copy, copied, isSupported } = useClipboard({ source: 'Hello' })

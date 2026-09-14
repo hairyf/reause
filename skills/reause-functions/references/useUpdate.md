@@ -20,11 +20,7 @@ update() // forces a re-render
 
 ```ts
 /**
- * React port of react-use's `useUpdate`.
- *
- * Map from react-use `useUpdate`
- * Mapping: `useReducer` with a wrapping counter — the returned function
- * dispatches an update that forces a re-render and is stable across renders.
+ * Map from react-use `useUpdate`.
  *
  * @example
  * const update = useUpdate()

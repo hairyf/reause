@@ -155,17 +155,15 @@ const [CounterStoreProvider, useCounterStore] = createInjectionState(({ initialV
 ```ts
 export interface CreateInjectionStateOptions<Return> {
   /**
-   * Custom injectionKey for InjectionState — the React equivalent of
-   * upstream's string/symbol key. React keys a context by object identity, so
-   * pass a `createContext(...)` instance; consumers may then read it directly
-   * with `useContext`.
+   * Custom injectionKey for InjectionState — the React equivalent of upstream's string/symbol key.
+   * React keys a context by object identity, so pass a `createContext(...)` instance; consumers may
+   * then read it directly with `useContext`.
    */
   injectionKey?: Context<Return | undefined>
   /**
-   * Default value used by `useInjectedState` when no provider is rendered
-   * above the consumer. Implemented natively through `createContext`; when a
-   * custom `injectionKey` is supplied, that context's own default is used
-   * instead.
+   * Default value used by `useInjectedState` when no provider is rendered above the consumer.
+   * Implemented natively through `createContext`; when a custom `injectionKey` is supplied, that
+   * context's own default is used instead.
    */
   defaultValue?: Return
 }
@@ -190,36 +188,7 @@ export type CreateInjectionStateReturn<
   ]
 >
 /**
- * Create a state that can be injected into descendant components — React port
- * of VueUse's `createInjectionState`.
- *
- * Map from @vueuse/shared `createInjectionState`
- * Mapping: React has no provide/inject pair, so the providing side becomes a
- * component and the state travels through a React Context created by the
- * factory (or supplied through `options.injectionKey`). Slot 0 of the returned
- * tuple is `Provider` — render it (it may wrap children) and the composable
- * runs during its render, exactly once per render, with the props passed to
- * it. Slot 1 is `useInjectedState`, which reads the nearest `Provider` above
- * the calling component with `useContext`.
- * Because JSX can only pass a single props object, the factory receives one
- * object — upstream's `(initialValue: number) => ...` becomes
- * `({ initialValue }: { initialValue: number }) => ...`.
- *
- * The second type parameter (`ProvideReturn`) is upstream's
- * `useProvidingState` return slot, which in this port is the provider
- * component's render output (`ReactNode`).
- *
- * Deviations from upstream:
- * - `options.injectionKey` takes a React `Context` instead of a string/symbol
- *   key: React keys a context by object identity, so the factory's own
- *   `Context` is the default key and a custom context can be shared with a
- *   plain `useContext`.
- * - The providing side is a component (`Provider`) rather than a callable
- *   `useProvidingState`: React cannot provide during a hook call of the same
- *   component that consumes it.
- * - The factory takes a single props object instead of variadic arguments.
- * - `children` is a reserved prop: it is consumed by `Provider` for rendering
- *   and is not forwarded to the factory.
+ * Map from @vueuse/shared `createInjectionState`.
  *
  * @see https://vueuse.org/createInjectionState
  *

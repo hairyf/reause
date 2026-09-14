@@ -57,16 +57,15 @@ export interface UseStateThrottledHistoryOptions<Raw, Serialized = Raw> {
    */
   parse?: (value: Serialized) => Raw
   /**
-   * Throttle duration in milliseconds between history commits — re-read on
-   * every change, so passing the current value of a state works naturally.
+   * Throttle duration in milliseconds between history commits — re-read on every change, so passing
+   * the current value of a state works naturally.
    *
    * @default 200
    */
   throttle?: number
   /**
-   * Commit the latest change on the trailing edge of the throttle window.
-   * When `false`, changes inside the window are dropped instead of collapsing
-   * into a trailing commit.
+   * Commit the latest change on the trailing edge of the throttle window. When `false`, changes
+   * inside the window are dropped instead of collapsing into a trailing commit.
    *
    * @default true
    */
@@ -102,15 +101,14 @@ export interface UseStateThrottledHistoryControls<Raw, Serialized = Raw> {
    */
   isTracking: boolean
   /**
-   * Tracked setter for the source state (value or updater form, like
-   * `setState`). Prefer it over your own setter when the update should be
-   * visible to `commit()` in the same tick — see `useStateManualHistory`.
+   * Tracked setter for the source state (value or updater form, like `setState`). Prefer it over
+   * your own setter when the update should be visible to `commit()` in the same tick — see
+   * `useStateManualHistory`.
    */
   setSource: Dispatch<SetStateAction<Raw>>
   /**
-   * Create a new history record immediately, bypassing the throttle —
-   * cancels a pending trailing commit for the same change
-   * (upstream: `ignorePrevAsyncUpdates` + the manual commit)
+   * Create a new history record immediately, bypassing the throttle — cancels a pending trailing
+   * commit for the same change
    */
   commit: () => void
   /**
@@ -132,9 +130,9 @@ export interface UseStateThrottledHistoryControls<Raw, Serialized = Raw> {
    */
   resume: (commitNow?: boolean) => void
   /**
-   * A sugar for pausing the recording within a function scope: changes made
-   * with `controls.setSource()` inside `fn` are not committed during `fn`, and
-   * a single commit is created after it — unless `cancel()` is called.
+   * A sugar for pausing the recording within a function scope: changes made with
+   * `controls.setSource()` inside `fn` are not committed during `fn`, and a single commit is
+   * created after it — unless `cancel()` is called.
    *
    * @param fn
    */
@@ -158,49 +156,8 @@ export interface UseStateThrottledHistoryReturn<
   redo: () => void
 }
 /**
- * React port of VueUse's `useThrottledRefHistory`.
- *
  * Map from @vueuse/core `useThrottledRefHistory`
- * (`source/vueuse/packages/core/useThrottledRefHistory/`). Shorthand for the
- * manual history machinery with a throttled filter: track the change history
- * of a state automatically, committing at most once per throttle duration —
- * the first change after a quiet window commits immediately (leading edge)
- * and changes inside the window collapse into a single trailing commit that
- * carries the latest value.
- *
- * The return object mirrors VueUse's `UseRefHistoryReturn` (refs flattened to
- * plain values):
- * `const { history, undo, redo, canUndo, canRedo, ... } = useStateThrottledHistory([source, setSource])`.
- *
- * Adjustments from upstream (Vue reactivity does not translate 1:1):
- *
- * 1. Source: upstream tracks a writable Vue `Ref<Raw>` and commits through a
- *    watcher; React state lives in the component, so the source is the
- *    controlled tuple `[state, setState]` of an existing `useState`; commits are
- *    driven by an effect on state changes (upstream: `watchIgnorable`). The `deep`
- *    and `flush` options don't apply — replace the state instead of mutating
- *    it, a mutated object does not re-render and is invisible to the history
- *    (`clone` / custom `dump` still support mutation-style sources).
- * 2. Throttle filter: upstream composes `throttleFilter` from
- *    `@vueuse/shared`; the filter logic is inlined here (same algorithm as
- *    `useThrottleFn`, see `packages/shared/src/useThrottleFn.ts`) with the
- *    leading edge fixed to `true` — upstream's shorthand only forwards
- *    `throttle` and `trailing`. `throttle` is re-read on every change.
- * 3. History operations supersede pending trailing commits: `undo` / `redo` /
- *    `reset` / `clear` and a manual `commit()` cancel a scheduled trailing
- *    commit (upstream's `ignorePrevAsyncUpdates` only cancels the queued
- *    watcher callback, so its trailing timer can still fire afterwards and
- *    re-record the restored record — the port keeps the history free of
- *    duplicates). A pending trailing commit still fires while tracking is
- *    paused, mirroring upstream.
- * 4. Same-tick changes: use `controls.setSource()` (value or updater form)
- *    for updates that must be visible to a manual `commit()` in the same
- *    tick — see `useStateManualHistory` for the full explanation.
- * 5. Storage: snapshots live in refs and a version counter triggers
- *    re-renders (upstream: reactive refs + `computed`); records are plain
- *    objects and timestamps use `Date.now()`. Upstream's `dispose` is not
- *    ported — disposal follows the component lifecycle and pending timers are
- *    cancelled on unmount. Upstream's `shouldCommit` is not ported.
+ * (`source/vueuse/packages/core/useThrottledRefHistory/`).
  *
  * @example
  * const [count, setCount] = useState(0)

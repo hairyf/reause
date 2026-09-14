@@ -58,10 +58,7 @@ function Component() {
 ```ts
 export interface UseFileDialogOptions {
   /**
-   * A custom `document` instance, e.g. working with iframes or in testing
-   * environments. Inlined here — `ConfigurableDocument` is not ported to
-   * `@reause/shared`, so `document?` mirrors the option `useTitle` exposes
-   * (defaults to the global `document` when not provided).
+   * A custom `document` instance, e.g. working with iframes or in testing environments.
    */
   document?: Document | null
   /**
@@ -111,31 +108,8 @@ export interface UseFileDialogReturn {
   }
 }
 /**
- * React port of VueUse's `useFileDialog`.
- *
  * Map from @vueuse/core `useFileDialog`
- * (`source/vueuse/packages/core/useFileDialog/`). Open file dialog with ease.
- *
- * The hook drives a hidden `<input type="file">` (created on mount unless a
- * custom `input` element is provided) and exposes `open` / `reset` / `files`
- * plus `onChange` / `onCancel` event hooks.
- *
- * React divergences:
- * - the Vue `files` shallowRef becomes plain state (`FileList | null`, no
- *   `.value`); `initialFiles` is read once at mount, like upstream setup;
- * - upstream's `createEventHook()` on* members become stable subscribe
- *   functions with the same `(fn) => { off }` shape, managed with Sets, so
- *   they are identity-stable across renders and compatible with the
- *   `useListener` protocol;
- * - the input element is resolved and wired in a mount effect instead of a
- *   `computed`, so nothing touches the DOM during render (SSR-safe);
- * - upstream's `watchEffect(() => applyOptions(options))` becomes an effect
- *   re-applying `multiple` / `accept` / `directory` / `capture` to the input
- *   whenever the (unwrapped) option values change across renders — mutate a
- *   ref-like source's `.current` and re-render to mirror `watchEffect` on a
- *   Vue ref;
- * - the event subscriptions are cleared on unmount (upstream:
- *   `tryOnScopeDispose` inside `createEventHook`'s `on`).
+ * (`source/vueuse/packages/core/useFileDialog/`).
  *
  * @example
  * const { files, open, reset, onChange, onCancel } = useFileDialog({ accept: 'image/*' })

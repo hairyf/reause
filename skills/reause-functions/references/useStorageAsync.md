@@ -58,17 +58,16 @@ const [accessToken, setAccessToken] = useStorageAsync('access.token', '', SomeAs
 ```ts
 type Awaitable<T> = T | Promise<T>
 /**
- * Custom data serialization with async support — `read`/`write` may return a
- * promise for backends that need asynchronous (de)serialization.
+ * Custom data serialization with async support — `read`/`write` may return a promise for backends
+ * that need asynchronous (de)serialization.
  */
 export interface SerializerAsync<T> {
   read: (raw: string) => Awaitable<T>
   write: (value: T) => Awaitable<string>
 }
 /**
- * Minimal async storage backend contract — like `StorageLike`, but every
- * operation may return a promise (IndexedDB, remote key-value stores, async
- * wrappers around `localStorage`, …).
+ * Minimal async storage backend contract — like `StorageLike`, but every operation may return a
+ * promise (IndexedDB, remote key-value stores, async wrappers around `localStorage`, …).
  */
 export interface StorageLikeAsync {
   getItem: (key: string) => Awaitable<string | null>
@@ -80,8 +79,7 @@ export interface UseStorageAsyncOptions<T> extends Omit<
   "serializer"
 > {
   /**
-   * Custom data serialization — same as `useStorage`, but the serializer may
-   * be asynchronous.
+   * Custom data serialization — same as `useStorage`, but the serializer may be asynchronous.
    */
   serializer?: SerializerAsync<T>
   /**

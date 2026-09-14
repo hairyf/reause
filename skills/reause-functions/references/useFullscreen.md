@@ -30,18 +30,15 @@ const { isFullscreen, enter, exit, toggle } = useFullscreen(el)
 
 ```ts
 /**
- * Element on which fullscreen is requested — a plain element (or `null` /
- * `undefined` while it is not available yet), a ref-like `{ current }` object
- * (e.g. the result of `useRef`) — the React equivalent of upstream's
- * `ElementRef`.
+ * Element on which fullscreen is requested — a React ref object (`RefObject`) holding the element
+ * (or `null` / `undefined` while it is not available yet).
  */
 export type FullscreenTarget = RefObject<
   HTMLElement | SVGElement | null | undefined
 >
 export interface UseFullscreenOptions {
   /**
-   * Specify a custom `document` instance, e.g. working with iframes or in
-   * testing environments.
+   * Specify a custom `document` instance, e.g. working with iframes or in testing environments.
    *
    * @default typeof document !== 'undefined' ? document : undefined
    */
@@ -59,8 +56,8 @@ export interface UseFullscreenReturn {
    */
   isSupported: boolean
   /**
-   * Whether the target element (or `document.documentElement` when no target
-   * is given) is currently displayed in fullscreen mode.
+   * Whether the target element (or `document.documentElement` when no target is given) is currently
+   * displayed in fullscreen mode.
    */
   isFullscreen: boolean
   /**
@@ -77,38 +74,8 @@ export interface UseFullscreenReturn {
   toggle: () => Promise<void>
 }
 /**
- * Reactive Fullscreen API — React port of VueUse's `useFullscreen`.
- *
  * Map from @vueuse/core `useFullscreen`
- * (`source/vueuse/packages/core/useFullscreen/`). Adds methods to present a
- * specific element (and its descendants) in fullscreen mode, and to exit
- * fullscreen mode once it is no longer needed. The target defaults to
- * `document.documentElement`, and some platforms (like iOS Safari) only allow
- * fullscreen on video elements.
- *
- * React divergences:
- * - upstream returns `isSupported` (`computed`) and `isFullscreen`
- *   (`shallowRef`) as reactive refs; here they are plain boolean states —
- *   `isSupported` resolves in a mount effect (SSR renders `false`) and
- *   `isFullscreen` follows the `fullscreenchange` events and the `enter` /
- *   `exit` calls;
- * - the `enter` / `exit` / `toggle` functions are stable `useCallback`s that
- *   read the latest resolved element, `document` and method names from a ref
- *   the way upstream reads its refs at call time;
- * - the vendor-prefixed method detection re-resolves in an effect whenever
- *   the resolved target or the `document` option changes (upstream
- *   `computed`), and the fullscreenchange listeners re-bind when the resolved
- *   target changes (upstream `useEventListener(() => unrefElement(targetRef))`);
- * - `tryOnMounted(handlerCallback)` becomes the same effect adopting the
- *   browser's current fullscreen state after mount, and
- *   `tryOnScopeDispose(exit)` with `autoExit` becomes an unmount cleanup (the
- *   option is read once at mount, as upstream destructures it at setup);
- * - rendering never touches the DOM: the target is read from its ref's
- *   `.current` and the global `document` is only read through
- *   a guarded `typeof document === 'undefined'` check, so server rendering is
- *   safe and the state keeps its defaults until the mount effect;
- * - the component variant (`UseFullscreen` render-slot component) is not
- *   ported — React uses the hook directly.
+ * (`source/vueuse/packages/core/useFullscreen/`).
  *
  * @example
  * const el = useRef<HTMLVideoElement>(null)

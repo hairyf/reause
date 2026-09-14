@@ -177,9 +177,9 @@ export interface UseStateManualHistoryControls<Raw, Serialized = Raw> {
    */
   reset: () => void
   /**
-   * Tracked setter for the source state (value or updater form, like
-   * `setState`). Prefer it over your own setter when the update should be
-   * visible to `commit()` in the same tick — see the hook's JSDoc.
+   * Tracked setter for the source state (value or updater form, like `setState`). Prefer it over
+   * your own setter when the update should be visible to `commit()` in the same tick — see the
+   * hook's JSDoc.
    */
   setSource: Dispatch<SetStateAction<Raw>>
 }
@@ -197,33 +197,8 @@ export interface UseStateManualHistoryReturn<
   commit: () => void
 }
 /**
- * React port of VueUse's `useManualRefHistory`.
- *
  * Map from @vueuse/core `useManualRefHistory`
- * (`source/vueuse/packages/core/useManualRefHistory/`). Manually track the
- * change history of a state when the user calls `commit()`, also provides
- * undo and redo functionality.
- *
- * The return object mirrors VueUse's `UseManualRefHistoryReturn` (refs
- * flattened to plain values):
- * `const { history, commit, undo, redo, ... } = useStateManualHistory([source, setSource])`.
- *
- * Adjustments from upstream (Vue reactivity does not translate 1:1):
- *
- * 1. Source: upstream tracks a writable Vue `Ref<Raw>`; React state lives in
- *    the component, so the source is the controlled tuple `[state, setState]`
- *    of an existing `useState` — upstream's `setSource` option is superseded by
- *    the tuple's setter.
- * 2. Same-tick commits: React `setState` is asynchronous — a `commit()`
- *    right after your own `setState` call would snapshot the previous
- *    rendered value. Use `controls.setSource()` for updates you commit in
- *    the same tick: it applies the update synchronously (value or updater
- *    form) and forwards it to your `setSource`.
- * 3. Storage: snapshots live in refs and a version counter triggers
- *    re-renders (upstream: reactive refs + `computed`). Records are plain
- *    objects (upstream wraps them in `markRaw` — Vue's `isReactive` has no
- *    React equivalent) and timestamps use `Date.now()` (upstream:
- *    `timestamp()`).
+ * (`source/vueuse/packages/core/useManualRefHistory/`).
  *
  * @example
  * const [count, setCount] = useState(0)

@@ -173,12 +173,8 @@ const keys = useMagicKeys({ reactive: true })
 
 ```ts
 /**
- * Default alias map used by `useMagicKeys` — maps common key names to their
- * canonical `KeyboardEvent.key` values (lowercase).
- *
  * Map from @vueuse/core `aliasMap.ts`
- * (`source/vueuse/packages/core/useMagicKeys/aliasMap.ts`). Upstream ships it
- * as a separate file; reause keeps hooks single-file, so it is inlined here.
+ * (`source/vueuse/packages/core/useMagicKeys/aliasMap.ts`).
  */
 export declare const DefaultMagicKeysAliasMap: Readonly<Record<string, string>>
 export interface UseMagicKeysOptions<Reactive extends boolean> {
@@ -195,8 +191,7 @@ export interface UseMagicKeysOptions<Reactive extends boolean> {
    */
   target?: RefObject<EventTarget | null | undefined>
   /**
-   * Alias map for keys, all the keys should be lowercase
-   * { target: keycode }
+   * Alias map for keys, all the keys should be lowercase { target: keycode }
    *
    * @example { ctrl: "control" }
    * @default <predefined-map>
@@ -209,8 +204,7 @@ export interface UseMagicKeysOptions<Reactive extends boolean> {
    */
   passive?: boolean
   /**
-   * Custom event handler for keydown/keyup event.
-   * Useful when you want to apply custom logic.
+   * Custom event handler for keydown/keyup event. Useful when you want to apply custom logic.
    *
    * When using `e.preventDefault()`, you will need to pass `passive: false` to useMagicKeys().
    */
@@ -218,51 +212,24 @@ export interface UseMagicKeysOptions<Reactive extends boolean> {
 }
 export interface MagicKeysInternal {
   /**
-   * A Set of currently pressed keys,
-   * Stores raw keyCodes.
+   * A Set of currently pressed keys, Stores raw keyCodes.
    *
    * @see https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key
    */
   current: ReadonlySet<string>
 }
 /**
- * Return of `useMagicKeys`. Upstream maps `Reactive extends true ? boolean :
- * ComputedRef<boolean>` — a plain boolean in reactive mode, a ref otherwise.
- * React state is always "reactive" (the port has no ref layer), so both
- * branches collapse to plain `boolean`; the conditional is kept to mirror the
- * upstream type shape.
+ * Return of `useMagicKeys`. Upstream maps `Reactive extends true ? boolean: ComputedRef<boolean>` —
+ * a plain boolean in reactive mode, a ref otherwise. React state is always "reactive" (the port has
+ * no ref layer), so both branches collapse to plain `boolean`; the conditional is kept to mirror
+ * the upstream type shape.
  */
 export type UseMagicKeysReturn<Reactive extends boolean> = Readonly<
   Record<string, Reactive extends true ? boolean : boolean> & MagicKeysInternal
 >
 /**
- * Reactive keys pressed state, with magical keys combination support.
- *
  * Map from @vueuse/core `useMagicKeys`
- * (`source/vueuse/packages/core/useMagicKeys/`). Tracks every currently pressed
- * key on the `target` (default `window`) and returns a single reactive object
- * whose properties are plain booleans — one per monitored key (`shift`,
- * `space`, `a`, ...). Keys can be combined with `+` / `_` to build shortcut
- * states (`Shift+Ctrl+A`, `alt_tab`, ...), and `current` is the `Set` of all
- * keys currently pressed.
- *
- * React divergences:
- * - Upstream returns a proxy of individual refs (or a reactive object with
- *   `reactive: true`). React has no refs: the whole key state lives in one
- *   state object updated on `keydown` / `keyup`, so the returned values are
- *   always plain booleans and `reactive` is accepted for API compatibility
- *   only — the return is a reactive object either way. Key side effects go in
- *   a `useEffect` (see the example below).
- * - The `keydown` / `keyup` listeners live in a self-contained `useEffect`
- *   with cleanup (upstream composes `useEventListener`) and the `blur` /
- *   `focus` reset listeners stay on `window`. SSR-safe: nothing touches the
- *   DOM during render.
- * - Upstream lazily creates a ref per key on access and ignores presses for
- *   keys that were never read; here every pressed key is recorded eagerly in
- *   the state object, so reading a key after it was pressed reports the truth
- *   (upstream would report `false` for a key that was never read before).
- *   Combination keys are computed on access through a small Proxy over the
- *   current state snapshot.
+ * (`source/vueuse/packages/core/useMagicKeys/`).
  *
  * @example
  * const { shift, space, a } = useMagicKeys()

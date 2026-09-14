@@ -17,7 +17,7 @@
 ## 3. 处理流程
 
 1. 轮询仓库 Issues：新请求 → 创建对应 Issue；已有 Issue 状态/标签变化 → 更新记录。
-2. **派发前必读评论**：执行 `gh issue view <N> --comments`，读取正文与**全部评论**，以最后一条所有者调整评论为准（优先级见 [orchestration.md](orchestration.md) §5）。命名或返回值不符合 [AGENTS.md](../AGENTS.md) 规范时**抛回父代理**，严禁臆测修改。
+2. **派发前必读评论**：执行 `gh issue view <N> --comments`，读取正文与**全部评论**，以最后一条所有者调整评论为准（优先级见 [orchestration.md](orchestration.md) §5）。命名或返回值不符合规范时**抛回父代理**，严禁臆测修改。
 3. 确认需求后（Issue 带 `implement` 标签）派发**实现子代理**完成编码并提交 PR（见 [subagent-execution.md](subagent-execution.md)）。
 4. 持续监控子代理 PR 的评论，并区分评论来源：
    - **触发条件**：**人类**提出的评论或审查意见（reviewer 要求修改）。自动化评论**不触发**——本仓库每个 PR 都会收到一条 netlify deploy-preview 通知，它只是文档构建门禁 `netlify/reause/deploy-preview` 的结果，不是审查意见，**不得**因此关闭或改动该检查。

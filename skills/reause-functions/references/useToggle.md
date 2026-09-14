@@ -94,20 +94,7 @@ export type UseToggleReturn<T extends boolean | number | string = boolean> = [
   (value?: T | ((current: T) => T)) => void,
 ]
 /**
- * React port of VueUse's `useToggle` — a toggler between a truthy and a falsy
- * value, both configurable.
- *
- * Map from @vueuse/shared `useToggle`
- * Mapping: `ref(initialValue)` → `useControllableState(initialValue)`,
- * `toggle()` → stable `useCallback`; accepts the full `State<T>` input.
- * `truthyValue` / `falsyValue` are plain values (upstream: `MaybeRefOrGetter` —
- * reactive refs/getters are not supported, see `MaybeRefOrGetter`). Upstream's
- * `toggle` returns the new value synchronously; React state updates are async,
- * so here `toggle` is `() => void` and the new value is read from `value` on
- * the next render. Like upstream, a bare `toggle()` flips between
- * `truthyValue` and `falsyValue`, `toggle(value)` (including an explicit
- * `undefined`) forces the value, and a function argument is applied as a
- * functional update (React adaptation).
+ * Map from @vueuse/shared `useToggle`.
  *
  * @example
  * const [value, toggle] = useToggle()

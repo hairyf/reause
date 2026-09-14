@@ -128,15 +128,14 @@ The following helper functions are also exported:
 ```ts
 /** Accepted DOM target kinds — mirrors upstream's `MaybeElement`. */
 type MaybeElement = HTMLElement | SVGElement | null | undefined
-/** A React ref object holding the element — upstream `MaybeElementRef`. */
-interface MaybeElementRef {
-  readonly current: MaybeElement
-}
-/** Target of the sortable container (upstream `MaybeRefOrGetter<MaybeElement>`). */
-type SortableTarget = MaybeElementRef
 /**
- * React return type of `useSortable` — the method bag of upstream
- * `UseSortableReturn` (issue §2B: an object, not a tuple).
+ * Target of the sortable container (upstream `MaybeRefOrGetter<MaybeElement>`). reause binds DOM
+ * targets to a React ref object — a plain element, a getter and a callback ref are not accepted.
+ */
+type SortableTarget = RefObject<MaybeElement>
+/**
+ * React return type of `useSortable` — the method bag of upstream `UseSortableReturn` (issue §2B:
+ * an object, not a tuple).
  */
 export interface UseSortableReturn {
   /**
@@ -162,26 +161,23 @@ export interface UseSortableReturn {
     (<K extends keyof Sortable.Options>(name: K) => Sortable.Options[K])
 }
 /**
- * Options of `useSortable` — upstream `UseSortableOptions`, with `onUpdate`
- * re-typed for React.
+ * Options of `useSortable` — upstream `UseSortableOptions`, with `onUpdate` re-typed for React.
  *
- * Upstream's `onUpdate` is the internal handler that mutates the caller's
- * array; here the hook never mutates `list`, so `onUpdate` receives the
- * reordered array instead (see `moveArrayElement`).
+ * is the internal handler that mutates the caller's array; here the hook never mutates `list`, so
+ * `onUpdate` receives the reordered array instead (see `moveArrayElement`).
  */
 export interface UseSortableOptions<T = unknown> extends Omit<
   Sortable.Options,
   "onUpdate"
 > {
   /**
-   * Watch the resolved element and automatically reinitialize Sortable when it
-   * changes.
+   * Watch the resolved element and automatically reinitialize Sortable when it changes.
    *
-   * When `false` (default), Sortable is only initialized once on mount. You
-   * must manually call `start()` if the element changes.
+   * When `false` (default), Sortable is only initialized once on mount. You must manually call
+   * `start()` if the element changes.
    *
-   * When `true`, the instance is destroyed and re-created whenever the
-   * resolved element identity changes (e.g. conditional rendering).
+   * When `true`, the instance is destroyed and re-created whenever the resolved element identity
+   * changes (e.g. conditional rendering).
    *
    * @default false
    */
@@ -195,36 +191,16 @@ export interface UseSortableOptions<T = unknown> extends Omit<
   /**
    * Called after a drag reorder with the NEW array and the sortablejs event.
    *
-   * React state is immutable, so the hook hands the reordered array to the
-   * caller instead of mutating `list` in place. When no `onUpdate` is passed,
-   * sortablejs still moves the DOM nodes while the array stays as-is — the
-   * component then re-renders from stale data and desyncs from the DOM. Always
-   * store the new array, e.g.
-   * `onUpdate: newList => setList(newList)`.
+   * React state is immutable, so the hook hands the reordered array to the caller instead of
+   * mutating `list` in place. When no `onUpdate` is passed, sortablejs still moves the DOM nodes
+   * while the array stays as-is — the component then re-renders from stale data and desyncs from
+   * the DOM. Always store the new array, e.g. `onUpdate: newList => setList(newList)`.
    */
   onUpdate?: (newList: T[], event: Sortable.SortableEvent | null) => void
 }
 /**
- * React port of VueUse's `useSortable` — wrapper for
- * [`sortablejs`](https://github.com/SortableJS/Sortable).
- *
  * Map from @vueuse/integrations `useSortable`
- * (`source/vueuse/packages/integrations/useSortable/`), a reactive wrapper
- * around the `sortablejs` package.
- *
- * Adjustment for React: the list is **immutable**. Upstream's
- * `moveArrayElement` mutates the caller's array in place (deferring the splice
- * through `nextTick` when the list is a ref), which cannot work in React —
- * an in-place mutation does not re-render. The reause
- * `moveArrayElement(list, from, to, e)` is pure: it returns a NEW reordered
- * array (and still performs upstream's DOM fixup when an event is given), and
- * the hook forwards that array to `options.onUpdate`.
- *
- * Adjustment for React: sortablejs manipulates DOM nodes directly, so the
- * component must be a controlled list that re-renders from `onUpdate` — stable
- * `key`s recommended — otherwise React and the DOM desync. Upstream's
- * `onMounted` maps to a mount effect, `onScopeDispose` to the effect cleanup,
- * and `watchElement` to an effect keyed on the resolved element identity.
+ * (`source/vueuse/packages/integrations/useSortable/`).
  *
  * @param el target element, React ref object (`{ current }`), or CSS selector
  * @param list current list items, in render order (never mutated)
@@ -257,24 +233,7 @@ export declare function insertNodeAt(
  */
 export declare function removeNode(node: Node): void
 /**
- * Move an element of `list` from `from` to `to`, returning a NEW array.
- *
- * Map from @vueuse/integrations `moveArrayElement` — the helper module
- * (`source/vueuse/packages/integrations/useSortable/`) shares its directory
- * with the `useSortable` hook ported above. With one
- * deliberate deviation: upstream mutates the caller's array in place (and
- * defers the splice with `nextTick` when the list is a ref), which cannot work
- * in React — an in-place mutation does not re-render. This implementation is
- * pure: the input array is never mutated and the moved copy is returned. The
- * move only happens when `to` is in range (`to >= 0 && to < list.length`,
- * exactly upstream's bounds check); otherwise a copy of `list` is returned
- * unchanged.
- *
- * The DOM fixup of upstream is kept for compatibility: when `e` is given (a
- * sortablejs event), `e.item` is removed from the DOM and re-inserted at
- * `from` inside `e.from`. That fixup runs regardless of the bounds check, as
- * upstream does — note the upstream quirk of inserting at `from` rather than
- * `to`. Pass `null` (or omit `e`) to only compute the array.
+ * Map from @vueuse/integrations `moveArrayElement`.
  *
  * @param list the current list — never mutated
  * @param from source index

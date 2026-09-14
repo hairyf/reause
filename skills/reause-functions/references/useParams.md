@@ -90,12 +90,11 @@ export type RouteParamValueRaw =
   string | number | boolean | null | (string | number | boolean | null)[]
 export interface UseParamsOptions<T, K> {
   /**
-   * Path template used to locate the param in `window.location.pathname`,
-   * e.g. `'/users/:userId'`. A segment starting with `:` captures the
-   * corresponding pathname segment; plain segments must match literally. In
-   * vue-router this route config comes from the router itself, so here it has
-   * to be passed explicitly — without it the hook cannot locate the param and
-   * exposes `defaultValue` (it never throws).
+   * Path template used to locate the param in `window.location.pathname`, e.g. `'/users/:userId'`.
+   * A segment starting with `:` captures the corresponding pathname segment; plain segments must
+   * match literally. In vue-router this route config comes from the router itself, so here it has
+   * to be passed explicitly — without it the hook cannot locate the param and exposes
+   * `defaultValue` (it never throws).
    */
   pattern?: string
   /**
@@ -110,9 +109,8 @@ export interface UseParamsOptions<T, K> {
    */
   mode?: "replace" | "push"
   /**
-   * Function to transform data before return, or an object with one or both
-   * functions: `get` to transform data before returning, and `set` to
-   * transform data before setting.
+   * Function to transform data before return, or an object with one or both functions: `get` to
+   * transform data before returning, and `set` to transform data before setting.
    */
   transform?:
     | ((value: T) => K)

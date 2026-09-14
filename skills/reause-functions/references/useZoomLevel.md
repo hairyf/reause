@@ -44,38 +44,13 @@ setLevel(2) // zoom level will change
 
 ```ts
 /**
- * Setter returned by `useZoomLevel`: writes the level to
- * `WebFrame.setZoomLevel` and updates the value returned by the hook.
+ * Setter returned by `useZoomLevel`: writes the level to `WebFrame.setZoomLevel` and updates the
+ * value returned by the hook.
  */
 export type ZoomLevelSetter = (value: number) => void
 /**
- * Reactive `WebFrame` zoom level — React port of VueUse's `useZoomLevel`.
- *
  * Map from @vueuse/electron `useZoomLevel`
- * (`source/vueuse/packages/electron/useZoomLevel/`). Upstream returns a
- * writable Vue `Ref<number>` whose setter writes to `WebFrame.setZoomLevel`;
- * this port follows the repo's state-like writable rule and returns the React
- * tuple `[level, setLevel]` instead.
- *
- * Adjustment for React:
- * - the writable ref becomes `const [level, setLevel] = useZoomLevel()` —
- *   `setLevel(value)` calls `webFrame.setZoomLevel(value)` and updates the
- *   returned level;
- * - upstream's `watch(level, cb, { immediate: true })` maps to a single sync
- *   effect keyed on `[webFrame, external level]` whose first run applies an
- *   explicitly passed level (upstream's immediate run) and re-applies when
- *   the source value changes. The last level written to `webFrame` is tracked
- *   in a ref, so a redundant render never re-writes the same level;
- * - upstream's `deepRef` passthrough is dropped: the level is a plain number,
- *   so there is no external ref to write back to;
- * - upstream has no range guard for zoom levels, so neither has this port —
- *   `0` is a valid level (upstream's `useZoomFactor` guard does not apply);
- * - the `WebFrame` instance is resolved once per render through the internal
- *   `resolveWebFrame` helper: pass it explicitly, or enable `nodeIntegration`
- *   so it can be read from `window.require('electron').webFrame`;
- * - `useZoomLevel()` reads the current level from `getZoomLevel()`, while
- *   `useZoomLevel(2)` / `useZoomLevel(webFrame, 2)` apply the level given as a
- *   plain number (upstream accepts a ref).
+ * (`source/vueuse/packages/electron/useZoomLevel/`).
  *
  * @see https://www.electronjs.org/docs/api/web-frame#webframesetzoomlevellevel
  * @see https://vueuse.org/useZoomLevel

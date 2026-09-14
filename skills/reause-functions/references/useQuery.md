@@ -87,9 +87,8 @@ export interface UseQueryOptions<T, K> {
    */
   mode?: "replace" | "push"
   /**
-   * Function to transform data before return, or an object with one or both
-   * functions: `get` to transform data before returning, and `set` to
-   * transform data before setting.
+   * Function to transform data before return, or an object with one or both functions: `get` to
+   * transform data before returning, and `set` to transform data before setting.
    */
   transform?:
     | ((value: T) => K)

@@ -114,20 +114,20 @@ export type EasingFunction = (n: number) => number
  */
 export interface UseTransitionOptions {
   /**
-   * Manually abort the running transition — checked on every frame, aborting
-   * stops the loop without snapping to the target and fires `onFinished`.
+   * Manually abort the running transition — checked on every frame, aborting stops the loop without
+   * snapping to the target and fires `onFinished`.
    */
   abort?: () => boolean
   /**
-   * Milliseconds to wait before starting the transition. A new source change
-   * while waiting cancels the pending one.
+   * Milliseconds to wait before starting the transition. A new source change while waiting cancels
+   * the pending one.
    *
    * @default 0
    */
   delay?: number
   /**
-   * Disables the transition — the output follows the source synchronously,
-   * and any running transition is dropped.
+   * Disables the transition — the output follows the source synchronously, and any running
+   * transition is dropped.
    *
    * @default false
    */
@@ -145,8 +145,7 @@ export interface UseTransitionOptions {
    */
   easing?: EasingFunction | CubicBezierPoints
   /**
-   * Specify a custom `window` instance, e.g. working with iframes or in
-   * testing environments.
+   * Specify a custom `window` instance, e.g. working with iframes or in testing environments.
    */
   window?: Window
   /**

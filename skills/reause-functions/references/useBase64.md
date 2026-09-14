@@ -101,13 +101,11 @@ export interface UseBase64ObjectOptions<T> extends UseBase64Options {
 }
 export interface UseBase64Return {
   /**
-   * The base64-encoded transformation result. `''` until the first
-   * transformation settles.
+   * The base64-encoded transformation result. `''` until the first transformation settles.
    */
   base64: string
   /**
-   * The promise of the current transformation. `undefined` until the first
-   * `execute()` run.
+   * The promise of the current transformation. `undefined` until the first `execute()` run.
    */
   promise: Promise<string> | undefined
   /**

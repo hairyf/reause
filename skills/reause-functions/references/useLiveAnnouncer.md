@@ -86,35 +86,8 @@ export interface UseLiveAnnouncerReturn {
   assertive: (message: string, timeout?: number) => void
 }
 /**
- * React port of VueUse's `useLiveAnnouncer`.
- *
  * Map from @vueuse/core `useLiveAnnouncer`
- * (`source/vueuse/packages/core/useLiveAnnouncer/`). Accessible way to
- * announce messages to screen reader users (ARIA live regions).
- *
- * The hook maintains a visually-hidden `<div>` (per `idPrefix`) containing a
- * `polite` (`role="status"`, `aria-live="polite"`) and an `assertive`
- * (`role="alert"`, `aria-live="assertive"`) region. `announce(message, mode,
- * timeout)` writes the message into the region with the given mode (default
- * `'polite'`), optionally auto-clearing it after `timeout` ms; a new
- * announcement cancels any pending auto-clear for the same mode so a
- * previously scheduled clear can never wipe a fresh message. `polite` /
- * `assertive` are shorthand for `announce` with a fixed mode.
- *
- * React divergences:
- * - upstream registers cleanup on the active effect scope
- *   (`tryOnScopeDispose`); here the DOM regions are created in a mount effect
- *   and torn down on unmount, so nothing touches the DOM during render or on
- *   the server (SSR-safe no-op when no `window` / `document` is available);
- * - the module-level `announcerMap` reference counting is kept 1:1: the
- *   container is only removed when the last mounted hook sharing an
- *   `idPrefix` unmounts;
- * - upstream `nextTick` becomes a microtask flush (see `nextTick` above);
- * - the return object `{ announce, polite, assertive }` mirrors upstream and
- *   is identity-stable across renders;
- * - the `window` option defaults to the global `window` (`undefined` on the
- *   server, where the hook becomes a no-op) — upstream's `defaultWindow`
- *   symbol is inlined here because the shared package does not export it.
+ * (`source/vueuse/packages/core/useLiveAnnouncer/`).
  *
  * @example
  * const { announce, polite, assertive } = useLiveAnnouncer()

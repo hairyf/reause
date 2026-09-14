@@ -174,13 +174,12 @@ export interface UseEventSourceOptions<Data> extends EventSourceInit {
 }
 export interface UseEventSourceReturn<Events extends string[], Data = any> {
   /**
-   * Reference to the latest data received via the EventSource,
-   * can be watched to respond to incoming messages
+   * Reference to the latest data received via the EventSource, can be watched to respond to
+   * incoming messages
    */
   data: Data | null
   /**
-   * The current state of the connection, can be only one of:
-   * 'CONNECTING', 'OPEN' 'CLOSED'
+   * The current state of the connection, can be only one of: 'CONNECTING', 'OPEN' 'CLOSED'
    */
   status: EventSourceStatus
   /**
@@ -196,8 +195,8 @@ export interface UseEventSourceReturn<Events extends string[], Data = any> {
    */
   close: () => void
   /**
-   * Reopen the EventSource connection.
-   * If there the current one is active, will close it before opening a new one.
+   * Reopen the EventSource connection. If there the current one is active, will close it before
+   * opening a new one.
    */
   open: () => void
   /**
@@ -211,36 +210,8 @@ export interface UseEventSourceReturn<Events extends string[], Data = any> {
   lastEventId: string | null
 }
 /**
- * Reactive wrapper for EventSource.
- *
  * Map from @vueuse/core `useEventSource`
- * (`source/vueuse/packages/core/useEventSource/`), a reactive wrapper around
- * the browser [EventSource](https://developer.mozilla.org/en-US/docs/Web/API/EventSource/EventSource)
- * (Server-Sent Events) client: it opens a persistent connection to an HTTP
- * server, exposes the current instance, the connection status, the latest
- * received data / named event / last event ID, and `open` / `close` shortcuts,
- * with optional auto-reconnect and custom data serialization.
- *
- * React divergences:
- * - the Vue `ShallowRef` returns become plain state: `data`, `status`, `event`,
- *   `error`, `eventSource` and `lastEventId` are `useState` values, updated
- *   when a message arrives or the connection is (re)created;
- * - the EventSource is created in a mount `useEffect` instead of during setup
- *   (upstream opens synchronously behind an `if (isClient)` check), so SSR
- *   renders the initial `CONNECTING`/`null` values without ever touching
- *   `EventSource` — SSR-safe;
- * - `open`, `close` are stable callbacks reading the mounted EventSource
- *   through a latest-value ref (upstream: closures over the same refs), and
- *   `close()` runs on unmount (upstream: `tryOnScopeDispose`);
- * - `url` is a read-only value source and takes a plain
- *   `string | URL | undefined` (upstream: `MaybeRefOrGetter`; resolve a React
- *   ref or getter at the call site); when `autoConnect` is on, a URL
- *   change between renders reconnects, mirroring upstream's `watch(urlRef,
- *   open)` — the initial connection is still only opened once by `immediate`;
- * - the per-event message listeners are registered with the raw
- *   `addEventListener` inside the connection effect (upstream: a
- *   `useEventListener` call per event name) and are cleaned up together with
- *   the EventSource on close/unmount.
+ * (`source/vueuse/packages/core/useEventSource/`).
  *
  * @example
  * const { status, data, error, close } = useEventSource('https://event-source-url')

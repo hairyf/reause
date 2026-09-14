@@ -89,9 +89,9 @@ export interface SyncStatesOptions {
   /**
    * Timing for syncing, same as watch's `flush` option.
    *
-   * React note: there is no React equivalent — effects always run after
-   * commit, so `'sync'` / `'pre'` / `'post'` are accepted for upstream
-   * signature compatibility and all behave identically.
+   * React note: there is no React equivalent — effects always run after commit, so `'sync'` /
+   * `'pre'` / `'post'` are accepted for upstream signature compatibility and all behave
+   * identically.
    *
    * @default 'sync'
    */
@@ -99,11 +99,9 @@ export interface SyncStatesOptions {
   /**
    * Watch deeply.
    *
-   * React note: no React equivalent — a write through a setter / `onChange`
-   * updates the target only on the following commit, so nested mutations
-   * cannot be observed (only the
-   * source value as a whole is compared, via `Object.is`). Accepted for
-   * upstream signature compatibility.
+   * React note: no React equivalent — a write through a setter / `onChange` updates the target only
+   * on the following commit, so nested mutations cannot be observed (only the source value as a
+   * whole is compared, via `Object.is`). Accepted for upstream signature compatibility.
    *
    * @default false
    */
@@ -116,29 +114,8 @@ export interface SyncStatesOptions {
   immediate?: boolean
 }
 /**
- * Keep target state(s) in sync with a source value — React port of VueUse's
- * `syncRefs`.
- *
  * Map from @vueuse/shared `syncRefs`
- * (`source/vueuse/packages/shared/syncRefs/`), renamed `syncStates` for the
- * React port: the source is a `State<T>` — a plain value, getter,
- * `[value, setter]` tuple or `{ value, onChange }` pair (upstream:
- * `WatchSource`) — resolved with `toValue`; the targets are writable
- * `State<T>` sources written back through their writable form (tuple setter /
- * `onChange`); upstream's `flush` / `deep` / `immediate` options
- * are kept for signature compatibility.
- *
- * React Hook adaptation: upstream syncs through Vue's reactive `watch`, and
- * React has no reactive system — so `syncStates` is implemented as a hook
- * (call it unconditionally at the top of a component). Internally a
- * `useEffect` that runs after every commit compares the resolved source value
- * with the last observed one via `Object.is`; a change is written through to
- * all targets. Because the observation happens post-commit, the caller must
- * re-render (e.g. `setState`) for a new source value to reach the targets —
- * a bare mutation outside of React is never observed (see the maintainer
- * notes on reause #40 / #41). The returned `stop` function tears the
- * synchronization down; the effect also stops doing any work once the owning
- * component unmounts.
+ * (`source/vueuse/packages/shared/syncRefs/`).
  *
  * @example
  * function Form() {

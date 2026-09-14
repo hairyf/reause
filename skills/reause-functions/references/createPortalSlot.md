@@ -223,9 +223,9 @@ export type PortalSlotComponent<
   MapSlotNameToSlotProps extends ObjectLiteralWithPotentialObjectLiterals,
 > = ComponentType<{
   /**
-   * The template to capture — a function receiving the bindings passed to
-   * `<SlotTarget>` plus `$slots` (a function returning the `<SlotTarget>`'s
-   * children, the React equivalent of upstream's `$slots.default`).
+   * The template to capture — a function receiving the bindings passed to `<SlotTarget>` plus
+   * `$slots` (a function returning the `<SlotTarget>`'s children, the React equivalent of
+   * upstream's `$slots.default`).
    */
   children?: (
     bindings: Bindings & {
@@ -237,8 +237,8 @@ export type SlotTargetComponent<Bindings extends Record<string, any>> =
   ComponentType<
     Bindings & {
       /**
-       * Children passed to `<SlotTarget>` — exposed to the template as
-       * `$slots.default` (React's single slot, mirroring upstream's default slot).
+       * Children passed to `<SlotTarget>` — exposed to the template as `$slots.default` (React's single
+       * slot, mirroring upstream's default slot).
        */
       children?: ReactNode
     }
@@ -257,63 +257,32 @@ export interface CreatePortalSlotOptions<Bindings extends Record<string, any>> {
   /**
    * Restrict the props forwarded from `<SlotTarget>` to the template.
    *
-   * Upstream declares Vue runtime props (`ComponentObjectPropsOptions`); React
-   * has no runtime props declaration, so this is a list of prop keys instead —
-   * only these are passed to the template as bindings and the rest are
-   * dropped. When omitted, every prop except `children` is forwarded
-   * (upstream: all attributes are passed through). `children` is reserved by
-   * the components and excluded from the accepted keys.
+   * Upstream declares Vue runtime props (`ComponentObjectPropsOptions`); React has no runtime props
+   * declaration, so this is a list of prop keys instead — only these are passed to the template as
+   * bindings and the rest are dropped. When omitted, every prop except `children` is forwarded.
+   * `children` is reserved by the components and excluded from the accepted keys.
    *
    * @default undefined (all props forwarded)
    */
   props?: readonly Exclude<keyof Bindings, "children">[]
   /**
-   * Name for the target (reuse) component, useful for devtools. Both
-   * components get `${name}.define` / `${name}.reuse` display names, exactly
-   * like upstream.
+   * Name for the target (reuse) component, useful for devtools. Both components get
+   * `${name}.define` / `${name}.reuse` display names, exactly like upstream.
    *
    * @default 'PortalSlot'
    */
   name?: string
   /**
-   * Accepted for API parity with upstream; React has no attribute-inheritance
-   * system (props never fall through to a root element), so it has no runtime
-   * effect.
+   * Accepted for API parity with upstream; React has no attribute-inheritance system (props never
+   * fall through to a root element), so it has no runtime effect.
    *
    * @default true
    */
   inheritAttrs?: boolean
 }
 /**
- * Define and reuse a template inside the component scope — React port of
- * VueUse's `createReusableTemplate`.
- *
  * Map from @vueuse/core `createReusableTemplate`
- * (`source/vueuse/packages/core/createReusableTemplate/`). The factory creates
- * a pair of components sharing one captured template: `PortalSlot` (the
- * "define" side) captures the render function passed as its children and
- * renders nothing; `SlotTarget` (the "reuse" side) renders that template with
- * the props passed to it. The pair supports array destructuring
- * (`[PortalSlot, SlotTarget]`), object destructuring (`{ define, reuse }`) and
- * property access (`pair.define` / `pair.reuse`) through `makeDestructurable`,
- * exactly like upstream.
- *
- * React divergences from upstream:
- * - the template is a **children-as-function** render prop instead of a
- *   `v-slot`: the bindings object replaces the slot props (the `<SlotTarget>`
- *   props), and `$slots.default` — a function returning the `<SlotTarget>`
- *   children — replaces the `$slots` map. React components expose a single
- *   slot, so only the `default` slot is provided at runtime;
- * - `props` is a list of prop keys instead of Vue's `ComponentObjectPropsOptions`;
- * - `inheritAttrs` is a no-op: React has no attribute-inheritance system;
- * - the template is captured **during render** (like upstream's define render
- *   assigns `render.value = slots.default`), so `<PortalSlot>` must render
- *   before `<SlotTarget>` in the same commit for the target to pick up the
- *   template;
- * - prop keys are camelized (`my-msg` → `myMsg`) only when no `props` option
- *   is given, mirroring upstream's attrs path.
- *
- * SSR-safe: nothing touches `window` or the DOM.
+ * (`source/vueuse/packages/core/createReusableTemplate/`).
  *
  * @see https://vueuse.org/core/createReusableTemplate/
  *

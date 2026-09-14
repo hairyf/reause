@@ -28,38 +28,11 @@ export interface UseFocusWithinReturn {
   focused: boolean
 }
 /**
- * Track if focus is contained within the target element.
- *
  * Map from @vueuse/core `useFocusWithin`
- * (`source/vueuse/packages/core/useFocusWithin/`). Tracks whether the target
- * element or any of its descendants currently holds focus — the dynamic
- * equivalent of the `:focus-within` CSS pseudo-class. `focused` flips to
- * `true` on a bubbling `focusin` event and back to `false` on `focusout`,
- * unless the target still matches `:focus-within` (focus moved between two of
- * its descendants). A common use case is a form element: watch `focused` to
- * know if any of its inputs currently has focus.
+ * (`source/vueuse/packages/core/useFocusWithin/`).
  *
- * React divergences:
- * - the Vue `ComputedRef<boolean>` return becomes a plain boolean read off
- *   the same object contract (`{ focused }`) as upstream;
- * - the `focusin` / `focusout` listeners (upstream composes `useEventListener`)
- *   attach in an effect and are removed on unmount. The target is re-resolved
- *   after every render and re-bound only when the resolved element or the
- *   `window` option changed, so a React ref that is `null` on the first render
- *   starts tracking once React attaches the element (upstream watches the
- *   `unrefElement` computed the same way);
- * - upstream's `useActiveElement` setup guard becomes a mount-time
- *   `document.activeElement` validity check in the same effect — when it is
- *   `null` no listeners attach and `focused` stays `false`, mirroring
- *   upstream's early return;
- * - the listener options (`{ passive: true }`) and the `:focus-within`
- *   re-check on `focusout` are preserved unchanged.
- *
- * SSR-safe: nothing touches `window` or the DOM during render — the validity
- * check and the listener bindings all happen in effects.
- *
- * @param target - element or React ref object (`{ current }`) returning
- *   the element to track focus within
+ * @param target - React ref object (`RefObject`) holding the element to
+ *   track focus within, resolved with the shared `unrefElement`
  * @param options - a custom `window` instance, e.g. working with iframes or
  *   in testing environments
  *

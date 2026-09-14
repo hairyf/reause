@@ -57,8 +57,8 @@ export interface UseWatchAtMostReturn {
    */
   stop: () => void
   /**
-   * Pause the watch — source changes do not fire the callback nor count
-   * towards the limit until `resume` is called.
+   * Pause the watch — source changes do not fire the callback nor count towards the limit until
+   * `resume` is called.
    */
   pause: () => void
   /**

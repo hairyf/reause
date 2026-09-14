@@ -88,8 +88,8 @@ export interface UseIntervalOptions<Controls extends boolean = false> {
    */
   callback?: (count: number) => void
   /**
-   * Increment the counter (and fire `callback`) immediately when the interval
-   * starts or `resume` is called
+   * Increment the counter (and fire `callback`) immediately when the interval starts or `resume` is
+   * called
    *
    * @default false
    */
@@ -119,23 +119,7 @@ export interface UseIntervalControls {
 }
 export type UseIntervalReturn = number | UseIntervalControls
 /**
- * React port of VueUse's `useInterval`.
- *
- * Map from @vueuse/shared `useInterval`
- * Mapping: upstream wraps `useIntervalFn` and returns a readonly
- * `ShallowRef<number>`; since `useIntervalFn` is mapped in its own module,
- * this port inlines the interval logic to stay self-contained — the counter
- * is a plain `number` state (no `.value`), the setup-time `resume()`
- * (`immediate`) becomes a mount `useEffect` (guarded against the StrictMode
- * double-invocation so `immediateCallback` fires only once), and
- * `tryOnScopeDispose(pause)` becomes the effect cleanup. `{ controls: true }`
- * exposes `counter` / `reset` plus the `Pausable` controls (`isActive` /
- * `pause` / `resume`). `interval` is a plain number (upstream:
- * `MaybeRefOrGetter<number>`); like upstream's reactive watch, a changed
- * interval live-restarts the timer while it is active.
- * `immediateCallback` follows `useIntervalFn`'s semantics (upstream
- * `useInterval` doesn't forward it). `pause` / `resume` / `reset` are stable
- * `useCallback`s.
+ * Map from @vueuse/shared `useInterval`.
  *
  * @example
  * // count will increase every 200ms

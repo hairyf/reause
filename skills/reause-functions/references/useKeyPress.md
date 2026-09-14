@@ -80,9 +80,7 @@ export type KeyPressPredicate = (
 export type KeyPressFilter = KeyType | KeyType[] | KeyPressPredicate
 export type KeyPressEvent = "keydown" | "keyup"
 /**
- * Event target: a plain element, a ref-like `{ current }` holder (`MaybeRefOrGetter`,
- * AGENTS.md §2) or a zero-argument resolver (`() => Element` — upstream's
- * `BasicTarget` arm).
+ * Event target: a React ref object (`RefObject`) holding the event target (AGENTS.md §2).
  */
 export type KeyPressTarget = RefObject<EventTarget | null | undefined>
 export interface UseKeyPressOptions {
@@ -93,15 +91,15 @@ export interface UseKeyPressOptions {
    */
   events?: KeyPressEvent[]
   /**
-   * Element to bind the listeners to. Accepts a plain element, a ref-like
-   * `{ current }` object or a zero-argument resolver, and falls back to `window`.
+   * Element to bind the listeners to. Accepts a React ref object (`RefObject`) holding the element,
+   * and falls back to `window`.
    *
    * @default window
    */
   target?: KeyPressTarget
   /**
-   * Require the event to carry **exactly** the filtered modifiers, so listening
-   * for `ctrl` no longer fires while `ctrl+a` is pressed.
+   * Require the event to carry **exactly** the filtered modifiers, so listening for `ctrl` no
+   * longer fires while `ctrl+a` is pressed.
    *
    * @default false
    */
@@ -114,85 +112,8 @@ export interface UseKeyPressOptions {
   useCapture?: boolean
 }
 /**
- * Listen for a key press by `keyCode`, alias, modifier combination or custom
- * predicate, and hand the handler both the event and the key that fired.
- *
  * Map from ahooks `useKeyPress`
- * (`source/ahooks/packages/hooks/src/useKeyPress/`) — its `index.ts` (276 LOC),
- * `index.en-US.md` / `index.zh-CN.md` and the `demo/demo1..8.tsx` demos. The
- * filter is matched against the event's `keyCode` (numbers, `.`-separated
- * compound strings and ~100 aliases such as `capslock`, `arrowleft` or
- * `numpad0`), and a match calls `handler(event, key)`.
- *
- * React divergences:
- * - upstream ships a **default export**; reause exports `useKeyPress` by name
- *   (repo convention) with the same arguments, the same behaviour and the same
- *   `void` return;
- * - the type names are hook-scoped. Upstream's `Options` / `Target` /
- *   `KeyEvent` are not usable in a shared barrel, `KeyFilter` and `KeyPredicate`
- *   are **already exported by `useKeyStroke`** (a second `export *` of the same
- *   name is a `TS2308` ambiguity, and the core barrel is exactly one line per
- *   hook), so this port exports `UseKeyPressOptions` / `KeyPressTarget` /
- *   `KeyPressEvent` / `KeyPressFilter` / `KeyPressPredicate`. `KeyType` keeps
- *   upstream's name — it is free. `KeyEvent` would also shadow the deprecated
- *   DOM global of that name;
- * - `target` maps upstream's `BasicTarget` onto the reause DOM convention
- *   (AGENTS.md §2): `MaybeRefOrGetter<EventTarget>` plus upstream's resolver arm,
- *   resolved through the shared `toValue` — the element resolver reause already
- *   uses — instead of a local `getTargetElement` copy. As upstream's
- *   `getTargetElement(target, window)`, only a **missing** `target` falls back
- *   to `window`; a ref-like or resolver target that currently resolves to
- *   `null` simply binds nothing;
- * - the effect that owns the listeners is composed from the merged
- *   `useDeepCompareEffect` plus a target-aware effect, mirroring upstream's
- *   `useDeepCompareEffectWithTarget(effect, [events], target)`: upstream
- *   deep-compares the deps and tracks the resolved element itself
- *   (`utils/useDeepCompareEffectWithTarget.ts`, `utils/createEffectWithTarget.ts`,
- *   `utils/depsEqual.ts` over `react-fast-compare`), so an inline `['keydown']`
- *   literal never re-binds while a genuinely different event set does;
- * - `useCapture` is read when the listeners are (re)bound, exactly as upstream:
- *   changing it alone does not re-bind (only a resolved-target or `events`
- *   change does), so a change made on its own takes effect on the next re-bind;
- * - SSR-safe: `window` is only touched when `target` is omitted, and the
- *   listeners bind in an effect.
- *
- * `KeyType` accepts numbers (raw `keyCode`s), which `useKeyStroke`'s `KeyFilter`
- * does not — the filter is documented as widened here rather than by touching
- * the merged hook. `eventHandler` receives the key that fired: for a string
- * filter or an array entry it is that **filter string** (so callers can tell
- * which of several filters matched), and otherwise `event.key`.
- *
- * Border with `useKeyStroke` (VueUse `onKeyStroke`), which is deliberately left
- * untouched — this hook is a sibling, not a layer on top of it. Both accept
- * `string[]`, but an array means something different in each:
- * `useKeyStroke` matches `keyFilter.includes(event.key)` — exact `event.key`
- * membership, layout-aware, no modifier or compound support, the handler only
- * receives the event, and the hook returns a stop function; this hook resolves
- * every entry through the `keyCode`/alias/modifier parser (so `['ctrl.a',
- * 'shift.b']` is meaningful), returns the matched entry to the handler, listens
- * to an `events` array with `useCapture`, and returns `void`. Sharing one
- * matcher would therefore have to change `useKeyStroke`'s observable behaviour,
- * which is exactly what this upgrade must not do: the port reuses the shared
- * primitives (`toValue`, `useLatest`, `useDeepCompareEffect`, `useUnmount`) and
- * nothing else;
- * - `useKeyStroke` also accepts `true` (any key) and a boolean predicate, while
- *   this hook's declared filter is upstream's (`KeyType | KeyType[] |
- *   predicate`). Upstream's final fallback branch (`() => Boolean(keyFilter)`)
- *   is mirrored verbatim; with this filter type it is unreachable dead code,
- *   exactly as upstream's types leave it.
- *
- * `keyCode` is a deprecated API: it is kept here for compatibility with
- * upstream's alias table and with callers that filter by key code, but
- * `event.key` is the modern, layout-aware path — which is why matching compares
- * `keyCode` and the handler is also handed `event.key`.
- *
- * Known divergence from the pin (upstream's own `as any` indexing): upstream
- * reads `modifierKey` / `aliasKeyCodeMap` through an untyped index, so a filter
- * segment named after an `Object.prototype` member reached the prototype —
- * `constructor`, `toString` and friends counted as a matched modifier, and
- * `__proto__` threw `TypeError: Object.prototype is not a function`. This port
- * checks own properties, so only the four real modifier names and the aliases
- * above match, and a pathological segment is simply inert.
+ * (`source/ahooks/packages/hooks/src/useKeyPress/`).
  *
  * @example
  * useKeyPress('ctrl.a', event => event.preventDefault())

@@ -34,8 +34,7 @@ export declare function promiseTimeout(
 export interface SingletonPromiseReturn<T> {
   (): Promise<T>
   /**
-   * Reset current staled promise.
-   * await it to have proper shutdown.
+   * Reset current staled promise. await it to have proper shutdown.
    */
   reset: () => Promise<void>
 }
@@ -67,8 +66,8 @@ export declare function increaseWithUnit(
   delta: number,
 ): string | number
 /**
- * Get a px value for SSR use, do not rely on this method outside of SSR as REM
- * unit is assumed at 16px, which might not be the case on the client
+ * Get a px value for SSR use, do not rely on this method outside of SSR as REM unit is assumed at
+ * 16px, which might not be the case on the client
  *
  * @example pxValue('37rem') // 592
  * @example pxValue('500px') // 500
@@ -108,11 +107,10 @@ export declare const hasOwn: <T extends object, K extends keyof T>(
 export declare const isIOS: boolean
 export declare const hyphenate: (str: string) => string
 /**
- * Values accepted by controllable state hooks: a plain value, a zero-argument
- * getter, a `[value, setter]` tuple or a `{ value, onChange }` pair. React
- * refs are deliberately **not** part of this union — a ref is a DOM handle,
- * so it is passed as a `RefObject` to DOM hooks and read with `unrefElement`
- * (`@reause/core`) instead of being treated as a state source.
+ * Values accepted by controllable state hooks: a plain value, a zero-argument getter, a `[value,
+ * setter]` tuple or a `{ value, onChange }` pair. React refs are deliberately **not** part of this
+ * union — a ref is a DOM handle, so it is passed as a `RefObject` to DOM hooks and read with
+ * `unrefElement` (`@reause/core`) instead of being treated as a state source.
  */
 export type StateValue<T> =
   | T
@@ -123,38 +121,35 @@ export type StateValue<T> =
       onChange?: (value: T) => void
     }
 /**
- * Allow a custom `window` instance, e.g. working with iframes or in testing
- * environments. Single source of truth — VueUse defines this in shared too.
+ * Allow a custom `window` instance, e.g. working with iframes or in testing environments. Single
+ * source of truth — VueUse defines this in shared too.
  */
 export interface ConfigurableWindow {
   window?: Window
 }
 /**
- * Type guard for React ref objects (`RefObject` — `{ current }` holders).
- * Callback refs are functions and cannot be read synchronously, so they are
- * not ref-like. Refs are DOM handles here, never state sources: use it to
- * detect a `RefObject` when a value may still be `undefined`/`null`.
+ * Type guard for React ref objects (`RefObject` — `{ current }` holders). Callback refs are
+ * functions and cannot be read synchronously, so they are not ref-like. Refs are DOM handles here,
+ * never state sources: use it to detect a `RefObject` when a value may still be `undefined`/`null`.
  */
 export declare function isRefLike(value: unknown): value is RefObject<unknown>
 /**
- * Resolve a controllable-state source to its current value — the React
- * replacement for VueUse's `toValue`. A `[value, setter]` tuple resolves to
- * its first element, a `{ value, onChange }` pair to `.value`, a
- * zero-argument getter is invoked, and a plain value is returned as-is.
+ * Resolve a controllable-state source to its current value — the React replacement for VueUse's
+ * `toValue`. A `[value, setter]` tuple resolves to its first element, a `{ value, onChange }` pair
+ * to `.value`, a zero-argument getter is invoked, and a plain value is returned as-is.
  *
- * React refs are not resolved here: a `RefObject` is a DOM handle, read with
- * `unrefElement` (`@reause/core`) instead.
+ * React refs are not resolved here: a `RefObject` is a DOM handle, read with `unrefElement`
+ * (`@reause/core`) instead.
  */
 export declare function toValue<T>(value: StateValue<T>): T
 export declare function toValue<T>(
   value: StateValue<T> | undefined | null,
 ): T | undefined | null
 /**
- * Write a value back through a writable `State<T>` source — a
- * `[value, setter]` tuple or a `{ value, onChange }` pair. Plain values and
- * getters have no write path and are skipped. This is the write-side
- * counterpart of `toValue`; hooks that push values into a `State<T>` import it
- * from here rather than re-implementing the branches.
+ * Write a value back through a writable `State<T>` source — a `[value, setter]` tuple or a `{
+ * value, onChange }` pair. Plain values and getters have no write path and are skipped. This is the
+ * write-side counterpart of `toValue`; hooks that push values into a `State<T>` import it from here
+ * rather than re-implementing the branches.
  */
 export declare function writeState<T>(
   source: StateValue<T> | undefined | null,

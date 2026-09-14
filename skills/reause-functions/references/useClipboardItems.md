@@ -57,42 +57,39 @@ export interface UseClipboardItemsOptions<Source> {
    */
   copiedDuring?: number
   /**
-   * Specify a custom `navigator` instance, e.g. working with iframes or in
-   * testing environments. Declared inline instead of composing a shared
-   * `ConfigurableNavigator` type because other core hooks export a same-named
-   * type — `export *` in `index.ts` would collide (TS2308), so like
+   * Specify a custom `navigator` instance, e.g. working with iframes or in testing environments.
+   * Declared inline instead of composing a shared `ConfigurableNavigator` type because other core
+   * hooks export a same-named type — `export *` in `index.ts` would collide (TS2308), so like
    * `useGamepad` this module declares the member directly.
    */
   navigator?: Navigator
 }
 export interface UseClipboardItemsReturn<Optional> {
   /**
-   * `true` when the resolved navigator exposes the Clipboard API
-   * (`'clipboard' in navigator`). Resolved in a mount effect, so it stays
-   * `false` during the first render and on the server (SSR-safe).
+   * `true` when the resolved navigator exposes the Clipboard API (`'clipboard' in navigator`).
+   * Resolved in a mount effect, so it stays `false` during the first render and on the server
+   * (SSR-safe).
    */
   isSupported: boolean
   /**
-   * The clipboard items currently read from the system clipboard. Updated by
-   * a successful `copy`, by a manual `read()` call, and automatically when
-   * `read` is enabled and a `copy` / `cut` event fires.
+   * The clipboard items currently read from the system clipboard. Updated by a successful `copy`,
+   * by a manual `read()` call, and automatically when `read` is enabled and a `copy` / `cut` event
+   * fires.
    */
   content: ClipboardItems
   /**
-   * Whether the last `copy` call succeeded. Resets to `false` after
-   * `copiedDuring` milliseconds via a timeout.
+   * Whether the last `copy` call succeeded. Resets to `false` after `copiedDuring` milliseconds via
+   * a timeout.
    */
   copied: boolean
   /**
-   * Asynchronously writes `content` to the system clipboard. When the
-   * `source` option is provided it may be called without arguments; it is a
-   * no-op (resolves without writing) when the Clipboard API is unsupported
-   * or when no value is available.
+   * Asynchronously writes `content` to the system clipboard. When the `source` option is provided
+   * it may be called without arguments; it is a no-op (resolves without writing) when the Clipboard
+   * API is unsupported or when no value is available.
    *
-   * The parameter is named `content` — upstream names it `text`
-   * (`copy: (text: ClipboardItems) => Promise<void>`). Same type and
-   * semantics; `content` matches the returned `content` value and avoids
-   * confusion with `useClipboard`'s text-only `text`.
+   * The parameter is named `content` — upstream names it `text` (`copy: (text: ClipboardItems) =>
+   * Promise<void>`). Same type and semantics; `content` matches the returned `content` value and
+   * avoids confusion with `useClipboard`'s text-only `text`.
    */
   copy: Optional extends true
     ? (content?: ClipboardItems) => Promise<void>
@@ -103,32 +100,8 @@ export interface UseClipboardItemsReturn<Optional> {
   read: () => void
 }
 /**
- * Reactive [Clipboard API](https://developer.mozilla.org/en-US/docs/Web/API/Clipboard_API).
- *
  * Map from @vueuse/core `useClipboardItems`
- * (`source/vueuse/packages/core/useClipboardItems/`). Provides the ability
- * to respond to clipboard commands (cut, copy and paste) as well as to
- * asynchronously read from and write to the system clipboard. Access to the
- * contents of the clipboard is gated behind the
- * [Permissions API](https://developer.mozilla.org/en-US/docs/Web/API/Permissions_API).
- *
- * React divergences:
- * - the Vue `content` / `copied` shallow refs become plain state values read
- *   directly, and `isSupported` (upstream `useSupported` computed) becomes a
- *   plain boolean resolved once in a mount effect — nothing touches
- *   `window` or `navigator` during render, so SSR renders the defaults;
- * - upstream binds the copy/cut listeners once at setup (after the support
- *   check passes); here a self-contained effect (the pattern of
- *   `useMagicKeys` / `useNetwork`) binds `copy` / `cut` on `window` while
- *   `read` is enabled and the Clipboard API is supported, so toggling `read`
- *   after mount re-binds or removes them (strictly more reactive than
- *   upstream's freeze-in), and removes them on unmount;
- * - `copy` is a stable callback that resolves the `source` option at call
- *   time (a plain value; upstream accepts a ref), writes no-op when
- *   the API is unsupported or no value is available, and sets `content` +
- *   `copied` after a successful write;
- * - the `copiedDuring` reset timer composes `@reause/shared` `useTimeoutFn`
- *   with `immediate: false`, and the pending timer is cleared on unmount.
+ * (`source/vueuse/packages/core/useClipboardItems/`).
  *
  * @example
  * const source = [

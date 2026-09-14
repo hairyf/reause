@@ -79,43 +79,21 @@ type FilterKeys<T> = {
 }
 type ChangeCaseKeys = FilterKeys<typeof changeCase>
 /**
- * Union of the transformations `change-case` exports as `*Case` functions —
- * derived from the module the same way VueUse does (`noCase`, `camelCase`,
- * `capitalCase`, `constantCase`, `dotCase`, `kebabCase`, `pascalCase`,
- * `pascalSnakeCase`, `pathCase`, `sentenceCase`, `snakeCase`, `trainCase`).
+ * Union of the transformations `change-case` exports as `*Case` functions — derived from the module
+ * the same way VueUse does (`noCase`, `camelCase`, `capitalCase`, `constantCase`, `dotCase`,
+ * `kebabCase`, `pascalCase`, `pascalSnakeCase`, `pathCase`, `sentenceCase`, `snakeCase`,
+ * `trainCase`).
  */
 export type ChangeCaseType = ChangeCaseKeys[keyof ChangeCaseKeys]
 /**
- * React return type: `[value, setValue]` tuple — the writable-side analog of
- * the upstream `WritableComputedRef<string>` (issue §2B). `value` is the
- * transformed string; `setValue` updates the internal input state.
+ * React return type: `[value, setValue]` tuple — the writable-side analog of the upstream
+ * `WritableComputedRef<string>` (issue §2B). `value` is the transformed string; `setValue` updates
+ * the internal input state.
  */
 export type UseChangeCaseReturn = [string, Dispatch<SetStateAction<string>>]
 /**
- * React port of VueUse's `useChangeCase`.
- *
  * Map from @vueuse/integrations `useChangeCase`
- * (`source/vueuse/packages/integrations/useChangeCase/`), a reactive wrapper
- * around the `change-case` package. Upstream returns a writable
- * `WritableComputedRef<string>`; here the writable computed ref maps to a
- * `[value, setValue]` tuple: `value` is the transformed string (`change-case`
- * applied to the internal input state with the current `type`), and
- * `setValue` updates that internal input state like a controlled `useState`.
- * `input` is the hook's **read-only value source** and takes a plain `string`
- * (upstream: `MaybeRef<string>` / `MaybeRefOrGetter<string>`); `type` and
- * `options` are plain values (format knobs, upstream `MaybeRefOrGetter`).
- *
- * Adjustment for React:
- * - upstream's writable computed captures a plain `input` once at setup. Here
- *   a changed `input` prop re-syncs the internal state on the next render, so
- *   a parent re-render with a new string is reflected; a `setValue` write is
- *   never clobbered while the `input` prop is unchanged (the baseline records
- *   the last externally synced value);
- * - writes are **not** propagated back to the caller: `setValue` updates the
- *   internal input state only (upstream's writable computed writes through to
- *   a ref input). A changed `input` prop always wins over the internal state;
- * - `setValue` writes the RAW string; the transform is re-applied on the next
- *   render (the upstream computed's `get` re-derives from the ref on access).
+ * (`source/vueuse/packages/integrations/useChangeCase/`).
  *
  * @__NO_SIDE_EFFECTS__
  * @example

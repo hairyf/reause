@@ -33,8 +33,8 @@ useWatchOnce(source, () => {
 ```ts
 export interface UseWatchOnceReturn {
   /**
-   * Stop watching before the callback has fired — further source changes are
-   * ignored. Calling it after the callback fired is a no-op.
+   * Stop watching before the callback has fired — further source changes are ignored. Calling it
+   * after the callback fired is a no-op.
    */
   stop: () => void
 }

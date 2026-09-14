@@ -82,8 +82,8 @@ argument of `toBe(value)` / `toContains(value)` is a plain value.
 ```ts
 export interface UntilToMatchOptions {
   /**
-   * Milliseconds timeout for promise to resolve/reject if the when condition does not meet.
-   * 0 for never timed out
+   * Milliseconds timeout for promise to resolve/reject if the when condition does not meet. 0 for
+   * never timed out
    *
    * @default 0
    */
@@ -95,9 +95,9 @@ export interface UntilToMatchOptions {
    */
   throwOnTimeout?: boolean
   /**
-   * `deep` option for the internal watch — kept for API compatibility. The
-   * React poller re-reads the source on every tick, so deep observation is
-   * implicit and this option is effectively a no-op.
+   * `deep` option for the internal watch — kept for API compatibility. The React poller re-reads
+   * the source on every tick, so deep observation is implicit and this option is effectively a
+   * no-op.
    *
    * @default false
    */
@@ -142,21 +142,7 @@ export interface UntilArrayInstance<T> extends UntilBaseInstance<T> {
   toContains: (value: ElementOf<T>, options?: UntilToMatchOptions) => Promise<T>
 }
 /**
- * Promised one-time watch for changes
- *
- * Map from @vueuse/shared `until`
- * React adaptation: upstream resolves when Vue's reactive `watch` callback
- * first observes the condition holding; React has no reactive refs or watch,
- * so this port **polls** the source — a plain value or a zero-argument getter
- * — at a small fixed interval (the same polling `useFetch` uses for its
- * `refetch` watch) and resolves the promise the first time the condition
- * holds. `until` is a **pure function, not a hook** — no React hooks are
- * involved — so it can be used anywhere a plain promise utility can.
- *
- * A plain value is a snapshot: it never changes between polls, so use a getter
- * when the value may change after `until` was called (`until(() => ref.current)`).
- * A `Ref` / `{ current }` object is not accepted directly. The `value` passed to
- * `toBe` / `toContains` is a plain value too.
+ * Map from @vueuse/shared `until`.
  *
  * @example
  * let count = 0

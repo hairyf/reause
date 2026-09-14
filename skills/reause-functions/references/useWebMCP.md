@@ -198,9 +198,8 @@ export interface UseWebMCPOptions<Args, Result> {
    */
   annotations?: WebMCPToolAnnotations
   /**
-   * The function the agent calls. May be async. Its return value is normalized
-   * into a WebMCP tool result, and any thrown/returned `Error` becomes an
-   * `isError` result.
+   * The function the agent calls. May be async. Its return value is normalized into a WebMCP tool
+   * result, and any thrown/returned `Error` becomes an `isError` result.
    */
   execute: (args: Args) => Result | Promise<Result>
   /**
@@ -218,9 +217,8 @@ export interface UseWebMCPOptions<Args, Result> {
    */
   onError?: (error: unknown) => void
   /**
-   * Specify a custom `document` instance, e.g. working with iframes or in
-   * testing environments. Upstream composes this from the shared
-   * `ConfigurableDocument` option type.
+   * Specify a custom `document` instance, e.g. working with iframes or in testing environments.
+   * Upstream composes this from the shared `ConfigurableDocument` option type.
    *
    * @default typeof document !== 'undefined' ? document : undefined
    */
@@ -228,8 +226,7 @@ export interface UseWebMCPOptions<Args, Result> {
 }
 export interface UseWebMCPReturn {
   /**
-   * If the experimental WebMCP API
-   * (`document.modelContext.registerTool`) is available.
+   * If the experimental WebMCP API (`document.modelContext.registerTool`) is available.
    */
   isSupported: boolean
   /**
@@ -242,55 +239,8 @@ export interface UseWebMCPReturn {
   error: Error | null
 }
 /**
- * React port of VueUse's `useWebMCP`.
- *
  * Map from @vueuse/core `useWebMCP`
- * (`source/vueuse/packages/core/useWebMCP/`). Register a
- * [WebMCP](https://github.com/webmachinelearning/webmcp) tool and tie its
- * lifecycle to the component: the tool is registered on mount (and whenever a
- * discoverable part — `name`, `description`, `inputSchema`, `annotations` or
- * `enabled` — changes) and unregistered automatically on unmount, so the tools
- * an agent sees stay in lockstep with what is on screen. Call it multiple
- * times to register multiple tools.
- *
- * The upstream return shape is mirrored 1:1 as a plain object: `isSupported`,
- * `isRegistered` and `error` are plain values (upstream: a `ComputedRef` plus
- * two `ShallowRef`s).
- *
- * React divergences:
- * - `isSupported` is a plain boolean computed by `useSupported`, i.e. in a
- *   mount effect — it stays `false` during render and on the server, so no
- *   `document.modelContext` is touched while rendering. The registration
- *   effect tolerates `false` on its first pass and re-runs when the probe
- *   settles;
- * - `isRegistered`/`error` are plain `useState` values (upstream
- *   `shallowRef`s) — the return is an object, so they are read-only and
- *   intentionally exposed without setters (internal registration state);
- * - `name`, `description`, `inputSchema`, `annotations` and `enabled` are
- *   plain React values (upstream: `MaybeRefOrGetter` — per this repo's
- *   binding standard, read-only value-source params only accept a plain `T`,
- *   the same way `useTitle` ports its `MaybeRefOrGetter` title). Because React
- *   has no reactive dependency tracking, the registration effect depends on
- *   those values directly, so passing a value derived from state re-registers
- *   the tool when it changes. The schema and annotations are serialized to
- *   stable strings first, so a content-equal inline object literal does not
- *   churn the registration (upstream serializes them inside its `watch`
- *   getters for the same reason);
- * - `execute`, `formatOutput` and `onError` are read live from a
- *   `{ current }` container (`live`) at call time (upstream reads
- *   `options.*` directly), so swapping those closures never re-registers the
- *   tool; the container is updated on every render rather than through
- *   `useRef`'s initializer;
- * - the custom `document` option overrides the global one and is resolved
- *   lazily inside the effects (`resolveDocument`), so the global `document` is
- *   never read during render;
- * - `register()` + `tryOnScopeDispose(cleanup)` collapse into a single
- *   `useEffect`: its cleanup aborts the `AbortController` (how WebMCP
- *   unregisters a tool), so it runs both on unmount and before every
- *   re-registration — upstream's `cleanup()` called at the top of `register()`;
- * - `doc!.modelContext!.registerTool` becomes an explicit callable check
- *   (upstream also feature-detects through `useSupported`);
- * - `DocumentWithModelContext` is declared locally; no `declare global`.
+ * (`source/vueuse/packages/core/useWebMCP/`).
  *
  * @example
  * const { isSupported, isRegistered, error } = useWebMCP({

@@ -25,55 +25,8 @@ This is the reause port of ahooks' `useRafTimeout` (`source/ahooks/packages/hook
 
 ```ts
 /**
- * Fire `fn` once, on the first animation frame at or after `delay`
- * milliseconds, and return a stable `clear` that cancels the pending timeout.
- *
  * Map from ahooks `useRafTimeout`
- * (`source/ahooks/packages/hooks/src/useRafTimeout/`). Mirrored directly
- * (AGENTS.md §1.1, React source ⇒ direct mirror) apart from the required
- * rename to `useTimeoutRafFn`, which aligns the export with the existing
- * `useTimeoutFn` in `@reause/shared`; the JSDoc marker keeps upstream's symbol
- * name. Upstream ships this hook as a default export, reause exports it by
- * name.
- *
- * Semantics worth stating, because they differ from the interval sibling:
- * - **one-shot.** `startTime` is captured once when the timeout is armed and is
- *   never reset, so the loop fires exactly once and then stops. It is not a
- *   repeating interval that is merely cancelled — no frame is pending after the
- *   callback ran.
- * - **clock source: `Date.now()`.** The elapsed time is measured with
- *   `Date.now()`, deliberately *not* with `performance.now()` and not with the
- *   frame timestamp `requestAnimationFrame` passes to its callback. The
- *   deadline is therefore wall-clock-ish and keeps counting while frames are
- *   throttled, and the callback fires on the first frame delivered after it.
- * - **the comparison is `>=`**, so a `delay` of `0` fires on the very first
- *   frame.
- * - **disabling condition: `!isNumber(delay) || delay < 0`.** `undefined`,
- *   `NaN` and any negative number return before arming anything, so nothing is
- *   scheduled and nothing can fire. Changing `delay` to such a value cancels
- *   the timeout armed by the previous value (effect cleanup).
- * - **dual branch.** With no `requestAnimationFrame` (a server render, or any
- *   frame-less host) the timeout downgrades to `setTimeout(fn, delay)`. The
- *   clear path mirrors upstream's classifier: it looks at
- *   `typeof cancelAnimationFrame`, so an environment that has one global but
- *   not the other mis-classifies the handle exactly as upstream does — a
- *   preserved quirk, not a divergence.
- * - **`fn` is read through `@reause/shared`'s `useLatest`** (the merged
- *   react-use port), and the arming effect depends on `delay` alone. A
- *   re-render carrying a new inline callback therefore neither restarts the
- *   timer nor fires a stale closure: the newest `fn` runs when the deadline is
- *   reached. No copy of `useLatest` is inlined here.
- * - **shared plumbing is deliberately local.** The frame loop lives in this
- *   file instead of a cross-hook helper because its only planned consumer,
- *   the interval sibling `useIntervalRafFn` (#941), does not exist yet.
- *   Extracting a shared draw-loop helper is deferred until #941 lands, rather
- *   than invented here for a single caller.
- *
- * Not a duplicate of `useTimeoutFn` (VueUse's `useTimeoutFn`, also in
- * `@reause/shared`): that one is a plain `setTimeout` with controls
- * (`{ isPending, start, stop }`, manually restartable and re-armable as often
- * as wanted); this is the frame-aligned, one-shot variant — it fires only when
- * the page is actually rendering and cannot be restarted, only cleared.
+ * (`source/ahooks/packages/hooks/src/useRafTimeout/`).
  *
  * @example
  * const clear = useTimeoutRafFn(() => setVisible(false), 1000)
