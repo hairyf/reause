@@ -46,6 +46,10 @@ interface MappedPage {
   /** Not part of the public surface — mirrors VueUse's `listFunctions` `_*` ignore. */
   internal?: boolean
   lastUpdated?: number
+  /** Alternate export names, from the page frontmatter's `alias` (VueUse parity). */
+  alias?: string[]
+  /** Related pages, from the page frontmatter's `related` plus the interop pass. */
+  related?: string[]
 }
 
 const RE_EXPORT = /export\s+(?:async\s+)?function\s+(\w+)|export\s+const\s+(\w+)\s*=/g
@@ -825,6 +829,8 @@ function collectPages(functions: MappedFunction[]): MappedPage[] {
   for (const entries of byDir.values()) {
     const { pkg, dir, category, lastUpdated } = entries[0]
     const md = readFileSync(join(root, 'packages', pkg, dir, 'index.md'), 'utf-8')
+    const alias = readFrontmatterList(md, 'alias')
+    const related = readFrontmatterList(md, 'related')
     pages.push({
       name: dir,
       pkg,
@@ -835,6 +841,10 @@ function collectPages(functions: MappedFunction[]): MappedPage[] {
       // composable — VueUse's `listFunctions` skips them the same way.
       internal: dir.startsWith('_') || undefined,
       lastUpdated: lastUpdated ? Math.max(...entries.map(e => e.lastUpdated || 0)) : undefined,
+      // Emitted only where the page declares them, so the committed `pages`
+      // array stays byte-identical for the pages that don't.
+      alias: alias.length ? alias : undefined,
+      related: related.length ? related : undefined,
     })
   }
 
@@ -901,17 +911,29 @@ async function generateFunctionsTS() {
   const provenance = new Map(
     collectFunctionRows().map(row => [`${row.name}\u0000${row.file}`, row.source]),
   )
-  const functions = all.map(fn => ({
-    name: fn.name,
-    file: fn.file,
-    pkg: fn.pkg,
-    dir: fn.dir,
-    category: fn.category,
-    source: provenance.get(`${fn.name}\u0000${fn.file}`),
-    lastUpdated: fn.lastUpdated,
-  }))
+  // `alias` / `related` are page-level (frontmatter) and two-way (upstream's
+  // "interop related" pass), so they resolve against the finished page list
+  // before the rows are built and then attach to every export of that page: the
+  // docs info block describes a page, not a symbol. `undefined` is dropped by
+  // `JSON.stringify`, so rows whose page declares neither keep their shape.
+  const pages = collectPages(all)
+  interopRelated(pages, all)
+  const relations = new Map(pages.map(page => [`${page.pkg}/${page.name}`, page]))
 
-  const pages = collectPages(functions)
+  const functions = all.map((fn) => {
+    const relation = relations.get(`${fn.pkg}/${fn.dir}`)
+    return {
+      name: fn.name,
+      file: fn.file,
+      pkg: fn.pkg,
+      dir: fn.dir,
+      category: fn.category,
+      source: provenance.get(`${fn.name}\u0000${fn.file}`),
+      lastUpdated: fn.lastUpdated,
+      alias: relation?.alias,
+      related: relation?.related,
+    }
+  })
 
   // Category list in VueUse's canonical order: core categories first,
   // `@`-prefixed addon categories last (mirrors `categoryNames` in
@@ -940,6 +962,10 @@ export interface FunctionInfo {
    */
   source?: string
   lastUpdated?: number
+  /** Alternate export names, from the page frontmatter's alias key (mirrors VueUse). */
+  alias?: string[]
+  /** Pages this one relates to: the page frontmatter's related key plus the two-way interop pass. */
+  related?: string[]
 }
 
 /**
@@ -955,6 +981,10 @@ export interface FunctionPageInfo {
   description: string
   internal?: boolean
   lastUpdated?: number
+  /** Alternate export names, from the page frontmatter's alias key. */
+  alias?: string[]
+  /** Related pages, from the page frontmatter's related key plus the interop pass. */
+  related?: string[]
 }
 
 export const functions: FunctionInfo[] = ${JSON.stringify(functions, null, 2)}
@@ -1003,6 +1033,79 @@ function getPageCategory(pkg: string, page: string): string {
   catch {
     return 'Uncategorized'
   }
+}
+
+/**
+ * A frontmatter list value — `alias: a`, `alias: a, b`, `alias: [a, b]` or a
+ * YAML block list. Ports the shape handling of VueUse's `readMetadata()`
+ * (metadata/scripts/update.ts), which splits a scalar on commas and trims an
+ * array the same way; `gray-matter` is not a dependency here, so the block is
+ * read line by line the way `getPageCategory` does.
+ */
+function readFrontmatterList(md: string, key: string): string[] {
+  const lines = md.replace(/\r\n/g, '\n').split('\n')
+  if (lines[0]?.trim() !== '---')
+    return []
+  const end = lines.indexOf('---', 1)
+  const block = lines.slice(1, end === -1 ? lines.length : end)
+  const start = block.findIndex(line => line.startsWith(`${key}:`))
+  if (start === -1)
+    return []
+
+  const raw = block[start].slice(key.length + 1).trim()
+  const items: string[] = []
+  if (raw) {
+    // `[a, b]` flow list, or the comma-separated scalar upstream splits.
+    items.push(...raw.replace(/^\[|\]$/g, '').split(','))
+  }
+  else {
+    // `key:` with nothing after it introduces a YAML block list underneath;
+    // reading stops at the first line that is not one of its items.
+    for (const line of block.slice(start + 1)) {
+      const item = line.trim()
+      if (!item.startsWith('-'))
+        break
+      items.push(item.slice(1))
+    }
+  }
+
+  return items
+    .map(item => item.trim().replace(/^['"]|['"]$/g, ''))
+    .filter(Boolean)
+}
+
+/**
+ * VueUse's "interop related" pass: `related` is a two-way relation, so a page
+ * that names another also becomes related to it. reause resolves an entry to a
+ * docs page — the registry is directory-driven, so a name shared by several
+ * exports (`breakpointsTailwind`) belongs to the same page as its siblings — and
+ * throws on an unknown name exactly like upstream, turning a typo into a failing
+ * `npm run update` instead of a silently dead docs link.
+ */
+function interopRelated(pages: MappedPage[], functions: MappedFunction[]): void {
+  function resolve(name: string): MappedPage | undefined {
+    const byDir = pages.find(page => page.name === name)
+    if (byDir)
+      return byDir
+    const row = functions.find(fn => fn.name === name)
+    return row ? pages.find(page => page.pkg === row.pkg && page.name === row.dir) : undefined
+  }
+
+  for (const page of pages) {
+    if (!page.related)
+      continue
+    for (const name of page.related) {
+      const target = resolve(name)
+      if (!target)
+        throw new Error(`Unknown related function: ${name}`)
+      if (!target.related)
+        target.related = []
+      if (!target.related.includes(page.name))
+        target.related.push(page.name)
+    }
+  }
+
+  pages.forEach(page => page.related?.sort())
 }
 
 // VueUse's canonical category order: known core categories by rank, unknown
