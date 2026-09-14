@@ -20,10 +20,10 @@ function Counter() {
 
   return (
     <div>
-      <span>
+      <p>
         {'Count is '}
         {count}
-      </span>
+      </p>
       <button onClick={inc}>Increment</button>
       <button onClick={dec}>Decrement</button>
     </div>

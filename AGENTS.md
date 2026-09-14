@@ -1,6 +1,7 @@
 # reause 开发规范
 
 > 自动化流水线 SOP（子代理执行 / 上游监控 / Issues 监控 / PR 合并 / Nightly Release / 编排）见 [docs/orchestration.md](docs/orchestration.md)。
+> 文档写作规范（`packages/**/index.md`、指南、Skills 生成物边界）见 [docs/writing-docs.md](docs/writing-docs.md)。
 
 ## 1. 来源判定与命名规范
 
@@ -36,7 +37,7 @@
 - **返回值约束（VueUse 转换类）**：
   - **≥2 个可写值**：返回对象，镜像 VueUse 结构，每个可写值配对专属 setter（如 `useDraggable` → `{ x, setX, y, setY }`）。
   - **恰 1 个可写值**：纯单值返回元组 `[value, setValue, otherObject]`；富记录/异步状态/DOM ref 返回对象 + 配对 setter。
-  - **0 个可写值**：结构与命名完全镜像 VueUse（如 `useClipboard`）。
+  - **0 个可写值**：结构与命名默认镜像 VueUse（如 `useShare`）；剪贴板两件套 `useClipboard` / `useClipboardItems` 例外，返回元组 `[value, action, { ...只读成员 }]`（如 `useClipboard` → `[text, copy, { copied, isSupported, copyPending }]`）。
 - **返回值约束（react-use 等原生 React 类）**：
   - **完全保持上游设计**：如上游返回元组/对象/函数，直接保持一致，不做强制改写。
 - **文档镜像**：

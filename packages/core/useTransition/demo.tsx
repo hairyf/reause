@@ -11,12 +11,25 @@ function easeOutElastic(n: number) {
       : (2 ** (-10 * n)) * Math.sin((n * 10 - 0.75) * ((2 * Math.PI) / 3)) + 1
 }
 
+// mirror upstream `demo.vue` scoped styles: `.track`, `.number.track` and
+// `.vector.track`
 const trackStyle: CSSProperties = {
   background: 'rgba(125, 125, 125, 0.3)',
   borderRadius: '0.5rem',
-  margin: '0.5rem 0',
-  maxHeight: '20rem',
+  maxWidth: '20rem',
   width: '100%',
+}
+
+const numberTrackStyle: CSSProperties = {
+  ...trackStyle,
+  height: '1rem',
+  margin: '0.5rem 0',
+  padding: '0 0.5rem',
+}
+
+const vectorTrackStyle: CSSProperties = {
+  ...trackStyle,
+  padding: '0.5rem',
 }
 
 const sledStyle: CSSProperties = {
@@ -62,7 +75,7 @@ export default function UseTransitionDemo() {
         {' '}
         <b>{cubicBezierNumber.toFixed(2)}</b>
       </p>
-      <div style={{ ...trackStyle, padding: '0 0.5rem' }}>
+      <div style={numberTrackStyle}>
         <div style={{ position: 'relative' }}>
           <div style={{ ...sledStyle, left: `${cubicBezierNumber}%`, transform: 'translateX(-50%)' }} />
         </div>
@@ -73,7 +86,7 @@ export default function UseTransitionDemo() {
         {' '}
         <b>{customFnNumber.toFixed(2)}</b>
       </p>
-      <div style={{ ...trackStyle, padding: '0 0.5rem' }}>
+      <div style={numberTrackStyle}>
         <div style={{ position: 'relative' }}>
           <div style={{ ...sledStyle, left: `${customFnNumber}%`, transform: 'translateX(-50%)' }} />
         </div>
@@ -91,7 +104,7 @@ export default function UseTransitionDemo() {
           ]
         </b>
       </p>
-      <div style={{ ...trackStyle, padding: '0.5rem' }}>
+      <div style={vectorTrackStyle}>
         <div style={{ paddingBottom: '30%', position: 'relative' }}>
           <div style={{ ...sledStyle, left: `${vector[0]}%`, top: `${vector[1]}%`, transform: 'translateX(-50%) translateY(-50%)' }} />
         </div>

@@ -20,10 +20,3 @@ useWatchOnce(source, () => {
   console.log('source changed!')
 })
 ```
-
-- `immediate: true` — fire the callback once on mount with the current value;
-  the mount call counts as the single fire.
-- The return value is `{ stop }` — call `stop()` to ignore further source
-  changes before the callback has fired (a no-op afterwards). The full
-  `WatchHandle` is otherwise not ported; watching ends when the component
-  unmounts.

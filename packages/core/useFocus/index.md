@@ -53,23 +53,3 @@ function Component() {
   )
 }
 ```
-
-## Return Values
-
-Returns a readonly tuple (React array destructuring, not a Vue-style ref object):
-
-```ts
-const [isFocused, setFocused] = useFocus(input)
-```
-
-| Element      | Type                                | Description                                                                                                                                                                                                                                                                              |
-| ------------ | ----------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `isFocused`  | `boolean`                           | Whether the target element has focus. Updated by the target's `focus` / `blur` events.                                                                                                                                                                                                   |
-| `setFocused` | `Dispatch<SetStateAction<boolean>>` | Focus the target with `setFocused(true)`, blur it with `setFocused(false)`. Accepts the functional updater form (`setFocused(prev => !prev)`). As upstream, the call itself only invokes `focus()` / `blur()` on the element — the state is then updated by the `focus` / `blur` events. |
-
-## React divergence from upstream
-
-Upstream VueUse returns `{ focused: WritableComputedRef<boolean> }`, so consumers read and write
-`focused.value`. This port follows the React idiom required by `AGENTS.md` and returns the tuple
-`[isFocused, setFocused]` — read the state from element 0, focus / blur the target with element 1,
-and there is no `.value`.

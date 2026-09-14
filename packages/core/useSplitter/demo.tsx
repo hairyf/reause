@@ -25,7 +25,10 @@ export default function UseSplitterDemo() {
       <div>
         <p style={{ margin: '0 0 6px' }}>
           Drag the divider, focus it and use the arrow keys, or double-click it to
-          reset. Sizes:
+          reset.
+        </p>
+        <p>
+          Sizes:
           {' '}
           {String(horizontal.sizes[0])}
           {' / '}

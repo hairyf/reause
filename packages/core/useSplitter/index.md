@@ -4,7 +4,7 @@ category: Elements
 
 # useSplitter
 
-Resizable panel layout with draggable, keyboard-accessible separators.
+A hook for resizable panel layouts that supports dragging and keyboard interactions.
 
 ## Usage
 
@@ -25,51 +25,53 @@ const splitter = useSplitter({
 // </div>
 ```
 
-`getHandleProps` returns everything a separator needs: `role="separator"`,
-`aria-orientation`, `aria-valuenow` / `aria-valuemin` / `aria-valuemax` (the
-before-panel's working size and its resolved bounds), `tabIndex`,
-`data-active`, `data-orientation` and the keyboard / double-click handlers.
-Arrow keys move the adjacent pair by `step` — `shiftStep` with Shift,
-reversed under `dir: 'rtl'` — `Home` / `End` drive the before-panel to its
-minimum / maximum, and `Enter` toggles the collapse of the smaller collapsible
-panel next to the handle.
+### Separator Attributes and Interactions (`getHandleProps`)
 
-Sizes are declared in CSS units. A bare `number` or a `%` string is a
-**flexible** size that shares the leftover space by weight; a `px` or `rem`
-string is a **fixed** size. The switch is global: as soon as _any_ pane size,
-`min`, `max`, `collapseThreshold`, `step`, `shiftStep` or controlled size uses a
-fixed unit, `pixelMode` turns on, every size is resolved to pixels, and a bare
-number then means _percent of the container_ rather than a relative weight. The
-hook returns `pixelMode` so a consumer can render accordingly.
+`getHandleProps` returns all accessible attributes and event handlers required for the separator handle:
+
+- **Accessibility Attributes**: `role="separator"`, `aria-orientation`, `aria-valuenow` / `aria-valuemin` / `aria-valuemax` (calculated based on the size and boundaries of the left/top panel), `tabIndex`.
+- **State and Style Markers**: `data-active`, `data-orientation`.
+- **Keyboard and Double-Click Interactions**:
+- `Arrow keys`: Adjust adjacent panels incrementally by `step` (uses `shiftStep` when holding `Shift`; direction is reversed in `dir: 'rtl'` mode).
+- `Home` / `End`: Instantly snap the left/top panel to its minimum/maximum limit.
+- `Enter`: Toggle the collapsed state of the smaller adjacent collapsible panel.
+- `Double-click`: Trigger a reset (enabled by default when `resetOnDoubleClick` is `true`).
+
+### Unit Control and Pixel Mode (`pixelMode`)
+
+Panel sizes support CSS unit declarations:
+
+- **Flexible Mode**: Pure numbers without units or `%` strings, distributing remaining space based on weight.
+- **Fixed Mode**: Strings containing `px` or `rem`.
+
+If any fixed unit appears in panel sizes, `min`, `max`, `collapseThreshold`, `step`, `shiftStep`, or controlled sizes, the hook automatically enables `pixelMode`. In this mode, all sizes are parsed and converted to pixels, and pure numbers are interpreted as **container percentages** rather than relative weights. Developers can render synchronously using the returned `pixelMode`.
 
 ```tsx
-// A fixed sidebar plus a flexible content pane. `pixelMode` is true here, so the
-// 240px pane keeps its width when the container is resized.
+// Pixel mode example: Sidebar fixed at 240px, content area responsive (sidebar remains 240px wide on container resize)
 const splitter = useSplitter({
   panels: [{ defaultSize: '240px', min: '120px' }, { defaultSize: 100 }],
 })
 
-// Vertical orientation flips the axis, the cursor and the arrow keys.
+// Vertical layout example: Automatically switches axes, cursors, and arrow key responses
 const vertical = useSplitter({
   panels: [{ defaultSize: 50 }, { defaultSize: 50 }],
   orientation: 'vertical',
 })
 ```
 
-Each returned size keeps the unit it was declared in, so a `'240px'` pane stays
-`'240px'` after a drag while its flexible neighbour becomes a percentage.
-`collapse(panelIndex)` and `expand(panelIndex)` move a panel's whole size to its
-neighbour and restore it from the snapshot taken before the collapse, and
-`reset(handleIndex)` restores the two panels next to a handle to their default
-ratio while preserving their combined size — the same thing a double-click on
-the handle does while `resetOnDoubleClick` is left at its `true` default.
+### Size Update Mechanism
 
-By default a drag only moves the two panels adjacent to the handle: when one of
-them reaches its `min` or `max`, the drag stops there. Pass `redistribute` to
-borrow from the panels beyond it — `'nearest'` takes from the closest panel in
-the drag direction first, `'equal'` spreads the change over all of them, and a
-function receives `{ sizes, panels, handleIndex, delta }` (all in resolved units)
-and returns the sizes to use:
+1. **Unit Preservation**: Panels retain their declared unit type after resizing (for example, `'240px'` remains `'240px'` after dragging, while its adjacent flexible panel automatically adapts to percentage).
+2. **Collapse Control**: Calling `collapse(panelIndex)` or `expand(panelIndex)` can absorb panel size into adjacent panels or restore the snapshot size saved prior to collapsing.
+3. **Space Reset**: Calling `reset(handleIndex)` restores the default ratios of adjacent panels while preserving their combined size.
+
+### Redistribution Mode (`redistribute`)
+
+By default, dragging only adjusts the two panels immediately adjacent to the separator. To push beyond this limitation and affect outer panels, configure `redistribute`:
+
+- `'nearest'`: Prioritizes taking space from the nearest panel in the drag direction.
+- `'equal'`: Distributes the size delta evenly across all panels in the drag direction.
+- `Custom Function`: Pass a custom function `({ sizes, panels, handleIndex, delta }) => resolvedSizes` for precise control.
 
 ```tsx
 const splitter = useSplitter({
@@ -82,8 +84,11 @@ const splitter = useSplitter({
 })
 ```
 
-To drive the layout yourself, pass `sizes` as a controlled value and observe
-`onSizeChange`; the hook then reports every resize without committing it.
-`onResizeStart` and `onResizeEnd` bracket a pointer drag, `onCollapseChange`
-fires once per panel that crosses into or out of the collapsed state, and
-`enabled: false` disables both the pointer and the keyboard handlers.
+### Controlled Mode and Event Listeners
+
+Supports passing `sizes` for controlled management, with event listeners for monitoring state changes:
+
+- `onSizeChange`: Triggered when sizes change (in controlled mode, this only notifies and does not automatically update internal state).
+- `onResizeStart` / `onResizeEnd`: Callbacks for the start and end of pointer dragging.
+- `onCollapseChange`: Triggered when a panel toggles between collapsed and expanded states.
+- `enabled: false`: Disables pointer and keyboard interactions in one toggle.

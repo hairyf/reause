@@ -16,7 +16,6 @@ export default function UseElementVisibilityDemo() {
           border: '2px dashed #0ea5e9',
           padding: 10,
           maxWidth: '100%',
-          marginBottom: 'calc(100vh - 20px)',
         }}
       >
         Target Element (scroll down)

@@ -31,9 +31,11 @@ export default function UseCssVarDemo() {
       <div ref={elv} style={{ '--color': '#7fa998', '--color-one': '#df8543', 'color': colorVal } as CSSProperties}>
         {`Sample text, ${key}: ${colorVal}`}
       </div>
-      <button onClick={changeVar}>
-        Change Color Variable
-      </button>
+      <div>
+        <button onClick={changeVar}>
+          Change Color Variable
+        </button>
+      </div>
     </div>
   )
 }

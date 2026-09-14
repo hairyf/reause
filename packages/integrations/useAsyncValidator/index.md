@@ -40,9 +40,3 @@ function Demo() {
   )
 }
 ```
-
-## Value sources
-
-`value` and `rules` are the hook's **read-only value sources** and take plain values
-(`Record<string, any>` and `Rules`; upstream: `MaybeRefOrGetter`). The object is validated as-is, so a
-form field literally named `value` is not special.

@@ -20,20 +20,3 @@ import { useQRCode } from '@reause/integrations'
 // `qrcode` is the data URL, `''` until the first encode resolves
 const qrcode = useQRCode('text-to-encode')
 ```
-
-### Value source
-
-`text` is the hook's **read-only value source** and takes a plain string (upstream:
-`MaybeRefOrGetter<string>`). A changed `text` prop re-encodes on the next render:
-
-```tsx
-const [text, setText] = useState('text-to-encode')
-const qrcode = useQRCode(text) // setText(next) re-encodes on the next render
-```
-
-```tsx
-<>
-  <input type="text" value={text} onChange={event => setText(event.target.value)} />
-  <img src={qrcode} alt="QR Code" />
-</>
-```

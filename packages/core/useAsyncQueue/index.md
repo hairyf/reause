@@ -82,9 +82,3 @@ const { result } = useAsyncQueue([p1, p2], {
 // Later, abort the queue
 controller.abort()
 ```
-
-### React Divergences
-
-- `activeIndex` is a `number` and `result` is a plain array — read them directly, without `.value` (upstream returns a `ShallowRef` and a `reactive` array).
-- The queue starts from a mount effect (after the first render) instead of synchronously during setup. A started ref keeps it running exactly once under React StrictMode's double-mounted effect.
-- Once a task is marked `aborted`, a late resolution from an in-flight task does not overwrite the aborted entry.

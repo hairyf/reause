@@ -48,14 +48,14 @@ global `window`, so a channel can be probed against an iframe's or a test enviro
 
 ## Return Values
 
-| State          | Type                            | Description                                                                                                   |
-| -------------- | ------------------------------- | ------------------------------------------------------------------------------------------------------------- |
-| isSupported    | `boolean`                       | Whether the `BroadcastChannel` API is supported (by the configured `window`).                                 |
-| channel        | `BroadcastChannel \| undefined` | The current channel instance; `undefined` before the mount effect creates it (SSR), retained after `close()`. |
-| data           | `D \| undefined`                | Latest data received via the channel's `message` event.                                                       |
-| post           | `(data: P) => void`             | Send a message to the channel. Throws `InvalidStateError` after `close()`.                                    |
-| close          | `() => void`                    | Close the channel and set `isClosed` to `true`; the instance is kept.                                         |
-| error          | `Event \| null`                 | The latest `messageerror` event, or `null` when none occurred.                                                |
-| isClosed       | `boolean`                       | Whether the channel has been closed — `true` after `close()` or a native `close` event.                       |
-| onMessage      | `(fn) => { off }`               | Register a callback fired on every `message` event (`useListener` protocol).                                  |
-| onMessageError | `(fn) => { off }`               | Register a callback fired on every `messageerror` event (`useListener` protocol).                             |
+| State          | Type                            | Description                                                                                                             |
+| -------------- | ------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| isSupported    | `boolean`                       | Whether the `BroadcastChannel` API is supported (by the configured `window`).                                           |
+| channel        | `BroadcastChannel \| undefined` | The current channel instance; `undefined` before the mount effect creates it (SSR), retained after `close()`.           |
+| data           | `D \| undefined`                | Latest data received via the channel's `message` event.                                                                 |
+| post           | `(data: P) => void`             | Send a message to the channel. Throws `InvalidStateError` after `close()`.                                              |
+| close          | `() => void`                    | Close the channel and set `isClosed` to `true`; the instance is kept.                                                   |
+| error          | `Event \| null`                 | The latest `messageerror` event, or `null` when none occurred.                                                          |
+| isClosed       | `boolean`                       | Whether the channel has been closed — `true` after `close()` or a native `close` event.                                 |
+| onMessage      | `(fn) => () => void`            | Register a callback fired on every `message` event (`useListener` protocol); the returned off function unsubscribes it. |
+| onMessageError | `(fn) => () => void`            | Register a callback fired on every `messageerror` event (`useListener` protocol).                                       |

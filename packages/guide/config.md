@@ -49,11 +49,6 @@ entirely. Two idioms cover the VueUse use cases:
 - **Synchronously (upstream `flush: 'sync'`):** use `useLayoutEffect` when you
   must read the DOM immediately after a commit.
 
-Because writes happen synchronously inside a setter call (rather than in a
-buffered reactive "tick"), you also do not get the de-duplication Vue's
-`'pre'` flush provides: multiple `setValue` calls in one handler each schedule
-a render, which React batches into one commit.
-
 ## Global Dependencies
 
 From v4.0, functions that access the browser APIs provide an option field to

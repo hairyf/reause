@@ -25,9 +25,3 @@ useWatchImmediate(obj, (updated) => {
 // later, from an event handler:
 setObj('VueUse') // logs 'VueUse'
 ```
-
-`useWatchImmediate` takes no options — `immediate` is always `true`, and
-upstream's `deep`/`flush`/`once` are not ported (tracking is by `Object.is`
-identity and effects always run after commit). It returns `void`: upstream's
-`WatchHandle.stop()` is not provided — watching ends when the component
-unmounts.

@@ -4,7 +4,7 @@ category: State
 
 # useLatest
 
-Returns a ref object whose `.current` always holds the latest value of the render that produced it — React port of react-use's [`useLatest`](https://github.com/streamich/react-use/blob/master/docs/useLatest.md) (upstream mapping files: `source/react-use/src/useLatest.ts`, 9 LOC, and `docs/useLatest.md`).
+Returns a ref whose `.current` always holds the latest rendered value.
 
 ## Usage
 
@@ -27,9 +27,3 @@ const latest = useLatest(value)
 // scheduled now, logs whatever `value` is when the timer fires
 setTimeout(() => console.log(latest.current), 1000)
 ```
-
-This works because `ref.current = value` is assigned **during render** — that
-is upstream's deliberate behaviour, and assigning it in an effect instead would
-leave the ref one commit behind. The container is typed `{ readonly current: T }`
-and returned as-is; the value is stored faithfully, so `undefined` and other
-falsy values are kept rather than gated on truthiness.

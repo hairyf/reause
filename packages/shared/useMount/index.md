@@ -4,7 +4,7 @@ category: Lifecycle
 
 # useMount
 
-Runs a callback once after the component mounts — React port of react-use's `useMount`.
+Runs a callback once after the component mounts.
 
 ## Usage
 

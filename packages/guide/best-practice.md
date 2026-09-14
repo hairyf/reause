@@ -4,9 +4,7 @@
 
 Most of the hooks in reause return an **object or a tuple** that you can
 [destructure](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment)
-to take what you need. Unlike VueUse — where the return is an object of refs
-that must be read via `.value` — reause hooks return **plain React values**,
-so there is no unwrapping step:
+to take what you need.
 
 ```tsx
 import { useMouse } from '@reause/core'
@@ -71,13 +69,6 @@ In Vue, `setup()` constructs the "connections" between data and logic, and
 VueUse functions accept **refs** as arguments because refs are reactive. React
 has no reactive refs: state lives in `useState`, and refs are plain mutable
 `{ current }` objects. reause adapts the argument rules accordingly:
-
-- **read-only value sources** (e.g. `useTitle`'s title, `useFetch`'s url)
-  accept plain values. Pass a state value directly; the hook re-syncs when it
-  changes across renders;
-- **DOM hooks** (e.g. `useEventListener`, `useInfiniteScroll`) accept a React
-  ref (`RefObject<T | null>`) so you can bind a `useRef` target; the hook
-  reads the element with `unrefElement`.
 
 Take `useTitle` as an example. It helps you get and set the current page's
 `document.title` property:

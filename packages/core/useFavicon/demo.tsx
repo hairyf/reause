@@ -1,7 +1,7 @@
 import { useFavicon } from '@reause/core'
 
 export default function UseFaviconDemo() {
-  const [, setIcon] = useFavicon('favicon-32x32.png', {
+  const [, setIcon] = useFavicon('reause.svg', {
     baseUrl: '/',
     rel: 'icon',
   })
@@ -11,11 +11,11 @@ export default function UseFaviconDemo() {
       <div>
         Change favicon to
       </div>
-      <button onClick={() => setIcon('vue.png')}>
-        Vue
+      <button onClick={() => setIcon('vueuse.svg')}>
+        Vueuse
       </button>
-      <button onClick={() => setIcon('favicon-32x32.png')}>
-        VueUse
+      <button onClick={() => setIcon('reause.svg')}>
+        Reause
       </button>
     </div>
   )

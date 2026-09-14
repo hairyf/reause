@@ -4,7 +4,7 @@ category: Utilities
 
 # useId
 
-SSR-safe id with an optional static override — React port of `@mantine/hooks`' `useId` (upstream mapping files: `source/mantine/packages/@mantine/hooks/src/use-id/use-id.ts`, 23 LOC, `use-isomorphic-effect/use-isomorphic-effect.ts` and `utils/random-id/random-id.ts`).
+SSR-safe id with an optional static override.
 
 ## Usage
 

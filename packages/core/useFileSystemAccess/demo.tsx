@@ -73,20 +73,28 @@ export default function UseFileSystemAccessDemo() {
         }, null, 2)}
       </pre>
 
-      <div>
-        Content
-        <textarea
-          value={content}
-          // edits go through `setData` (React immutable update); `save()`
-          // persists them to the picked handle
-          onChange={(event) => {
-            if (typeof data === 'string')
-              setData(event.target.value)
-          }}
-          rows={20}
-          cols={40}
-        />
-      </div>
+      {/* upstream `v-if="content"` — the block only exists once there is content */}
+      {content
+        ? (
+            <div>
+              Content
+              {typeof data === 'string'
+                ? (
+                    <textarea
+                      value={data}
+                      // edits go through `setData` (React immutable update); `save()`
+                      // persists them to the picked handle
+                      onChange={event => setData(event.target.value)}
+                      rows={20}
+                      cols={40}
+                      className="w-full"
+                    />
+                  )
+                // upstream `v-else` — `ArrayBuffer` / `Blob` are not editable text
+                : <span>{content}</span>}
+            </div>
+          )
+        : null}
     </div>
   )
 }

@@ -29,19 +29,6 @@ useEffect(() => {
 // <span>{formatDuration(currentTime)} / {formatDuration(duration)}</span>
 ```
 
-### Source Forms
-
-`src` and `tracks` are read-only value sources and take plain values (upstream:
-`MaybeRefOrGetter`). Resolve a React ref or state value at the call site; the element `target` is a
-React ref (`RefObject`) because it is a DOM target, not a value source:
-
-```tsx
-const [src, setSrc] = useState('video.mp4')
-
-useMediaControls(videoRef, { src, tracks: subtitleTracks })
-useMediaControls(videoRef, { src: srcRef.current }) // resolve a React ref at the call site
-```
-
 ### Providing Captions, Subtitles, etc...
 
 You can provide captions, subtitles, etc in the `tracks` options of the

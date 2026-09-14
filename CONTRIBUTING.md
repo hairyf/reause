@@ -59,6 +59,10 @@ packages/<pkg>/index.ts              one barrel line: export * from './<fn>'
    `packages/<pkg>/<fn>/demo.tsx`. The `## Demo` section is injected automatically
    from `demo.tsx` by `packages/.vitepress/plugins/markdownTransform.ts` — there is
    no `<DemoContainer>` tag to write by hand.
+   Docs pages follow [docs/writing-docs.md](docs/writing-docs.md) — short single-sentence intro
+   (front-loaded before the first comma), `category` frontmatter, no hand-written type blocks or
+   upstream-divergence sections, and never an edit to the generated `skills/**` copies.
+
 6. Do **not** edit or regenerate the metadata trio (`meta/functions.md`,
    `packages/functions.md`, `packages/metadata/src/functions.ts`). It is generated
    by the orchestrator after the PR is merged. `npm run update` may be run locally

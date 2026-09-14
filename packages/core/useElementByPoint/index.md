@@ -17,8 +17,7 @@ const { element } = useElementByPoint({ x, y })
 
 ## Source Forms
 
-`x` and `y` are read-only value sources and take plain numbers (upstream:
-`MaybeRefOrGetter<number>`). Resolve a React ref or state value at the call site; `multiple` stays a
+`x` and `y` are read-only value sources and take plain numbers. Resolve a React ref or state value at the call site; `multiple` stays a
 plain value / React ref (a behavior toggle):
 
 ```tsx
