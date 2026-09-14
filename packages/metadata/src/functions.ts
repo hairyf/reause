@@ -169,7 +169,7 @@ export const functions: FunctionInfo[] = [
     dir: 'createEventHook',
     category: 'Utilities',
     source: 'vueuse',
-    lastUpdated: 1789366373000,
+    lastUpdated: 1789381201000,
   },
   {
     name: 'createFetch',
@@ -350,7 +350,7 @@ export const functions: FunctionInfo[] = [
     file: 'packages/core/useCollapse/index.tsx',
     pkg: 'core',
     dir: 'useCollapse',
-    category: 'Browser',
+    category: 'Elements',
     source: 'mantine',
     lastUpdated: 1789366373000,
   },
@@ -407,14 +407,14 @@ export const functions: FunctionInfo[] = [
     dir: 'useStartTyping',
     category: 'Sensors',
     source: 'vueuse',
-    lastUpdated: 1789366373000,
+    lastUpdated: 1789381377000,
   },
   {
     name: 'isMeasured',
     file: 'packages/core/useCollapse/index.tsx',
     pkg: 'core',
     dir: 'useCollapse',
-    category: 'Browser',
+    category: 'Elements',
     source: 'mantine',
     lastUpdated: 1789366373000,
   },
@@ -425,7 +425,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useStartTyping',
     category: 'Sensors',
     source: 'vueuse',
-    lastUpdated: 1789366373000,
+    lastUpdated: 1789381377000,
   },
   {
     name: 'logicAnd',
@@ -473,7 +473,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useGamepad',
     category: 'Browser',
     source: 'vueuse',
-    lastUpdated: 1789366373000,
+    lastUpdated: 1789381201000,
   },
   {
     name: 'moveArrayElement',
@@ -760,7 +760,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useAsyncFn',
     category: 'State',
     source: 'react-use',
-    lastUpdated: 1789366373000,
+    lastUpdated: 1789381394000,
   },
   {
     name: 'useAsyncQueue',
@@ -859,7 +859,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useBroadcastChannel',
     category: 'Browser',
     source: 'vueuse',
-    lastUpdated: 1789366373000,
+    lastUpdated: 1789381201000,
   },
   {
     name: 'useBrowserLocation',
@@ -931,7 +931,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useClipboard',
     category: 'Browser',
     source: 'vueuse',
-    lastUpdated: 1789366373000,
+    lastUpdated: 1789381387000,
     related: ['useClipboardItems'],
   },
   {
@@ -941,7 +941,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useClipboardItems',
     category: 'Browser',
     source: 'vueuse',
-    lastUpdated: 1789366373000,
+    lastUpdated: 1789381387000,
     related: ['useClipboard'],
   },
   {
@@ -958,7 +958,7 @@ export const functions: FunctionInfo[] = [
     file: 'packages/core/useCollapse/index.tsx',
     pkg: 'core',
     dir: 'useCollapse',
-    category: 'Browser',
+    category: 'Elements',
     source: 'mantine',
     lastUpdated: 1789366373000,
   },
@@ -979,7 +979,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useConfirmDialog',
     category: 'Utilities',
     source: 'vueuse',
-    lastUpdated: 1789366373000,
+    lastUpdated: 1789381201000,
   },
   {
     name: 'useConst',
@@ -995,7 +995,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'useControllableState',
     category: 'State',
-    lastUpdated: 1789362234000,
+    lastUpdated: 1789381471000,
   },
   {
     name: 'useCookies',
@@ -1123,7 +1123,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useDevicesList',
     category: 'Sensors',
     source: 'vueuse',
-    lastUpdated: 1789366373000,
+    lastUpdated: 1789381201000,
     related: ['useUserMedia'],
   },
   {
@@ -1161,7 +1161,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useDrauu',
     category: '@Integrations',
     source: 'vueuse',
-    lastUpdated: 1789366373000,
+    lastUpdated: 1789381201000,
   },
   {
     name: 'useDropZone',
@@ -1170,7 +1170,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useDropZone',
     category: 'Elements',
     source: 'vueuse',
-    lastUpdated: 1789366373000,
+    lastUpdated: 1789381201000,
   },
   {
     name: 'useEffectOnce',
@@ -1269,7 +1269,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useEventListener',
     category: 'Browser',
     source: 'vueuse',
-    lastUpdated: 1789366373000,
+    lastUpdated: 1789381377000,
   },
   {
     name: 'useEventSource',
@@ -1323,7 +1323,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useFileDialog',
     category: 'Browser',
     source: 'vueuse',
-    lastUpdated: 1789366373000,
+    lastUpdated: 1789381201000,
   },
   {
     name: 'useFileSystemAccess',
@@ -1359,7 +1359,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useFocus',
     category: 'Sensors',
     source: 'vueuse',
-    lastUpdated: 1789366373000,
+    lastUpdated: 1789381377000,
   },
   {
     name: 'useFocusReturn',
@@ -1431,7 +1431,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useGamepad',
     category: 'Browser',
     source: 'vueuse',
-    lastUpdated: 1789366373000,
+    lastUpdated: 1789381201000,
   },
   {
     name: 'useGeolocation',
@@ -1682,7 +1682,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'useListener',
     category: 'State',
-    lastUpdated: 1789366373000,
+    lastUpdated: 1789381201000,
   },
   {
     name: 'useLiveAnnouncer',
@@ -1800,6 +1800,15 @@ export const functions: FunctionInfo[] = [
     category: 'Utilities',
     source: 'vueuse',
     lastUpdated: 1789366373000,
+  },
+  {
+    name: 'useMemoizedFn',
+    file: 'packages/shared/useMemoizedFn/index.tsx',
+    pkg: 'shared',
+    dir: 'useMemoizedFn',
+    category: 'Side-effects',
+    source: 'ahooks',
+    lastUpdated: 1789404071000,
   },
   {
     name: 'useMemory',
@@ -2252,7 +2261,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useScroll',
     category: 'Sensors',
     source: 'vueuse',
-    lastUpdated: 1789366373000,
+    lastUpdated: 1789398645000,
   },
   {
     name: 'useScrollLock',
@@ -2340,7 +2349,7 @@ export const functions: FunctionInfo[] = [
     file: 'packages/core/useSplitter/index.tsx',
     pkg: 'core',
     dir: 'useSplitter',
-    category: 'Browser',
+    category: 'Elements',
     source: 'mantine',
     lastUpdated: 1789366373000,
   },
@@ -2360,7 +2369,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useStartTyping',
     category: 'Sensors',
     source: 'vueuse',
-    lastUpdated: 1789366373000,
+    lastUpdated: 1789381377000,
   },
   {
     name: 'useStateAutoReset',
@@ -2462,7 +2471,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useStepper',
     category: 'Utilities',
     source: 'vueuse',
-    lastUpdated: 1789366373000,
+    lastUpdated: 1789381393000,
   },
   {
     name: 'useStorage',
@@ -2924,7 +2933,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useWebNotification',
     category: 'Browser',
     source: 'vueuse',
-    lastUpdated: 1789366373000,
+    lastUpdated: 1789381201000,
   },
   {
     name: 'useWebSocket',
@@ -3027,7 +3036,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/shared/createEventHook/index.md',
     category: 'Utilities',
     description: 'utility for creating event hooks',
-    lastUpdated: 1789366373000,
+    lastUpdated: 1789381201000,
   },
   {
     name: 'createGenericProjection',
@@ -3325,7 +3334,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useAsyncFn/index.md',
     category: 'State',
     description: 'returns state and a callback for an `async` function (or any function returning a promise)',
-    lastUpdated: 1789366373000,
+    lastUpdated: 1789381394000,
   },
   {
     name: 'useAsyncQueue',
@@ -3413,7 +3422,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useBroadcastChannel/index.md',
     category: 'Browser',
     description: 'reactive [BroadcastChannel API](https://developer.mozilla.org/en-US/docs/Web/API/BroadcastChannel)',
-    lastUpdated: 1789366373000,
+    lastUpdated: 1789381201000,
   },
   {
     name: 'useBrowserLocation',
@@ -3477,7 +3486,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useClipboard/index.md',
     category: 'Browser',
     description: 'reactive [Clipboard API](https://developer.mozilla.org/en-US/docs/Web/API/Clipboard_API)',
-    lastUpdated: 1789366373000,
+    lastUpdated: 1789381387000,
     related: ['useClipboardItems'],
   },
   {
@@ -3486,7 +3495,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useClipboardItems/index.md',
     category: 'Browser',
     description: 'reactive [Clipboard API](https://developer.mozilla.org/en-US/docs/Web/API/Clipboard_API)',
-    lastUpdated: 1789366373000,
+    lastUpdated: 1789381387000,
     related: ['useClipboard'],
   },
   {
@@ -3501,7 +3510,7 @@ export const pages: FunctionPageInfo[] = [
     name: 'useCollapse',
     pkg: 'core',
     doc: 'packages/core/useCollapse/index.md',
-    category: 'Browser',
+    category: 'Elements',
     description: "animate an element's height between `0` and its measured content height",
     lastUpdated: 1789366373000,
   },
@@ -3520,7 +3529,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useConfirmDialog/index.md',
     category: 'Utilities',
     description: 'creates event hooks to support modals and confirmation dialog chains',
-    lastUpdated: 1789366373000,
+    lastUpdated: 1789381201000,
   },
   {
     name: 'useConst',
@@ -3536,7 +3545,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/shared/useControllableState/index.md',
     category: 'State',
     description: 'a hook for combining controlled and uncontrolled state sources',
-    lastUpdated: 1789362234000,
+    lastUpdated: 1789381471000,
   },
   {
     name: 'useCookies',
@@ -3654,7 +3663,7 @@ export const pages: FunctionPageInfo[] = [
     category: 'Sensors',
     description:
       'reactive [`enumerateDevices`](https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/enumerateDevices) listing available input/output devices',
-    lastUpdated: 1789366373000,
+    lastUpdated: 1789381201000,
     related: ['useUserMedia'],
   },
   {
@@ -3690,7 +3699,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/integrations/useDrauu/index.md',
     category: '@Integrations',
     description: 'reactive instance for [drauu](https://github.com/antfu/drauu)',
-    lastUpdated: 1789366373000,
+    lastUpdated: 1789381201000,
   },
   {
     name: 'useDropZone',
@@ -3698,7 +3707,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useDropZone/index.md',
     category: 'Elements',
     description: 'create a zone where files can be dropped',
-    lastUpdated: 1789366373000,
+    lastUpdated: 1789381201000,
   },
   {
     name: 'useEffectOnce',
@@ -3787,7 +3796,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useEventListener/index.md',
     category: 'Browser',
     description: 'use EventListener with ease',
-    lastUpdated: 1789366373000,
+    lastUpdated: 1789381377000,
   },
   {
     name: 'useEventSource',
@@ -3837,7 +3846,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useFileDialog/index.md',
     category: 'Browser',
     description: 'open file dialog with ease',
-    lastUpdated: 1789366373000,
+    lastUpdated: 1789381201000,
   },
   {
     name: 'useFileSystemAccess',
@@ -3870,7 +3879,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useFocus/index.md',
     category: 'Sensors',
     description: 'reactive utility to track or set the focus state of a DOM element',
-    lastUpdated: 1789366373000,
+    lastUpdated: 1789381377000,
   },
   {
     name: 'useFocusReturn',
@@ -3936,7 +3945,7 @@ export const pages: FunctionPageInfo[] = [
     category: 'Browser',
     description:
       'provides reactive bindings for the [Gamepad API](https://developer.mozilla.org/en-US/docs/Web/API/Gamepad_API)',
-    lastUpdated: 1789366373000,
+    lastUpdated: 1789381201000,
   },
   {
     name: 'useGeolocation',
@@ -4140,7 +4149,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/shared/useListener/index.md',
     category: 'State',
     description: 'bind a callback to a listener registration function returned by a reause hook',
-    lastUpdated: 1789366373000,
+    lastUpdated: 1789381201000,
   },
   {
     name: 'useLiveAnnouncer',
@@ -4246,6 +4255,14 @@ export const pages: FunctionPageInfo[] = [
     category: 'Utilities',
     description: 'cache results of functions depending on arguments',
     lastUpdated: 1789366373000,
+  },
+  {
+    name: 'useMemoizedFn',
+    pkg: 'shared',
+    doc: 'packages/shared/useMemoizedFn/index.md',
+    category: 'Side-effects',
+    description: "keep a function's identity stable while always calling its latest implementation",
+    lastUpdated: 1789404071000,
   },
   {
     name: 'useMemory',
@@ -4656,7 +4673,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useScroll/index.md',
     category: 'Sensors',
     description: 'reactive scroll position and state',
-    lastUpdated: 1789366373000,
+    lastUpdated: 1789398645000,
   },
   {
     name: 'useScrollLock',
@@ -4735,7 +4752,7 @@ export const pages: FunctionPageInfo[] = [
     name: 'useSplitter',
     pkg: 'core',
     doc: 'packages/core/useSplitter/index.md',
-    category: 'Browser',
+    category: 'Elements',
     description: 'a hook for resizable panel layouts that supports dragging and keyboard interactions',
     lastUpdated: 1789366373000,
   },
@@ -4754,7 +4771,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useStartTyping/index.md',
     category: 'Sensors',
     description: 'fires when users start typing on non-editable elements',
-    lastUpdated: 1789366373000,
+    lastUpdated: 1789381377000,
   },
   {
     name: 'useStateAutoReset',
@@ -4846,7 +4863,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useStepper/index.md',
     category: 'Utilities',
     description: 'provides helpers for building a multi-step wizard interface',
-    lastUpdated: 1789366373000,
+    lastUpdated: 1789381393000,
   },
   {
     name: 'useStorage',
@@ -5270,7 +5287,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useWebNotification/index.md',
     category: 'Browser',
     description: 'reactive [Notification](https://developer.mozilla.org/en-US/docs/Web/API/notification)',
-    lastUpdated: 1789366373000,
+    lastUpdated: 1789381201000,
   },
   {
     name: 'useWebSocket',
