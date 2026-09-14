@@ -88,6 +88,7 @@
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "rxjs": "^6.6.7",
+    "shiki": "2.5.0",
     "simple-git-hooks": "^2.14.0",
     "sortablejs": "^1.15.7",
     "taze": "^21.1.0",

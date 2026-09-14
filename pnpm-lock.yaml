@@ -140,6 +140,9 @@ importers:
       rxjs:
         specifier: ^6.6.7
         version: 6.6.7
+      shiki:
+        specifier: 2.5.0
+        version: 2.5.0
       simple-git-hooks:
         specifier: ^2.14.0
         version: 2.14.0
