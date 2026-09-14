@@ -1,16 +1,16 @@
-import type { ConfigurableWindow, RefOrValue } from '@reause/shared'
+import type { ConfigurableWindow } from '@reause/shared'
 import type { ElementTarget } from '../useResizeObserver'
-import { deepEqual, isObject, objectOmit, toValue } from '@reause/shared'
+import { deepEqual, isObject, objectOmit } from '@reause/shared'
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { unrefElement } from '../unrefElement'
 import { useEventListener } from '../useEventListener'
 import { useRafFn } from '../useRafFn'
 
 /**
- * Options for `useAnimate`: the platform `KeyframeAnimationOptions`
- * (`duration` / `easing` / `iterations` / `direction` / `fill`, ...) plus the
- * VueUse-specific knobs — `immediate`, `commitStyles`, `persist`,
- * `playbackRate`, `onReady`, `onError` — and a custom `window` instance, e.g.
- * working with iframes or in testing environments.
+ * Options for `useAnimate`: the platform `KeyframeAnimationOptions` (`duration` / `easing` /
+ * `iterations` / `direction` / `fill`...) plus the VueUse-specific knobs — `immediate`,
+ * `commitStyles`, `persist`, `playbackRate`, `onReady`, `onError` — and a custom `window` instance,
+ * e.g. working with iframes or in testing environments.
  */
 export interface UseAnimateOptions extends KeyframeAnimationOptions, ConfigurableWindow {
   /**
@@ -20,8 +20,8 @@ export interface UseAnimateOptions extends KeyframeAnimationOptions, Configurabl
    */
   immediate?: boolean
   /**
-   * Whether to commit the end styling state of an animation to the element
-   * being animated. In general, you should use `fill` option with this.
+   * Whether to commit the end styling state of an animation to the element being animated. In
+   * general, you should use `fill` option with this.
    *
    * @default false
    */
@@ -49,24 +49,22 @@ export interface UseAnimateOptions extends KeyframeAnimationOptions, Configurabl
 }
 
 /**
- * Animation keyframes — an array of keyframe objects, a keyframe object, or
- * `null` (see [Keyframe Formats](https://developer.mozilla.org/en-US/docs/Web/API/Web_Animations_API/Keyframe_Formats)),
- * accepted as a plain value or a ref-like `{ current }` object (a React ref).
+ * Animation keyframes — an array of keyframe objects, a keyframe object, or `null` (see [Keyframe
+ * Formats](https://developer.mozilla.org/en-US/docs/Web/API/Web_Animations_API/Keyframe_Formats)),
+ * as a plain value.
  */
-export type UseAnimateKeyframes = RefOrValue<Keyframe[] | PropertyIndexedKeyframes | null>
+export type UseAnimateKeyframes = Keyframe[] | PropertyIndexedKeyframes | null
 
 /**
- * Store of the animation attributes kept in sync from the platform
- * `Animation` object on every animation frame while the hook is running
- * (upstream: a `shallowReactive` store driven by `useRafFn`).
+ * Store of the animation attributes kept in sync from the platform `Animation` object on every
+ * animation frame while the hook is running.
  */
 type AnimateStore = Pick<Animation, 'startTime' | 'currentTime' | 'timeline' | 'playbackRate' | 'pending' | 'playState' | 'replaceState'>
 
 /**
- * Field-by-field equality of two animation stores. Upstream writes the
- * platform attributes one by one into a `shallowReactive` store, which only
- * triggers when a value actually changes — the React port must compare before
- * publishing, otherwise every frame re-renders (see the frame loop).
+ * Field-by-field equality of two animation stores. Upstream writes the platform attributes one by
+ * one into a `shallowReactive` store, which only triggers when a value actually changes — the React
+ * port must compare before publishing, otherwise every frame re-renders (see the frame loop).
  */
 function isSameStore(a: AnimateStore, b: AnimateStore): boolean {
   return a.startTime === b.startTime
@@ -79,29 +77,25 @@ function isSameStore(a: AnimateStore, b: AnimateStore): boolean {
 }
 
 /**
- * Return of `useAnimate`. Mirrors the upstream `UseAnimateReturn` member by
- * member; the upstream Vue refs become plain values:
- * - `isSupported` is `boolean` state (upstream: `ComputedRef<boolean>`);
- * - `animate` is the `Animation` object or `undefined` (upstream:
- *   `ShallowRef<Animation | undefined>`);
- * - the state members `pending` / `playState` / `replaceState` /
- *   `startTime` / `currentTime` / `timeline` / `playbackRate` are plain values
- *   re-rendered on every animation frame while the animation runs —
- *   upstream's `ComputedRef`s / `WritableComputedRef`s have no setter here, so
- *   seeking (`animate.currentTime = ...`) goes through the returned `animate`
- *   object directly;
+ * Return of `useAnimate`. Mirrors the upstream `UseAnimateReturn` member by member; the upstream
+ * Vue refs become plain values:
+ * - `isSupported` is `boolean` state;
+ * - `animate` is the `Animation` object or `undefined`;
+ * - the state members `pending` / `playState` / `replaceState` / `startTime` / `currentTime` /
+ * `timeline` / `playbackRate` are plain values re-rendered on every animation frame while the
+ * animation runs — upstream's `ComputedRef`s / `WritableComputedRef`s have no setter here, so
+ * seeking (`animate.currentTime =...`) goes through the returned `animate` object directly;
  * - the controls `play` / `pause` / `reverse` / `finish` / `cancel` are stable.
  */
 export interface UseAnimateReturn {
   /**
-   * Whether the current environment supports the Web Animations API
-   * (`Element.animate`), probed on the resolved `window` option. Starts
-   * `false` and settles in a mount effect (SSR-safe).
+   * Whether the current environment supports the Web Animations API (`Element.animate`), probed on
+   * the resolved `window` option. Starts `false` and settles in a mount effect (SSR-safe).
    */
   isSupported: boolean
   /**
-   * The `Animation` instance created on the target element, `undefined` while
-   * no target is mounted or the API is unsupported.
+   * The `Animation` instance created on the target element, `undefined` while no target is mounted
+   * or the API is unsupported.
    */
   animate: Animation | undefined
   /** Start or resume playing the animation. */
@@ -131,60 +125,17 @@ export interface UseAnimateReturn {
 }
 
 /**
- * React equivalent of upstream's `unrefElement`: resolves a ref-like object
- * or a plain value down to an element.
- */
-function unrefElement(value: unknown): Element | undefined {
-  if (typeof value === 'function')
-    return unrefElement((value as () => unknown)())
-  if (value && typeof value === 'object' && 'current' in value)
-    return unrefElement((value as { current: unknown }).current)
-  return (value as Element | null | undefined) ?? undefined
-}
-
-/**
- * Upstream `useSupported(() => window && HTMLElement && 'animate' in
- * HTMLElement.prototype)` gates the probe on the configurable `window` but
- * reads the global `HTMLElement` prototype; the same probe runs in the mount
- * effect here, re-running when the resolved window changes.
+ * Upstream `useSupported(() => window && HTMLElement && 'animate' in HTMLElement.prototype)` gates
+ * the probe on the configurable `window` but reads the global `HTMLElement` prototype; the same
+ * probe runs in the mount effect here, re-running when the resolved window changes.
  */
 function supportsElementAnimate(win: Window | undefined): boolean {
   return Boolean(win) && typeof HTMLElement !== 'undefined' && 'animate' in HTMLElement.prototype
 }
 
 /**
- * Reactive [Web Animations API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Animations_API).
- *
  * Map from @vueuse/core `useAnimate`
- * (`source/vueuse/packages/core/useAnimate/`): creates an `Animation` on the
- * target element via `Element.animate(keyframes, options)` and mirrors its
- * mutable attributes (`playState`, `currentTime`, `playbackRate`, ...) into
- * state on every animation frame through a `useRafFn` loop, while exposing
- * stable controls (`play` / `pause` / `reverse` / `finish` / `cancel`).
- *
- * React divergences:
- * - upstream's Vue watch (target + keyframes) / `tryOnMounted` / scope-dispose
- *   become `useEffect`s: the mount effect creates the animation (and re-creates
- *   it when the resolved target element appears or changes, keeping it paused
- *   when `immediate: false`), the keyframes effect swaps the animation's
- *   `effect` when the resolved keyframes change, and the unmount cleanup calls
- *   `cancel`;
- * - the returned `ComputedRef` / `WritableComputedRef` members become plain
- *   values re-rendered per frame — the writable setters (e.g. seeking through
- *   `currentTime`) are dropped, use the returned `animate` object for that;
- * - `keyframes` re-resolves with `toValue` on every render and is compared
- *   with deep equality, so a ref-like `{ current }` object keyframes input
- *   updates live without an explicit subscription while a deep-equal
- *   reassignment (e.g. reordered keys) stays silent (upstream: a deep
- *   watcher);
- * - `isSupported` is plain `boolean` state settled in the mount effect
- *   (re-probing when the resolved `window` option changes), and internal
- *   gating reads a ref mirror so effects decide synchronously (upstream
- *   `useSupported` computed);
- * - the `finish` / `cancel` / `remove` event listeners are bound to the
- *   `Animation` object through `useEventListener` (upstream:
- *   `useEventListener(animate, ...)`), which rebinds when the animation is
- *   replaced.
+ * (`source/vueuse/packages/core/useAnimate/`).
  *
  * @example
  * const el = useRef<HTMLSpanElement>(null)
@@ -302,7 +253,7 @@ export function useAnimate(
 
     if (!animateRef.current) {
       const animation = el.animate(
-        toValue(keyframesRef.current) ?? null,
+        keyframesRef.current ?? null,
         animateOptionsRef.current,
       )
       animateRef.current = animation
@@ -414,7 +365,7 @@ export function useAnimate(
   // object (or any deep-equal reassignment) does not recreate the effect
   // (upstream: a deep watcher). The first run is skipped — the animation is
   // created with the initial keyframes already.
-  const resolvedKeyframes = toValue(keyframes)
+  const resolvedKeyframes = keyframes
   const previousKeyframesRef = useRef(resolvedKeyframes)
 
   useEffect(() => {
@@ -436,7 +387,7 @@ export function useAnimate(
 
   // Round-trip the animation events into the store loop and commit the end
   // styling state when requested (upstream `useEventListener` on the
-  // `Animation`; the ref-like target re-binds after the animation appears).
+  // `Animation`; the ref's `.current` re-binds after the animation appears).
   const listenerOptions = { passive: true }
   useEventListener(animateRef, ['cancel', 'finish', 'remove'], syncPause, listenerOptions)
   useEventListener(animateRef, 'finish', () => {

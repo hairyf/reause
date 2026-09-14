@@ -9,13 +9,12 @@ export type UseStateThrottledReturn<T = any> = [value: T, setValue: Dispatch<Set
 /**
  * Throttle changing of a state value — React port of VueUse's `refThrottled`.
  *
- * The `value` argument accepts any `State<T>` supported by
- * `useControllableState`: a plain value, lazy initializer, controlled tuple,
- * or `{ value, onChange }` source. The returned tuple contains the current
- * value, its setter, and a throttled mirror.
+ * The `value` argument accepts any `State<T>` supported by `useControllableState`: a plain value,
+ * lazy initializer, controlled tuple, or `{ value, onChange }` source. The returned tuple contains
+ * the current value, its setter, and a throttled mirror.
  *
- * A `delay <= 0` short-circuits like upstream (`if (delay <= 0) return value`):
- * the throttled element is the input itself — no throttling, no timers.
+ * A `delay <= 0` short-circuits like upstream (`if (delay <= 0) return value`): the throttled
+ * element is the input itself — no throttling, no timers.
  *
  * @param value State source accepted by `useControllableState`.
  * @param delay Delay in milliseconds between commits (default: 200).

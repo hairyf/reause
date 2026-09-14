@@ -13,12 +13,16 @@ export interface FunctionInfo {
   category: string
   /**
    * Upstream source this export ports from (`vueuse`, `react-use`,
-   * `react-hookz`, `mantine`, `ahooks`, `react-spring`), resolved from the
-   * port's own annotation against that source's pinned tree. Absent for a pure
-   * reause-only export (the table's `—`).
+   * `react-hookz`, `mantine`, `ahooks`), resolved from the port's own
+   * annotation against that source's pinned tree. Absent for a pure reause-only
+   * export (the table's `—`).
    */
   source?: string
   lastUpdated?: number
+  /** Alternate export names, from the page frontmatter's alias key (mirrors VueUse). */
+  alias?: string[]
+  /** Pages this one relates to: the page frontmatter's related key plus the two-way interop pass. */
+  related?: string[]
 }
 
 /**
@@ -34,18 +38,13 @@ export interface FunctionPageInfo {
   description: string
   internal?: boolean
   lastUpdated?: number
+  /** Alternate export names, from the page frontmatter's alias key. */
+  alias?: string[]
+  /** Related pages, from the page frontmatter's related key plus the interop pass. */
+  related?: string[]
 }
 
 export const functions: FunctionInfo[] = [
-  {
-    name: 'assert',
-    file: 'packages/shared/utils/index.tsx',
-    pkg: 'shared',
-    dir: 'utils',
-    category: 'Utilities',
-    source: 'vueuse',
-    lastUpdated: 1789147565000,
-  },
   {
     name: 'breakpointsAntDesign',
     file: 'packages/core/useBreakpoints/index.tsx',
@@ -53,7 +52,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useBreakpoints',
     category: 'Browser',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'breakpointsBootstrapV5',
@@ -62,7 +61,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useBreakpoints',
     category: 'Browser',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'breakpointsElement',
@@ -71,7 +70,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useBreakpoints',
     category: 'Browser',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'breakpointsMasterCss',
@@ -80,7 +79,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useBreakpoints',
     category: 'Browser',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'breakpointsPrimeFlex',
@@ -89,7 +88,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useBreakpoints',
     category: 'Browser',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'breakpointsQuasar',
@@ -98,7 +97,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useBreakpoints',
     category: 'Browser',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'breakpointsSematic',
@@ -107,7 +106,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useBreakpoints',
     category: 'Browser',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'breakpointsTailwind',
@@ -116,7 +115,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useBreakpoints',
     category: 'Browser',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'breakpointsVuetify',
@@ -125,7 +124,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useBreakpoints',
     category: 'Browser',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'breakpointsVuetifyV2',
@@ -134,7 +133,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useBreakpoints',
     category: 'Browser',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'breakpointsVuetifyV3',
@@ -143,16 +142,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useBreakpoints',
     category: 'Browser',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
-  },
-  {
-    name: 'clamp',
-    file: 'packages/shared/utils/index.tsx',
-    pkg: 'shared',
-    dir: 'utils',
-    category: 'Utilities',
-    source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'cloneFnJSON',
@@ -161,7 +151,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useCloned',
     category: 'Utilities',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'createCookies',
@@ -170,7 +160,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useCookies',
     category: '@Integrations',
     source: 'vueuse',
-    lastUpdated: 1788976915000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'createEventHook',
@@ -179,7 +169,7 @@ export const functions: FunctionInfo[] = [
     dir: 'createEventHook',
     category: 'Utilities',
     source: 'vueuse',
-    lastUpdated: 1788992100000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'createFetch',
@@ -188,7 +178,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useFetch',
     category: 'Network',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'createGenericProjection',
@@ -197,7 +187,8 @@ export const functions: FunctionInfo[] = [
     dir: 'createGenericProjection',
     category: '@Math',
     source: 'vueuse',
-    lastUpdated: 1788958332000,
+    lastUpdated: 1789366373000,
+    related: ['createProjection', 'useProjection'],
   },
   {
     name: 'createGlobalState',
@@ -205,17 +196,9 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'createGlobalState',
     category: 'State',
-    source: 'vueuse',
-    lastUpdated: 1789010295000,
-  },
-  {
-    name: 'createInjectionState',
-    file: 'packages/shared/createInjectionState/index.tsx',
-    pkg: 'shared',
-    dir: 'createInjectionState',
-    category: 'State',
-    source: 'vueuse',
-    lastUpdated: 1788958778000,
+    source: 'react-use',
+    lastUpdated: 1789366373000,
+    related: ['createSharedHook'],
   },
   {
     name: 'createMemo',
@@ -224,7 +207,7 @@ export const functions: FunctionInfo[] = [
     dir: 'createMemo',
     category: 'Factory',
     source: 'react-use',
-    lastUpdated: 1789255071000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'createPortalSlot',
@@ -233,7 +216,7 @@ export const functions: FunctionInfo[] = [
     dir: 'createPortalSlot',
     category: 'Component',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'createProjection',
@@ -242,7 +225,8 @@ export const functions: FunctionInfo[] = [
     dir: 'createProjection',
     category: '@Math',
     source: 'vueuse',
-    lastUpdated: 1788958332000,
+    lastUpdated: 1789366373000,
+    related: ['createGenericProjection', 'useProjection'],
   },
   {
     name: 'createPromisifiedComponent',
@@ -251,7 +235,7 @@ export const functions: FunctionInfo[] = [
     dir: 'createPromisifiedComponent',
     category: 'Component',
     source: 'vueuse',
-    lastUpdated: 1789024203000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'createReducer',
@@ -260,7 +244,16 @@ export const functions: FunctionInfo[] = [
     dir: 'createReducer',
     category: 'Factory',
     source: 'react-use',
-    lastUpdated: 1789272862000,
+    lastUpdated: 1789366373000,
+  },
+  {
+    name: 'createScopedHook',
+    file: 'packages/shared/createScopedHook/index.tsx',
+    pkg: 'shared',
+    dir: 'createScopedHook',
+    category: 'State',
+    source: 'vueuse',
+    lastUpdated: 1789367733000,
   },
   {
     name: 'createSharedHook',
@@ -269,16 +262,8 @@ export const functions: FunctionInfo[] = [
     dir: 'createSharedHook',
     category: 'State',
     source: 'vueuse',
-    lastUpdated: 1789022210000,
-  },
-  {
-    name: 'createSingletonPromise',
-    file: 'packages/shared/utils/index.tsx',
-    pkg: 'shared',
-    dir: 'utils',
-    category: 'Utilities',
-    source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
+    related: ['createGlobalState'],
   },
   {
     name: 'customStorageEventName',
@@ -287,7 +272,8 @@ export const functions: FunctionInfo[] = [
     dir: 'useStorage',
     category: 'State',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
+    related: ['useColorMode', 'useDark'],
   },
   {
     name: 'debounceFilter',
@@ -296,7 +282,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useWatchWithFilter',
     category: 'Watch',
     source: 'vueuse',
-    lastUpdated: 1788994784000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'deepClone',
@@ -304,7 +290,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'useWatchDeep',
     category: 'Watch',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'deepEqual',
@@ -312,7 +298,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'useWatchDeep',
     category: 'Watch',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'events',
@@ -321,7 +307,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useEventBus',
     category: 'Utilities',
     source: 'vueuse',
-    lastUpdated: 1788942682000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'formatDate',
@@ -330,7 +316,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useDateFormat',
     category: 'Time',
     source: 'vueuse',
-    lastUpdated: 1788958330000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'formatTimeAgo',
@@ -339,7 +325,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useTimeAgo',
     category: 'Time',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'formatTimeAgoIntl',
@@ -348,7 +334,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useTimeAgoIntl',
     category: 'Time',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'formatTimeAgoIntlParts',
@@ -357,16 +343,16 @@ export const functions: FunctionInfo[] = [
     dir: 'useTimeAgoIntl',
     category: 'Time',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'getElementHeight',
     file: 'packages/core/useCollapse/index.tsx',
     pkg: 'core',
     dir: 'useCollapse',
-    category: 'Animation',
+    category: 'Browser',
     source: 'mantine',
-    lastUpdated: 1789270746000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'getHotkeyHandler',
@@ -375,7 +361,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useHotkeys',
     category: 'Sensors',
     source: 'mantine',
-    lastUpdated: 1789256170000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'getHotkeyMatcher',
@@ -384,7 +370,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useHotkeys',
     category: 'Sensors',
     source: 'mantine',
-    lastUpdated: 1789256170000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'guessSerializerType',
@@ -393,34 +379,8 @@ export const functions: FunctionInfo[] = [
     dir: 'useStorage',
     category: 'State',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
-  },
-  {
-    name: 'hasOwn',
-    file: 'packages/shared/utils/index.tsx',
-    pkg: 'shared',
-    dir: 'utils',
-    category: 'Utilities',
-    source: 'vueuse',
-    lastUpdated: 1789147565000,
-  },
-  {
-    name: 'hyphenate',
-    file: 'packages/shared/utils/index.tsx',
-    pkg: 'shared',
-    dir: 'utils',
-    category: 'Utilities',
-    source: 'vueuse',
-    lastUpdated: 1789147565000,
-  },
-  {
-    name: 'increaseWithUnit',
-    file: 'packages/shared/utils/index.tsx',
-    pkg: 'shared',
-    dir: 'utils',
-    category: 'Utilities',
-    source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
+    related: ['useColorMode', 'useDark'],
   },
   {
     name: 'insertNodeAt',
@@ -429,25 +389,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useSortable',
     category: '@Integrations',
     source: 'vueuse',
-    lastUpdated: 1789312513000,
-  },
-  {
-    name: 'isClient',
-    file: 'packages/shared/utils/index.tsx',
-    pkg: 'shared',
-    dir: 'utils',
-    category: 'Utilities',
-    source: 'vueuse',
-    lastUpdated: 1789147565000,
-  },
-  {
-    name: 'isDef',
-    file: 'packages/shared/utils/index.tsx',
-    pkg: 'shared',
-    dir: 'utils',
-    category: 'Utilities',
-    source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'isDefined',
@@ -456,7 +398,7 @@ export const functions: FunctionInfo[] = [
     dir: 'isDefined',
     category: 'Utilities',
     source: 'vueuse',
-    lastUpdated: 1788999327000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'isFocusedElementEditable',
@@ -465,42 +407,16 @@ export const functions: FunctionInfo[] = [
     dir: 'useStartTyping',
     category: 'Sensors',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
-  },
-  {
-    name: 'isIOS',
-    file: 'packages/shared/utils/index.tsx',
-    pkg: 'shared',
-    dir: 'utils',
-    category: 'Utilities',
-    source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'isMeasured',
     file: 'packages/core/useCollapse/index.tsx',
     pkg: 'core',
     dir: 'useCollapse',
-    category: 'Animation',
+    category: 'Browser',
     source: 'mantine',
-    lastUpdated: 1789270746000,
-  },
-  {
-    name: 'isObject',
-    file: 'packages/shared/utils/index.tsx',
-    pkg: 'shared',
-    dir: 'utils',
-    category: 'Utilities',
-    source: 'vueuse',
-    lastUpdated: 1789147565000,
-  },
-  {
-    name: 'isRefLike',
-    file: 'packages/shared/utils/index.tsx',
-    pkg: 'shared',
-    dir: 'utils',
-    category: 'Utilities',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'isTypedCharValid',
@@ -509,7 +425,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useStartTyping',
     category: 'Sensors',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'logicAnd',
@@ -518,7 +434,8 @@ export const functions: FunctionInfo[] = [
     dir: 'logicAnd',
     category: '@Math',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
+    related: ['logicNot', 'logicOr'],
   },
   {
     name: 'logicNot',
@@ -527,7 +444,8 @@ export const functions: FunctionInfo[] = [
     dir: 'logicNot',
     category: '@Math',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
+    related: ['logicAnd', 'logicOr'],
   },
   {
     name: 'logicOr',
@@ -536,7 +454,8 @@ export const functions: FunctionInfo[] = [
     dir: 'logicOr',
     category: '@Math',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
+    related: ['logicAnd', 'logicNot'],
   },
   {
     name: 'makeDestructurable',
@@ -545,7 +464,7 @@ export const functions: FunctionInfo[] = [
     dir: 'makeDestructurable',
     category: 'Utilities',
     source: 'vueuse',
-    lastUpdated: 1788999468000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'mapGamepadToXbox360Controller',
@@ -554,7 +473,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useGamepad',
     category: 'Browser',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'moveArrayElement',
@@ -563,16 +482,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useSortable',
     category: '@Integrations',
     source: 'vueuse',
-    lastUpdated: 1789312513000,
-  },
-  {
-    name: 'noop',
-    file: 'packages/shared/utils/index.tsx',
-    pkg: 'shared',
-    dir: 'utils',
-    category: 'Utilities',
-    source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'normalizeDate',
@@ -581,34 +491,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useDateFormat',
     category: 'Time',
     source: 'vueuse',
-    lastUpdated: 1788958330000,
-  },
-  {
-    name: 'now',
-    file: 'packages/shared/utils/index.tsx',
-    pkg: 'shared',
-    dir: 'utils',
-    category: 'Utilities',
-    source: 'vueuse',
-    lastUpdated: 1789147565000,
-  },
-  {
-    name: 'objectOmit',
-    file: 'packages/shared/utils/index.tsx',
-    pkg: 'shared',
-    dir: 'utils',
-    category: 'Utilities',
-    source: 'vueuse',
-    lastUpdated: 1789147565000,
-  },
-  {
-    name: 'objectPick',
-    file: 'packages/shared/utils/index.tsx',
-    pkg: 'shared',
-    dir: 'utils',
-    category: 'Utilities',
-    source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'parseHotkey',
@@ -617,34 +500,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useHotkeys',
     category: 'Sensors',
     source: 'mantine',
-    lastUpdated: 1789256170000,
-  },
-  {
-    name: 'promiseTimeout',
-    file: 'packages/shared/utils/index.tsx',
-    pkg: 'shared',
-    dir: 'utils',
-    category: 'Utilities',
-    source: 'vueuse',
-    lastUpdated: 1789147565000,
-  },
-  {
-    name: 'pxValue',
-    file: 'packages/shared/utils/index.tsx',
-    pkg: 'shared',
-    dir: 'utils',
-    category: 'Utilities',
-    source: 'vueuse',
-    lastUpdated: 1789147565000,
-  },
-  {
-    name: 'rand',
-    file: 'packages/shared/utils/index.tsx',
-    pkg: 'shared',
-    dir: 'utils',
-    category: 'Utilities',
-    source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'removeNode',
@@ -653,7 +509,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useSortable',
     category: '@Integrations',
     source: 'vueuse',
-    lastUpdated: 1789312513000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'resolveIpcRenderer',
@@ -661,7 +517,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'electron',
     dir: '_resolve',
     category: '@Electron',
-    lastUpdated: 1788942682000,
+    lastUpdated: 1789362234000,
   },
   {
     name: 'resolveWebFrame',
@@ -669,7 +525,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'electron',
     dir: '_resolve',
     category: '@Electron',
-    lastUpdated: 1788942682000,
+    lastUpdated: 1789362234000,
   },
   {
     name: 'shallowEqual',
@@ -677,7 +533,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'useShallowCompareEffect',
     category: 'Lifecycle',
-    lastUpdated: 1789272086000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'SSRWidthProvider',
@@ -686,7 +542,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useSSRWidth',
     category: 'Browser',
     source: 'vueuse',
-    lastUpdated: 1789312513000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'syncState',
@@ -695,7 +551,8 @@ export const functions: FunctionInfo[] = [
     dir: 'syncState',
     category: 'Reactivity',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
+    related: ['syncStates'],
   },
   {
     name: 'syncStates',
@@ -704,7 +561,8 @@ export const functions: FunctionInfo[] = [
     dir: 'syncStates',
     category: 'Reactivity',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
+    related: ['syncState'],
   },
   {
     name: 'throttleFilter',
@@ -713,25 +571,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useWatchWithFilter',
     category: 'Watch',
     source: 'vueuse',
-    lastUpdated: 1788994784000,
-  },
-  {
-    name: 'timestamp',
-    file: 'packages/shared/utils/index.tsx',
-    pkg: 'shared',
-    dir: 'utils',
-    category: 'Utilities',
-    source: 'vueuse',
-    lastUpdated: 1789147565000,
-  },
-  {
-    name: 'toArray',
-    file: 'packages/shared/utils/index.tsx',
-    pkg: 'shared',
-    dir: 'utils',
-    category: 'Utilities',
-    source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'toObserver',
@@ -740,16 +580,7 @@ export const functions: FunctionInfo[] = [
     dir: 'toObserver',
     category: '@RxJS',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
-  },
-  {
-    name: 'toValue',
-    file: 'packages/shared/utils/index.tsx',
-    pkg: 'shared',
-    dir: 'utils',
-    category: 'Utilities',
-    source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'TransitionPresets',
@@ -758,7 +589,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useTransition',
     category: 'Animation',
     source: 'vueuse',
-    lastUpdated: 1788994691000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'unrefElement',
@@ -767,7 +598,7 @@ export const functions: FunctionInfo[] = [
     dir: 'unrefElement',
     category: 'Component',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'until',
@@ -776,7 +607,7 @@ export const functions: FunctionInfo[] = [
     dir: 'until',
     category: 'Watch',
     source: 'vueuse',
-    lastUpdated: 1789000817000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useAbs',
@@ -785,7 +616,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useAbs',
     category: '@Math',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useActiveElement',
@@ -794,7 +625,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useActiveElement',
     category: 'Elements',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useAnimate',
@@ -803,7 +634,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useAnimate',
     category: 'Animation',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useArrayDifference',
@@ -812,7 +643,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useArrayDifference',
     category: 'Array',
     source: 'vueuse',
-    lastUpdated: 1788958330000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useArrayEvery',
@@ -821,7 +652,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useArrayEvery',
     category: 'Array',
     source: 'vueuse',
-    lastUpdated: 1788958330000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useArrayFilter',
@@ -830,7 +661,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useArrayFilter',
     category: 'Array',
     source: 'vueuse',
-    lastUpdated: 1789000901000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useArrayFind',
@@ -839,7 +670,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useArrayFind',
     category: 'Array',
     source: 'vueuse',
-    lastUpdated: 1788958330000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useArrayFindIndex',
@@ -848,7 +679,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useArrayFindIndex',
     category: 'Array',
     source: 'vueuse',
-    lastUpdated: 1788942682000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useArrayFindLast',
@@ -857,7 +688,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useArrayFindLast',
     category: 'Array',
     source: 'vueuse',
-    lastUpdated: 1788958330000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useArrayIncludes',
@@ -866,7 +697,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useArrayIncludes',
     category: 'Array',
     source: 'vueuse',
-    lastUpdated: 1788958330000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useArrayJoin',
@@ -875,7 +706,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useArrayJoin',
     category: 'Array',
     source: 'vueuse',
-    lastUpdated: 1789001105000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useArrayMap',
@@ -884,7 +715,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useArrayMap',
     category: 'Array',
     source: 'vueuse',
-    lastUpdated: 1789000678000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useArrayReduce',
@@ -893,7 +724,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useArrayReduce',
     category: 'Array',
     source: 'vueuse',
-    lastUpdated: 1788958330000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useArraySome',
@@ -902,7 +733,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useArraySome',
     category: 'Array',
     source: 'vueuse',
-    lastUpdated: 1788958330000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useArrayUnique',
@@ -911,7 +742,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useArrayUnique',
     category: 'Array',
     source: 'vueuse',
-    lastUpdated: 1788958330000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useAsync',
@@ -920,16 +751,16 @@ export const functions: FunctionInfo[] = [
     dir: 'useAsync',
     category: 'Reactivity',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useAsyncFn',
     file: 'packages/core/useAsyncFn/index.tsx',
     pkg: 'core',
     dir: 'useAsyncFn',
-    category: 'Side-effects',
+    category: 'State',
     source: 'react-use',
-    lastUpdated: 1789254431000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useAsyncQueue',
@@ -938,7 +769,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useAsyncQueue',
     category: 'Utilities',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useAsyncState',
@@ -947,7 +778,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useAsyncState',
     category: 'State',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useAsyncValidator',
@@ -956,7 +787,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useAsyncValidator',
     category: '@Integrations',
     source: 'vueuse',
-    lastUpdated: 1788994827000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useAuth',
@@ -965,7 +796,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useAuth',
     category: '@Firebase',
     source: 'vueuse',
-    lastUpdated: 1789017154000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useAverage',
@@ -974,7 +805,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useAverage',
     category: '@Math',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useAxios',
@@ -983,7 +814,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useAxios',
     category: '@Integrations',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useBase64',
@@ -992,7 +823,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useBase64',
     category: 'Utilities',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useBattery',
@@ -1001,7 +832,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useBattery',
     category: 'Sensors',
     source: 'vueuse',
-    lastUpdated: 1788942682000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useBluetooth',
@@ -1010,7 +841,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useBluetooth',
     category: 'Browser',
     source: 'vueuse',
-    lastUpdated: 1788953542000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useBreakpoints',
@@ -1019,7 +850,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useBreakpoints',
     category: 'Browser',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useBroadcastChannel',
@@ -1028,7 +859,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useBroadcastChannel',
     category: 'Browser',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useBrowserLocation',
@@ -1037,7 +868,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useBrowserLocation',
     category: 'Browser',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useCached',
@@ -1046,7 +877,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useCached',
     category: 'Utilities',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useCeil',
@@ -1055,7 +886,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useCeil',
     category: '@Math',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useChangeCase',
@@ -1064,7 +895,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useChangeCase',
     category: '@Integrations',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useClamp',
@@ -1073,7 +904,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useClamp',
     category: '@Math',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useClickAway',
@@ -1082,7 +913,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useClickAway',
     category: 'Sensors',
     source: 'ahooks',
-    lastUpdated: 1789256593000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useClickOutside',
@@ -1091,7 +922,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useClickOutside',
     category: 'Sensors',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useClipboard',
@@ -1100,7 +931,8 @@ export const functions: FunctionInfo[] = [
     dir: 'useClipboard',
     category: 'Browser',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
+    related: ['useClipboardItems'],
   },
   {
     name: 'useClipboardItems',
@@ -1109,7 +941,8 @@ export const functions: FunctionInfo[] = [
     dir: 'useClipboardItems',
     category: 'Browser',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
+    related: ['useClipboard'],
   },
   {
     name: 'useCloned',
@@ -1118,16 +951,16 @@ export const functions: FunctionInfo[] = [
     dir: 'useCloned',
     category: 'Utilities',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useCollapse',
     file: 'packages/core/useCollapse/index.tsx',
     pkg: 'core',
     dir: 'useCollapse',
-    category: 'Animation',
+    category: 'Browser',
     source: 'mantine',
-    lastUpdated: 1789270746000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useColorMode',
@@ -1136,7 +969,8 @@ export const functions: FunctionInfo[] = [
     dir: 'useColorMode',
     category: 'Browser',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
+    related: ['useDark', 'usePreferredDark', 'useStorage'],
   },
   {
     name: 'useConfirmDialog',
@@ -1145,7 +979,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useConfirmDialog',
     category: 'Utilities',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useConst',
@@ -1153,7 +987,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'useConst',
     category: 'Utilities',
-    lastUpdated: 1789221182000,
+    lastUpdated: 1789362234000,
   },
   {
     name: 'useControllableState',
@@ -1161,7 +995,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'useControllableState',
     category: 'State',
-    lastUpdated: 1788979068000,
+    lastUpdated: 1789362234000,
   },
   {
     name: 'useCookies',
@@ -1170,7 +1004,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useCookies',
     category: '@Integrations',
     source: 'vueuse',
-    lastUpdated: 1788976915000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useCountdown',
@@ -1179,7 +1013,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useCountdown',
     category: 'Time',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useCounter',
@@ -1188,7 +1022,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useCounter',
     category: 'State',
     source: 'vueuse',
-    lastUpdated: 1788996836000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useCssSupports',
@@ -1197,7 +1031,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useCssSupports',
     category: 'Browser',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useCssVar',
@@ -1206,7 +1040,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useCssVar',
     category: 'Browser',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useCycleList',
@@ -1215,7 +1049,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useCycleList',
     category: 'Utilities',
     source: 'vueuse',
-    lastUpdated: 1788958794000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useDark',
@@ -1224,7 +1058,8 @@ export const functions: FunctionInfo[] = [
     dir: 'useDark',
     category: 'Browser',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
+    related: ['useColorMode', 'usePreferredDark', 'useStorage'],
   },
   {
     name: 'useDateFormat',
@@ -1233,7 +1068,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useDateFormat',
     category: 'Time',
     source: 'vueuse',
-    lastUpdated: 1788958330000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useDebounceFn',
@@ -1242,7 +1077,8 @@ export const functions: FunctionInfo[] = [
     dir: 'useDebounceFn',
     category: 'Utilities',
     source: 'vueuse',
-    lastUpdated: 1788984677000,
+    lastUpdated: 1789366373000,
+    related: ['useThrottleFn'],
   },
   {
     name: 'useDeepCompareEffect',
@@ -1251,7 +1087,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useDeepCompareEffect',
     category: 'Lifecycle',
     source: 'react-use',
-    lastUpdated: 1789271565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useDeviceMotion',
@@ -1260,7 +1096,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useDeviceMotion',
     category: 'Sensors',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useDeviceOrientation',
@@ -1269,7 +1105,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useDeviceOrientation',
     category: 'Sensors',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useDevicePixelRatio',
@@ -1278,7 +1114,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useDevicePixelRatio',
     category: 'Sensors',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useDevicesList',
@@ -1287,7 +1123,8 @@ export const functions: FunctionInfo[] = [
     dir: 'useDevicesList',
     category: 'Sensors',
     source: 'vueuse',
-    lastUpdated: 1788966944000,
+    lastUpdated: 1789366373000,
+    related: ['useUserMedia'],
   },
   {
     name: 'useDisplayMedia',
@@ -1296,7 +1133,8 @@ export const functions: FunctionInfo[] = [
     dir: 'useDisplayMedia',
     category: 'Sensors',
     source: 'vueuse',
-    lastUpdated: 1788970689000,
+    lastUpdated: 1789366373000,
+    related: ['useUserMedia'],
   },
   {
     name: 'useDocumentVisibility',
@@ -1305,7 +1143,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useDocumentVisibility',
     category: 'Elements',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useDraggable',
@@ -1314,7 +1152,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useDraggable',
     category: 'Elements',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useDrauu',
@@ -1323,7 +1161,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useDrauu',
     category: '@Integrations',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useDropZone',
@@ -1332,7 +1170,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useDropZone',
     category: 'Elements',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useEffectOnce',
@@ -1341,7 +1179,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useEffectOnce',
     category: 'Lifecycle',
     source: 'react-use',
-    lastUpdated: 1789257038000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useElementBounding',
@@ -1350,7 +1188,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useElementBounding',
     category: 'Elements',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useElementByPoint',
@@ -1359,7 +1197,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useElementByPoint',
     category: 'Sensors',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useElementHover',
@@ -1368,7 +1206,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useElementHover',
     category: 'Sensors',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useElementOverflow',
@@ -1377,7 +1215,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useElementOverflow',
     category: 'Elements',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useElementRemoval',
@@ -1386,7 +1224,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useElementRemoval',
     category: 'Sensors',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useElementSize',
@@ -1395,7 +1233,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useElementSize',
     category: 'Elements',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useElementVisibility',
@@ -1404,7 +1242,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useElementVisibility',
     category: 'Elements',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useError',
@@ -1413,7 +1251,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useError',
     category: 'Side-effects',
     source: 'react-use',
-    lastUpdated: 1789254261000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useEventBus',
@@ -1422,7 +1260,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useEventBus',
     category: 'Utilities',
     source: 'vueuse',
-    lastUpdated: 1788942682000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useEventListener',
@@ -1431,7 +1269,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useEventListener',
     category: 'Browser',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useEventSource',
@@ -1440,7 +1278,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useEventSource',
     category: 'Network',
     source: 'vueuse',
-    lastUpdated: 1788971998000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useExtractedObservable',
@@ -1449,7 +1287,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useExtractedObservable',
     category: '@RxJS',
     source: 'vueuse',
-    lastUpdated: 1789020143000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useEyeDropper',
@@ -1458,7 +1296,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useEyeDropper',
     category: 'Browser',
     source: 'vueuse',
-    lastUpdated: 1788942682000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useFavicon',
@@ -1467,7 +1305,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useFavicon',
     category: 'Browser',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useFetch',
@@ -1476,7 +1314,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useFetch',
     category: 'Network',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useFileDialog',
@@ -1485,7 +1323,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useFileDialog',
     category: 'Browser',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useFileSystemAccess',
@@ -1494,7 +1332,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useFileSystemAccess',
     category: 'Browser',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useFirestore',
@@ -1503,7 +1341,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useFirestore',
     category: '@Firebase',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useFloor',
@@ -1512,7 +1350,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useFloor',
     category: '@Math',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useFocus',
@@ -1521,7 +1359,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useFocus',
     category: 'Sensors',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useFocusReturn',
@@ -1530,7 +1368,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useFocusReturn',
     category: 'Sensors',
     source: 'mantine',
-    lastUpdated: 1789257282000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useFocusTrap',
@@ -1539,7 +1377,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useFocusTrap',
     category: '@Integrations',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useFocusWithin',
@@ -1548,7 +1386,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useFocusWithin',
     category: 'Sensors',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useFps',
@@ -1557,7 +1395,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useFps',
     category: 'Sensors',
     source: 'vueuse',
-    lastUpdated: 1788971997000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useFrom',
@@ -1566,7 +1404,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useFrom',
     category: '@RxJS',
     source: 'vueuse',
-    lastUpdated: 1789031655000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useFullscreen',
@@ -1575,7 +1413,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useFullscreen',
     category: 'Browser',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useFuse',
@@ -1584,7 +1422,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useFuse',
     category: '@Integrations',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useGamepad',
@@ -1593,7 +1431,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useGamepad',
     category: 'Browser',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useGeolocation',
@@ -1602,7 +1440,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useGeolocation',
     category: 'Sensors',
     source: 'vueuse',
-    lastUpdated: 1788942682000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useHash',
@@ -1611,7 +1449,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useHash',
     category: 'Browser',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useHotkeys',
@@ -1620,7 +1458,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useHotkeys',
     category: 'Sensors',
     source: 'mantine',
-    lastUpdated: 1789256170000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useId',
@@ -1629,7 +1467,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useId',
     category: 'Utilities',
     source: 'mantine',
-    lastUpdated: 1789273543000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useIDBKeyval',
@@ -1638,7 +1476,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useIDBKeyval',
     category: '@Integrations',
     source: 'vueuse',
-    lastUpdated: 1788991159000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useIdle',
@@ -1647,7 +1485,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useIdle',
     category: 'Sensors',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useImage',
@@ -1656,7 +1494,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useImage',
     category: 'Browser',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useInfiniteScroll',
@@ -1665,7 +1503,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useInfiniteScroll',
     category: 'Sensors',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useIntersectionObserver',
@@ -1674,7 +1512,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useIntersectionObserver',
     category: 'Elements',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useInterval',
@@ -1683,7 +1521,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useInterval',
     category: 'Animation',
     source: 'vueuse',
-    lastUpdated: 1788985429000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useIntervalFn',
@@ -1692,7 +1530,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useIntervalFn',
     category: 'Animation',
     source: 'vueuse',
-    lastUpdated: 1788999284000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useIntervalRafFn',
@@ -1701,7 +1539,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useIntervalRafFn',
     category: 'Animation',
     source: 'ahooks',
-    lastUpdated: 1789277192000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useIpcRenderer',
@@ -1710,7 +1548,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useIpcRenderer',
     category: '@Electron',
     source: 'vueuse',
-    lastUpdated: 1788988203000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useIpcRendererInvoke',
@@ -1719,7 +1557,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useIpcRendererInvoke',
     category: '@Electron',
     source: 'vueuse',
-    lastUpdated: 1788988307000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useIpcRendererOn',
@@ -1728,7 +1566,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useIpcRendererOn',
     category: '@Electron',
     source: 'vueuse',
-    lastUpdated: 1788942682000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useIsFirstRender',
@@ -1737,7 +1575,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useIsFirstRender',
     category: 'Lifecycle',
     source: 'mantine',
-    lastUpdated: 1789276355000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useIsomorphicLayoutEffect',
@@ -1746,7 +1584,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useIsomorphicLayoutEffect',
     category: 'Lifecycle',
     source: 'react-use',
-    lastUpdated: 1789273543000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useJwt',
@@ -1755,7 +1593,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useJwt',
     category: '@Integrations',
     source: 'vueuse',
-    lastUpdated: 1788991529000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useKeyDown',
@@ -1764,7 +1602,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useKeyStroke',
     category: 'Sensors',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useKeyModifier',
@@ -1773,7 +1611,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useKeyModifier',
     category: 'Sensors',
     source: 'vueuse',
-    lastUpdated: 1788984370000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useKeyPress',
@@ -1782,7 +1620,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useKeyPress',
     category: 'Sensors',
     source: 'ahooks',
-    lastUpdated: 1789275170000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useKeyPressed',
@@ -1791,7 +1629,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useKeyStroke',
     category: 'Sensors',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useKeyStroke',
@@ -1800,7 +1638,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useKeyStroke',
     category: 'Sensors',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useKeyUp',
@@ -1809,7 +1647,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useKeyStroke',
     category: 'Sensors',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useLastChanged',
@@ -1818,7 +1656,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useLastChanged',
     category: 'State',
     source: 'vueuse',
-    lastUpdated: 1788942682000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useLatest',
@@ -1827,7 +1665,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useLatest',
     category: 'State',
     source: 'react-use',
-    lastUpdated: 1789252819000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useList',
@@ -1836,7 +1674,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useList',
     category: 'State',
     source: 'react-use',
-    lastUpdated: 1789279795000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useListener',
@@ -1844,7 +1682,7 @@ export const functions: FunctionInfo[] = [
     pkg: 'shared',
     dir: 'useListener',
     category: 'State',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useLiveAnnouncer',
@@ -1853,7 +1691,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useLiveAnnouncer',
     category: 'Browser',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useLocalStorage',
@@ -1862,7 +1700,16 @@ export const functions: FunctionInfo[] = [
     dir: 'useLocalStorage',
     category: 'State',
     source: 'vueuse',
-    lastUpdated: 1788942682000,
+    lastUpdated: 1789366373000,
+  },
+  {
+    name: 'useLockFn',
+    file: 'packages/shared/useLockFn/index.tsx',
+    pkg: 'shared',
+    dir: 'useLockFn',
+    category: 'Side-effects',
+    source: 'ahooks',
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useLogger',
@@ -1871,7 +1718,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useLogger',
     category: 'Lifecycle',
     source: 'react-use',
-    lastUpdated: 1789308328000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useLongPress',
@@ -1880,7 +1727,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useLongPress',
     category: 'Sensors',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useMagicKeys',
@@ -1889,7 +1736,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useMagicKeys',
     category: 'Sensors',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useMap',
@@ -1898,7 +1745,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useMap',
     category: 'State',
     source: 'react-hookz',
-    lastUpdated: 1789276266000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useMask',
@@ -1907,7 +1754,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useMask',
     category: 'Browser',
     source: 'mantine',
-    lastUpdated: 1789285795000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useMath',
@@ -1916,7 +1763,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useMath',
     category: '@Math',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useMax',
@@ -1925,7 +1772,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useMax',
     category: '@Math',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useMediaControls',
@@ -1934,7 +1781,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useMediaControls',
     category: 'Browser',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useMediaQuery',
@@ -1943,7 +1790,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useMediaQuery',
     category: 'Browser',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useMemoize',
@@ -1952,7 +1799,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useMemoize',
     category: 'Utilities',
     source: 'vueuse',
-    lastUpdated: 1788989746000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useMemory',
@@ -1961,7 +1808,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useMemory',
     category: 'Browser',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useMethods',
@@ -1970,7 +1817,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useMethods',
     category: 'State',
     source: 'react-use',
-    lastUpdated: 1789315101000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useMin',
@@ -1979,7 +1826,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useMin',
     category: '@Math',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useMount',
@@ -1988,7 +1835,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useMount',
     category: 'Lifecycle',
     source: 'react-use',
-    lastUpdated: 1789257038000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useMounted',
@@ -1997,7 +1844,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useMounted',
     category: 'Component',
     source: 'vueuse',
-    lastUpdated: 1788990050000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useMouse',
@@ -2006,7 +1853,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useMouse',
     category: 'Sensors',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useMouseInElement',
@@ -2015,7 +1862,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useMouseInElement',
     category: 'Elements',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useMousePressed',
@@ -2024,7 +1871,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useMousePressed',
     category: 'Sensors',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useMutationObserver',
@@ -2033,7 +1880,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useMutationObserver',
     category: 'Elements',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useNavigatorLanguage',
@@ -2042,7 +1889,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useNavigatorLanguage',
     category: 'Sensors',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useNetwork',
@@ -2051,7 +1898,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useNetwork',
     category: 'Sensors',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useNow',
@@ -2060,7 +1907,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useNow',
     category: 'Animation',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useNProgress',
@@ -2069,7 +1916,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useNProgress',
     category: '@Integrations',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useObjectUrl',
@@ -2078,7 +1925,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useObjectUrl',
     category: 'Browser',
     source: 'vueuse',
-    lastUpdated: 1788958794000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useObservable',
@@ -2087,7 +1934,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useObservable',
     category: '@RxJS',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useOffsetPagination',
@@ -2096,7 +1943,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useOffsetPagination',
     category: 'Utilities',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useOnline',
@@ -2105,7 +1952,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useOnline',
     category: 'Sensors',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'usePageLeave',
@@ -2114,7 +1961,7 @@ export const functions: FunctionInfo[] = [
     dir: 'usePageLeave',
     category: 'Sensors',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useParallax',
@@ -2123,7 +1970,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useParallax',
     category: 'Sensors',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useParams',
@@ -2132,7 +1979,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useParams',
     category: 'Browser',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useParentElement',
@@ -2141,7 +1988,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useParentElement',
     category: 'Elements',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'usePerformanceObserver',
@@ -2150,7 +1997,7 @@ export const functions: FunctionInfo[] = [
     dir: 'usePerformanceObserver',
     category: 'Browser',
     source: 'vueuse',
-    lastUpdated: 1788991736000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'usePermission',
@@ -2159,7 +2006,8 @@ export const functions: FunctionInfo[] = [
     dir: 'usePermission',
     category: 'Browser',
     source: 'vueuse',
-    lastUpdated: 1788992388000,
+    lastUpdated: 1789366373000,
+    related: ['useUserMedia'],
   },
   {
     name: 'usePointer',
@@ -2168,7 +2016,7 @@ export const functions: FunctionInfo[] = [
     dir: 'usePointer',
     category: 'Sensors',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'usePointerLock',
@@ -2177,7 +2025,7 @@ export const functions: FunctionInfo[] = [
     dir: 'usePointerLock',
     category: 'Sensors',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'usePointerSwipe',
@@ -2186,7 +2034,7 @@ export const functions: FunctionInfo[] = [
     dir: 'usePointerSwipe',
     category: 'Sensors',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'usePrecision',
@@ -2195,7 +2043,7 @@ export const functions: FunctionInfo[] = [
     dir: 'usePrecision',
     category: '@Math',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'usePreferredColorScheme',
@@ -2204,7 +2052,7 @@ export const functions: FunctionInfo[] = [
     dir: 'usePreferredColorScheme',
     category: 'Browser',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'usePreferredContrast',
@@ -2213,7 +2061,7 @@ export const functions: FunctionInfo[] = [
     dir: 'usePreferredContrast',
     category: 'Browser',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'usePreferredDark',
@@ -2222,7 +2070,8 @@ export const functions: FunctionInfo[] = [
     dir: 'usePreferredDark',
     category: 'Browser',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
+    related: ['useColorMode', 'useDark'],
   },
   {
     name: 'usePreferredLanguages',
@@ -2231,7 +2080,7 @@ export const functions: FunctionInfo[] = [
     dir: 'usePreferredLanguages',
     category: 'Browser',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'usePreferredReducedMotion',
@@ -2240,7 +2089,7 @@ export const functions: FunctionInfo[] = [
     dir: 'usePreferredReducedMotion',
     category: 'Browser',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'usePreferredReducedTransparency',
@@ -2249,7 +2098,7 @@ export const functions: FunctionInfo[] = [
     dir: 'usePreferredReducedTransparency',
     category: 'Browser',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'usePrevious',
@@ -2258,7 +2107,16 @@ export const functions: FunctionInfo[] = [
     dir: 'usePrevious',
     category: 'Utilities',
     source: 'vueuse',
-    lastUpdated: 1788964249000,
+    lastUpdated: 1789366373000,
+  },
+  {
+    name: 'usePreviousDistinct',
+    file: 'packages/shared/usePreviousDistinct/index.tsx',
+    pkg: 'shared',
+    dir: 'usePreviousDistinct',
+    category: 'State',
+    source: 'react-use',
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useProjection',
@@ -2267,7 +2125,8 @@ export const functions: FunctionInfo[] = [
     dir: 'useProjection',
     category: '@Math',
     source: 'vueuse',
-    lastUpdated: 1788995800000,
+    lastUpdated: 1789366373000,
+    related: ['createGenericProjection', 'createProjection'],
   },
   {
     name: 'useQRCode',
@@ -2276,7 +2135,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useQRCode',
     category: '@Integrations',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useQuery',
@@ -2285,7 +2144,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useQuery',
     category: 'Browser',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useQueue',
@@ -2294,7 +2153,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useQueue',
     category: 'State',
     source: 'react-use',
-    lastUpdated: 1789318112000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useRafFn',
@@ -2303,7 +2162,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useRafFn',
     category: 'Animation',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useRafState',
@@ -2312,7 +2171,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useRafState',
     category: 'Animation',
     source: 'react-use',
-    lastUpdated: 1789257838000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useRefsList',
@@ -2321,7 +2180,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useRefsList',
     category: 'Component',
     source: 'vueuse',
-    lastUpdated: 1788963203000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useResizeObserver',
@@ -2330,7 +2189,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useResizeObserver',
     category: 'Elements',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useRound',
@@ -2339,7 +2198,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useRound',
     category: '@Math',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useRTDB',
@@ -2348,7 +2207,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useRTDB',
     category: '@Firebase',
     source: 'vueuse',
-    lastUpdated: 1788942682000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useSafeState',
@@ -2357,7 +2216,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useSafeState',
     category: 'State',
     source: 'ahooks',
-    lastUpdated: 1789308388000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useScreenOrientation',
@@ -2366,7 +2225,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useScreenOrientation',
     category: 'Browser',
     source: 'vueuse',
-    lastUpdated: 1788960166000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useScreenSafeArea',
@@ -2375,7 +2234,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useScreenSafeArea',
     category: 'Browser',
     source: 'vueuse',
-    lastUpdated: 1788942682000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useScriptTag',
@@ -2384,7 +2243,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useScriptTag',
     category: 'Browser',
     source: 'vueuse',
-    lastUpdated: 1788963761000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useScroll',
@@ -2393,7 +2252,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useScroll',
     category: 'Sensors',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useScrollLock',
@@ -2402,7 +2261,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useScrollLock',
     category: 'Sensors',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useSessionStorage',
@@ -2411,7 +2270,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useSessionStorage',
     category: 'State',
     source: 'vueuse',
-    lastUpdated: 1788960102000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useSet',
@@ -2420,7 +2279,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useSet',
     category: 'State',
     source: 'react-hookz',
-    lastUpdated: 1789275061000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useShallowCompareEffect',
@@ -2429,7 +2288,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useShallowCompareEffect',
     category: 'Lifecycle',
     source: 'react-use',
-    lastUpdated: 1789272086000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useShare',
@@ -2438,7 +2297,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useShare',
     category: 'Browser',
     source: 'vueuse',
-    lastUpdated: 1788963984000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useSortable',
@@ -2447,7 +2306,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useSortable',
     category: '@Integrations',
     source: 'vueuse',
-    lastUpdated: 1789312513000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useSorted',
@@ -2456,7 +2315,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useSorted',
     category: 'Array',
     source: 'vueuse',
-    lastUpdated: 1788962909000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useSpeechRecognition',
@@ -2465,7 +2324,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useSpeechRecognition',
     category: 'Sensors',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useSpeechSynthesis',
@@ -2474,25 +2333,16 @@ export const functions: FunctionInfo[] = [
     dir: 'useSpeechSynthesis',
     category: 'Sensors',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useSplitter',
     file: 'packages/core/useSplitter/index.tsx',
     pkg: 'core',
     dir: 'useSplitter',
-    category: 'Elements',
+    category: 'Browser',
     source: 'mantine',
-    lastUpdated: 1789286495000,
-  },
-  {
-    name: 'useSpring',
-    file: 'packages/integrations/useSpring/index.tsx',
-    pkg: 'integrations',
-    dir: 'useSpring',
-    category: 'Animation',
-    source: 'react-spring',
-    lastUpdated: 1789289266000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useSSRWidth',
@@ -2501,7 +2351,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useSSRWidth',
     category: 'Browser',
     source: 'vueuse',
-    lastUpdated: 1789312513000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useStartTyping',
@@ -2510,7 +2360,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useStartTyping',
     category: 'Sensors',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useStateAutoReset',
@@ -2519,7 +2369,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useStateAutoReset',
     category: 'Reactivity',
     source: 'vueuse',
-    lastUpdated: 1788977666000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useStateDebounced',
@@ -2528,7 +2378,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useStateDebounced',
     category: 'Reactivity',
     source: 'vueuse',
-    lastUpdated: 1789000838000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useStateDebouncedHistory',
@@ -2537,7 +2387,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useStateDebouncedHistory',
     category: 'State',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useStateDefault',
@@ -2546,7 +2396,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useStateDefault',
     category: 'Reactivity',
     source: 'vueuse',
-    lastUpdated: 1788998493000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useStateHistory',
@@ -2555,7 +2405,8 @@ export const functions: FunctionInfo[] = [
     dir: 'useStateHistory',
     category: 'State',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
+    related: ['useStateWithControl'],
   },
   {
     name: 'useStateManualHistory',
@@ -2564,7 +2415,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useStateManualHistory',
     category: 'State',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useStateManualReset',
@@ -2573,7 +2424,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useStateManualReset',
     category: 'Reactivity',
     source: 'vueuse',
-    lastUpdated: 1788997642000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useStateThrottled',
@@ -2582,7 +2433,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useStateThrottled',
     category: 'Reactivity',
     source: 'vueuse',
-    lastUpdated: 1789000282000,
+    lastUpdated: 1789362234000,
   },
   {
     name: 'useStateThrottledHistory',
@@ -2591,7 +2442,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useStateThrottledHistory',
     category: 'State',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useStateWithControl',
@@ -2600,7 +2451,9 @@ export const functions: FunctionInfo[] = [
     dir: 'useStateWithControl',
     category: 'Reactivity',
     source: 'vueuse',
-    lastUpdated: 1788998206000,
+    lastUpdated: 1789366373000,
+    alias: ['controlledRef'],
+    related: ['useStateHistory'],
   },
   {
     name: 'useStepper',
@@ -2609,7 +2462,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useStepper',
     category: 'Utilities',
     source: 'vueuse',
-    lastUpdated: 1788965950000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useStorage',
@@ -2618,7 +2471,8 @@ export const functions: FunctionInfo[] = [
     dir: 'useStorage',
     category: 'State',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
+    related: ['useColorMode', 'useDark'],
   },
   {
     name: 'useStorageAsync',
@@ -2627,7 +2481,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useStorageAsync',
     category: 'State',
     source: 'vueuse',
-    lastUpdated: 1788966005000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useStyleTag',
@@ -2636,7 +2490,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useStyleTag',
     category: 'Browser',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useSubject',
@@ -2645,7 +2499,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useSubject',
     category: '@RxJS',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useSubscription',
@@ -2654,7 +2508,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useSubscription',
     category: '@RxJS',
     source: 'vueuse',
-    lastUpdated: 1789017877000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useSum',
@@ -2663,7 +2517,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useSum',
     category: '@Math',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useSupported',
@@ -2672,7 +2526,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useSupported',
     category: 'Utilities',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useSwipe',
@@ -2681,7 +2535,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useSwipe',
     category: 'Sensors',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useTemporalNow',
@@ -2690,7 +2544,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useTemporalNow',
     category: 'Time',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useTextareaAutosize',
@@ -2699,7 +2553,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useTextareaAutosize',
     category: 'Browser',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useTextDirection',
@@ -2708,7 +2562,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useTextDirection',
     category: 'Browser',
     source: 'vueuse',
-    lastUpdated: 1788996791000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useTextSelection',
@@ -2717,7 +2571,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useTextSelection',
     category: 'Sensors',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useThrottleFn',
@@ -2726,7 +2580,8 @@ export const functions: FunctionInfo[] = [
     dir: 'useThrottleFn',
     category: 'Utilities',
     source: 'vueuse',
-    lastUpdated: 1788998912000,
+    lastUpdated: 1789366373000,
+    related: ['useDebounceFn'],
   },
   {
     name: 'useTimeAgo',
@@ -2735,7 +2590,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useTimeAgo',
     category: 'Time',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useTimeAgoIntl',
@@ -2744,7 +2599,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useTimeAgoIntl',
     category: 'Time',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useTimeout',
@@ -2753,7 +2608,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useTimeout',
     category: 'Animation',
     source: 'vueuse',
-    lastUpdated: 1788981733000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useTimeoutFn',
@@ -2762,7 +2617,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useTimeoutFn',
     category: 'Animation',
     source: 'vueuse',
-    lastUpdated: 1788981739000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useTimeoutPoll',
@@ -2771,7 +2626,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useTimeoutPoll',
     category: 'Utilities',
     source: 'vueuse',
-    lastUpdated: 1788994903000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useTimeoutRafFn',
@@ -2780,7 +2635,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useTimeoutRafFn',
     category: 'Animation',
     source: 'ahooks',
-    lastUpdated: 1789273126000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useTimestamp',
@@ -2789,7 +2644,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useTimestamp',
     category: 'Animation',
     source: 'vueuse',
-    lastUpdated: 1788998330000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useTitle',
@@ -2798,7 +2653,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useTitle',
     category: 'Browser',
     source: 'vueuse',
-    lastUpdated: 1788991870000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useToggle',
@@ -2807,7 +2662,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useToggle',
     category: 'Utilities',
     source: 'vueuse',
-    lastUpdated: 1788981648000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useToNumber',
@@ -2816,7 +2671,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useToNumber',
     category: 'Utilities',
     source: 'vueuse',
-    lastUpdated: 1788942682000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useToString',
@@ -2825,7 +2680,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useToString',
     category: 'Utilities',
     source: 'vueuse',
-    lastUpdated: 1789001834000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useTrackedEffect',
@@ -2834,7 +2689,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useTrackedEffect',
     category: 'Lifecycle',
     source: 'ahooks',
-    lastUpdated: 1789288373000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useTransition',
@@ -2843,7 +2698,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useTransition',
     category: 'Animation',
     source: 'vueuse',
-    lastUpdated: 1788994691000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useTrunc',
@@ -2852,7 +2707,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useTrunc',
     category: '@Math',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useUnmount',
@@ -2861,7 +2716,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useUnmount',
     category: 'Lifecycle',
     source: 'react-use',
-    lastUpdated: 1788942682000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useUnmountedRef',
@@ -2870,7 +2725,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useUnmountedRef',
     category: 'Lifecycle',
     source: 'ahooks',
-    lastUpdated: 1789277394000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useUpdate',
@@ -2879,7 +2734,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useUpdate',
     category: 'Animation',
     source: 'react-use',
-    lastUpdated: 1788942682000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useUpdateEffect',
@@ -2888,7 +2743,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useUpdateEffect',
     category: 'Lifecycle',
     source: 'react-use',
-    lastUpdated: 1789276355000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useUrlSearchParams',
@@ -2897,7 +2752,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useUrlSearchParams',
     category: 'Browser',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useUserMedia',
@@ -2906,7 +2761,8 @@ export const functions: FunctionInfo[] = [
     dir: 'useUserMedia',
     category: 'Sensors',
     source: 'vueuse',
-    lastUpdated: 1788997864000,
+    lastUpdated: 1789366373000,
+    related: ['useDevicesList', 'useDisplayMedia', 'usePermission'],
   },
   {
     name: 'useVibrate',
@@ -2915,7 +2771,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useVibrate',
     category: 'Browser',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useVirtualList',
@@ -2924,7 +2780,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useVirtualList',
     category: 'Component',
     source: 'vueuse',
-    lastUpdated: 1788996627000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useWakeLock',
@@ -2933,7 +2789,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useWakeLock',
     category: 'Browser',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useWatch',
@@ -2942,7 +2798,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useWatch',
     category: 'Watch',
     source: 'vueuse',
-    lastUpdated: 1789001849000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useWatchArray',
@@ -2951,7 +2807,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useWatchArray',
     category: 'Watch',
     source: 'vueuse',
-    lastUpdated: 1789001863000,
+    lastUpdated: 1789362234000,
   },
   {
     name: 'useWatchAtMost',
@@ -2960,7 +2816,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useWatchAtMost',
     category: 'Watch',
     source: 'vueuse',
-    lastUpdated: 1788986162000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useWatchDebounced',
@@ -2969,7 +2825,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useWatchDebounced',
     category: 'Watch',
     source: 'vueuse',
-    lastUpdated: 1789001877000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useWatchDeep',
@@ -2978,7 +2834,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useWatchDeep',
     category: 'Watch',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useWatchExtractedObservable',
@@ -2987,7 +2843,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useWatchExtractedObservable',
     category: '@RxJS',
     source: 'vueuse',
-    lastUpdated: 1789010190000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useWatchIgnorable',
@@ -2996,7 +2852,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useWatchIgnorable',
     category: 'Watch',
     source: 'vueuse',
-    lastUpdated: 1788986154000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useWatchImmediate',
@@ -3005,7 +2861,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useWatchImmediate',
     category: 'Watch',
     source: 'vueuse',
-    lastUpdated: 1788942682000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useWatchOnce',
@@ -3014,7 +2870,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useWatchOnce',
     category: 'Watch',
     source: 'vueuse',
-    lastUpdated: 1789001932000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useWatchPausable',
@@ -3023,7 +2879,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useWatchPausable',
     category: 'Watch',
     source: 'vueuse',
-    lastUpdated: 1788994734000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useWatchThrottled',
@@ -3032,7 +2888,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useWatchThrottled',
     category: 'Watch',
     source: 'vueuse',
-    lastUpdated: 1788994759000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useWatchTriggerable',
@@ -3041,7 +2897,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useWatchTriggerable',
     category: 'Watch',
     source: 'vueuse',
-    lastUpdated: 1788988809000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useWatchWithFilter',
@@ -3050,7 +2906,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useWatchWithFilter',
     category: 'Watch',
     source: 'vueuse',
-    lastUpdated: 1788994784000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useWebMCP',
@@ -3059,7 +2915,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useWebMCP',
     category: 'Browser',
     source: 'vueuse',
-    lastUpdated: 1789150290000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useWebNotification',
@@ -3068,7 +2924,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useWebNotification',
     category: 'Browser',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useWebSocket',
@@ -3077,7 +2933,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useWebSocket',
     category: 'Browser',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useWebWorker',
@@ -3086,7 +2942,8 @@ export const functions: FunctionInfo[] = [
     dir: 'useWebWorker',
     category: 'Browser',
     source: 'vueuse',
-    lastUpdated: 1788998635000,
+    lastUpdated: 1789366373000,
+    related: ['useWebWorkerFn'],
   },
   {
     name: 'useWebWorkerFn',
@@ -3095,7 +2952,8 @@ export const functions: FunctionInfo[] = [
     dir: 'useWebWorkerFn',
     category: 'Browser',
     source: 'vueuse',
-    lastUpdated: 1788999163000,
+    lastUpdated: 1789366373000,
+    related: ['useWebWorker'],
   },
   {
     name: 'useWhenever',
@@ -3104,7 +2962,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useWhenever',
     category: 'Watch',
     source: 'vueuse',
-    lastUpdated: 1788988828000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useWindowFocus',
@@ -3113,7 +2971,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useWindowFocus',
     category: 'Elements',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useWindowScroll',
@@ -3122,7 +2980,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useWindowScroll',
     category: 'Elements',
     source: 'vueuse',
-    lastUpdated: 1788993907000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useWindowSize',
@@ -3131,7 +2989,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useWindowSize',
     category: 'Elements',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useZoomFactor',
@@ -3140,7 +2998,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useZoomFactor',
     category: '@Electron',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useZoomLevel',
@@ -3149,15 +3007,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useZoomLevel',
     category: '@Electron',
     source: 'vueuse',
-    lastUpdated: 1789147565000,
-  },
-  {
-    name: 'writeState',
-    file: 'packages/shared/utils/index.tsx',
-    pkg: 'shared',
-    dir: 'utils',
-    category: 'Utilities',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
 ]
 
@@ -3169,7 +3019,7 @@ export const pages: FunctionPageInfo[] = [
     category: '@Electron',
     description: 'internal helpers shared by the `@reause/electron` hooks',
     internal: true,
-    lastUpdated: 1788942682000,
+    lastUpdated: 1789362234000,
   },
   {
     name: 'createEventHook',
@@ -3177,7 +3027,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/shared/createEventHook/index.md',
     category: 'Utilities',
     description: 'utility for creating event hooks',
-    lastUpdated: 1788992100000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'createGenericProjection',
@@ -3185,7 +3035,8 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/math/createGenericProjection/index.md',
     category: '@Math',
     description: 'generic version of `createProjection`',
-    lastUpdated: 1788958332000,
+    lastUpdated: 1789366373000,
+    related: ['createProjection', 'useProjection'],
   },
   {
     name: 'createGlobalState',
@@ -3193,23 +3044,16 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/shared/createGlobalState/index.md',
     category: 'State',
     description: 'keep state in the global scope',
-    lastUpdated: 1789010295000,
-  },
-  {
-    name: 'createInjectionState',
-    pkg: 'shared',
-    doc: 'packages/shared/createInjectionState/index.md',
-    category: 'State',
-    description: 'create global state that can be injected into components',
-    lastUpdated: 1788958778000,
+    lastUpdated: 1789366373000,
+    related: ['createSharedHook'],
   },
   {
     name: 'createMemo',
     pkg: 'shared',
     doc: 'packages/shared/createMemo/index.md',
     category: 'Factory',
-    description: "turn a pure function into a memoising hook — React port of react-use's `createMemo`",
-    lastUpdated: 1789255071000,
+    description: 'turn a pure function into a memoising hook',
+    lastUpdated: 1789366373000,
   },
   {
     name: 'createPortalSlot',
@@ -3217,7 +3061,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/createPortalSlot/index.md',
     category: 'Component',
     description: 'define and reuse a template inside the component scope',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'createProjection',
@@ -3225,7 +3069,8 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/math/createProjection/index.md',
     category: '@Math',
     description: 'reactive numeric projection from one domain to another',
-    lastUpdated: 1788958332000,
+    lastUpdated: 1789366373000,
+    related: ['createGenericProjection', 'useProjection'],
   },
   {
     name: 'createPromisifiedComponent',
@@ -3233,16 +3078,23 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/createPromisifiedComponent/index.md',
     category: 'Component',
     description: 'template as Promise',
-    lastUpdated: 1789024203000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'createReducer',
     pkg: 'shared',
     doc: 'packages/shared/createReducer/index.md',
     category: 'Factory',
-    description:
-      "build a `useReducer`-shaped hook around a Redux-style middleware chain — React port of react-use's `createReducer`",
-    lastUpdated: 1789272862000,
+    description: 'build a `useReducer`-shaped hook around a Redux-style middleware chain',
+    lastUpdated: 1789366373000,
+  },
+  {
+    name: 'createScopedHook',
+    pkg: 'shared',
+    doc: 'packages/shared/createScopedHook/index.md',
+    category: 'State',
+    description: 'create global state that can be injected into components',
+    lastUpdated: 1789367733000,
   },
   {
     name: 'createSharedHook',
@@ -3250,15 +3102,16 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/shared/createSharedHook/index.md',
     category: 'State',
     description: 'make a composable function usable with multiple React components',
-    lastUpdated: 1789022210000,
+    lastUpdated: 1789366373000,
+    related: ['createGlobalState'],
   },
   {
     name: 'isDefined',
     pkg: 'shared',
     doc: 'packages/shared/isDefined/index.md',
     category: 'Utilities',
-    description: 'non-nullish checking type guard for ref-like objects',
-    lastUpdated: 1788999327000,
+    description: 'non-nullish checking type guard for React ref objects and plain values',
+    lastUpdated: 1789366373000,
   },
   {
     name: 'logicAnd',
@@ -3266,7 +3119,8 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/math/logicAnd/index.md',
     category: '@Math',
     description: '`AND` condition for values',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
+    related: ['logicNot', 'logicOr'],
   },
   {
     name: 'logicNot',
@@ -3274,7 +3128,8 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/math/logicNot/index.md',
     category: '@Math',
     description: '`NOT` condition for values',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
+    related: ['logicAnd', 'logicOr'],
   },
   {
     name: 'logicOr',
@@ -3282,7 +3137,8 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/math/logicOr/index.md',
     category: '@Math',
     description: '`OR` conditions for values',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
+    related: ['logicAnd', 'logicNot'],
   },
   {
     name: 'makeDestructurable',
@@ -3290,7 +3146,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/shared/makeDestructurable/index.md',
     category: 'Utilities',
     description: 'make isomorphic destructurable for object and array at the same time',
-    lastUpdated: 1788999468000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'syncState',
@@ -3298,7 +3154,8 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/shared/syncState/index.md',
     category: 'Reactivity',
     description: 'two-way state synchronization between two writable `State<T>` sources',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
+    related: ['syncStates'],
   },
   {
     name: 'syncStates',
@@ -3306,7 +3163,8 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/shared/syncStates/index.md',
     category: 'Reactivity',
     description: 'keep target state(s) in sync with a source value',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
+    related: ['syncState'],
   },
   {
     name: 'toObserver',
@@ -3314,16 +3172,16 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/rxjs/toObserver/index.md',
     category: '@RxJS',
     description:
-      'sugar function to convert a ref-like object (`{ current }`) or a setter function into an RxJS [Observer](https://rxjs.dev/guide/observer) — a `useRef` write does not re-render',
-    lastUpdated: 1789147565000,
+      'sugar function to convert a ref object (`RefObject`) or a setter function into an RxJS [Observer](https://rxjs.dev/guide/observer) — a `useRef` write does not re-render',
+    lastUpdated: 1789366373000,
   },
   {
     name: 'unrefElement',
     pkg: 'core',
     doc: 'packages/core/unrefElement/index.md',
     category: 'Component',
-    description: 'get the DOM element of a React ref-like object or a plain element',
-    lastUpdated: 1789147565000,
+    description: 'get the DOM element a React ref object currently holds',
+    lastUpdated: 1789366373000,
   },
   {
     name: 'until',
@@ -3331,7 +3189,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/shared/until/index.md',
     category: 'Watch',
     description: 'promised one-time watch for changes',
-    lastUpdated: 1789000817000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useAbs',
@@ -3339,7 +3197,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/math/useAbs/index.md',
     category: '@Math',
     description: 'reactive `Math.abs`',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useActiveElement',
@@ -3347,7 +3205,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useActiveElement/index.md',
     category: 'Elements',
     description: 'reactive `document.activeElement`',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useAnimate',
@@ -3355,7 +3213,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useAnimate/index.md',
     category: 'Animation',
     description: 'reactive [Web Animations API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Animations_API)',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useArrayDifference',
@@ -3363,7 +3221,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/shared/useArrayDifference/index.md',
     category: 'Array',
     description: 'reactive get array difference of two arrays',
-    lastUpdated: 1788958330000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useArrayEvery',
@@ -3371,7 +3229,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/shared/useArrayEvery/index.md',
     category: 'Array',
     description: 'reactive `Array.every`',
-    lastUpdated: 1788958330000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useArrayFilter',
@@ -3379,7 +3237,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/shared/useArrayFilter/index.md',
     category: 'Array',
     description: 'reactive `Array.filter`',
-    lastUpdated: 1789000901000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useArrayFind',
@@ -3387,7 +3245,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/shared/useArrayFind/index.md',
     category: 'Array',
     description: 'reactive `Array.find`',
-    lastUpdated: 1788958330000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useArrayFindIndex',
@@ -3395,7 +3253,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/shared/useArrayFindIndex/index.md',
     category: 'Array',
     description: 'reactive `Array.findIndex`',
-    lastUpdated: 1788942682000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useArrayFindLast',
@@ -3403,7 +3261,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/shared/useArrayFindLast/index.md',
     category: 'Array',
     description: 'reactive `Array.findLast`',
-    lastUpdated: 1788958330000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useArrayIncludes',
@@ -3411,7 +3269,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/shared/useArrayIncludes/index.md',
     category: 'Array',
     description: 'reactive `Array.includes`',
-    lastUpdated: 1788958330000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useArrayJoin',
@@ -3419,7 +3277,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/shared/useArrayJoin/index.md',
     category: 'Array',
     description: 'reactive `Array.join`',
-    lastUpdated: 1789001105000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useArrayMap',
@@ -3427,7 +3285,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/shared/useArrayMap/index.md',
     category: 'Array',
     description: 'reactive `Array.map`',
-    lastUpdated: 1789000678000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useArrayReduce',
@@ -3435,7 +3293,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/shared/useArrayReduce/index.md',
     category: 'Array',
     description: 'reactive `Array.reduce`',
-    lastUpdated: 1788958330000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useArraySome',
@@ -3443,7 +3301,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/shared/useArraySome/index.md',
     category: 'Array',
     description: 'reactive `Array.some`',
-    lastUpdated: 1788958330000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useArrayUnique',
@@ -3451,7 +3309,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/shared/useArrayUnique/index.md',
     category: 'Array',
     description: 'reactive unique array',
-    lastUpdated: 1788958330000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useAsync',
@@ -3459,16 +3317,15 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useAsync/index.md',
     category: 'Reactivity',
     description: 'derived value for async functions',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useAsyncFn',
     pkg: 'core',
     doc: 'packages/core/useAsyncFn/index.md',
-    category: 'Side-effects',
-    description:
-      "returns state and a callback for an `async` function (or any function returning a promise) — React port of react-use's [`useAsyncFn`](https://github.com/streamich/react-use/blob/master/docs/useAsyncFn.md) (upstream mapping files: `source/react-use/src/useAsyncFn.ts`",
-    lastUpdated: 1789254431000,
+    category: 'State',
+    description: 'returns state and a callback for an `async` function (or any function returning a promise)',
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useAsyncQueue',
@@ -3476,7 +3333,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useAsyncQueue/index.md',
     category: 'Utilities',
     description: 'executes each asynchronous task sequentially and passes the current task result to the next task',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useAsyncState',
@@ -3484,7 +3341,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useAsyncState/index.md',
     category: 'State',
     description: 'reactive async state',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useAsyncValidator',
@@ -3492,7 +3349,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/integrations/useAsyncValidator/index.md',
     category: '@Integrations',
     description: 'wrapper for [`async-validator`](https://github.com/yiminghe/async-validator)',
-    lastUpdated: 1788994827000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useAuth',
@@ -3500,7 +3357,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/firebase/useAuth/index.md',
     category: '@Firebase',
     description: 'reactive [Firebase Auth](https://firebase.google.com/docs/auth) binding',
-    lastUpdated: 1789017154000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useAverage',
@@ -3508,7 +3365,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/math/useAverage/index.md',
     category: '@Math',
     description: 'get the average of an array reactively',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useAxios',
@@ -3516,7 +3373,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/integrations/useAxios/index.md',
     category: '@Integrations',
     description: 'wrapper for [`axios`](https://github.com/axios/axios)',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useBase64',
@@ -3524,7 +3381,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useBase64/index.md',
     category: 'Utilities',
     description: 'reactive base64 transforming',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useBattery',
@@ -3532,7 +3389,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useBattery/index.md',
     category: 'Sensors',
     description: 'reactive [Battery Status API](https://developer.mozilla.org/en-US/docs/Web/API/Battery_Status_API)',
-    lastUpdated: 1788942682000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useBluetooth',
@@ -3540,7 +3397,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useBluetooth/index.md',
     category: 'Browser',
     description: 'reactive [Web Bluetooth API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Bluetooth_API)',
-    lastUpdated: 1788953542000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useBreakpoints',
@@ -3548,7 +3405,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useBreakpoints/index.md',
     category: 'Browser',
     description: 'reactive viewport breakpoints',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useBroadcastChannel',
@@ -3556,7 +3413,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useBroadcastChannel/index.md',
     category: 'Browser',
     description: 'reactive [BroadcastChannel API](https://developer.mozilla.org/en-US/docs/Web/API/BroadcastChannel)',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useBrowserLocation',
@@ -3564,7 +3421,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useBrowserLocation/index.md',
     category: 'Browser',
     description: 'reactive browser location',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useCached',
@@ -3572,7 +3429,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useCached/index.md',
     category: 'Utilities',
     description: 'cache a value with a custom comparator',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useCeil',
@@ -3580,7 +3437,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/math/useCeil/index.md',
     category: '@Math',
     description: 'reactive `Math.ceil`',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useChangeCase',
@@ -3588,7 +3445,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/integrations/useChangeCase/index.md',
     category: '@Integrations',
     description: 'reactive wrapper for [`change-case`](https://github.com/blakeembrey/change-case)',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useClamp',
@@ -3596,16 +3453,15 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/math/useClamp/index.md',
     category: '@Math',
     description: 'reactively clamp a value between two other values',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useClickAway',
     pkg: 'core',
     doc: 'packages/core/useClickAway/index.md',
     category: 'Sensors',
-    description:
-      "fire a handler when a click lands outside one or more target elements — the reause port of ahooks' [`useClickAway`](https://github.com/alibaba/hooks/blob/master/packages/hooks/src/useClickAway/index.ts) (upstream mapping files: `source/ahooks/packages/hooks/src/useClickAway/index.ts`",
-    lastUpdated: 1789256593000,
+    description: 'fire a handler when a click lands outside one or more target elements',
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useClickOutside',
@@ -3613,7 +3469,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useClickOutside/index.md',
     category: 'Sensors',
     description: 'listen for clicks outside of an element',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useClipboard',
@@ -3621,7 +3477,8 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useClipboard/index.md',
     category: 'Browser',
     description: 'reactive [Clipboard API](https://developer.mozilla.org/en-US/docs/Web/API/Clipboard_API)',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
+    related: ['useClipboardItems'],
   },
   {
     name: 'useClipboardItems',
@@ -3629,7 +3486,8 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useClipboardItems/index.md',
     category: 'Browser',
     description: 'reactive [Clipboard API](https://developer.mozilla.org/en-US/docs/Web/API/Clipboard_API)',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
+    related: ['useClipboard'],
   },
   {
     name: 'useCloned',
@@ -3637,16 +3495,15 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useCloned/index.md',
     category: 'Utilities',
     description: 'reactive clone of a value',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useCollapse',
     pkg: 'core',
     doc: 'packages/core/useCollapse/index.md',
-    category: 'Animation',
-    description:
-      "animate an element's height between `0` and its measured content height — a four-state machine (`entered` / `entering` / `exiting` / `exited`) plus a `getCollapseProps()` bundle you spread on the collapsible element",
-    lastUpdated: 1789270746000,
+    category: 'Browser',
+    description: "animate an element's height between `0` and its measured content height",
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useColorMode',
@@ -3654,7 +3511,8 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useColorMode/index.md',
     category: 'Browser',
     description: 'reactive color mode (dark / light / customs) with auto data persistence',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
+    related: ['useDark', 'usePreferredDark', 'useStorage'],
   },
   {
     name: 'useConfirmDialog',
@@ -3662,7 +3520,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useConfirmDialog/index.md',
     category: 'Utilities',
     description: 'creates event hooks to support modals and confirmation dialog chains',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useConst',
@@ -3670,7 +3528,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/shared/useConst/index.md',
     category: 'Utilities',
     description: 'return a value that is computed **once**',
-    lastUpdated: 1789221182000,
+    lastUpdated: 1789362234000,
   },
   {
     name: 'useControllableState',
@@ -3678,7 +3536,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/shared/useControllableState/index.md',
     category: 'State',
     description: 'a hook for combining controlled and uncontrolled state sources',
-    lastUpdated: 1788979068000,
+    lastUpdated: 1789362234000,
   },
   {
     name: 'useCookies',
@@ -3686,7 +3544,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/integrations/useCookies/index.md',
     category: '@Integrations',
     description: 'wrapper for [`universal-cookie`](https://www.npmjs.com/package/universal-cookie)',
-    lastUpdated: 1788976915000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useCountdown',
@@ -3694,7 +3552,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useCountdown/index.md',
     category: 'Time',
     description: 'reactive countdown timer in seconds',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useCounter',
@@ -3702,7 +3560,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/shared/useCounter/index.md',
     category: 'State',
     description: 'a basic counter with `inc` / `dec` / `set` / `reset` and optional `min` / `max` bounds',
-    lastUpdated: 1788996836000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useCssSupports',
@@ -3711,7 +3569,7 @@ export const pages: FunctionPageInfo[] = [
     category: 'Browser',
     description:
       'SSR compatible and reactive [`CSS.supports`](https://developer.mozilla.org/docs/Web/API/CSS/supports_static)',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useCssVar',
@@ -3719,7 +3577,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useCssVar/index.md',
     category: 'Browser',
     description: 'manipulate CSS variables',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useCycleList',
@@ -3727,7 +3585,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useCycleList/index.md',
     category: 'Utilities',
     description: 'cycle through a list of items',
-    lastUpdated: 1788958794000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useDark',
@@ -3735,7 +3593,8 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useDark/index.md',
     category: 'Browser',
     description: 'reactive dark mode with auto data persistence',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
+    related: ['useColorMode', 'usePreferredDark', 'useStorage'],
   },
   {
     name: 'useDateFormat',
@@ -3743,7 +3602,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/shared/useDateFormat/index.md',
     category: 'Time',
     description: 'get the formatted date according to the string of tokens passed in',
-    lastUpdated: 1788958330000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useDebounceFn',
@@ -3751,16 +3610,16 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/shared/useDebounceFn/index.md',
     category: 'Utilities',
     description: 'debounce execution of a function',
-    lastUpdated: 1788984677000,
+    lastUpdated: 1789366373000,
+    related: ['useThrottleFn'],
   },
   {
     name: 'useDeepCompareEffect',
     pkg: 'shared',
     doc: 'packages/shared/useDeepCompareEffect/index.md',
     category: 'Lifecycle',
-    description:
-      '`useEffect` whose dependency comparison is **deep** — the effect re-runs only when `deps` differ structurally',
-    lastUpdated: 1789271565000,
+    description: '`useEffect` whose dependency comparison is **deep**',
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useDeviceMotion',
@@ -3768,7 +3627,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useDeviceMotion/index.md',
     category: 'Sensors',
     description: 'reactive [DeviceMotionEvent](https://developer.mozilla.org/en-US/docs/Web/API/DeviceMotionEvent)',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useDeviceOrientation',
@@ -3777,7 +3636,7 @@ export const pages: FunctionPageInfo[] = [
     category: 'Sensors',
     description:
       'reactive [DeviceOrientationEvent](https://developer.mozilla.org/en-US/docs/Web/API/DeviceOrientationEvent)',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useDevicePixelRatio',
@@ -3786,7 +3645,7 @@ export const pages: FunctionPageInfo[] = [
     category: 'Sensors',
     description:
       'reactively track [`window.devicePixelRatio`](https://developer.mozilla.org/docs/Web/API/Window/devicePixelRatio)',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useDevicesList',
@@ -3795,7 +3654,8 @@ export const pages: FunctionPageInfo[] = [
     category: 'Sensors',
     description:
       'reactive [`enumerateDevices`](https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/enumerateDevices) listing available input/output devices',
-    lastUpdated: 1788966944000,
+    lastUpdated: 1789366373000,
+    related: ['useUserMedia'],
   },
   {
     name: 'useDisplayMedia',
@@ -3804,7 +3664,8 @@ export const pages: FunctionPageInfo[] = [
     category: 'Sensors',
     description:
       'reactive [`mediaDevices.getDisplayMedia`](https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getDisplayMedia) streaming',
-    lastUpdated: 1788970689000,
+    lastUpdated: 1789366373000,
+    related: ['useUserMedia'],
   },
   {
     name: 'useDocumentVisibility',
@@ -3813,7 +3674,7 @@ export const pages: FunctionPageInfo[] = [
     category: 'Elements',
     description:
       'reactively track [`document.visibilityState`](https://developer.mozilla.org/en-US/docs/Web/API/Document/visibilityState)',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useDraggable',
@@ -3821,7 +3682,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useDraggable/index.md',
     category: 'Elements',
     description: 'make elements draggable',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useDrauu',
@@ -3829,7 +3690,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/integrations/useDrauu/index.md',
     category: '@Integrations',
     description: 'reactive instance for [drauu](https://github.com/antfu/drauu)',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useDropZone',
@@ -3837,7 +3698,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useDropZone/index.md',
     category: 'Elements',
     description: 'create a zone where files can be dropped',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useEffectOnce',
@@ -3845,7 +3706,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/shared/useEffectOnce/index.md',
     category: 'Lifecycle',
     description: 'runs an effect once after the component mounts',
-    lastUpdated: 1789257038000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useElementBounding',
@@ -3854,7 +3715,7 @@ export const pages: FunctionPageInfo[] = [
     category: 'Elements',
     description:
       'reactive [bounding box](https://developer.mozilla.org/en-US/docs/Web/API/Element/getBoundingClientRect) of an HTML element',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useElementByPoint',
@@ -3862,7 +3723,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useElementByPoint/index.md',
     category: 'Sensors',
     description: 'reactive element by point',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useElementHover',
@@ -3870,7 +3731,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useElementHover/index.md',
     category: 'Sensors',
     description: "reactive element's hover state",
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useElementOverflow',
@@ -3878,7 +3739,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useElementOverflow/index.md',
     category: 'Elements',
     description: "reactive element's overflow state",
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useElementRemoval',
@@ -3886,7 +3747,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useElementRemoval/index.md',
     category: 'Sensors',
     description: 'fires when the element or any element containing it is removed from the DOM',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useElementSize',
@@ -3894,7 +3755,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useElementSize/index.md',
     category: 'Elements',
     description: 'reactive size of an HTML element',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useElementVisibility',
@@ -3902,16 +3763,15 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useElementVisibility/index.md',
     category: 'Elements',
     description: 'tracks the visibility of an element within the viewport',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useError',
     pkg: 'shared',
     doc: 'packages/shared/useError/index.md',
     category: 'Side-effects',
-    description:
-      'returns a referentially stable error dispatcher whose error is re-thrown from a `useEffect` on the next render',
-    lastUpdated: 1789254261000,
+    description: 'returns a stable error dispatcher that re-throws on the next render',
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useEventBus',
@@ -3919,7 +3779,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useEventBus/index.md',
     category: 'Utilities',
     description: 'a basic event bus',
-    lastUpdated: 1788942682000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useEventListener',
@@ -3927,7 +3787,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useEventListener/index.md',
     category: 'Browser',
     description: 'use EventListener with ease',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useEventSource',
@@ -3936,7 +3796,7 @@ export const pages: FunctionPageInfo[] = [
     category: 'Network',
     description:
       'an [EventSource](https://developer.mozilla.org/en-US/docs/Web/API/EventSource) or [Server-Sent-Events](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events) instance opens a persistent connection to an HTTP server',
-    lastUpdated: 1788971998000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useExtractedObservable',
@@ -3944,7 +3804,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/rxjs/useExtractedObservable/index.md',
     category: '@RxJS',
     description: 'use an RxJS [`Observable`](https://rxjs.dev/guide/observable) as extracted from one or more hooks',
-    lastUpdated: 1789020143000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useEyeDropper',
@@ -3952,7 +3812,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useEyeDropper/index.md',
     category: 'Browser',
     description: 'reactive [EyeDropper API](https://developer.mozilla.org/en-US/docs/Web/API/EyeDropper_API)',
-    lastUpdated: 1788942682000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useFavicon',
@@ -3960,7 +3820,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useFavicon/index.md',
     category: 'Browser',
     description: 'reactive favicon',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useFetch',
@@ -3969,7 +3829,7 @@ export const pages: FunctionPageInfo[] = [
     category: 'Network',
     description:
       'reactive [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) provides the ability to abort requests',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useFileDialog',
@@ -3977,7 +3837,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useFileDialog/index.md',
     category: 'Browser',
     description: 'open file dialog with ease',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useFileSystemAccess',
@@ -3986,7 +3846,7 @@ export const pages: FunctionPageInfo[] = [
     category: 'Browser',
     description:
       'create and read and write local files with [FileSystemAccessAPI](https://developer.mozilla.org/en-US/docs/Web/API/File_System_Access_API)',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useFirestore',
@@ -3994,7 +3854,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/firebase/useFirestore/index.md',
     category: '@Firebase',
     description: 'reactive [Firestore](https://firebase.google.com/docs/firestore) binding',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useFloor',
@@ -4002,7 +3862,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/math/useFloor/index.md',
     category: '@Math',
     description: 'reactive `Math.floor`',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useFocus',
@@ -4010,16 +3870,15 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useFocus/index.md',
     category: 'Sensors',
     description: 'reactive utility to track or set the focus state of a DOM element',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useFocusReturn',
     pkg: 'core',
     doc: 'packages/core/useFocusReturn/index.md',
     category: 'Sensors',
-    description:
-      "return focus to the element that was active before an overlay opened — React port of `@mantine/hooks`' `useFocusReturn` (upstream mapping file: `source/mantine/packages/@mantine/hooks/src/use-focus-return/use-focus-return.ts`",
-    lastUpdated: 1789257282000,
+    description: 'return focus to the element that was active before an overlay opened',
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useFocusTrap',
@@ -4027,7 +3886,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/integrations/useFocusTrap/index.md',
     category: '@Integrations',
     description: 'reactive wrapper for [`focus-trap`](https://github.com/focus-trap/focus-trap)',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useFocusWithin',
@@ -4035,7 +3894,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useFocusWithin/index.md',
     category: 'Sensors',
     description: 'reactive utility to track if an element or one of its descendants has focus',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useFps',
@@ -4043,7 +3902,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useFps/index.md',
     category: 'Sensors',
     description: 'reactive FPS (frames per second)',
-    lastUpdated: 1788971997000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useFrom',
@@ -4052,7 +3911,7 @@ export const pages: FunctionPageInfo[] = [
     category: '@RxJS',
     description:
       "create an [`Observable`](https://rxjs.dev/guide/observable) from an rxjs `ObservableInput` — passed straight to RxJS's [`from()`](https://rxjs.dev/api/index/function/from) — or from a plain value that re-emits whenever it changes across renders",
-    lastUpdated: 1789031655000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useFullscreen',
@@ -4060,7 +3919,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useFullscreen/index.md',
     category: 'Browser',
     description: 'reactive [Fullscreen API](https://developer.mozilla.org/en-US/docs/Web/API/Fullscreen_API)',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useFuse',
@@ -4068,7 +3927,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/integrations/useFuse/index.md',
     category: '@Integrations',
     description: 'easily implement fuzzy search using a hook with [Fuse.js](https://github.com/krisk/fuse)',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useGamepad',
@@ -4077,7 +3936,7 @@ export const pages: FunctionPageInfo[] = [
     category: 'Browser',
     description:
       'provides reactive bindings for the [Gamepad API](https://developer.mozilla.org/en-US/docs/Web/API/Gamepad_API)',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useGeolocation',
@@ -4085,7 +3944,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useGeolocation/index.md',
     category: 'Sensors',
     description: 'reactive [Geolocation API](https://developer.mozilla.org/en-US/docs/Web/API/Geolocation_API)',
-    lastUpdated: 1788942682000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useHash',
@@ -4093,7 +3952,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useHash/index.md',
     category: 'Browser',
     description: 'shorthand for a reactive `window.location.hash`',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useHotkeys',
@@ -4102,16 +3961,15 @@ export const pages: FunctionPageInfo[] = [
     category: 'Sensors',
     description:
       'keyboard shortcuts written as hotkey strings — `mod+K` means `⌘K` on Apple hardware and `Ctrl+K` elsewhere',
-    lastUpdated: 1789256170000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useId',
     pkg: 'core',
     doc: 'packages/core/useId/index.md',
     category: 'Utilities',
-    description:
-      "SSR-safe id with an optional static override — React port of `@mantine/hooks`' `useId` (upstream mapping files: `source/mantine/packages/@mantine/hooks/src/use-id/use-id.ts`",
-    lastUpdated: 1789273543000,
+    description: 'SSR-safe id with an optional static override',
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useIDBKeyval',
@@ -4119,7 +3977,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/integrations/useIDBKeyval/index.md',
     category: '@Integrations',
     description: 'wrapper for [`idb-keyval`](https://www.npmjs.com/package/idb-keyval)',
-    lastUpdated: 1788991159000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useIdle',
@@ -4127,7 +3985,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useIdle/index.md',
     category: 'Sensors',
     description: 'tracks whether the user is being inactive',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useImage',
@@ -4135,7 +3993,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useImage/index.md',
     category: 'Browser',
     description: 'reactive load an image in the browser',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useInfiniteScroll',
@@ -4143,7 +4001,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useInfiniteScroll/index.md',
     category: 'Sensors',
     description: 'infinite scrolling of the element',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useIntersectionObserver',
@@ -4151,7 +4009,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useIntersectionObserver/index.md',
     category: 'Elements',
     description: "detects changes to a target element's visibility",
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useInterval',
@@ -4159,7 +4017,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/shared/useInterval/index.md',
     category: 'Animation',
     description: 'reactive counter that increases on every interval',
-    lastUpdated: 1788985429000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useIntervalFn',
@@ -4167,7 +4025,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/shared/useIntervalFn/index.md',
     category: 'Animation',
     description: 'wrapper for `setInterval` with controls',
-    lastUpdated: 1788999284000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useIntervalRafFn',
@@ -4175,7 +4033,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/shared/useIntervalRafFn/index.md',
     category: 'Animation',
     description: 'fire a callback repeatedly on animation frames',
-    lastUpdated: 1789277192000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useIpcRenderer',
@@ -4183,7 +4041,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/electron/useIpcRenderer/index.md',
     category: '@Electron',
     description: 'provides [ipcRenderer](https://www.electronjs.org/docs/api/ipc-renderer) and all of its APIs',
-    lastUpdated: 1788988203000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useIpcRendererInvoke',
@@ -4192,7 +4050,7 @@ export const pages: FunctionPageInfo[] = [
     category: '@Electron',
     description:
       'reactive [ipcRenderer.invoke API](https://www.electronjs.org/docs/api/ipc-renderer#ipcrendererinvokechannel-args) result',
-    lastUpdated: 1788988307000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useIpcRendererOn',
@@ -4201,16 +4059,15 @@ export const pages: FunctionPageInfo[] = [
     category: '@Electron',
     description:
       'use [ipcRenderer.on](https://www.electronjs.org/docs/api/ipc-renderer#ipcrendereronchannel-listener) with ease and [ipcRenderer.removeListener](https://www.electronjs.org/docs/api/ipc-renderer#ipcrendererremovelistenerchannel-listener) automatically on unmounted',
-    lastUpdated: 1788942682000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useIsFirstRender',
     pkg: 'shared',
     doc: 'packages/shared/useIsFirstRender/index.md',
     category: 'Lifecycle',
-    description:
-      "`true` on the very first render of a component instance and `false` on every render after it — a React port of `@mantine/hooks`' `useIsFirstRender` (upstream mapping file: `source/mantine/packages/@mantine/hooks/src/use-is-first-render/use-is-first-render.ts`",
-    lastUpdated: 1789276355000,
+    description: '`true` on the very first render of a component instance and `false` on every render after it',
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useIsomorphicLayoutEffect',
@@ -4218,7 +4075,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/shared/useIsomorphicLayoutEffect/index.md',
     category: 'Lifecycle',
     description: '`useLayoutEffect` on the client',
-    lastUpdated: 1789273543000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useJwt',
@@ -4226,7 +4083,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/integrations/useJwt/index.md',
     category: '@Integrations',
     description: 'wrapper for [`jwt-decode`](https://github.com/auth0/jwt-decode)',
-    lastUpdated: 1788991529000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useKeyModifier',
@@ -4235,7 +4092,7 @@ export const pages: FunctionPageInfo[] = [
     category: 'Sensors',
     description:
       'reactive [Modifier State](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/getModifierState)',
-    lastUpdated: 1788984370000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useKeyPress',
@@ -4243,7 +4100,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useKeyPress/index.md',
     category: 'Sensors',
     description: 'listen for a key press by `keyCode`',
-    lastUpdated: 1789275170000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useKeyStroke',
@@ -4251,7 +4108,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useKeyStroke/index.md',
     category: 'Sensors',
     description: 'listen for keyboard keystrokes',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useLastChanged',
@@ -4259,25 +4116,23 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/shared/useLastChanged/index.md',
     category: 'State',
     description: 'records the timestamp of the last change',
-    lastUpdated: 1788942682000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useLatest',
     pkg: 'shared',
     doc: 'packages/shared/useLatest/index.md',
     category: 'State',
-    description:
-      "returns a ref object whose `.current` always holds the latest value of the render that produced it — React port of react-use's [`useLatest`](https://github.com/streamich/react-use/blob/master/docs/useLatest.md) (upstream mapping files: `source/react-use/src/useLatest.ts`",
-    lastUpdated: 1789252819000,
+    description: 'returns a ref whose `.current` always holds the latest rendered value',
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useList',
     pkg: 'shared',
     doc: 'packages/shared/useList/index.md',
     category: 'State',
-    description:
-      "tracks an array and returns it with a stable set of immutable mutators — React port of react-use's `useList`",
-    lastUpdated: 1789279795000,
+    description: 'tracks an array and returns it with a stable set of immutable mutators',
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useListener',
@@ -4285,7 +4140,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/shared/useListener/index.md',
     category: 'State',
     description: 'bind a callback to a listener registration function returned by a reause hook',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useLiveAnnouncer',
@@ -4293,7 +4148,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useLiveAnnouncer/index.md',
     category: 'Browser',
     description: 'accessible way to announce messages to screen reader users (ARIA live regions)',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useLocalStorage',
@@ -4301,7 +4156,15 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useLocalStorage/index.md',
     category: 'State',
     description: 'reactive [LocalStorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage)',
-    lastUpdated: 1788942682000,
+    lastUpdated: 1789366373000,
+  },
+  {
+    name: 'useLockFn',
+    pkg: 'shared',
+    doc: 'packages/shared/useLockFn/index.md',
+    category: 'Side-effects',
+    description: 'add a lock to an async function so overlapping calls are dropped',
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useLogger',
@@ -4309,7 +4172,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/shared/useLogger/index.md',
     category: 'Lifecycle',
     description: "console-log a component's lifecycle transitions — mount",
-    lastUpdated: 1789308328000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useLongPress',
@@ -4317,7 +4180,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useLongPress/index.md',
     category: 'Sensors',
     description: 'listen for a long press on an element',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useMagicKeys',
@@ -4325,15 +4188,15 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useMagicKeys/index.md',
     category: 'Sensors',
     description: 'reactive keys pressed state',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useMap',
     pkg: 'shared',
     doc: 'packages/shared/useMap/index.md',
     category: 'State',
-    description: "a real `Map` whose mutations re-render — React port of react-hookz's `useMap`",
-    lastUpdated: 1789276266000,
+    description: 'a real `Map` whose mutations re-render',
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useMask',
@@ -4341,7 +4204,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useMask/index.md',
     category: 'Browser',
     description: 'input masking engine',
-    lastUpdated: 1789285795000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useMath',
@@ -4349,7 +4212,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/math/useMath/index.md',
     category: '@Math',
     description: 'reactive `Math` methods',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useMax',
@@ -4357,7 +4220,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/math/useMax/index.md',
     category: '@Math',
     description: 'reactive `Math.max`',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useMediaControls',
@@ -4365,7 +4228,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useMediaControls/index.md',
     category: 'Browser',
     description: 'reactive media controls for both `audio` and `video` elements',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useMediaQuery',
@@ -4374,7 +4237,7 @@ export const pages: FunctionPageInfo[] = [
     category: 'Browser',
     description:
       'reactive [Media Query](https://developer.mozilla.org/en-US/docs/Web/CSS/Media_Queries/Testing_media_queries)',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useMemoize',
@@ -4382,7 +4245,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useMemoize/index.md',
     category: 'Utilities',
     description: 'cache results of functions depending on arguments',
-    lastUpdated: 1788989746000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useMemory',
@@ -4390,7 +4253,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useMemory/index.md',
     category: 'Browser',
     description: 'reactive Memory Info',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useMethods',
@@ -4399,7 +4262,7 @@ export const pages: FunctionPageInfo[] = [
     category: 'State',
     description:
       '`useReducer` sugar — turn an object of pure state transitions into a state value plus one callable method per transition',
-    lastUpdated: 1789315101000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useMin',
@@ -4407,15 +4270,15 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/math/useMin/index.md',
     category: '@Math',
     description: 'reactive `Math.min`',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useMount',
     pkg: 'shared',
     doc: 'packages/shared/useMount/index.md',
     category: 'Lifecycle',
-    description: "runs a callback once after the component mounts — React port of react-use's `useMount`",
-    lastUpdated: 1789257038000,
+    description: 'runs a callback once after the component mounts',
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useMounted',
@@ -4423,7 +4286,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useMounted/index.md',
     category: 'Component',
     description: 'mounted state in ref',
-    lastUpdated: 1788990050000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useMouse',
@@ -4431,7 +4294,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useMouse/index.md',
     category: 'Sensors',
     description: 'reactive mouse position',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useMouseInElement',
@@ -4439,7 +4302,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useMouseInElement/index.md',
     category: 'Elements',
     description: 'reactive mouse position related to an element',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useMousePressed',
@@ -4447,7 +4310,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useMousePressed/index.md',
     category: 'Sensors',
     description: 'reactive mouse pressing state',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useMutationObserver',
@@ -4455,7 +4318,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useMutationObserver/index.md',
     category: 'Elements',
     description: 'watch for changes being made to the DOM tree',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useNavigatorLanguage',
@@ -4463,7 +4326,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useNavigatorLanguage/index.md',
     category: 'Sensors',
     description: 'reactive [navigator.language](https://developer.mozilla.org/en-US/docs/Web/API/Navigator/language)',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useNetwork',
@@ -4471,7 +4334,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useNetwork/index.md',
     category: 'Sensors',
     description: 'reactive [Network status](https://developer.mozilla.org/en-US/docs/Web/API/Network_Information_API)',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useNow',
@@ -4479,7 +4342,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useNow/index.md',
     category: 'Animation',
     description: 'reactive current Date instance',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useNProgress',
@@ -4487,7 +4350,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/integrations/useNProgress/index.md',
     category: '@Integrations',
     description: 'reactive wrapper for [`nprogress`](https://github.com/rstacruz/nprogress)',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useObjectUrl',
@@ -4495,7 +4358,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useObjectUrl/index.md',
     category: 'Browser',
     description: 'reactive URL representing an object',
-    lastUpdated: 1788958794000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useObservable',
@@ -4503,7 +4366,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/rxjs/useObservable/index.md',
     category: '@RxJS',
     description: 'use an RxJS [`Observable`](https://rxjs.dev/guide/observable)',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useOffsetPagination',
@@ -4511,7 +4374,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useOffsetPagination/index.md',
     category: 'Utilities',
     description: 'reactive offset pagination',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useOnline',
@@ -4519,7 +4382,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useOnline/index.md',
     category: 'Sensors',
     description: 'reactive online state',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'usePageLeave',
@@ -4527,7 +4390,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/usePageLeave/index.md',
     category: 'Sensors',
     description: 'reactive state to show whether the mouse leaves the page',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useParallax',
@@ -4535,7 +4398,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useParallax/index.md',
     category: 'Sensors',
     description: 'create parallax effect easily',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useParams',
@@ -4543,7 +4406,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useParams/index.md',
     category: 'Browser',
     description: 'shorthand for a reactive path parameter in `window.location.pathname`',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useParentElement',
@@ -4551,7 +4414,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useParentElement/index.md',
     category: 'Elements',
     description: 'get parent element of the given element',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'usePerformanceObserver',
@@ -4559,7 +4422,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/usePerformanceObserver/index.md',
     category: 'Browser',
     description: 'observe performance metrics',
-    lastUpdated: 1788991736000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'usePermission',
@@ -4567,7 +4430,8 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/usePermission/index.md',
     category: 'Browser',
     description: 'reactive [Permissions API](https://developer.mozilla.org/en-US/docs/Web/API/Permissions_API) state',
-    lastUpdated: 1788992388000,
+    lastUpdated: 1789366373000,
+    related: ['useUserMedia'],
   },
   {
     name: 'usePointer',
@@ -4575,7 +4439,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/usePointer/index.md',
     category: 'Sensors',
     description: 'reactive pointer state',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'usePointerLock',
@@ -4583,7 +4447,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/usePointerLock/index.md',
     category: 'Sensors',
     description: 'reactive [pointer lock](https://developer.mozilla.org/en-US/docs/Web/API/Pointer_Lock_API)',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'usePointerSwipe',
@@ -4592,7 +4456,7 @@ export const pages: FunctionPageInfo[] = [
     category: 'Sensors',
     description:
       'reactive swipe detection based on [PointerEvents](https://developer.mozilla.org/en-US/docs/Web/API/PointerEvent)',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'usePrecision',
@@ -4600,7 +4464,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/math/usePrecision/index.md',
     category: '@Math',
     description: 'reactively set the precision of a number',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'usePreferredColorScheme',
@@ -4609,7 +4473,7 @@ export const pages: FunctionPageInfo[] = [
     category: 'Browser',
     description:
       'reactive [`prefers-color-scheme`](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-color-scheme) media query',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'usePreferredContrast',
@@ -4618,7 +4482,7 @@ export const pages: FunctionPageInfo[] = [
     category: 'Browser',
     description:
       'reactive [`prefers-contrast`](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-contrast) media query',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'usePreferredDark',
@@ -4627,7 +4491,8 @@ export const pages: FunctionPageInfo[] = [
     category: 'Browser',
     description:
       'reactive [`prefers-color-scheme: dark`](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-color-scheme) media query',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
+    related: ['useColorMode', 'useDark'],
   },
   {
     name: 'usePreferredLanguages',
@@ -4635,7 +4500,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/usePreferredLanguages/index.md',
     category: 'Browser',
     description: 'reactive Navigator Languages',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'usePreferredReducedMotion',
@@ -4644,7 +4509,7 @@ export const pages: FunctionPageInfo[] = [
     category: 'Browser',
     description:
       'reactive [`prefers-reduced-motion`](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-reduced-motion) media query',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'usePreferredReducedTransparency',
@@ -4653,7 +4518,7 @@ export const pages: FunctionPageInfo[] = [
     category: 'Browser',
     description:
       'reactive [`prefers-reduced-transparency`](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-reduced-transparency) media query',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'usePrevious',
@@ -4661,7 +4526,15 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/usePrevious/index.md',
     category: 'Utilities',
     description: 'holds the previous value of a source',
-    lastUpdated: 1788964249000,
+    lastUpdated: 1789366373000,
+  },
+  {
+    name: 'usePreviousDistinct',
+    pkg: 'shared',
+    doc: 'packages/shared/usePreviousDistinct/index.md',
+    category: 'State',
+    description: 'just like `usePrevious`',
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useProjection',
@@ -4669,7 +4542,8 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/math/useProjection/index.md',
     category: '@Math',
     description: 'reactive numeric projection from one domain to another',
-    lastUpdated: 1788995800000,
+    lastUpdated: 1789366373000,
+    related: ['createGenericProjection', 'createProjection'],
   },
   {
     name: 'useQRCode',
@@ -4677,7 +4551,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/integrations/useQRCode/index.md',
     category: '@Integrations',
     description: 'wrapper for [`qrcode`](https://github.com/soldair/node-qrcode)',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useQuery',
@@ -4685,15 +4559,15 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useQuery/index.md',
     category: 'Browser',
     description: 'shorthand for a reactive query parameter in `window.location.search`',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useQueue',
     pkg: 'shared',
     doc: 'packages/shared/useQueue/index.md',
     category: 'State',
-    description: "state hook that implements a simple FIFO queue — React port of react-use's `useQueue`",
-    lastUpdated: 1789318112000,
+    description: 'state hook that implements a simple FIFO queue',
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useRafFn',
@@ -4701,15 +4575,15 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useRafFn/index.md',
     category: 'Animation',
     description: 'call function on every `requestAnimationFrame`',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useRafState',
     pkg: 'shared',
     doc: 'packages/shared/useRafState/index.md',
     category: 'Animation',
-    description: "state updates coalesced into an animation frame — React port of react-use's `useRafState`",
-    lastUpdated: 1789257838000,
+    description: 'state updates coalesced into an animation frame',
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useRefsList',
@@ -4717,7 +4591,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useRefsList/index.md',
     category: 'Component',
     description: 'shorthand for binding refs to elements rendered inside a list',
-    lastUpdated: 1788963203000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useResizeObserver',
@@ -4725,7 +4599,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useResizeObserver/index.md',
     category: 'Elements',
     description: "reports changes to the dimensions of an Element's content or the border-box",
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useRound',
@@ -4733,7 +4607,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/math/useRound/index.md',
     category: '@Math',
     description: 'reactive `Math.round`',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useRTDB',
@@ -4741,16 +4615,15 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/firebase/useRTDB/index.md',
     category: '@Firebase',
     description: 'reactive [Firebase Realtime Database](https://firebase.google.com/docs/database) binding',
-    lastUpdated: 1788942682000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useSafeState',
     pkg: 'shared',
     doc: 'packages/shared/useSafeState/index.md',
     category: 'State',
-    description:
-      "a `useState` whose setter is a no-op once the component has unmounted — React port of ahooks' [`useSafeState`](https://ahooks.js.org/hooks/use-safe-state) (`source/ahooks/packages/hooks/src/useSafeState/`; upstream exports it as the **default** export",
-    lastUpdated: 1789308388000,
+    description: 'a `useState` whose setter is a no-op once the component has unmounted',
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useScreenOrientation',
@@ -4759,7 +4632,7 @@ export const pages: FunctionPageInfo[] = [
     category: 'Browser',
     description:
       'reactive [Screen Orientation API](https://developer.mozilla.org/en-US/docs/Web/API/Screen_Orientation_API)',
-    lastUpdated: 1788960166000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useScreenSafeArea',
@@ -4767,7 +4640,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useScreenSafeArea/index.md',
     category: 'Browser',
     description: 'reactive `env(safe-area-inset-*)`',
-    lastUpdated: 1788942682000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useScriptTag',
@@ -4775,7 +4648,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useScriptTag/index.md',
     category: 'Browser',
     description: 'creates a script tag',
-    lastUpdated: 1788963761000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useScroll',
@@ -4783,7 +4656,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useScroll/index.md',
     category: 'Sensors',
     description: 'reactive scroll position and state',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useScrollLock',
@@ -4791,7 +4664,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useScrollLock/index.md',
     category: 'Sensors',
     description: 'lock scrolling of the element',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useSessionStorage',
@@ -4799,15 +4672,15 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useSessionStorage/index.md',
     category: 'State',
     description: 'reactive [SessionStorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage)',
-    lastUpdated: 1788960102000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useSet',
     pkg: 'shared',
     doc: 'packages/shared/useSet/index.md',
     category: 'State',
-    description: "a real `Set` whose mutations re-render — React port of react-hookz's `useSet`",
-    lastUpdated: 1789275061000,
+    description: 'a real `Set` whose mutations re-render',
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useShallowCompareEffect',
@@ -4815,8 +4688,8 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/shared/useShallowCompareEffect/index.md',
     category: 'Lifecycle',
     description:
-      "`useEffect` whose dependency list is compared by one-level (shallow) equality instead of reference identity — a React port of react-use's [`useShallowCompareEffect`](https://raw.githubusercontent.com/streamich/react-use/master/docs/useShallowCompareEffect.md) (docs page fetched; the rendered `https://streamich.github.io/react-use/?path=/story/lifecycle-useshallowcompareeffect--docs` page is unverified)",
-    lastUpdated: 1789272086000,
+      '`useEffect` whose dependency list is compared by one-level (shallow) equality instead of reference identity',
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useShare',
@@ -4824,7 +4697,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useShare/index.md',
     category: 'Browser',
     description: 'reactive [Web Share API](https://developer.mozilla.org/en-US/docs/Web/API/Navigator/share)',
-    lastUpdated: 1788963984000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useSortable',
@@ -4832,7 +4705,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/integrations/useSortable/index.md',
     category: '@Integrations',
     description: 'wrapper for [`sortablejs`](https://github.com/SortableJS/Sortable)',
-    lastUpdated: 1789312513000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useSorted',
@@ -4840,7 +4713,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useSorted/index.md',
     category: 'Array',
     description: 'reactive sorted array',
-    lastUpdated: 1788962909000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useSpeechRecognition',
@@ -4848,7 +4721,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useSpeechRecognition/index.md',
     category: 'Sensors',
     description: 'reactive [SpeechRecognition](https://developer.mozilla.org/en-US/docs/Web/API/SpeechRecognition)',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useSpeechSynthesis',
@@ -4856,23 +4729,15 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useSpeechSynthesis/index.md',
     category: 'Sensors',
     description: 'reactive [SpeechSynthesis](https://developer.mozilla.org/en-US/docs/Web/API/SpeechSynthesis)',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useSplitter',
     pkg: 'core',
     doc: 'packages/core/useSplitter/index.md',
-    category: 'Elements',
-    description: 'resizable panel layout with draggable',
-    lastUpdated: 1789286495000,
-  },
-  {
-    name: 'useSpring',
-    pkg: 'integrations',
-    doc: 'packages/integrations/useSpring/index.md',
-    category: 'Animation',
-    description: 're-export of `useSpring` from',
-    lastUpdated: 1789289266000,
+    category: 'Browser',
+    description: 'a hook for resizable panel layouts that supports dragging and keyboard interactions',
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useSSRWidth',
@@ -4881,7 +4746,7 @@ export const pages: FunctionPageInfo[] = [
     category: 'Browser',
     description:
       'used to set a global viewport width which will be used when rendering SSR components that rely on the viewport width like `useMediaQuery` or `useBreakpoints`',
-    lastUpdated: 1789312513000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useStartTyping',
@@ -4889,7 +4754,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useStartTyping/index.md',
     category: 'Sensors',
     description: 'fires when users start typing on non-editable elements',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useStateAutoReset',
@@ -4897,7 +4762,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/shared/useStateAutoReset/index.md',
     category: 'Reactivity',
     description: 'a controllable state which will be reset to the default value after some time',
-    lastUpdated: 1788977666000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useStateDebounced',
@@ -4905,7 +4770,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/shared/useStateDebounced/index.md',
     category: 'Reactivity',
     description: 'a controllable state which will be debounced',
-    lastUpdated: 1789000838000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useStateDebouncedHistory',
@@ -4913,7 +4778,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useStateDebouncedHistory/index.md',
     category: 'State',
     description: 'shorthand for `useStateHistory` with debounced filter',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useStateDefault',
@@ -4921,7 +4786,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/shared/useStateDefault/index.md',
     category: 'Reactivity',
     description: 'apply default value to a ref',
-    lastUpdated: 1788998493000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useStateHistory',
@@ -4930,7 +4795,8 @@ export const pages: FunctionPageInfo[] = [
     category: 'State',
     description:
       'track the change history of a state automatically — every change commits a history record — also provides undo and redo functionality',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
+    related: ['useStateWithControl'],
   },
   {
     name: 'useStateManualHistory',
@@ -4938,7 +4804,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useStateManualHistory/index.md',
     category: 'State',
     description: 'manually track the change history of a state when the user calls `commit()`',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useStateManualReset',
@@ -4946,7 +4812,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/shared/useStateManualReset/index.md',
     category: 'Reactivity',
     description: 'a state with manual reset functionality',
-    lastUpdated: 1788997642000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useStateThrottled',
@@ -4954,7 +4820,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/shared/useStateThrottled/index.md',
     category: 'Reactivity',
     description: 'throttle changing of a state value',
-    lastUpdated: 1789000282000,
+    lastUpdated: 1789362234000,
   },
   {
     name: 'useStateThrottledHistory',
@@ -4962,7 +4828,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useStateThrottledHistory/index.md',
     category: 'State',
     description: 'shorthand for `useStateHistory` with throttled filter',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useStateWithControl',
@@ -4970,7 +4836,9 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/shared/useStateWithControl/index.md',
     category: 'Reactivity',
     description: 'fine-grained controls over a state and its re-renders',
-    lastUpdated: 1788998206000,
+    lastUpdated: 1789366373000,
+    alias: ['controlledRef'],
+    related: ['useStateHistory'],
   },
   {
     name: 'useStepper',
@@ -4978,7 +4846,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useStepper/index.md',
     category: 'Utilities',
     description: 'provides helpers for building a multi-step wizard interface',
-    lastUpdated: 1788965950000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useStorage',
@@ -4987,7 +4855,8 @@ export const pages: FunctionPageInfo[] = [
     category: 'State',
     description:
       'create a controllable state that can be used to access & modify [LocalStorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage) or [SessionStorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage)',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
+    related: ['useColorMode', 'useDark'],
   },
   {
     name: 'useStorageAsync',
@@ -4995,7 +4864,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useStorageAsync/index.md',
     category: 'State',
     description: 'reactive Storage with async support',
-    lastUpdated: 1788966005000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useStyleTag',
@@ -5003,7 +4872,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useStyleTag/index.md',
     category: 'Browser',
     description: 'inject reactive `style` element in head',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useSubject',
@@ -5012,7 +4881,7 @@ export const pages: FunctionPageInfo[] = [
     category: '@RxJS',
     description:
       'bind an RxJS [`Subject`](https://rxjs.dev/guide/subject) to a controllable state and propagate value changes both ways',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useSubscription',
@@ -5021,7 +4890,7 @@ export const pages: FunctionPageInfo[] = [
     category: '@RxJS',
     description:
       'use an RxJS [`Subscription`](https://rxjs.dev/guide/subscription) without worrying about unsubscribing from it or creating memory leaks',
-    lastUpdated: 1789017877000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useSum',
@@ -5029,7 +4898,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/math/useSum/index.md',
     category: '@Math',
     description: 'get the sum of an array reactively',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useSupported',
@@ -5037,7 +4906,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useSupported/index.md',
     category: 'Utilities',
     description: 'SSR compatibility `isSupported`',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useSwipe',
@@ -5046,7 +4915,7 @@ export const pages: FunctionPageInfo[] = [
     category: 'Sensors',
     description:
       'reactive swipe detection based on [`TouchEvents`](https://developer.mozilla.org/en-US/docs/Web/API/TouchEvent)',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useTemporalNow',
@@ -5055,7 +4924,7 @@ export const pages: FunctionPageInfo[] = [
     category: 'Time',
     description:
       'reactive [Temporal API](https://tc39.es/proposal-temporal/docs/) with timezone conversion and calendar system support',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useTextareaAutosize',
@@ -5063,7 +4932,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useTextareaAutosize/index.md',
     category: 'Browser',
     description: 'automatically update the height of a textarea depending on the content',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useTextDirection',
@@ -5072,7 +4941,7 @@ export const pages: FunctionPageInfo[] = [
     category: 'Browser',
     description:
       "reactive [dir](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/dir) of the element's text",
-    lastUpdated: 1788996791000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useTextSelection',
@@ -5081,7 +4950,7 @@ export const pages: FunctionPageInfo[] = [
     category: 'Sensors',
     description:
       'reactively track user text selection based on [`Window.getSelection`](https://developer.mozilla.org/en-US/docs/Web/API/Window/getSelection)',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useThrottleFn',
@@ -5089,7 +4958,8 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/shared/useThrottleFn/index.md',
     category: 'Utilities',
     description: 'throttle execution of a function',
-    lastUpdated: 1788998912000,
+    lastUpdated: 1789366373000,
+    related: ['useDebounceFn'],
   },
   {
     name: 'useTimeAgo',
@@ -5097,7 +4967,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useTimeAgo/index.md',
     category: 'Time',
     description: 'reactive time ago',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useTimeAgoIntl',
@@ -5105,7 +4975,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useTimeAgoIntl/index.md',
     category: 'Time',
     description: 'reactive time ago with i18n supported',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useTimeout',
@@ -5113,7 +4983,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/shared/useTimeout/index.md',
     category: 'Animation',
     description: 'a reactive value that becomes `true` after a given time',
-    lastUpdated: 1788981733000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useTimeoutFn',
@@ -5121,7 +4991,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/shared/useTimeoutFn/index.md',
     category: 'Animation',
     description: 'wrapper for `setTimeout` with controls',
-    lastUpdated: 1788981739000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useTimeoutPoll',
@@ -5129,7 +4999,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useTimeoutPoll/index.md',
     category: 'Utilities',
     description: 'use timeout to poll something — it triggers the callback after the last task is done',
-    lastUpdated: 1788994903000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useTimeoutRafFn',
@@ -5137,7 +5007,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/shared/useTimeoutRafFn/index.md',
     category: 'Animation',
     description: 'fire a callback once on the first animation frame at or after a delay',
-    lastUpdated: 1789273126000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useTimestamp',
@@ -5145,7 +5015,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useTimestamp/index.md',
     category: 'Animation',
     description: 'reactive current timestamp (`Date.now() + offset`)',
-    lastUpdated: 1788998330000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useTitle',
@@ -5153,7 +5023,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useTitle/index.md',
     category: 'Browser',
     description: 'reactive document title',
-    lastUpdated: 1788991870000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useToggle',
@@ -5161,7 +5031,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/shared/useToggle/index.md',
     category: 'Utilities',
     description: 'a boolean (or value) toggler with controllable state support',
-    lastUpdated: 1788981648000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useToNumber',
@@ -5169,7 +5039,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/shared/useToNumber/index.md',
     category: 'Utilities',
     description: 'convert a string or number value to a number',
-    lastUpdated: 1788942682000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useToString',
@@ -5177,16 +5047,15 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/shared/useToString/index.md',
     category: 'Utilities',
     description: 'convert a value to its string representation',
-    lastUpdated: 1789001834000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useTrackedEffect',
     pkg: 'shared',
     doc: 'packages/shared/useTrackedEffect/index.md',
     category: 'Lifecycle',
-    description:
-      "`useEffect` that also reports **which** dependencies changed — React port of ahooks' [`useTrackedEffect`](https://ahooks.js.org/hooks/use-tracked-effect) (`source/ahooks/packages/hooks/src/useTrackedEffect/`; upstream exports it as the **default** export",
-    lastUpdated: 1789288373000,
+    description: '`useEffect` that also reports **which** dependencies changed',
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useTransition',
@@ -5194,7 +5063,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useTransition/index.md',
     category: 'Animation',
     description: 'transition between values',
-    lastUpdated: 1788994691000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useTrunc',
@@ -5202,43 +5071,39 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/math/useTrunc/index.md',
     category: '@Math',
     description: 'truncates a number',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useUnmount',
     pkg: 'shared',
     doc: 'packages/shared/useUnmount/index.md',
     category: 'Lifecycle',
-    description:
-      "runs a callback when the component unmounts — React port of react-use's [`useUnmount`](https://streamich.github.io/react-use/?path=/story/lifecycle-useunmount--docs)",
-    lastUpdated: 1788942682000,
+    description: 'runs a callback when the component unmounts',
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useUnmountedRef',
     pkg: 'shared',
     doc: 'packages/shared/useUnmountedRef/index.md',
     category: 'Lifecycle',
-    description:
-      "a ref that reports whether the component has unmounted — React port of ahooks' [`useUnmountedRef`](https://ahooks.js.org/hooks/use-unmounted-ref) (`source/ahooks/packages/hooks/src/useUnmountedRef/`; upstream exports it as the **default** export",
-    lastUpdated: 1789277394000,
+    description: 'a ref that reports whether the component has unmounted',
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useUpdate',
     pkg: 'shared',
     doc: 'packages/shared/useUpdate/index.md',
     category: 'Animation',
-    description:
-      "a force-update hook — React port of react-use's [`useUpdate`](https://streamich.github.io/react-use/?path=/story/animation-useupdate--docs)",
-    lastUpdated: 1788942682000,
+    description: 'a force-update hook',
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useUpdateEffect',
     pkg: 'shared',
     doc: 'packages/shared/useUpdateEffect/index.md',
     category: 'Lifecycle',
-    description:
-      "`useEffect` that skips the first render — React port of react-use's [`useUpdateEffect`](https://streamich.github.io/react-use/?path=/story/lifecycle-useupdateeffect--docs)",
-    lastUpdated: 1789276355000,
+    description: '`useEffect` that skips the first render',
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useUrlSearchParams',
@@ -5246,7 +5111,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useUrlSearchParams/index.md',
     category: 'Browser',
     description: 'reactive [URLSearchParams](https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams)',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useUserMedia',
@@ -5255,7 +5120,8 @@ export const pages: FunctionPageInfo[] = [
     category: 'Sensors',
     description:
       'streaming via [`mediaDevices.getUserMedia`](https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia)',
-    lastUpdated: 1788997864000,
+    lastUpdated: 1789366373000,
+    related: ['useDevicesList', 'useDisplayMedia', 'usePermission'],
   },
   {
     name: 'useVibrate',
@@ -5263,7 +5129,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useVibrate/index.md',
     category: 'Browser',
     description: 'reactive [Vibration API](https://developer.mozilla.org/en-US/docs/Web/API/Vibration_API)',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useVirtualList',
@@ -5271,7 +5137,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useVirtualList/index.md',
     category: 'Component',
     description: 'create virtual lists with ease',
-    lastUpdated: 1788996627000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useWakeLock',
@@ -5280,7 +5146,7 @@ export const pages: FunctionPageInfo[] = [
     category: 'Browser',
     description:
       'reactive [Screen Wake Lock API](https://developer.mozilla.org/en-US/docs/Web/API/Screen_Wake_Lock_API)',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useWatch',
@@ -5288,7 +5154,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/shared/useWatch/index.md',
     category: 'Watch',
     description: 'watches a source — a single value or an array of values — and invokes a callback with `(value',
-    lastUpdated: 1789001849000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useWatchArray',
@@ -5296,7 +5162,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/shared/useWatchArray/index.md',
     category: 'Watch',
     description: 'watches an array value and reports which items were added and removed since the previous list',
-    lastUpdated: 1789001863000,
+    lastUpdated: 1789362234000,
   },
   {
     name: 'useWatchAtMost',
@@ -5304,7 +5170,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/shared/useWatchAtMost/index.md',
     category: 'Watch',
     description: 'like `useWatch`',
-    lastUpdated: 1788986162000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useWatchDebounced',
@@ -5312,7 +5178,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/shared/useWatchDebounced/index.md',
     category: 'Watch',
     description: 'debounced watch',
-    lastUpdated: 1789001877000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useWatchDeep',
@@ -5321,7 +5187,7 @@ export const pages: FunctionPageInfo[] = [
     category: 'Watch',
     description:
       'shorthand for watching a value with `{ deep: true }` — invokes the callback only when the value differs **deeply** from the previous one',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useWatchExtractedObservable',
@@ -5330,7 +5196,7 @@ export const pages: FunctionPageInfo[] = [
     category: '@RxJS',
     description:
       'watch the values of an RxJS [`Observable`](https://rxjs.dev/guide/observable) as extracted from one or more hooks',
-    lastUpdated: 1789010190000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useWatchIgnorable',
@@ -5339,7 +5205,7 @@ export const pages: FunctionPageInfo[] = [
     category: 'Watch',
     description:
       'ignorable watch — extended watch that returns `ignoreUpdates(updater)` / `ignorePrevAsyncUpdates()` / `stop` to ignore particular updates to the source',
-    lastUpdated: 1788986154000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useWatchImmediate',
@@ -5347,7 +5213,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/shared/useWatchImmediate/index.md',
     category: 'Watch',
     description: 'shorthand for watching value with `{ immediate: true }`',
-    lastUpdated: 1788942682000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useWatchOnce',
@@ -5355,7 +5221,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/shared/useWatchOnce/index.md',
     category: 'Watch',
     description: 'shorthand for watching value with `{ once: true }`',
-    lastUpdated: 1789001932000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useWatchPausable',
@@ -5363,7 +5229,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/shared/useWatchPausable/index.md',
     category: 'Watch',
     description: "pausable watch — pause and resume a watched value's updates",
-    lastUpdated: 1788994734000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useWatchThrottled',
@@ -5371,7 +5237,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/shared/useWatchThrottled/index.md',
     category: 'Watch',
     description: 'throttled watch',
-    lastUpdated: 1788994759000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useWatchTriggerable',
@@ -5379,7 +5245,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/shared/useWatchTriggerable/index.md',
     category: 'Watch',
     description: 'watch that can be triggered manually',
-    lastUpdated: 1788988809000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useWatchWithFilter',
@@ -5387,7 +5253,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/shared/useWatchWithFilter/index.md',
     category: 'Watch',
     description: '`watch` with additional EventFilter control',
-    lastUpdated: 1788994784000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useWebMCP',
@@ -5396,7 +5262,7 @@ export const pages: FunctionPageInfo[] = [
     category: 'Browser',
     description:
       'register a [WebMCP](https://github.com/webmachinelearning/webmcp) tool and tie its lifecycle to the current component',
-    lastUpdated: 1789150290000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useWebNotification',
@@ -5404,7 +5270,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useWebNotification/index.md',
     category: 'Browser',
     description: 'reactive [Notification](https://developer.mozilla.org/en-US/docs/Web/API/notification)',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useWebSocket',
@@ -5412,7 +5278,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useWebSocket/index.md',
     category: 'Browser',
     description: 'reactive [WebSocket](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/WebSocket) client',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useWebWorker',
@@ -5421,7 +5287,8 @@ export const pages: FunctionPageInfo[] = [
     category: 'Browser',
     description:
       'simple [Web Workers](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Using_web_workers) registration and communication',
-    lastUpdated: 1788998635000,
+    lastUpdated: 1789366373000,
+    related: ['useWebWorkerFn'],
   },
   {
     name: 'useWebWorkerFn',
@@ -5429,7 +5296,8 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useWebWorkerFn/index.md',
     category: 'Browser',
     description: 'run expensive functions without blocking the UI',
-    lastUpdated: 1788999163000,
+    lastUpdated: 1789366373000,
+    related: ['useWebWorker'],
   },
   {
     name: 'useWhenever',
@@ -5437,7 +5305,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/shared/useWhenever/index.md',
     category: 'Watch',
     description: 'shorthand for watching value to be truthy',
-    lastUpdated: 1788988828000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useWindowFocus',
@@ -5445,7 +5313,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useWindowFocus/index.md',
     category: 'Elements',
     description: 'reactive window focus state',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useWindowScroll',
@@ -5453,7 +5321,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useWindowScroll/index.md',
     category: 'Elements',
     description: 'reactive window scroll',
-    lastUpdated: 1788993907000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useWindowSize',
@@ -5461,7 +5329,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useWindowSize/index.md',
     category: 'Elements',
     description: 'reactive window size',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useZoomFactor',
@@ -5469,7 +5337,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/electron/useZoomFactor/index.md',
     category: '@Electron',
     description: 'reactive [WebFrame](https://www.electronjs.org/docs/api/web-frame#webframe) zoom factor',
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
   {
     name: 'useZoomLevel',
@@ -5477,16 +5345,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/electron/useZoomLevel/index.md',
     category: '@Electron',
     description: 'reactive [WebFrame](https://www.electronjs.org/docs/api/web-frame#webframe) zoom level',
-    lastUpdated: 1789147565000,
-  },
-  {
-    name: 'utils',
-    pkg: 'shared',
-    doc: 'packages/shared/utils/index.md',
-    category: 'Utilities',
-    description:
-      "framework-agnostic helper functions ported 1:1 from VueUse's internal [`@vueuse/shared`](https://vueuse.org/shared/) utils group (`is.ts` / `general.ts`) — plain TypeScript with no React state",
-    lastUpdated: 1789147565000,
+    lastUpdated: 1789366373000,
   },
 ]
 

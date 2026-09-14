@@ -17,8 +17,8 @@ export interface UseBatteryOptions extends ConfigurableNavigator {
  */
 export interface UseBatteryReturn {
   /**
-   * Whether the Battery Status API is supported in the current browser.
-   * `false` during render and on the server, resolved in a mount effect.
+   * Whether the Battery Status API is supported in the current browser. `false` during render and
+   * on the server, resolved in a mount effect.
    */
   isSupported: boolean
   /**
@@ -40,9 +40,9 @@ export interface UseBatteryReturn {
 }
 
 /**
- * The `BatteryManager` object handed back by `navigator.getBattery()` — the
- * DOM lib does not ship this interface, so it is declared here as upstream
- * does. The properties are read through getters on the live object.
+ * The `BatteryManager` object handed back by `navigator.getBattery()` — the DOM lib does not ship
+ * this interface, so it is declared here as upstream does. The properties are read through getters
+ * on the live object.
  */
 export interface BatteryManager extends EventTarget {
   charging: boolean
@@ -56,27 +56,8 @@ type NavigatorWithBattery = Navigator & {
 }
 
 /**
- * Reactive Battery Status API.
- *
  * Map from @vueuse/core `useBattery`
- * (`source/vueuse/packages/core/useBattery/`). Reactive
- * [Battery Status API](https://developer.mozilla.org/en-US/docs/Web/API/Battery_Status_API):
- * returns an object mirroring the upstream members — `isSupported`,
- * `charging`, `chargingTime`, `dischargingTime`, `level` — as plain values
- * held in `useState`s.
- *
- * Adjustment for React:
- * - the upstream Vue shallow refs become plain state values read off the
- *   result object, so no `.value` is involved;
- * - `isSupported` comes from `useSupported` (resolves after mount, stays
- *   `false` on the server) and gates a mount effect that acquires the
- *   battery manager, reads its initial state and registers the four battery
- *   event listeners (`chargingchange`, `chargingtimechange`,
- *   `dischargingtimechange`, `levelchange`), removed again in cleanup on
- *   unmount (upstream: `if (isSupported.value)` setup block +
- *   `useEventListener` + `tryOnScopeDispose`);
- * - there is no `navigator` access during render, so SSR renders the
- *   defaults without acquiring anything.
+ * (`source/vueuse/packages/core/useBattery/`).
  *
  * @see https://vueuse.org/core/useBattery/
  * @param options

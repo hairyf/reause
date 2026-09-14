@@ -3,11 +3,7 @@ import { useReducer } from 'react'
 const updateReducer = (num: number): number => (num + 1) % 1_000_000
 
 /**
- * React port of react-use's `useUpdate`.
- *
- * Map from react-use `useUpdate`
- * Mapping: `useReducer` with a wrapping counter — the returned function
- * dispatches an update that forces a re-render and is stable across renders.
+ * Map from react-use `useUpdate`.
  *
  * @example
  * const update = useUpdate()

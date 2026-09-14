@@ -3,11 +3,10 @@ import type { Dispatch, SetStateAction } from 'react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 /**
- * Structural subset of the Web Speech API `SpeechRecognition` interface —
- * `lib.dom` does not ship the global type yet (it only defines
- * `SpeechRecognitionResult(List)` and `SpeechRecognitionAlternative`), so
- * this mirrors upstream's local `types.ts` instead of adding ambient
- * declarations.
+ * Structural subset of the Web Speech API `SpeechRecognition` interface — `lib.dom` does not ship
+ * the global type yet (it only defines `SpeechRecognitionResult(List)` and
+ * `SpeechRecognitionAlternative`), so this mirrors upstream's local `types.ts` instead of adding
+ * ambient declarations.
  */
 interface SpeechRecognition extends EventTarget {
   continuous: boolean
@@ -58,7 +57,8 @@ export interface UseSpeechRecognitionOptions extends ConfigurableWindow {
    */
   continuous?: boolean
   /**
-   * Controls whether interim results should be returned (true) or not (false.) Interim results are results that are not yet final
+   * Controls whether interim results should be returned (true) or not (false.) Interim results are
+   * results that are not yet final
    *
    * @default true
    */
@@ -82,17 +82,16 @@ export interface UseSpeechRecognitionReturn {
   isSupported: boolean
   isListening: boolean
   /**
-   * Setter for `isListening` — the React mapping of upstream's writable
-   * `isListening` ref. Takes a plain value or a functional updater (like a
-   * React `useState` setter, `prev => next`). `setIsListening(true)` starts
-   * the recognition instance, `false` stops it — the same effect as
+   * Setter for `isListening` — the React mapping of upstream's writable `isListening` ref. Takes a
+   * plain value or a functional updater (like a React `useState` setter, `prev => next`).
+   * `setIsListening(true)` starts the recognition instance, `false` stops it — the same effect as
    * `start()` / `stop()`.
    */
   setIsListening: Dispatch<SetStateAction<boolean>>
   isFinal: boolean
   /**
-   * The underlying SpeechRecognition instance — created once during the
-   * first render when the API is available, `undefined` otherwise.
+   * The underlying SpeechRecognition instance — created once during the first render when the API
+   * is available, `undefined` otherwise.
    */
   recognition: SpeechRecognition | undefined
   result: string
@@ -104,9 +103,8 @@ export interface UseSpeechRecognitionReturn {
   confidence: number
   error: SpeechRecognitionErrorEvent | Error | undefined
   /**
-   * Setter for `error` — the React mapping of upstream's writable `error`
-   * ref. Takes a plain value or a functional updater (like a React
-   * `useState` setter, `prev => next`).
+   * Setter for `error` — the React mapping of upstream's writable `error` ref. Takes a plain value
+   * or a functional updater (like a React `useState` setter, `prev => next`).
    */
   setError: Dispatch<SetStateAction<SpeechRecognitionErrorEvent | Error | undefined>>
   toggle: (value?: boolean) => void
@@ -119,41 +117,8 @@ function getDefaultWindow(): Window | undefined {
 }
 
 /**
- * React port of VueUse's `useSpeechRecognition`.
- *
  * Map from @vueuse/core `useSpeechRecognition`
- * (`source/vueuse/packages/core/useSpeechRecognition/`). Reactive
- * [SpeechRecognition](https://developer.mozilla.org/en-US/docs/Web/API/SpeechRecognition)
- * — drives the browser speech service and tracks the recognized transcript.
- *
- * React divergences:
- *
- * 1. The Vue refs (`isListening`, `isFinal`, `result`, `confidence`,
- *    `error`) become plain state values; upstream's writable refs are paired
- *    with their setters (`isListening` → `setIsListening`, `error` →
- *    `setError`) while the read-only ones (`isFinal`, `result`,
- *    `confidence`) stay read-only; `recognition` is the stable underlying
- *    instance, created during the first render when the API is available
- *    (upstream creates it eagerly in setup).
- * 2. `start()` / `stop()` / `toggle()` are stable callbacks backed by
- *    latest-value refs. Upstream drives `recognition.start()` /
- *    `recognition.stop()` from a `watch(isListening)`; here an effect does,
- *    skipping its initial run to mirror the watcher (which never fires for
- *    the initial `false`).
- * 3. `lang` is a plain option (upstream accepts a `RefOrValue`). A
- *    changed language is re-applied while not listening, and `onend`
- *    re-applies the latest value for the next run — same as upstream's
- *    `watch(lang)` + `onend` reset.
- * 4. The unmount cleanup stops the recognition instance directly. Upstream's
- *    `tryOnScopeDispose(stop)` only flips the `isListening` ref — its
- *    `watch(isListening)` is already dead when dispose callbacks run, so a
- *    live browser session keeps listening after unmount upstream. Here the
- *    instance is stopped directly (guarded by the same try/catch as
- *    upstream's start/stop), because a React state flip during unmount
- *    cannot re-run effects.
- * 5. SSR-safe: without a `window` the hook reports `isSupported: false`,
- *    and `start()` / `stop()` only flip `isListening` (upstream keeps the
- *    flag writable with no recognition instance, too).
+ * (`source/vueuse/packages/core/useSpeechRecognition/`).
  *
  * @example
  * const {

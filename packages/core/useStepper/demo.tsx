@@ -29,7 +29,7 @@ export default function UseStepperDemo() {
     payment: 'credit-card',
   })
 
-  const [index, , { steps, current, isFirst, isLast, goTo, goToNext, isBefore, isCurrent }] = useStepper(STEPS)
+  const { index, steps, current, isFirst, isLast, goTo, goToNext, isBefore, isCurrent } = useStepper(STEPS)
 
   function isStepValid(step: string): boolean {
     switch (step) {

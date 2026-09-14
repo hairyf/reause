@@ -17,7 +17,8 @@ it('useParentElement returns the parent of the given element', async () => {
   const cleanup = attach(parent, child)
 
   try {
-    const { result } = await renderHook(() => useParentElement(child))
+    const source = { current: child }
+    const { result } = await renderHook(() => useParentElement(source))
     expect(result.current).toBe(parent)
   }
   finally {
@@ -82,13 +83,13 @@ it('useParentElement captures an element attached after mount (late attach)', as
   await expect.element(screen.getByTestId('result')).toHaveTextContent('late-parent')
 })
 
-it('useParentElement accepts a plain element source', async () => {
+it('useParentElement accepts an inline { current } source', async () => {
   const parent = document.createElement('div')
   const child = document.createElement('p')
   const cleanup = attach(parent, child)
 
   try {
-    const { result } = await renderHook(() => useParentElement(child))
+    const { result } = await renderHook(() => useParentElement({ current: child }))
     expect(result.current).toBe(parent)
   }
   finally {
@@ -132,7 +133,7 @@ it('useParentElement updates when the element prop changes', async () => {
 
   try {
     const { result, rerender } = await renderHook(
-      (props?: { element?: HTMLElement | null }) => useParentElement(props?.element),
+      (props?: { element?: HTMLElement | null }) => useParentElement({ current: props?.element }),
       { initialProps: { element: childA as HTMLElement | null } },
     )
 
@@ -153,13 +154,13 @@ it('useParentElement updates when the element prop changes', async () => {
 
 it('useParentElement returns null for a detached element', async () => {
   const orphan = document.createElement('div')
-  const { result } = await renderHook(() => useParentElement(orphan))
+  const { result } = await renderHook(() => useParentElement({ current: orphan }))
 
   expect(result.current).toBe(null)
 })
 
 it('useParentElement keeps the value undefined for a null source', async () => {
-  const { result } = await renderHook(() => useParentElement(null))
+  const { result } = await renderHook(() => useParentElement({ current: null }))
 
   expect(result.current).toBeUndefined()
 })
@@ -176,7 +177,7 @@ it('useParentElement supports SVG elements', async () => {
   const cleanup = attach(svg, circle)
 
   try {
-    const { result } = await renderHook(() => useParentElement(circle))
+    const { result } = await renderHook(() => useParentElement({ current: circle }))
     expect(result.current).toBe(svg)
   }
   finally {

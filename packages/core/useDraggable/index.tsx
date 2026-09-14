@@ -1,18 +1,18 @@
-import type { RefOrValue } from '@reause/shared'
+import type { RefObject } from 'react'
 import type { PointerType } from '../usePointer'
-import { toValue } from '@reause/shared'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { unrefElement } from '../unrefElement'
 
 export interface Position {
   x: number
   y: number
 }
 
-export type DraggableTarget = RefOrValue<HTMLElement | SVGElement | null | undefined>
+export type DraggableTarget = RefObject<HTMLElement | SVGElement | null | undefined>
 
-export type DraggableElement = RefOrValue<HTMLElement | SVGElement | Window | Document | null | undefined>
+export type DraggableElement = RefObject<HTMLElement | SVGElement | Window | Document | null | undefined>
 
-export type DraggableContainer = RefOrValue<HTMLElement | SVGElement | null | undefined>
+export type DraggableContainer = RefObject<HTMLElement | SVGElement | null | undefined>
 
 export interface UseDraggableOptions {
   /**
@@ -20,21 +20,21 @@ export interface UseDraggableOptions {
    *
    * @default false
    */
-  exact?: RefOrValue<boolean>
+  exact?: boolean
 
   /**
    * Prevent events defaults
    *
    * @default false
    */
-  preventDefault?: RefOrValue<boolean>
+  preventDefault?: boolean
 
   /**
    * Prevent events propagation
    *
    * @default false
    */
-  stopPropagation?: RefOrValue<boolean>
+  stopPropagation?: boolean
 
   /**
    * Whether dispatch events in capturing phase
@@ -76,7 +76,7 @@ export interface UseDraggableOptions {
    *
    * @default { x: 0, y: 0 }
    */
-  initialValue?: RefOrValue<Position>
+  initialValue?: Position
 
   /**
    * Callback when the dragging starts. Return `false` to prevent dragging.
@@ -105,7 +105,7 @@ export interface UseDraggableOptions {
    *
    * @default false
    */
-  disabled?: RefOrValue<boolean>
+  disabled?: boolean
 
   /**
    * Mouse buttons that are allowed to trigger drag events.
@@ -119,37 +119,37 @@ export interface UseDraggableOptions {
    * @see https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button#value
    * @default [0]
    */
-  buttons?: RefOrValue<number[]>
+  buttons?: number[]
 
   /**
    * Whether to restrict dragging within the visible area of the container.
    *
-   * If enabled, the draggable element will not leave the visible area of its container,
-   * ensuring it remains within the viewport of the container during the drag.
+   * If enabled, the draggable element will not leave the visible area of its container, ensuring it
+   * remains within the viewport of the container during the drag.
    *
    * @default false
    */
-  restrictInView?: RefOrValue<boolean>
+  restrictInView?: boolean
 
   /**
    * Whether to enable auto-scroll when dragging near the edges.
    *
    * @default false
    */
-  autoScroll?: RefOrValue<boolean | {
+  autoScroll?: boolean | {
     /**
      * Speed of auto-scroll.
      *
      * @default 2
      */
-    speed?: RefOrValue<number | Position>
+    speed?: number | Position
 
     /**
      * Margin from the edge to trigger auto-scroll.
      *
      * @default 30
      */
-    margin?: RefOrValue<number | Position>
+    margin?: number | Position
 
     /**
      * Direction of auto-scroll.
@@ -157,7 +157,7 @@ export interface UseDraggableOptions {
      * @default 'both'
      */
     direction?: 'x' | 'y' | 'both'
-  }>
+  }
 }
 
 export interface UseDraggableReturn {
@@ -167,15 +167,13 @@ export interface UseDraggableReturn {
   isDragging: boolean
   style: string
   /**
-   * Set the x position — the React equivalent of assigning upstream's writable
-   * `x` ref. Updates the returned `x`, `position` and `style` together with
-   * the internal drag position.
+   * Set the x position — the React equivalent of assigning upstream's writable `x` ref. Updates the
+   * returned `x`, `position` and `style` together with the internal drag position.
    */
   setX: (value: number) => void
   /**
-   * Set the y position — the React equivalent of assigning upstream's writable
-   * `y` ref. Updates the returned `y`, `position` and `style` together with
-   * the internal drag position.
+   * Set the y position — the React equivalent of assigning upstream's writable `y` ref. Updates the
+   * returned `y`, `position` and `style` together with the internal drag position.
    */
   setY: (value: number) => void
 }
@@ -249,45 +247,8 @@ function isPointerNearEdge(
 }
 
 /**
- * React port of VueUse's `useDraggable`.
- *
  * Map from @vueuse/core `useDraggable`
- * (`source/vueuse/packages/core/useDraggable/`), which makes an element
- * draggable with the pointer: a `pointerdown` on the `handle` (default the
- * `target`) starts the drag, `pointermove` / `pointerup` / `pointercancel`
- * on the `draggingElement` (default `window`) move and end it, and `x` / `y`
- * track the element's position. The drag position is clamped to the
- * `containerElement` bounds when one is given, and `autoScroll` scrolls a
- * scrollable container while the pointer is near its edges.
- *
- * React divergences:
- *
- * - the Vue refs returned by upstream (`x`, `y`, `position`, `isDragging`,
- *   `style`) become a plain object backed by React state: `x` / `y` are
- *   numbers, `position` the `{ x, y }` pair, `isDragging` a boolean and
- *   `style` a ready-to-use CSS string (`left: ?px; top: ?px;`); `x` and `y`
- *   are writable through the paired `setX` / `setY` setters (the React
- *   equivalent of assigning upstream's writable refs), which update the
- *   returned state and the internal drag position together;
- * - upstream's `useEventListener` becomes a self-contained mount `useEffect`
- *   that re-subscribes when the resolved `handle` / `draggingElement` or the
- *   `capture` / `preventDefault` flags change, and removes all listeners on
- *   unmount;
- * - `target`, `handle`, `draggingElement` and `containerElement` accept a
- *   plain element or a ref-like `{ current }` object (e.g. the result of
- *   `useRef`) — the React equivalent of upstream's
- *   `RefOrValue`. They are re-resolved on every render and the
- *   listeners re-bind when the resolved element changes;
- * - every remaining option (`disabled`, `buttons`, `exact`, `axis`,
- *   `restrictInView`, `autoScroll`, `onStart` / `onMove` / `onEnd`, …) is
- *   read through a latest-value ref, so the stable listeners always see the
- *   newest options without re-subscribing on renders;
- * - upstream's `watch(position, checkAutoScroll)` becomes a `useEffect`
- *   keyed on the position state; the auto-scroll `setInterval` is stopped on
- *   drag end and on unmount;
- * - SSR-safe: nothing touches `window` or the DOM during render — the
- *   listeners attach in the mount effect only, and `initialValue` seeds the
- *   state so SSR renders the same initial position.
+ * (`source/vueuse/packages/core/useDraggable/`).
  *
  * @example
  * const el = useRef<HTMLDivElement>(null)
@@ -306,7 +267,7 @@ export function useDraggable(
     autoScroll = false,
   } = options
 
-  const initial = toValue(initialValue) ?? { x: 0, y: 0 }
+  const initial = initialValue ?? { x: 0, y: 0 }
   const [position, setPosition] = useState<Position>(initial)
   const [isDragging, setIsDragging] = useState(false)
 
@@ -351,24 +312,24 @@ export function useDraggable(
   // upstream resolves the scroll settings once at setup (`toValue(autoScroll)`)
   // — mirror it with a one-time state initializer
   const [scrollSettings] = useState<ScrollSettings>(() => {
-    const scrollConfig = toValue(autoScroll)
+    const scrollConfig = autoScroll
     return typeof scrollConfig === 'object'
       ? {
-          speed: toValue(scrollConfig.speed) ?? defaultScrollConfig.speed,
-          margin: toValue(scrollConfig.margin) ?? defaultScrollConfig.margin,
+          speed: scrollConfig.speed ?? defaultScrollConfig.speed,
+          margin: scrollConfig.margin ?? defaultScrollConfig.margin,
           direction: scrollConfig.direction ?? defaultScrollConfig.direction,
         }
       : { ...defaultScrollConfig }
   })
 
   // dependency-tracking reads: refs populate before effects run, so the first
-  // render reports `null` / `undefined` for ref-like targets — the effect
+  // render reports `null` / `undefined` for the ref's `.current` — the effect
   // below re-resolves fresh and re-binds whenever a resolved element changes
-  const trackedTarget = toValue(target)
-  const trackedHandle = toValue(draggingHandle)
-  const trackedDraggingElement = toValue(draggingElement)
-  const resolvedPreventDefault = toValue(preventDefault)
-  const resolvedAutoScroll = toValue(autoScroll)
+  const trackedTarget = target
+  const trackedHandle = draggingHandle
+  const trackedDraggingElement = draggingElement
+  const resolvedPreventDefault = preventDefault
+  const resolvedAutoScroll = autoScroll
 
   const autoScrollIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
@@ -380,10 +341,10 @@ export function useDraggable(
   }, [])
 
   const startAutoScroll = useCallback(() => {
-    const container = toValue(optionsRef.current.containerElement)
+    const container = optionsRef.current.containerElement ? unrefElement(optionsRef.current.containerElement) : undefined
     if (container && !autoScrollIntervalRef.current) {
       autoScrollIntervalRef.current = setInterval(() => {
-        const el = toValue(targetRef.current)
+        const el = unrefElement(targetRef.current)
         if (!el)
           return
         const targetRect = el.getBoundingClientRect()
@@ -401,12 +362,12 @@ export function useDraggable(
   }, [scrollSettings])
 
   const checkAutoScroll = useCallback(() => {
-    if (toValue(optionsRef.current.disabled) || !pressedDeltaRef.current)
+    if (optionsRef.current.disabled || !pressedDeltaRef.current)
       return
-    const container = toValue(optionsRef.current.containerElement)
+    const container = optionsRef.current.containerElement ? unrefElement(optionsRef.current.containerElement) : undefined
     if (!container)
       return
-    const el = toValue(targetRef.current)
+    const el = unrefElement(targetRef.current)
     if (!el)
       return
     const targetRect = el.getBoundingClientRect()
@@ -421,7 +382,7 @@ export function useDraggable(
 
   // mirror of upstream's `watch(position, checkAutoScroll)`
   useEffect(() => {
-    if (!toValue(optionsRef.current.autoScroll))
+    if (!optionsRef.current.autoScroll)
       return
     checkAutoScroll()
   }, [position, checkAutoScroll])
@@ -437,13 +398,13 @@ export function useDraggable(
       return
 
     // upstream: `draggingHandle` defaults to the `target`, `draggingElement`
-    // to the window — resolve fresh here so ref-like targets that populated
-    // after the first render bind correctly
-    const handleEl = toValue(optionsRef.current.handle) ?? toValue(targetRef.current)
-    const dragEl = toValue(optionsRef.current.draggingElement) ?? win
+    // to the window — resolve fresh here so a ref whose `.current` populated
+    // after the first render binds correctly
+    const handleEl = (optionsRef.current.handle ? unrefElement(optionsRef.current.handle) : undefined) ?? unrefElement(targetRef.current)
+    const dragEl = (optionsRef.current.draggingElement ? unrefElement(optionsRef.current.draggingElement) : undefined) ?? win
     const listenerOptions: AddEventListenerOptions = {
       capture: capture ?? true,
-      passive: !toValue(optionsRef.current.preventDefault),
+      passive: !optionsRef.current.preventDefault,
     }
 
     const filterEvent = (e: PointerEvent) => {
@@ -455,28 +416,28 @@ export function useDraggable(
 
     const handleEvent = (e: PointerEvent) => {
       const current = optionsRef.current
-      if (toValue(current.preventDefault))
+      if (current.preventDefault)
         e.preventDefault()
-      if (toValue(current.stopPropagation))
+      if (current.stopPropagation)
         e.stopPropagation()
     }
 
     const onPointerDown = (e: PointerEvent) => {
       const current = optionsRef.current
-      if (!toValue(current.buttons ?? [0]).includes(e.button))
+      if (!(current.buttons ?? [0]).includes(e.button))
         return
-      if (toValue(current.disabled) || !filterEvent(e))
+      if (current.disabled || !filterEvent(e))
         return
-      if (toValue(current.exact) && e.target !== toValue(targetRef.current))
+      if (current.exact && e.target !== unrefElement(targetRef.current))
         return
 
-      const container = toValue(current.containerElement)
+      const container = current.containerElement ? unrefElement(current.containerElement) : undefined
       const containerRect = container?.getBoundingClientRect?.()
-      const el = toValue(targetRef.current)
+      const el = unrefElement(targetRef.current)
       if (!el)
         return
       const targetRect = el.getBoundingClientRect()
-      const autoScrollEnabled = toValue(current.autoScroll)
+      const autoScrollEnabled = current.autoScroll
       const pos = {
         x: e.clientX - (container ? targetRect.left - containerRect!.left + (autoScrollEnabled ? 0 : container.scrollLeft) : targetRect.left),
         y: e.clientY - (container ? targetRect.top - containerRect!.top + (autoScrollEnabled ? 0 : container.scrollTop) : targetRect.top),
@@ -490,17 +451,17 @@ export function useDraggable(
 
     const onPointerMove = (e: PointerEvent) => {
       const current = optionsRef.current
-      if (toValue(current.disabled) || !filterEvent(e))
+      if (current.disabled || !filterEvent(e))
         return
       const delta = pressedDeltaRef.current
       if (!delta)
         return
 
-      const container = toValue(current.containerElement)
+      const container = current.containerElement ? unrefElement(current.containerElement) : undefined
       if (container instanceof HTMLElement)
         clampContainerScroll(container)
 
-      const el = toValue(targetRef.current)
+      const el = unrefElement(targetRef.current)
       if (!el)
         return
       const targetRect = el.getBoundingClientRect()
@@ -517,14 +478,14 @@ export function useDraggable(
           y = Math.min(Math.max(0, y), container.scrollHeight - targetRect.height)
       }
 
-      if (toValue(current.autoScroll) && container) {
+      if (current.autoScroll && container) {
         if (autoScrollIntervalRef.current === null)
           handleAutoScroll(container, targetRect, { x, y }, scrollSettings)
 
         x += container.scrollLeft
         y += container.scrollTop
       }
-      if (container && (toValue(current.restrictInView) || toValue(current.autoScroll))) {
+      if (container && (current.restrictInView || current.autoScroll)) {
         if (axisValue !== 'y') {
           const relativeX = x - container.scrollLeft
           if (relativeX < 0)
@@ -550,13 +511,13 @@ export function useDraggable(
 
     const onPointerUp = (e: PointerEvent) => {
       const current = optionsRef.current
-      if (toValue(current.disabled) || !filterEvent(e))
+      if (current.disabled || !filterEvent(e))
         return
       if (!pressedDeltaRef.current)
         return
       pressedDeltaRef.current = undefined
       setIsDragging(false)
-      if (toValue(current.autoScroll))
+      if (current.autoScroll)
         stopAutoScroll()
       current.onEnd?.(positionRef.current, e)
       handleEvent(e)

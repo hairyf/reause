@@ -25,20 +25,8 @@ re-evaluated on every call — there is no reactivity, so re-renders drive re-ev
 
 ```ts
 /**
- * `OR` conditions for values.
- *
  * Map from @vueuse/math `logicOr`
- * (`source/vueuse/packages/math/logicOr/`). Compute the logical `OR` of any
- * number of values.
- *
- * Adjustment for React: upstream wraps the computation in `computed(() => ...)`
- * and returns a `ComputedRef<boolean>`; the reause version is a pure utility
- * function — all plain arguments are evaluated on every call and the plain
- * boolean result is returned directly, with no effects and no `.value` wrapper
- * (SSR-safe). The caller re-invokes it to react to changing values.
- *
- * React divergence: arguments are plain values, not upstream's
- * `MaybeRefOrGetter<any>[]`.
+ * (`source/vueuse/packages/math/logicOr/`).
  *
  * @see https://vueuse.org/math/logicOr/
  *

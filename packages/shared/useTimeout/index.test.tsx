@@ -33,13 +33,13 @@ describe('useTimeout', () => {
     expect(result.current.isPending).toBe(false)
   })
 
-  it('accepts a ref interval (upstream: ref target)', async () => {
-    const ms = { current: 10 }
+  it('accepts a plain-number interval', async () => {
+    const ms = 20
     const { result, act } = await renderHook(() => useTimeout(ms))
     expect(result.current).toBe(false)
 
     await act(async () => {
-      vi.advanceTimersByTime(10)
+      vi.advanceTimersByTime(20)
     })
     expect(result.current).toBe(true)
   })

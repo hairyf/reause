@@ -65,23 +65,8 @@ export interface UseNetworkReturn {
 type NavigatorWithConnection = Navigator & { connection?: NetworkInformation }
 
 /**
- * React port of VueUse's `useNetwork`.
- *
  * Map from @vueuse/core `useNetwork`
- * (`source/vueuse/packages/core/useNetwork/`). Reactive Network status —
- * the Network Information API (`navigator.connection`) combined with the
- * window `online`/`offline` events.
- *
- * React divergences:
- * - the Vue shallowRefs become plain state values in a single object return;
- * - `isSupported` (upstream `useSupported`) starts `false` and is resolved in
- *   the mount effect, so nothing touches `navigator` during render
- *   (SSR-safe);
- * - the window `online`/`offline` and `connection` `change` listeners
- *   (upstream `useEventListener`, passive) live in one self-contained
- *   `useEffect` and are removed on unmount;
- * - the initial network read happens in the same mount effect (upstream reads
- *   it during setup).
+ * (`source/vueuse/packages/core/useNetwork/`).
  *
  * @example
  * const { isOnline, offlineAt, onlineAt, downlink, downlinkMax, effectiveType, saveData, rtt, type } = useNetwork()

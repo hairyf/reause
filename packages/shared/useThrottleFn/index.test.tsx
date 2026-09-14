@@ -183,13 +183,14 @@ describe('useThrottleFn', () => {
     expect(await pending).toBe(3)
   })
 
-  it('re-reads a ref ms on every call', async () => {
+  it('re-reads ms from the latest render on every call', async () => {
     const calls: number[] = []
-    const delay = { current: 100 }
-    const { result, act } = await renderHook(() =>
-      useThrottleFn((n: number) => {
+    const { result, act, rerender } = await renderHook(
+      ({ ms }: { ms: number } = { ms: 100 }) => useThrottleFn((n: number) => {
         calls.push(n)
-      }, delay))
+      }, ms),
+      { initialProps: { ms: 100 } },
+    )
 
     await act(async () => {
       result.current(1)
@@ -204,7 +205,7 @@ describe('useThrottleFn', () => {
     })
     expect(calls).toEqual([1, 2])
 
-    delay.current = 300
+    await rerender({ ms: 300 })
     await act(async () => {
       vi.advanceTimersByTime(400)
     })
@@ -226,20 +227,21 @@ describe('useThrottleFn', () => {
     expect(calls).toEqual([1, 2, 3, 4])
   })
 
-  it('re-reads a ref-like ms ({ current }) on every call', async () => {
+  it('applies a longer ms from the latest render to the pending window', async () => {
     const calls: number[] = []
-    const delay = { current: 100 }
-    const { result, act } = await renderHook(() =>
-      useThrottleFn((n: number) => {
+    const { result, act, rerender } = await renderHook(
+      ({ ms }: { ms: number } = { ms: 100 }) => useThrottleFn((n: number) => {
         calls.push(n)
-      }, delay))
+      }, ms),
+      { initialProps: { ms: 100 } },
+    )
 
     await act(async () => {
       result.current(1)
     })
     expect(calls).toEqual([1])
 
-    delay.current = 300
+    await rerender({ ms: 300 })
     await act(async () => {
       result.current(2)
     })

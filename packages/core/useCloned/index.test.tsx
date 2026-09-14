@@ -24,18 +24,18 @@ describe('useCloned', () => {
     expect(result.current.cloned).toEqual(data)
   })
 
-  it('works with refs', async () => {
-    const data = { current: { test: 'test' } }
+  it('tracks in-place mutations of the source through a getter', async () => {
+    const data = { test: 'test' }
 
     const { result, rerender } = await renderHook(() => {
-      const [cloned, setCloned, { isModified, sync }] = useCloned(data)
+      const [cloned, setCloned, { isModified, sync }] = useCloned(() => data)
       return { cloned, setCloned, isModified, sync }
     })
 
-    data.current.test = 'success'
+    data.test = 'success'
     await rerender()
 
-    expect(result.current.cloned).toEqual(data.current)
+    expect(result.current.cloned).toEqual(data)
   })
 
   it('works with getter function', async () => {
@@ -93,7 +93,7 @@ describe('useCloned', () => {
       return { cloned, setCloned, isModified, sync, setValue }
     })
 
-    // the initial sync is skipped, exactly as for ref-like sources
+    // the initial sync is skipped, exactly as for a getter source
     expect(tuple.result.current.cloned).toEqual({})
 
     await tuple.act(() => {
@@ -119,36 +119,36 @@ describe('useCloned', () => {
     expect(pair.result.current.cloned).toEqual({ test: 'pair' })
   })
 
-  it('works with refs and manual sync', async () => {
-    const data = { current: { test: 'test' } }
+  it('works with a getter source and manual sync', async () => {
+    const data = { test: 'test' }
 
     const { result, act } = await renderHook(() => {
-      const [cloned, setCloned, { isModified, sync }] = useCloned(data, { manual: true })
+      const [cloned, setCloned, { isModified, sync }] = useCloned(() => data, { manual: true })
       return { cloned, setCloned, isModified, sync }
     })
 
-    data.current.test = 'success'
+    data.test = 'success'
 
-    expect(result.current.cloned).not.toEqual(data.current)
+    expect(result.current.cloned).not.toEqual(data)
 
     await act(() => {
       result.current.sync()
     })
 
-    expect(result.current.cloned).toEqual(data.current)
+    expect(result.current.cloned).toEqual(data)
   })
 
   it('works with custom clone function', async () => {
-    const data: { current: Record<string, any> } = { current: { test: 'test' } }
+    const data: Record<string, any> = { test: 'test' }
 
     const { result, rerender } = await renderHook(() => {
-      const [cloned, setCloned, { isModified, sync }] = useCloned(data, {
+      const [cloned, setCloned, { isModified, sync }] = useCloned(() => data, {
         clone: source => ({ ...source, proxyTest: true }),
       })
       return { cloned, setCloned, isModified, sync }
     })
 
-    data.current.test = 'partial'
+    data.test = 'partial'
     await rerender()
 
     expect(result.current.cloned.test).toBe('partial')
@@ -156,7 +156,7 @@ describe('useCloned', () => {
   })
 
   it('infers source type in custom clone function', async () => {
-    const data = { current: { test: 'test' } }
+    const data = { test: 'test' }
 
     await renderHook(() => useCloned(data, {
       clone: (source) => {
@@ -167,33 +167,33 @@ describe('useCloned', () => {
   })
 
   it('works with watch options', async () => {
-    const data = { current: { test: 'test' } }
+    let data = { test: 'test' }
 
     const { result, rerender } = await renderHook(() => {
-      const [cloned, setCloned, { isModified, sync }] = useCloned(data, { immediate: false, deep: false })
+      const [cloned, setCloned, { isModified, sync }] = useCloned(() => data, { immediate: false, deep: false })
       return { cloned, setCloned, isModified, sync }
     })
 
     // test immediate: false
     expect(result.current.cloned).toEqual({})
 
-    data.current.test = 'not valid'
+    data.test = 'not valid'
     await rerender()
 
     // test deep: false
     expect(result.current.cloned).toEqual({})
 
-    data.current = { test: 'valid' }
+    data = { test: 'valid' }
     await rerender()
 
-    expect(result.current.cloned).toEqual(data.current)
+    expect(result.current.cloned).toEqual(data)
   })
 
   it('works with use isModified', async () => {
-    const data = { current: { test: 'test' } }
+    const data = { test: 'test' }
 
     const { result, rerender, act } = await renderHook(() => {
-      const [cloned, setCloned, { isModified, sync }] = useCloned(data)
+      const [cloned, setCloned, { isModified, sync }] = useCloned(() => data)
       return { cloned, setCloned, isModified, sync }
     })
 
@@ -212,10 +212,10 @@ describe('useCloned', () => {
   })
 
   it('setCloned updates the clone without re-syncing from the source', async () => {
-    const data = { current: { test: 'test' } }
+    const data = { test: 'test' }
 
     const { result, act } = await renderHook(() => {
-      const [cloned, setCloned, { isModified, sync }] = useCloned(data)
+      const [cloned, setCloned, { isModified, sync }] = useCloned(() => data)
       return { cloned, setCloned, isModified, sync }
     })
 
@@ -229,14 +229,14 @@ describe('useCloned', () => {
     expect(result.current.cloned).toEqual({ test: 'replaced' })
     expect(result.current.isModified).toBe(true)
     // the clone was not re-cloned from the source
-    expect(data.current).toEqual({ test: 'test' })
+    expect(data).toEqual({ test: 'test' })
   })
 
   it('sync resets isModified after setCloned', async () => {
-    const data = { current: { test: 'test' } }
+    const data = { test: 'test' }
 
     const { result, act } = await renderHook(() => {
-      const [cloned, setCloned, { isModified, sync }] = useCloned(data)
+      const [cloned, setCloned, { isModified, sync }] = useCloned(() => data)
       return { cloned, setCloned, isModified, sync }
     })
 
@@ -254,10 +254,10 @@ describe('useCloned', () => {
   })
 
   it('setCloned accepts a functional updater', async () => {
-    const data = { current: { test: 'test', extra: 1 } }
+    const data = { test: 'test', extra: 1 }
 
     const { result, act } = await renderHook(() => {
-      const [cloned, setCloned, { isModified, sync }] = useCloned(data)
+      const [cloned, setCloned, { isModified, sync }] = useCloned(() => data)
       return { cloned, setCloned, isModified, sync }
     })
 

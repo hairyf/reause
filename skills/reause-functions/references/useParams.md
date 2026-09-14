@@ -76,13 +76,6 @@ setUserId('alice') // URL: /users/alice
 setUserId('guest') // URL: /users/ (no param, since it equals default)
 ```
 
-## React divergences from upstream
-
-- No router dependency: upstream proxies `route.params` through vue-router; this hook matches `window.location.pathname` against the `pattern` option and reads/writes `window.location` / `history` directly, so it needs no routing library.
-- Returns the React array tuple `[value, setValue]` (upstream returns a single writable Vue ref).
-- Upstream batches multi-key writes per tick through a queue and pushes one router navigation; here each `setValue` performs its own history update immediately.
-- There is no multi-page router context: the hook is scoped to the current `window.location` only.
-
 ## Type Declarations
 
 ```ts
@@ -90,12 +83,11 @@ export type RouteParamValueRaw =
   string | number | boolean | null | (string | number | boolean | null)[]
 export interface UseParamsOptions<T, K> {
   /**
-   * Path template used to locate the param in `window.location.pathname`,
-   * e.g. `'/users/:userId'`. A segment starting with `:` captures the
-   * corresponding pathname segment; plain segments must match literally. In
-   * vue-router this route config comes from the router itself, so here it has
-   * to be passed explicitly — without it the hook cannot locate the param and
-   * exposes `defaultValue` (it never throws).
+   * Path template used to locate the param in `window.location.pathname`, e.g. `'/users/:userId'`.
+   * A segment starting with `:` captures the corresponding pathname segment; plain segments must
+   * match literally. In vue-router this route config comes from the router itself, so here it has
+   * to be passed explicitly — without it the hook cannot locate the param and exposes
+   * `defaultValue` (it never throws).
    */
   pattern?: string
   /**
@@ -110,9 +102,8 @@ export interface UseParamsOptions<T, K> {
    */
   mode?: "replace" | "push"
   /**
-   * Function to transform data before return, or an object with one or both
-   * functions: `get` to transform data before returning, and `set` to
-   * transform data before setting.
+   * Function to transform data before return, or an object with one or both functions: `get` to
+   * transform data before returning, and `set` to transform data before setting.
    */
   transform?:
     | ((value: T) => K)

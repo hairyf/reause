@@ -5,34 +5,36 @@ import { render, renderHook } from 'vitest-browser-react'
 import { userEvent } from 'vitest/browser'
 import { useClickOutside } from '../useClickOutside'
 
-function getComplexComponent(usePlainElement = false) {
+function getComplexComponent(useLateTarget = false) {
   return function ComplexComponent() {
     const target = useRef<HTMLDivElement>(null)
-    const outside = useRef<HTMLDivElement>(null)
-    // the plain-element variant keeps the resolved node in state: it is `null`
-    // on the first render and appears after the ref callback runs, so the hook
-    // must read the latest target at event time (a getter used to read it the
-    // same way)
+    // `ignore` takes plain elements now, not refs: the outside node is captured
+    // through a callback ref + state so it is available on the render after it
+    // attaches (the hook reads `ignore` through a latest-value ref)
+    const [outside, setOutside] = useState<HTMLDivElement | null>(null)
+    // the late-target variant keeps the resolved node in state and wraps it in
+    // an inline ref object: it is `null` on the first render and appears after
+    // the ref callback runs, so the hook must read the latest ref at event time
     const [element, setElement] = useState<HTMLDivElement | null>(null)
     useClickOutside(
-      usePlainElement ? element : target,
+      useLateTarget ? { current: element } : target,
       (event) => {
         // Mirrors the upstream test which spies on `console.log`
         // eslint-disable-next-line no-console
         console.log(event)
       },
       {
-        ignore: [outside],
+        ignore: outside ? [outside] : [],
       },
     )
 
     return (
       <div>
-        <div ref={usePlainElement ? setElement : target}>
+        <div ref={useLateTarget ? setElement : target}>
           Inside
         </div>
 
-        <div ref={outside}>
+        <div ref={setOutside}>
           Outside
           <label>
             <input type="radio" />
@@ -138,7 +140,7 @@ describe('useClickOutside', () => {
     })
   })
 
-  it('allow the value of target to be a plain element', async () => {
+  it('resolves a target that is only attached after the first commit', async () => {
     const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {})
     const ComplexComponent = getComplexComponent(true)
     const screen = await render(<ComplexComponent />)

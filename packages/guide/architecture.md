@@ -7,8 +7,8 @@ covered in the **Non-VueUse sources** section (§13) below.
 
 The official VueUse repository is referenced as a git submodule at [`source/vueuse`](https://github.com/hairyf/reause/tree/main/source/vueuse)
 and is the source of truth for every port that names no other source. Each other source is pinned
-as its own read-only checkout under `source/*` — except `react-spring`, which is re-exported from a
-dependency and has no checkout. [`meta/functions.md`](https://github.com/hairyf/reause/blob/main/meta/functions.md)
+as its own read-only checkout under `source/*`.
+[`meta/functions.md`](https://github.com/hairyf/reause/blob/main/meta/functions.md)
 records the resolved source for every export.
 
 **Path consistency rule:** every VueUse file/folder has a reause counterpart at
@@ -79,7 +79,7 @@ The VitePress docs root is **`packages/`** (same as VueUse), with the site confi
 | `packages/.vitepress/shims.d.ts`                 | [`packages/.vitepress/shims.d.ts`](https://github.com/hairyf/reause/blob/main/packages/.vitepress/shims.d.ts)                                                                                   | ✅     |
 | `packages/.vitepress/sw.ts` (workbox SW)         | [`packages/.vitepress/sw.ts`](https://github.com/hairyf/reause/blob/main/packages/.vitepress/sw.ts)                                                                                             | ✅     |
 | `packages/.vitepress/transformHead.ts` (og meta) | inline `transformHead` in config.ts                                                                                                                                                             | ✅     |
-| `packages/.vitepress/twoslash.ts`                | — Vue/SFC-specific (no twoslash in React docs)                                                                                                                                                  | —      |
+| `packages/.vitepress/twoslash.ts`                | [`packages/.vitepress/twoslash.ts`](https://github.com/hairyf/reause/blob/main/packages/.vitepress/twoslash.ts) (injects `@reause/*` hook imports instead of Vue globals)                       | ✅     |
 | `packages/.vitepress/vite.config.ts`             | PWA plugin wired in `config.ts` `vite.plugins`                                                                                                                                                  | ✅     |
 | `packages/index.md` (home)                       | [`packages/index.md`](https://github.com/hairyf/reause/blob/main/packages/index.md)                                                                                                             | ✅     |
 | `packages/functions.md`                          | [`packages/functions.md`](https://github.com/hairyf/reause/blob/main/packages/functions.md) (auto-generated)                                                                                    | ✅     |
@@ -91,12 +91,12 @@ The VitePress docs root is **`packages/`** (same as VueUse), with the site confi
 
 All four VitePress plugins are mirrored with identical virtual-module contracts:
 
-| VueUse plugin                                       | reause                                                                                                                                                                                           | status |
-| --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------ |
-| `plugins/changelog.ts` (`/virtual-changelog`)       | [`packages/.vitepress/plugins/changelog.ts`](https://github.com/hairyf/reause/blob/main/packages/.vitepress/plugins/changelog.ts)                                                                | ✅     |
-| `plugins/contributors.ts` (`/virtual-contributors`) | [`packages/.vitepress/plugins/contributors.ts`](https://github.com/hairyf/reause/blob/main/packages/.vitepress/plugins/contributors.ts)                                                          | ✅     |
-| `plugins/pwa-virtual.ts` (`virtual:pwa`)            | [`packages/.vitepress/plugins/pwa-virtual.ts`](https://github.com/hairyf/reause/blob/main/packages/.vitepress/plugins/pwa-virtual.ts)                                                            | ✅     |
-| `plugins/markdownTransform.ts`                      | [`packages/.vitepress/plugins/markdownTransform.ts`](https://github.com/hairyf/reause/blob/main/packages/.vitepress/plugins/markdownTransform.ts) (linkify only; Vue/twoslash injection omitted) | ✅     |
+| VueUse plugin                                       | reause                                                                                                                                                                                                                                                    | status |
+| --------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ |
+| `plugins/changelog.ts` (`/virtual-changelog`)       | [`packages/.vitepress/plugins/changelog.ts`](https://github.com/hairyf/reause/blob/main/packages/.vitepress/plugins/changelog.ts) — `getChangeLog()` builds the rows from one `git log --name-only` pass instead of upstream's per-commit `git diff-tree` | ✅     |
+| `plugins/contributors.ts` (`/virtual-contributors`) | [`packages/.vitepress/plugins/contributors.ts`](https://github.com/hairyf/reause/blob/main/packages/.vitepress/plugins/contributors.ts)                                                                                                                   | ✅     |
+| `plugins/pwa-virtual.ts` (`virtual:pwa`)            | [`packages/.vitepress/plugins/pwa-virtual.ts`](https://github.com/hairyf/reause/blob/main/packages/.vitepress/plugins/pwa-virtual.ts)                                                                                                                     | ✅     |
+| `plugins/markdownTransform.ts`                      | [`packages/.vitepress/plugins/markdownTransform.ts`](https://github.com/hairyf/reause/blob/main/packages/.vitepress/plugins/markdownTransform.ts) (linkify + twoslash meta/imports injection)                                                             | ✅     |
 
 Data sources mirror upstream: changelog/contributors derive from `git log` of the
 mapped files; `markdownTransform` links backticked function names from the
@@ -104,17 +104,20 @@ mapped files; `markdownTransform` links backticked function names from the
 
 ### `packages/.vitepress/theme/`
 
-| VueUse                                                     | reause                                                                                                                                  | status |
-| ---------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- | ------ |
-| `theme/index.ts` (extends DefaultTheme)                    | [`theme/index.ts`](https://github.com/hairyf/reause/blob/main/packages/.vitepress/theme/index.ts)                                       | ✅     |
-| `theme/styles/{main,vars,overrides,utils,demo}.css`        | same five files in [`theme/styles/`](https://github.com/hairyf/reause/tree/main/packages/.vitepress/theme/styles)                       | ✅     |
-| `theme/components/DemoContainer.vue`                       | same — mounts React demos via `createRoot`                                                                                              | ✅     |
-| `theme/components/Note.vue`                                | [`theme/components/Note.vue`](https://github.com/hairyf/reause/blob/main/packages/.vitepress/theme/components/Note.vue)                 | ✅     |
-| `theme/components/Contributors.vue`                        | [`theme/components/Contributors.vue`](https://github.com/hairyf/reause/blob/main/packages/.vitepress/theme/components/Contributors.vue) | ✅     |
-| `theme/components/ReloadPrompt.vue`                        | [`theme/components/ReloadPrompt.vue`](https://github.com/hairyf/reause/blob/main/packages/.vitepress/theme/components/ReloadPrompt.vue) | ✅     |
-| `theme/redirects.ts` (fn-name short links)                 | — handled by VitePress `_redirects` (scripts/redirects.ts)                                                                              | —      |
-| `theme/components/FunctionBadge.vue` + `FunctionsList.vue` | [`theme/components/`](https://github.com/hairyf/reause/tree/main/packages/.vitepress/theme/components)                                  | ✅     |
-| `theme/composables/{dark,versions}.ts`                     | — default theme handles dark mode; version shown via `meta/versions.ts`                                                                 | —      |
+| VueUse                                                     | reause                                                                                                                                                                                                                                                              | status |
+| ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ |
+| `theme/index.ts` (extends DefaultTheme)                    | [`theme/index.ts`](https://github.com/hairyf/reause/blob/main/packages/.vitepress/theme/index.ts)                                                                                                                                                                   | ✅     |
+| `theme/styles/{main,vars,overrides,utils,demo}.css`        | same five files in [`theme/styles/`](https://github.com/hairyf/reause/tree/main/packages/.vitepress/theme/styles)                                                                                                                                                   | ✅     |
+| `theme/components/DemoContainer.vue`                       | same — mounts React demos via `createRoot`                                                                                                                                                                                                                          | ✅     |
+| `theme/components/Note.vue`                                | [`theme/components/Note.vue`](https://github.com/hairyf/reause/blob/main/packages/.vitepress/theme/components/Note.vue)                                                                                                                                             | ✅     |
+| `theme/components/Contributors.vue`                        | [`theme/components/Contributors.vue`](https://github.com/hairyf/reause/blob/main/packages/.vitepress/theme/components/Contributors.vue)                                                                                                                             | ✅     |
+| `theme/components/ReloadPrompt.vue`                        | [`theme/components/ReloadPrompt.vue`](https://github.com/hairyf/reause/blob/main/packages/.vitepress/theme/components/ReloadPrompt.vue)                                                                                                                             | ✅     |
+| `theme/redirects.ts` (fn-name short links)                 | — handled by VitePress `_redirects` (scripts/redirects.ts)                                                                                                                                                                                                          | —      |
+| `theme/components/FunctionBadge.vue` + `FunctionsList.vue` | [`theme/components/`](https://github.com/hairyf/reause/tree/main/packages/.vitepress/theme/components)                                                                                                                                                              | ✅     |
+| `theme/components/FunctionInfo.vue`                        | [`theme/components/FunctionInfo.vue`](https://github.com/hairyf/reause/blob/main/packages/.vitepress/theme/components/FunctionInfo.vue) — the per-page info block, fed by `scripts/export-size.ts`                                                                  | ✅     |
+| `theme/components/Changelog.vue` + `ChangelogEntry.vue`    | [`theme/components/Changelog.vue`](https://github.com/hairyf/reause/blob/main/packages/.vitepress/theme/components/Changelog.vue) — the `## Changelog` timeline, fed by `/virtual-changelog`; octicon glyphs are inlined because reause installs no icon collection | ✅     |
+| `theme/utils.ts` (`renderCommitMessage`)                   | [`theme/utils.ts`](https://github.com/hairyf/reause/blob/main/packages/.vitepress/theme/utils.ts) — issue links point at `hairyf/reause`                                                                                                                            | ✅     |
+| `theme/composables/{dark,versions}.ts`                     | — default theme handles dark mode; version shown via `meta/versions.ts`                                                                                                                                                                                             | —      |
 
 ## 4. Meta — `meta/`
 
@@ -235,26 +238,24 @@ browser project.
 ## 13. Non-VueUse sources
 
 Everything above describes the VueUse mirror, which still defines the package layout. reause also
-ports from `react-use`, `react-hookz`, `mantine` and `ahooks`, and re-exports `@react-spring/web`.
+ports from `react-use`, `react-hookz`, `mantine` and `ahooks`.
 Those ports are added to the **existing** packages — there is no package per source:
 
-| source         | pinned tree          | lands in                         | how it is ported                                      |
-| -------------- | -------------------- | -------------------------------- | ----------------------------------------------------- |
-| `react-use`    | `source/react-use`   | `@reause/shared`, `@reause/core` | direct mirror — upstream names and return shapes kept |
-| `react-hookz`  | `source/react-hookz` | `@reause/shared`                 | direct mirror                                         |
-| `mantine`      | `source/mantine`     | `@reause/core`, `@reause/shared` | direct mirror, detached from `@mantine/core`          |
-| `ahooks`       | `source/ahooks`      | `@reause/shared`, `@reause/core` | direct mirror with documented renames                 |
-| `react-spring` | — (no checkout)      | `@reause/integrations`           | **re-export only** — nothing is mirrored              |
+| source        | pinned tree          | lands in                         | how it is ported                                      |
+| ------------- | -------------------- | -------------------------------- | ----------------------------------------------------- |
+| `react-use`   | `source/react-use`   | `@reause/shared`, `@reause/core` | direct mirror — upstream names and return shapes kept |
+| `react-hookz` | `source/react-hookz` | `@reause/shared`                 | direct mirror                                         |
+| `mantine`     | `source/mantine`     | `@reause/core`, `@reause/shared` | direct mirror, detached from `@mantine/core`          |
+| `ahooks`      | `source/ahooks`      | `@reause/shared`, `@reause/core` | direct mirror with documented renames                 |
 
 - **Provenance convention:** a port declares its upstream with `` Map from <source> `<upstream-symbol>` `` in its JSDoc. That explicit form is what [`meta/functions.md`](https://github.com/hairyf/reause/blob/main/meta/functions.md) resolves for every source; the prose form (`` React port of VueUse's `<symbol>` ``) stays VueUse-only by design, so a non-VueUse port must carry the annotation. Per-source naming and return-value rules are in [AGENTS.md](https://github.com/hairyf/reause/blob/main/AGENTS.md) §1.
-- **`react-spring` is the exception:** `@react-spring/web` has no pinned checkout, so `useSpring` re-exports it and the registry marks the row `✅ re-exported`. There is no path to verify the claim against, so no 1:1 fidelity is claimed for it.
 - **One monitored source:** only `source/vueuse` is polled for upstream updates; the other checkouts are provenance-only and are read solely to resolve a port's own annotation ([docs/upstream-monitoring.md](https://github.com/hairyf/reause/blob/main/docs/upstream-monitoring.md) §1).
 - **Not yet a source:** a `source/usehooks` checkout is mounted, but it has no ports yet and is therefore absent from the registry's source ids.
 
 ## Mapping decisions
 
 - **Runtime API mapping (conceptual):** Vue's `ref()`/`reactive()` → React `useState()`; `watch()`/`watchEffect()` → `useEffect()`; `computed()` → `useMemo()`/`useCallback()`; composable teardown → effect cleanup on unmount.
-- **Per-source pinned trees:** every port is checked against the pinned checkout of the source its `Map from` annotation names — `source/vueuse`, `source/react-use`, `source/react-hookz`, `source/mantine` or `source/ahooks`. Placement follows the source: `useToggle`/`useCounter` live in `@reause/shared` because upstream has them in `@vueuse/shared`. `react-spring` has no pin — it is re-exported, so its claim carries provenance without a verifiable path (§13).
+- **Per-source pinned trees:** every port is checked against the pinned checkout of the source its `Map from` annotation names — `source/vueuse`, `source/react-use`, `source/react-hookz`, `source/mantine` or `source/ahooks`. Placement follows the source: `useToggle`/`useCounter` live in `@reause/shared` because upstream has them in `@vueuse/shared`.
 - **Docs metadata driven:** function lists/registry are generated by `npm run update` (mirroring VueUse's pipeline): `meta/functions.md` (mapping table), `packages/functions.md` (docs page), `packages/metadata/src/functions.ts` (registry).
 - **Test framework:** vitest-browser-react (browser mode) instead of React Testing Library — real-browser hook tests, mirroring VueUse's vitest browser project.
 - **Docs + React:** VitePress (Vue-based) with React demos mounted client-side via a `DemoContainer` Vue component; docs styling uses the default theme (no unocss).
@@ -266,7 +267,7 @@ Those ports are added to the **existing** packages — there is no package per s
 
 The **VueUse** mirror covers the map above: every `@vueuse/core` function is either ported or closed as intentionally impractical (27 Vue-only `ref` / reactivity APIs, [audit](https://github.com/hairyf/reause/blob/main/docs/upstream-monitoring.md)), and the only unmapped surface is `@vueuse/components`. The non-VueUse sources (§13) are an open, growing set ported on their own terms — no completeness is claimed for them. The generated [`meta/functions.md`](https://github.com/hairyf/reause/blob/main/meta/functions.md) is export-driven, so it is a port registry rather than a coverage proof; since [#915](https://github.com/hairyf/reause/issues/915) it also records the source each export came from.
 
-1. **Large-scale AI mapping** of all `@vueuse/core` functions — complete: [`meta/functions.md`](https://github.com/hairyf/reause/blob/main/meta/functions.md) lists every mapped export with the source it came from (347 rows at the time of writing: 333 resolved to a module in their own source's pin, 3 resolved outside the pinned submodule, 10 reause-only exports such as `isRefLike` or `writeState`, 1 re-exported from `react-spring`, which has no pin to resolve against).
+1. **Large-scale AI mapping** of all `@vueuse/core` functions — complete: [`meta/functions.md`](https://github.com/hairyf/reause/blob/main/meta/functions.md) lists every mapped export with the source it came from (348 rows at the time of writing: 335 resolved to a module in their own source's pin, 3 resolved outside the pinned submodule, 10 reause-only exports such as `isRefLike` or `writeState`).
 2. **`rxjs` / `electron` / `firebase` / `skills` sub-packages** — created and mapped: [`packages/rxjs`](https://github.com/hairyf/reause/tree/main/packages/rxjs), [`packages/electron`](https://github.com/hairyf/reause/tree/main/packages/electron), [`packages/firebase`](https://github.com/hairyf/reause/tree/main/packages/firebase), [`packages/skills`](https://github.com/hairyf/reause/tree/main/packages/skills).
 3. **Publishing to npm (`@reause/*`)** — the `publish.yml` workflow and `publish:ci` script publish through npm **trusted publishing** (OIDC, no token). `v0.1.4` is the current release: all nine published `@reause/*` packages are at `0.1.4` with SLSA provenance, and the Trusted Publisher entries (repo `hairyf/reause`, workflow `publish.yml`) are configured on npmjs.com. The other prerequisite is that every published `package.json` carries a `repository` field whose URL normalises to `https://github.com/hairyf/reause` — OIDC alone is not enough, since npm rejects the upload with `E422 … Error verifying sigstore provenance bundle` otherwise ([release prerequisites](https://github.com/hairyf/reause/blob/main/docs/release.md)).
 4. **`components` package** — ⏳ TODO: the renderless component surface of `@vueuse/components` is not mapped yet ([Components](/guide/components)).

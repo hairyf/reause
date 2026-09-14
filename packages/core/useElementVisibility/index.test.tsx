@@ -1,8 +1,20 @@
+import type { RefObject } from 'react'
+import type { UseElementVisibilityOptions } from '../useElementVisibility'
 import type { UseIntersectionObserverOptions } from '../useIntersectionObserver'
+import type { ElementTarget } from '../useResizeObserver'
 import { beforeEach, describe, expect, expectTypeOf, it, vi } from 'vitest'
 import { renderHook } from 'vitest-browser-react'
 import { useElementVisibility } from '../useElementVisibility'
 import { useIntersectionObserver } from '../useIntersectionObserver'
+
+/**
+ * The hook binds DOM targets to React refs only — a plain element, a getter or
+ * a callback ref is not accepted, so every test wraps its element in a
+ * `{ current }` holder.
+ */
+function refOf<T>(value: T | null): RefObject<T | null> {
+  return { current: value }
+}
 
 // Mirror upstream's index.browser.test.ts: the underlying observer is mocked
 // so the callback wiring and option passthrough can be asserted
@@ -35,18 +47,30 @@ describe('useElementVisibility', () => {
     expectTypeOf(useElementVisibility).returns.toBeBoolean()
   })
 
+  it('accepts only a React ref object as the DOM target', () => {
+    expectTypeOf<Parameters<typeof useElementVisibility>[0]>()
+      .toEqualTypeOf<ElementTarget>()
+    // a plain element is deliberately rejected — refs are the only DOM target
+    expectTypeOf<HTMLDivElement>()
+      .not
+      .toMatchTypeOf<Parameters<typeof useElementVisibility>[0]>()
+    // `rootMargin` is a plain CSS margin string, not a ref/value union
+    expectTypeOf<UseElementVisibilityOptions['rootMargin']>()
+      .toEqualTypeOf<string | undefined>()
+  })
+
   it('should work when el is not an element', async () => {
-    const { result } = await renderHook(() => useElementVisibility(null))
+    const { result } = await renderHook(() => useElementVisibility(refOf<HTMLElement>(null)))
     expect(result.current).toBe(false)
   })
 
   it('should work when window is null', async () => {
-    const { result } = await renderHook(() => useElementVisibility(el, { window: null as unknown as undefined }))
+    const { result } = await renderHook(() => useElementVisibility(refOf(el), { window: null as unknown as undefined }))
     expect(result.current).toBe(false)
   })
 
   it('should forward a null window to useIntersectionObserver (observation disabled)', async () => {
-    await renderHook(() => useElementVisibility(el, { window: null as unknown as undefined }))
+    await renderHook(() => useElementVisibility(refOf(el), { window: null as unknown as undefined }))
 
     // the null window must reach the observer hook as-is — it must NOT be
     // collapsed to the global window (which would re-enable observation)
@@ -54,28 +78,30 @@ describe('useElementVisibility', () => {
   })
 
   it('should work when threshold is null', async () => {
-    const { result } = await renderHook(() => useElementVisibility(el, { threshold: null as unknown as undefined }))
+    const { result } = await renderHook(() => useElementVisibility(refOf(el), { threshold: null as unknown as undefined }))
     expect(result.current).toBe(false)
   })
 
   it('should allow set initial value', async () => {
-    const { result } = await renderHook(() => useElementVisibility(el, { initialValue: true }))
+    const { result } = await renderHook(() => useElementVisibility(refOf(el), { initialValue: true }))
     expect(result.current).toBe(true)
   })
 
   describe('when internally using useIntersectionObserver', () => {
     it('should call useIntersectionObserver internally', async () => {
-      await renderHook(() => useElementVisibility(el))
+      await renderHook(() => useElementVisibility(refOf(el)))
       expect(vi.mocked(useIntersectionObserver)).toHaveBeenCalledTimes(1)
     })
 
-    it('passes the given element to useIntersectionObserver', async () => {
-      await renderHook(() => useElementVisibility(el))
-      expect(vi.mocked(useIntersectionObserver).mock.lastCall?.[0]).toBe(el)
+    it('passes the given ref target through to useIntersectionObserver', async () => {
+      const target = refOf(el)
+      await renderHook(() => useElementVisibility(target))
+      // the ref object itself is forwarded — the observer hook resolves it
+      expect(vi.mocked(useIntersectionObserver).mock.lastCall?.[0]).toBe(target)
     })
 
     it('passes a callback to useIntersectionObserver that sets visibility based on isIntersecting', async () => {
-      const { result, act } = await renderHook(() => useElementVisibility(el))
+      const { result, act } = await renderHook(() => useElementVisibility(refOf(el)))
       const callback = vi.mocked(useIntersectionObserver).mock.lastCall?.[1]
 
       expect(result.current).toBe(false)
@@ -97,7 +123,7 @@ describe('useElementVisibility', () => {
     })
 
     it('uses the latest version of isIntersecting when multiple intersection entries are given', async () => {
-      const { result, act } = await renderHook(() => useElementVisibility(el))
+      const { result, act } = await renderHook(() => useElementVisibility(refOf(el)))
       const callback = vi.mocked(useIntersectionObserver).mock.lastCall?.[1]
 
       await act(() => {
@@ -128,26 +154,28 @@ describe('useElementVisibility', () => {
     it('passes the given window to useIntersectionObserver', async () => {
       const mockWindow = {} as Window
 
-      await renderHook(() => useElementVisibility(el, { window: mockWindow }))
+      await renderHook(() => useElementVisibility(refOf(el), { window: mockWindow }))
       expect(vi.mocked(useIntersectionObserver).mock.lastCall?.[2]?.window).toBe(mockWindow)
     })
 
-    it('uses the given scrollTarget as the root element in useIntersectionObserver', async () => {
+    it('uses the given scrollTarget ref as the root in useIntersectionObserver', async () => {
       const mockScrollTarget = document.createElement('div')
+      const scrollTarget = refOf(mockScrollTarget)
 
-      await renderHook(() => useElementVisibility(el, { scrollTarget: mockScrollTarget }))
-      expect(vi.mocked(useIntersectionObserver).mock.lastCall?.[2]?.root).toBe(mockScrollTarget)
+      await renderHook(() => useElementVisibility(refOf(el), { scrollTarget }))
+      // the ref is forwarded as-is — the observer hook resolves it
+      expect(vi.mocked(useIntersectionObserver).mock.lastCall?.[2]?.root).toBe(scrollTarget)
     })
 
     it('returns a plain boolean, not the upstream controls object', async () => {
-      const { result } = await renderHook(() => useElementVisibility(el))
+      const { result } = await renderHook(() => useElementVisibility(refOf(el)))
       expect(result.current).toBeTypeOf('boolean')
       expect(result.current).not.toHaveProperty('isVisible')
       expect(result.current).not.toHaveProperty('stop')
     })
 
     it('stops the observer after the first visibility change when once is true', async () => {
-      const { result, act } = await renderHook(() => useElementVisibility(el, { once: true }))
+      const { result, act } = await renderHook(() => useElementVisibility(refOf(el), { once: true }))
       const callback = vi.mocked(useIntersectionObserver).mock.lastCall?.[1]
       const stopMock = (vi.mocked(useIntersectionObserver).mock.results.at(-1)?.value as { stop: () => void } | undefined)?.stop
 

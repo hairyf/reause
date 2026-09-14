@@ -1,5 +1,6 @@
+import type { RefObject } from 'react'
 import type { ElementTargetOrArray } from '../useResizeObserver'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, expectTypeOf, it } from 'vitest'
 import { renderHook } from 'vitest-browser-react'
 import { useResizeObserver } from '../useResizeObserver'
 
@@ -47,6 +48,15 @@ function appendElement(width: string, height: string): HTMLDivElement {
 }
 
 /**
+ * The hook binds DOM targets to React refs only — a plain element, a getter or
+ * a callback ref is not accepted, so every test wraps its element in a
+ * `{ current }` holder.
+ */
+function refOf<T>(value: T | null): RefObject<T | null> {
+  return { current: value }
+}
+
+/**
  * Let two rendering frames pass plus a slack timeout — the platform
  * `ResizeObserver` delivers asynchronously per frame, so a deterministic
  * "nothing was delivered" assertion has to wait out a couple of frames.
@@ -57,6 +67,19 @@ async function settleFrames(): Promise<void> {
 }
 
 describe('useResizeObserver', () => {
+  it('accepts a React ref object as the only DOM target form', () => {
+    expectTypeOf<ElementTargetOrArray<HTMLElement>>()
+      .toMatchTypeOf<RefObject<HTMLElement | null> | RefObject<HTMLElement | null>[]>()
+    // a plain element is deliberately rejected — refs are the only DOM target
+    expectTypeOf<HTMLElement>()
+      .not
+      .toMatchTypeOf<ElementTargetOrArray<HTMLElement>>()
+    // the callback form of React's `Ref<T>` is rejected too
+    expectTypeOf<(instance: HTMLElement | null) => void>()
+      .not
+      .toMatchTypeOf<ElementTargetOrArray<HTMLElement>>()
+  })
+
   it('reports the initial size and subsequent resizes of an attached element', async () => {
     const element = appendElement('100px', '50px')
     const entries: ResizeObserverEntry[] = []
@@ -64,7 +87,7 @@ describe('useResizeObserver', () => {
       entries.push(...list)
     }
 
-    const { unmount } = await renderHook(() => useResizeObserver(element, collect))
+    const { unmount } = await renderHook(() => useResizeObserver(refOf(element), collect))
 
     // the platform observer delivers the current sizes once observed
     await expect.poll(() => entries.length).toBeGreaterThan(0)
@@ -85,7 +108,7 @@ describe('useResizeObserver', () => {
       entries.push(...list)
     }
 
-    const { unmount } = await renderHook(() => useResizeObserver(element, collect))
+    const { unmount } = await renderHook(() => useResizeObserver(refOf(element), collect))
 
     // platform semantics: a detached element has no rendered box, so any
     // initial delivery reports a zero rect — never the styled size
@@ -109,7 +132,7 @@ describe('useResizeObserver', () => {
       entries.push(...list)
     }
 
-    const { result, unmount } = await renderHook(() => useResizeObserver(element, collect))
+    const { result, unmount } = await renderHook(() => useResizeObserver(refOf(element), collect))
 
     await expect.poll(() => entries.length).toBeGreaterThan(0)
     expect(result.current.isSupported).toBe(true)
@@ -133,7 +156,7 @@ describe('useResizeObserver', () => {
       entries.push(...list)
     }
 
-    const { unmount } = await renderHook(() => useResizeObserver(element, collect))
+    const { unmount } = await renderHook(() => useResizeObserver(refOf(element), collect))
 
     await expect.poll(() => entries.length).toBeGreaterThan(0)
     await unmount()
@@ -147,7 +170,7 @@ describe('useResizeObserver', () => {
 
   it('re-observes when a ref target attaches between renders', async () => {
     const element = appendElement('100px', '50px')
-    const ref = { current: null as HTMLDivElement | null }
+    const ref = refOf<HTMLDivElement>(null)
     const entries: ResizeObserverEntry[] = []
     const collect = (list: ReadonlyArray<ResizeObserverEntry>) => {
       entries.push(...list)
@@ -155,7 +178,7 @@ describe('useResizeObserver', () => {
 
     const { rerender, unmount } = await renderHook(
       (props?: { target: ElementTargetOrArray }) =>
-        useResizeObserver(props?.target ?? [], collect),
+        useResizeObserver(props?.target ?? refOf(null), collect),
       { initialProps: { target: ref } },
     )
 
@@ -180,13 +203,13 @@ describe('useResizeObserver', () => {
 
     const { rerender, unmount } = await renderHook(
       (props?: { target: ElementTargetOrArray }) =>
-        useResizeObserver(props?.target ?? [], collect),
-      { initialProps: { target: first } },
+        useResizeObserver(props?.target ?? refOf(null), collect),
+      { initialProps: { target: refOf(first) } },
     )
 
     await expect.poll(() => entries.length).toBeGreaterThan(0)
 
-    await rerender({ target: second })
+    await rerender({ target: refOf(second) })
     await expect.poll(() => entries.at(-1)?.target).toBe(second)
 
     second.style.width = '240px'
@@ -205,7 +228,9 @@ describe('useResizeObserver', () => {
       entries.push(...list)
     }
 
-    const { unmount } = await renderHook(() => useResizeObserver([first, second], collect))
+    const { unmount } = await renderHook(() =>
+      useResizeObserver([refOf(first), refOf(second)], collect),
+    )
 
     await expect.poll(() => entries.some(entry => entry.target === first)).toBe(true)
     await expect.poll(() => entries.some(entry => entry.target === second)).toBe(true)
@@ -213,29 +238,6 @@ describe('useResizeObserver', () => {
     await unmount()
     first.remove()
     second.remove()
-  })
-
-  it('observes a getter target (runtime resolveTargets path)', async () => {
-    const element = appendElement('100px', '50px')
-    const entries: ResizeObserverEntry[] = []
-    const collect = (list: ReadonlyArray<ResizeObserverEntry>) => {
-      entries.push(...list)
-    }
-
-    // The public type only accepts elements and RefObjects (callback refs are
-    // deliberately excluded), but `resolveTargets` still resolves a function
-    // target at runtime — covered here via a cast.
-    const getter = (() => element) as unknown as ElementTargetOrArray
-    const { unmount } = await renderHook(() => useResizeObserver(getter, collect))
-
-    await expect.poll(() => entries.length).toBeGreaterThan(0)
-    await expect.poll(() => entries.at(-1)?.target).toBe(element)
-
-    element.style.width = '200px'
-    await expect.poll(() => entries.at(-1)?.contentRect.width).toBe(200)
-
-    await unmount()
-    element.remove()
   })
 
   it('passes the box option through to the platform observer', async () => {
@@ -247,7 +249,7 @@ describe('useResizeObserver', () => {
     }
 
     const { unmount } = await renderHook(() =>
-      useResizeObserver(element, collect, { box: 'border-box' }),
+      useResizeObserver(refOf(element), collect, { box: 'border-box' }),
     )
 
     await expect.poll(() => entries.length).toBeGreaterThan(0)
@@ -273,7 +275,7 @@ describe('useResizeObserver', () => {
 
     const { result, rerender, unmount } = await renderHook(
       (props?: { callback: ResizeObserverCallback }) =>
-        useResizeObserver(element, props?.callback ?? collect, { window: win }),
+        useResizeObserver(refOf(element), props?.callback ?? collect, { window: win }),
       { initialProps: { callback: collect } },
     )
 
@@ -309,7 +311,7 @@ describe('useResizeObserver', () => {
     const win = createStubWindow(false)
 
     const { result, unmount } = await renderHook(() =>
-      useResizeObserver(element, collect, { window: win }),
+      useResizeObserver(refOf(element), collect, { window: win }),
     )
 
     expect(result.current.isSupported).toBe(false)

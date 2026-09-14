@@ -31,21 +31,8 @@ function accurateMultiply(value: number, power: number): number {
 }
 
 /**
- * React port of VueUse's `usePrecision`.
- *
  * Map from @vueuse/math `usePrecision`
- * (`source/vueuse/packages/math/usePrecision/`). Reactively set the precision
- * of a number.
- *
- * Adjustment for React: upstream wraps the computation in `computed(() => ...)`
- * and returns a `ComputedRef<number>`; the reause version is a pure derived
- * hook — the plain `value`, `digits` and `options` are read at render time and
- * the precision-adjusted number is memoized and returned directly, with no
- * effects and no `.value` wrapper (SSR-safe).
- *
- * React divergence: parameters are plain read-only values, not upstream's
- * `MaybeRefOrGetter<...>`. The caller re-renders with new values (e.g. from
- * `useState`).
+ * (`source/vueuse/packages/math/usePrecision/`).
  *
  * @see https://vueuse.org/math/usePrecision/
  *

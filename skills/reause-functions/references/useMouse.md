@@ -65,7 +65,7 @@ export interface UseMouseOptions extends ConfigurableWindow {
    *
    * @default 'Window'
    */
-  target?: RefOrValue<Window | EventTarget | null | undefined>
+  target?: RefObject<Window | EventTarget | null | undefined>
   /**
    * Listen to `touchmove` events
    *
@@ -89,7 +89,7 @@ export interface UseMouseOptions extends ConfigurableWindow {
    */
   initialValue?: Position
   /**
-   * Filter for if events should to be received (upstream: `ConfigurableEventFilter`).
+   * Filter for if events should to be received.
    */
   eventFilter?: EventFilter
 }
@@ -99,37 +99,8 @@ export interface UseMouseReturn {
   sourceType: UseMouseSourceType
 }
 /**
- * Reactive mouse position.
- *
  * Map from @vueuse/core `useMouse`
- * (`source/vueuse/packages/core/useMouse/`), which listens to
- * `mousemove` / `dragover` (+ `touchstart` / `touchmove` when `touch` is
- * enabled, `touchend` reset when `resetOnTouchEnds` is set) on the `target`
- * option (default `window`), extracts the cursor coordinates with the `type`
- * extractor (`page` by default, or `client` / `screen` / `movement` / a custom
- * `UseMouseEventExtractor`) and tracks which input produced the last position
- * in `sourceType`. A `scroll` listener on `window` compensates the `page`
- * coordinates while the page scrolls.
- *
- * React divergences:
- * - the Vue shallow refs returned by upstream (`x` / `y` / `sourceType`)
- *   become plain values — read `x`, `y` and `sourceType` directly off the
- *   result object;
- * - upstream's `useEventListener` becomes a self-contained mount `useEffect`
- *   that re-subscribes when the resolved `target` / the resolved `window`
- *   option / the `type` mode / the `touch` / `scroll` / `resetOnTouchEnds`
- *   flags change and removes all listeners on unmount;
- * - `target` accepts a plain element or a ref-like `{ current }` object
- *   (upstream: `RefOrValue`); it is re-resolved on every render
- *   and the listeners re-bind when the resolved element changes. Not passing
- *   `target` listens on the `window` option (default the global `window`),
- *   while an explicit `null` attaches nothing — exactly like upstream;
- * - `initialValue` is folded into the `useState` initializers and read back
- *   by the `touchend` reset through a latest-value ref, so SSR renders the
- *   defaults (`x: 0`, `y: 0`, `sourceType: null`) without touching `window`;
- * - the `eventFilter` wrapper forwards upstream's placeholder second
- *   argument (`{}`) so a chained filter reads an object instead of
- *   `undefined` (upstream: `eventFilter(() => mouseHandler(event), {} as any)`).
+ * (`source/vueuse/packages/core/useMouse/`).
  *
  * @example
  * const { x, y, sourceType } = useMouse()

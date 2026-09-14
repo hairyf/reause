@@ -152,9 +152,9 @@ console.log(isActive) // true/false
 
 ```ts
 /**
- * Structural subset of `Temporal.DurationLike` (the repo's TypeScript libs do
- * not ship Temporal types yet, so this port describes the Temporal surface it
- * uses with minimal inline structural types instead).
+ * Structural subset of `Temporal.DurationLike` (the repo's TypeScript libs do not ship Temporal
+ * types yet, so this port describes the Temporal surface it uses with minimal inline structural
+ * types instead).
  */
 export interface TemporalDurationLike {
   days?: number
@@ -206,9 +206,9 @@ export interface TemporalZonedDateTime {
   subtract: (duration: TemporalDurationLike | string) => TemporalZonedDateTime
 }
 /**
- * Structural subset of the `Temporal` namespace used by this hook. Any
- * spec-compliant implementation can be passed as the `temporal` option, e.g.
- * the `Temporal` export of `temporal-polyfill` or `@js-temporal/polyfill`.
+ * Structural subset of the `Temporal` namespace used by this hook. Any spec-compliant
+ * implementation can be passed as the `temporal` option, e.g. the `Temporal` export of
+ * `temporal-polyfill` or `@js-temporal/polyfill`.
  */
 export interface TemporalImplementation {
   Now: {
@@ -235,18 +235,16 @@ export interface UseTemporalNowOptions {
    */
   calendar?: string
   /**
-   * Custom `Temporal` implementation to use, e.g. the `Temporal` export from
-   * `temporal-polyfill` or `@js-temporal/polyfill`, instead of relying on the
-   * global `Temporal` object.
+   * Custom `Temporal` implementation to use, e.g. the `Temporal` export from `temporal-polyfill` or
+   * `@js-temporal/polyfill`, instead of relying on the global `Temporal` object.
    *
    * @default globalThis.Temporal
    */
   temporal?: TemporalImplementation
   /**
-   * Custom scheduler driving the `now` updates. Called during render, so it
-   * must follow the Rules of Hooks (pass it consistently across renders) —
-   * e.g. `scheduler: cb => useIntervalFn(cb, 500, { immediate: false })` with
-   * `useIntervalFn` from `@reause/shared`.
+   * Custom scheduler driving the `now` updates. Called during render, so it must follow the Rules
+   * of Hooks (pass it consistently across renders) — e.g. `scheduler: cb => useIntervalFn(cb, 500,
+   * { immediate: false })` with `useIntervalFn` from `@reause/shared`.
    *
    * @default requestAnimationFrame loop, started immediately
    */
@@ -270,8 +268,7 @@ export interface UseTemporalNowControls {
   resume: () => void
 }
 /**
- * Drives `now` updates and reports pausable controls (upstream:
- * `ConfigurableScheduler` returning `Pausable`).
+ * Drives `now` updates and reports pausable controls.
  */
 export type UseTemporalNowScheduler = (
   updateNow: () => void,
@@ -291,12 +288,10 @@ export interface UseTemporalNowReturn extends UseTemporalNowControls {
   calendar: string
   /**
    * Change the timezone — `now` is refreshed immediately
-   * (upstream: writable `timezone` ref)
    */
   setTimezone: Dispatch<SetStateAction<string>>
   /**
    * Change the calendar — `now` is refreshed immediately
-   * (upstream: writable `calendar` ref)
    */
   setCalendar: Dispatch<SetStateAction<string>>
   /**
@@ -324,16 +319,14 @@ export interface UseTemporalNowReturn extends UseTemporalNowControls {
    */
   format: (options?: Intl.DateTimeFormatOptions) => string
   /**
-   * Add a duration. Accepts a structural `TemporalDurationLike` or an ISO 8601
-   * duration string — a deliberate widening of upstream's
-   * `Temporal.DurationLike` to also take strings (e.g. `add('P7D')`), which
-   * upstream's runtime accepts as well.
+   * Add a duration. Accepts a structural `TemporalDurationLike` or an ISO 8601 duration string — a
+   * deliberate widening of upstream's `Temporal.DurationLike` to also take strings (e.g.
+   * `add('P7D')`), which upstream's runtime accepts as well.
    */
   add: (duration: TemporalDurationLike | string) => TemporalZonedDateTime
   /**
-   * Subtract a duration. Accepts a structural `TemporalDurationLike` or an ISO
-   * 8601 duration string — same widening as `add` (upstream:
-   * `Temporal.DurationLike`).
+   * Subtract a duration. Accepts a structural `TemporalDurationLike` or an ISO 8601 duration string
+   * — same widening as `add`.
    */
   subtract: (duration: TemporalDurationLike | string) => TemporalZonedDateTime
   /**
@@ -342,33 +335,8 @@ export interface UseTemporalNowReturn extends UseTemporalNowControls {
   compare: (other: TemporalZonedDateTime | string) => number
 }
 /**
- * Reactive Temporal API with timezone and calendar support.
- *
  * Map from @vueuse/core `useTemporalNow`
  * (`source/vueuse/packages/core/useTemporalNow/`).
- *
- * Adjustments from upstream (Vue reactivity does not translate 1:1):
- *
- * 1. `now` is React state refreshed by the scheduler (upstream: a
- *    `shallowRef` driven by `useRafFn`), so reading it re-renders the
- *    component on every tick.
- * 2. Upstream's writable `timezone`/`calendar` refs become plain values plus
- *    `setTimezone`/`setCalendar` setters; changing either refreshes `now`
- *    immediately (upstream: `watch([timezone, calendar], updateNow)`).
- * 3. The `scheduler` option is called during render to compose the update
- *    loop, so it must be passed consistently across renders (Rules of Hooks).
- *    The default is this package's `useRafFn` — the same default upstream
- *    uses — starting the loop immediately on mount.
- * 4. This repo's TypeScript libs do not ship `Temporal` types, so the
- *    Temporal surface is described with minimal inline structural types
- *    (`TemporalZonedDateTime`, `TemporalImplementation`, ...). Any
- *    spec-compliant implementation works as the `temporal` option — for
- *    `@js-temporal/polyfill` cast it: `temporal: Temporal as unknown as TemporalImplementation`.
- * 5. Like upstream, the implementation is not bundled: the global `Temporal`
- *    object is read (native or polyfilled), and calling this hook throws when
- *    no implementation is available — resolve + validate happen before the
- *    first hook call, so the error surfaces deterministically (upstream:
- *    throws during setup).
  *
  * @example
  * const { now, timezone, calendar, format } = useTemporalNow()

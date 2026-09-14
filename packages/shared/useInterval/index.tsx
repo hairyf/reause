@@ -1,6 +1,4 @@
-import type { RefOrValue } from '../index'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { toValue } from '../utils'
 
 export interface UseIntervalOptions<Controls extends boolean = false> {
   /**
@@ -20,8 +18,8 @@ export interface UseIntervalOptions<Controls extends boolean = false> {
    */
   callback?: (count: number) => void
   /**
-   * Increment the counter (and fire `callback`) immediately when the interval
-   * starts or `resume` is called
+   * Increment the counter (and fire `callback`) immediately when the interval starts or `resume` is
+   * called
    *
    * @default false
    */
@@ -54,24 +52,7 @@ export interface UseIntervalControls {
 export type UseIntervalReturn = number | UseIntervalControls
 
 /**
- * React port of VueUse's `useInterval`.
- *
- * Map from @vueuse/shared `useInterval`
- * Mapping: upstream wraps `useIntervalFn` and returns a readonly
- * `ShallowRef<number>`; since `useIntervalFn` is mapped in its own module,
- * this port inlines the interval logic to stay self-contained — the counter
- * is a plain `number` state (no `.value`), the setup-time `resume()`
- * (`immediate`) becomes a mount `useEffect` (guarded against the StrictMode
- * double-invocation so `immediateCallback` fires only once), and
- * `tryOnScopeDispose(pause)` becomes the effect cleanup. `{ controls: true }`
- * exposes `counter` / `reset` plus the `Pausable` controls (`isActive` /
- * `pause` / `resume`). `interval` accepts a number or a React ref (upstream:
- * `RefOrValue<number>`); like upstream's reactive watch, a changed interval
- * live-restarts the timer while it is active (a ref's `.current` mutation is
- * only picked up on the next render — React has no reactive refs).
- * `immediateCallback` follows `useIntervalFn`'s semantics (upstream
- * `useInterval` doesn't forward it). `pause` / `resume` / `reset` are stable
- * `useCallback`s.
+ * Map from @vueuse/shared `useInterval`.
  *
  * @example
  * // count will increase every 200ms
@@ -79,10 +60,10 @@ export type UseIntervalReturn = number | UseIntervalControls
  *
  * const { counter, isActive, pause, resume, reset } = useInterval(200, { controls: true })
  */
-export function useInterval(interval?: RefOrValue<number>, options?: UseIntervalOptions<false>): number
-export function useInterval(interval: RefOrValue<number>, options: UseIntervalOptions<true>): UseIntervalControls
+export function useInterval(interval?: number, options?: UseIntervalOptions<false>): number
+export function useInterval(interval: number, options: UseIntervalOptions<true>): UseIntervalControls
 export function useInterval(
-  interval: RefOrValue<number> = 1000,
+  interval: number = 1000,
   options: UseIntervalOptions<boolean> = {},
 ): number | UseIntervalControls {
   const {
@@ -106,7 +87,7 @@ export function useInterval(
   // upstream reports `isActive === true` right after setup (interval > 0);
   // initialize lazily so the first render already reflects it
   const [isActive, setIsActive] = useState(() =>
-    immediate && toValue(interval) > 0)
+    immediate && interval > 0)
   // mirrored ref so the interval-change effect can check activeness synchronously
   const isActiveRef = useRef(false)
 
@@ -133,7 +114,7 @@ export function useInterval(
   }, [])
 
   const resume = useCallback(() => {
-    const ms = toValue(intervalRef.current)
+    const ms = intervalRef.current
     if (ms <= 0)
       return
     isActiveRef.current = true
@@ -163,7 +144,7 @@ export function useInterval(
   // restart the timer when the interval changes while active
   // (upstream: a `watch` on the interval calls `resume()`)
   const mountedRef = useRef(false)
-  const intervalMs = toValue(interval)
+  const intervalMs = interval
   useEffect(() => {
     if (!mountedRef.current) {
       mountedRef.current = true

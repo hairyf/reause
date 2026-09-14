@@ -14,7 +14,7 @@ import { useAbs } from '@reause/math'
 const result = useAbs(-23) // 23
 ```
 
-`value` is a plain read-only `number` (upstream takes `MaybeRefOrGetter<number>`). Re-render with a
+`value` is a plain read-only `number`. Re-render with a
 new value — e.g. from `useState` — and the hook recomputes:
 
 ```tsx
@@ -31,19 +31,8 @@ setValue(23) // triggers a re-render
 
 ```ts
 /**
- * React port of VueUse's `useAbs`.
- *
  * Map from @vueuse/math `useAbs`
- * (`source/vueuse/packages/math/useAbs/`). Reactive `Math.abs`.
- *
- * Adjustment for React: upstream wraps the computation in `computed(() => ...)`
- * and returns a `ComputedRef<number>`; the reause version is a pure derived
- * hook — the plain `number` argument is read at render time and `Math.abs` is
- * applied directly, with no effects and no `.value` wrapper (SSR-safe).
- *
- * React divergence: `value` is a plain read-only `number`, not upstream's
- * `MaybeRefOrGetter<number>`. The caller re-renders with a new value (e.g. from
- * `useState`) and the hook recomputes.
+ * (`source/vueuse/packages/math/useAbs/`).
  *
  * @see https://vueuse.org/math/useAbs/
  *

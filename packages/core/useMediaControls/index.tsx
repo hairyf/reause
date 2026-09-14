@@ -1,10 +1,11 @@
-import type { RefOrValue } from '@reause/shared'
-import { isObject, toValue } from '@reause/shared'
+import type { RefObject } from 'react'
+import { isObject } from '@reause/shared'
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { unrefElement } from '../unrefElement'
 
 /**
- * Many of the jsdoc definitions here are modified version of the
- * documentation from MDN(https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement)
+ * Many of the jsdoc definitions here are modified version of the documentation from
+ * MDN(https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement)
  */
 
 export interface UseMediaSource {
@@ -26,8 +27,8 @@ export interface UseMediaSource {
 
 export interface UseMediaTextTrackSource {
   /**
-   * Indicates that the track should be enabled unless the user's preferences indicate
-   * that another track is more appropriate
+   * Indicates that the track should be enabled unless the user's preferences indicate that another
+   * track is more appropriate
    */
   default?: boolean
 
@@ -37,46 +38,40 @@ export interface UseMediaTextTrackSource {
   kind: TextTrackKind
 
   /**
-   * A user-readable title of the text track which is used by the browser
-   * when listing available text tracks.
+   * A user-readable title of the text track which is used by the browser when listing available
+   * text tracks.
    */
   label: string
 
   /**
-   * Address of the track (.vtt file). Must be a valid URL. This attribute
-   * must be specified and its URL value must have the same origin as the document
+   * Address of the track (.vtt file). Must be a valid URL. This attribute must be specified and its
+   * URL value must have the same origin as the document
    */
   src: string
 
   /**
-   * Language of the track text data. It must be a valid BCP 47 language tag.
-   * If the kind attribute is set to subtitles, then srclang must be defined.
+   * Language of the track text data. It must be a valid BCP 47 language tag. If the kind attribute
+   * is set to subtitles, then srclang must be defined.
    */
   srcLang: string
 }
 
 export interface UseMediaControlsOptions {
   /**
-   * Specify a custom `document` instance, e.g. working with iframes or in
-   * testing environments. Inlined here — `ConfigurableDocument` is not ported
-   * to @reause/shared.
+   * Specify a custom `document` instance, e.g. working with iframes or in testing environments.
    *
    * @default typeof document !== 'undefined' ? document : undefined
    */
   document?: Document
 
   /**
-   * The source for the media, may either be a string, a `UseMediaSource` object, or a list
-   * of `UseMediaSource` objects. A read-only value source — pass a plain value
-   * (upstream: `MaybeRefOrGetter`; resolve a React ref or getter at the call
-   * site).
+   * The source for the media, may either be a string, a `UseMediaSource` object, or a list of
+   * `UseMediaSource` objects. A read-only value source — pass a plain value.
    */
   src?: string | UseMediaSource | UseMediaSource[]
 
   /**
-   * A list of text tracks for the media. A read-only value source — pass a
-   * plain array (upstream: `MaybeRefOrGetter`; resolve a React ref or getter
-   * at the call site).
+   * A list of text tracks for the media. A read-only value source — pass a plain array.
    */
   tracks?: UseMediaTextTrackSource[]
 }
@@ -93,14 +88,13 @@ export interface UseMediaTextTrack {
   label: string
 
   /**
-   * Language of the track text data. It must be a valid BCP 47 language tag.
-   * If the kind attribute is set to subtitles, then srclang must be defined.
+   * Language of the track text data. It must be a valid BCP 47 language tag. If the kind attribute
+   * is set to subtitles, then srclang must be defined.
    */
   language: string
 
   /**
-   * Specifies the display mode of the text track, either `disabled`,
-   * `hidden`, or `showing`
+   * Specifies the display mode of the text track, either `disabled`, `hidden`, or `showing`
    */
   mode: TextTrackMode
 
@@ -126,12 +120,11 @@ export interface UseMediaTextTrack {
 }
 
 /**
- * Target media element accepted by `useMediaControls` — a plain element or a
- * ref-like `{ current }` object (e.g. `useRef<HTMLVideoElement>(null)`, whose
- * `current` is populated after mount) — the React analog of upstream's
- * media-element target.
+ * Target media element accepted by `useMediaControls` — a React ref object (`RefObject`) holding
+ * the element (e.g. `useRef<HTMLVideoElement>(null)`, whose `current` is populated after mount),
+ * resolved with the shared `unrefElement` — the React analog of upstream's media-element target.
  */
-export type UseMediaControlsTarget = RefOrValue<HTMLMediaElement | null | undefined>
+export type UseMediaControlsTarget = RefObject<HTMLMediaElement | null | undefined>
 
 export interface UseMediaControlsReturn {
   currentTime: number
@@ -175,8 +168,8 @@ export interface UseMediaControlsReturn {
 type EventHookOn<T = any> = (fn: (param: T) => void) => () => void
 
 /**
- * Minimal event emitter — inlined from @vueuse/shared `createEventHook`
- * (not yet ported to @reause/shared, so kept local with attribution).
+ * Minimal event emitter — inlined from @vueuse/shared `createEventHook` (not yet ported to
+ * @reause/shared, so kept local with attribution).
  */
 function createEventHook<T = any>() {
   const fns: Array<(param: T) => void> = []
@@ -220,11 +213,10 @@ function tracksToArray(tracks: TextTrackList): UseMediaTextTrack[] {
 }
 
 /**
- * Deep-enough equality for `UseMediaTextTrack` lists (compares the fields a
- * media element's `textTracks` list exposes). The text-track listeners refresh
- * the `tracks` state on `addtrack` / `removetrack` / `change`, and those
- * events also fire while the injection effect (re)creates the `<track>`
- * children — without this guard every injection cycle would re-render.
+ * Deep-enough equality for `UseMediaTextTrack` lists (compares the fields a media element's
+ * `textTracks` list exposes). The text-track listeners refresh the `tracks` state on `addtrack` /
+ * `removetrack` / `change`, and those events also fire while the injection effect (re)creates the
+ * `<track>` children — without this guard every injection cycle would re-render.
  */
 function tracksEqual(a: UseMediaTextTrack[], b: UseMediaTextTrack[]): boolean {
   if (a.length !== b.length)
@@ -242,8 +234,8 @@ function tracksEqual(a: UseMediaTextTrack[], b: UseMediaTextTrack[]): boolean {
 }
 
 /**
- * Normalizes the `src` option into a list of `UseMediaSource` (upstream merges
- * a string / object / list the same way).
+ * Normalizes the `src` option into a list of `UseMediaSource` (upstream merges a string / object /
+ * list the same way).
  */
 function normalizeSources(src: string | UseMediaSource | UseMediaSource[] | undefined): UseMediaSource[] {
   if (!src)
@@ -258,11 +250,9 @@ function normalizeSources(src: string | UseMediaSource | UseMediaSource[] | unde
 }
 
 /**
- * Content fingerprint of the `src` option. React has no reactivity, so the
- * injection effect must not re-run merely because a render produced a new
- * object identity — it depends on this stable string instead, matching
- * upstream's `watchEffect` re-running when the reactive value's content
- * changes.
+ * Content fingerprint of the `src` option. React has no reactivity, so the injection effect must
+ * not re-run merely because a render produced a new object identity — it depends on this stable
+ * string instead.
  */
 function sourcesSignature(src: string | UseMediaSource | UseMediaSource[] | undefined): string {
   return JSON.stringify(normalizeSources(src))
@@ -278,10 +268,9 @@ function tracksSignature(tracks: UseMediaTextTrackSource[] | undefined): string 
 const listenerOptions: AddEventListenerOptions = { passive: true }
 
 /**
- * Mirror the value into a ref and bump the React state — used by the media
- * event handlers so the stable callbacks and the binding effect read the
- * latest value without re-rendering (upstream mutates its refs directly;
- * React state only drives renders).
+ * Mirror the value into a ref and bump the React state — used by the media event handlers so the
+ * stable callbacks and the binding effect read the latest value without re-rendering (upstream
+ * mutates its refs directly; React state only drives renders).
  */
 function updateState(set: (value: boolean) => void, ref: { current: boolean }, value: boolean) {
   ref.current = value
@@ -289,8 +278,7 @@ function updateState(set: (value: boolean) => void, ref: { current: boolean }, v
 }
 
 /**
- * Numeric variant of `updateState` for `currentTime` / `duration` / `volume`
- * / `playbackRate`.
+ * Numeric variant of `updateState` for `currentTime` / `duration` / `volume` / `playbackRate`.
  */
 function updateNumberState(set: (value: number) => void, ref: { current: number }, value: number) {
   ref.current = value
@@ -298,64 +286,8 @@ function updateNumberState(set: (value: number) => void, ref: { current: number 
 }
 
 /**
- * Reactive media controls for both `audio` and `video` elements.
- *
  * Map from @vueuse/core `useMediaControls`
- * (`source/vueuse/packages/core/useMediaControls/`). Listens to the media
- * element's events (`play` / `pause` / `timeupdate` / `durationchange` /
- * `volumechange` / `ratechange` / `seeked` / `ended` / ...) and mirrors the
- * playback state into plain React state. The `src` and `tracks` options are
- * injected into the element as `<source>` / `<track>` children (upstream
- * `watchEffect`s), and the returned controls drive the element directly.
- *
- * React divergences from upstream:
- *
- * 1. The Vue `ShallowRef` returns become plain state values
- *    (`currentTime`, `duration`, `playing`, `volume`, `muted`, `rate`,
- *    `tracks`, `selectedTrack`, ...) returned in a single object — read them
- *    like upstream's `xxx.value`.
- * 2. Writable refs → control methods: upstream writes
- *    `playing.value = true`, `currentTime.value = 60`, `volume.value = 0.5`,
- *    `rate.value = 2`, `muted.value = true`; here those writes become
- *    `play()` / `pause()` / `toggle()`, `seek(time)`, `setVolume(volume)`,
- *    `setRate(rate)`, `mute()` / `unmute()` / `toggleMute()`. Each method
- *    writes through to the element (mirroring upstream's ignorable watches).
- *    `enableTrack` / `disableTrack` / `togglePictureInPicture` are ported
- *    as-is (they were methods upstream too).
- * 3. Upstream's per-event `useEventListener(target, ...)` bindings and the
- *    nested text-track listeners become a single binding effect that resolves
- *    the current element via `toValue` at effect run time — so a `useRef`
- *    target populated after mount still binds, exactly like upstream's
- *    element-aware watches — and re-binds with cleanup whenever the resolved
- *    element changes or the hook unmounts.
- * 4. The upstream `watchEffect`s that inject `<source>` / `<track>` children
- *    and call `el.load()` become effects that clean up the injected elements
- *    (removing them from the previous element when the target or options
- *    change) and that are SSR-safe — `document` is only reached through a
- *    guarded default and the effects run after mount. `options.src` and
- *    `options.tracks` are read-only value sources and take plain values
- *    (upstream: `MaybeRefOrGetter`; resolve a React ref or getter at the call
- *    site). The `target` element param stays
- *    `RefOrValue<HTMLMediaElement | null | undefined>` (a DOM target, not a
- *    value source).
- * 5. `supportsPictureInPicture` is resolved once at setup (upstream reads a
- *    computed at setup too) and state defaults (`volume: 1`, `muted: false`,
- *    `rate: 1`, `currentTime: 0`, ...) stay until the events fill them in.
- * 6. The `onSourceError` / `onPlaybackError` event hooks (upstream
- *    `createEventHook`) are inlined — the shared `createEventHook` is not yet
- *    ported to @reause/shared. Upstream's `play()` failure path also rethrows
- *    so Vue's global error handler observes it; React has no equivalent global
- *    handler for unhandled promise rejections, so here the failure is only
- *    routed to `onPlaybackError`.
- * 7. SSR-safe: nothing touches `document` or the media element during render
- *    — the element is only accessed inside effects and control methods, so
- *    the server renders the initial defaults.
- * 8. Upstream's non-immediate `watch([target, volume|muted|rate])`
- *    apply-watchers are replaced by the control methods writing through to
- *    the element directly; the binding effect only applies the current
- *    `volume` / `muted` / `playbackRate` when re-binding to a *different*
- *    element (target swap), so the first bind never clobbers pre-set element
- *    state (e.g. a `<video muted>` attribute).
+ * (`source/vueuse/packages/core/useMediaControls/`).
  *
  * @example
  * const video = useRef<HTMLVideoElement>(null)
@@ -390,7 +322,7 @@ export function useMediaControls(
 
   // Resolve the target element during render so the binding effects re-run
   // when it changes (a re-render that re-points the ref).
-  const el = toValue(target)
+  const el = target ? unrefElement(target) : undefined
 
   // Resolve the src / tracks options during render so the injection effects
   // re-run when their CONTENT changes (upstream `watchEffect`s re-run on their
@@ -439,14 +371,13 @@ export function useMediaControls(
   const playbackErrorEventRef = useRef(createEventHook<Event>())
 
   /**
-   * Bind every media listener to the current element and apply the current
-   * state to it. Re-runs (with cleanup) whenever the resolved target element
-   * changes and on unmount — upstream's `useEventListener(target, ...)` calls
-   * plus the `watch([target, volume|muted|rate])` apply-watchers and the
-   * nested text-track listeners.
+   * Bind every media listener to the current element and apply the current state to it. Re-runs
+   * (with cleanup) whenever the resolved target element changes and on unmount — upstream's
+   * `useEventListener(target...)` calls plus the `watch([target, volume|muted|rate])`
+   * apply-watchers and the nested text-track listeners.
    */
   useEffect(() => {
-    const mediaEl = toValue(targetRef.current)
+    const mediaEl = unrefElement(targetRef.current)
     if (!mediaEl)
       return
 
@@ -526,13 +457,13 @@ export function useMediaControls(
   }, [el])
 
   /**
-   * Inject the `src` option as `<source>` children and `el.load()` — upstream
-   * `watchEffect`. The created sources (and their error listeners) are removed
-   * on cleanup so a target / option change never leaves stale sources behind.
+   * Inject the `src` option as `<source>` children and `el.load()` — upstream `watchEffect`. The
+   * created sources (and their error listeners) are removed on cleanup so a target / option change
+   * never leaves stale sources behind.
    */
   useEffect(() => {
-    const mediaEl = toValue(targetRef.current)
-    const src = toValue(optionsRef.current.src)
+    const mediaEl = unrefElement(targetRef.current)
+    const src = optionsRef.current.src
     if (!doc || !mediaEl || !src)
       return
 
@@ -570,15 +501,14 @@ export function useMediaControls(
   }, [doc, el, srcSignature])
 
   /**
-   * Inject the `tracks` option as `<track>` children — upstream `watchEffect`.
-   * The MediaAPI provides an API for adding text tracks, but they don't
-   * currently have an API for removing text tracks, so the created `<track>`
-   * elements are removed manually on cleanup (upstream re-creates them on
-   * every watcher re-run).
+   * Inject the `tracks` option as `<track>` children — upstream `watchEffect`. The MediaAPI
+   * provides an API for adding text tracks, but they don't currently have an API for removing text
+   * tracks, so the created `<track>` elements are removed manually on cleanup (upstream re-creates
+   * them on every watcher re-run).
    */
   useEffect(() => {
-    const mediaEl = toValue(targetRef.current)
-    const textTracks = toValue(optionsRef.current.tracks)
+    const mediaEl = unrefElement(targetRef.current)
+    const textTracks = optionsRef.current.tracks
     if (!doc || !mediaEl || !textTracks || !textTracks.length)
       return
 
@@ -611,13 +541,12 @@ export function useMediaControls(
   }, [doc, el, tracksSignatureValue])
 
   /**
-   * Disables the specified track. If no track is specified then
-   * all tracks will be disabled
+   * Disables the specified track. If no track is specified then all tracks will be disabled
    *
    * @param track The id of the track to disable
    */
   const disableTrack = useCallback((track?: number | UseMediaTextTrack) => {
-    const mediaEl = toValue(targetRef.current)
+    const mediaEl = unrefElement(targetRef.current)
     if (!mediaEl)
       return
 
@@ -637,14 +566,13 @@ export function useMediaControls(
   }, [])
 
   /**
-   * Enables the specified track and disables the
-   * other tracks unless otherwise specified
+   * Enables the specified track and disables the other tracks unless otherwise specified
    *
    * @param track The track of the id of the track to enable
    * @param disableTracks Disable all other tracks
    */
   const enableTrack = useCallback((track: number | UseMediaTextTrack, disableTracks = true) => {
-    const mediaEl = toValue(targetRef.current)
+    const mediaEl = unrefElement(targetRef.current)
     if (!mediaEl)
       return
 
@@ -665,7 +593,7 @@ export function useMediaControls(
    */
   const togglePictureInPicture = useCallback(() => {
     return new Promise<PictureInPictureWindow | void>((resolve, reject) => {
-      const mediaEl = toValue(targetRef.current)
+      const mediaEl = unrefElement(targetRef.current)
       if (!mediaEl)
         return
 
@@ -681,14 +609,13 @@ export function useMediaControls(
   }, [doc, supportsPictureInPicture])
 
   /**
-   * Start playback — upstream writes `playing.value = true` (ignorable watch →
-   * `el.play()`). Playback failures trigger `onPlaybackError`; upstream also
-   * rethrows so Vue's global error handler observes the failure, but React has
-   * no equivalent global handler for unhandled promise rejections, so the
-   * error is only routed to the event hook (divergence #6 above).
+   * Start playback — upstream writes `playing.value = true` (ignorable watch → `el.play()`).
+   * Playback failures trigger `onPlaybackError`; upstream also rethrows so Vue's global error
+   * handler observes the failure, but React has no equivalent global handler for unhandled promise
+   * rejections, so the error is only routed to the event hook (divergence #6 above).
    */
   const play = useCallback(() => {
-    const mediaEl = toValue(targetRef.current)
+    const mediaEl = unrefElement(targetRef.current)
     if (!mediaEl)
       return
 
@@ -700,11 +627,10 @@ export function useMediaControls(
   }, [])
 
   /**
-   * Pause playback — upstream writes `playing.value = false` (ignorable watch →
-   * `el.pause()`).
+   * Pause playback — upstream writes `playing.value = false` (ignorable watch → `el.pause()`).
    */
   const pause = useCallback(() => {
-    const mediaEl = toValue(targetRef.current)
+    const mediaEl = unrefElement(targetRef.current)
     if (!mediaEl)
       return
 
@@ -724,13 +650,13 @@ export function useMediaControls(
   }, [pause, play])
 
   /**
-   * Seek the media to the given time — upstream writes `currentTime.value`
-   * (ignorable watch → `el.currentTime = time`).
+   * Seek the media to the given time — upstream writes `currentTime.value` (ignorable watch →
+   * `el.currentTime = time`).
    *
    * @param time Time in seconds to seek to
    */
   const seek = useCallback((time: number) => {
-    const mediaEl = toValue(targetRef.current)
+    const mediaEl = unrefElement(targetRef.current)
     if (!mediaEl)
       return
 
@@ -739,13 +665,12 @@ export function useMediaControls(
   }, [])
 
   /**
-   * Set the media volume — upstream writes `volume.value` (watch →
-   * `el.volume = volume`).
+   * Set the media volume — upstream writes `volume.value` (watch → `el.volume = volume`).
    *
    * @param volume Volume between 0 and 1
    */
   const setVolume = useCallback((nextVolume: number) => {
-    const mediaEl = toValue(targetRef.current)
+    const mediaEl = unrefElement(targetRef.current)
     if (!mediaEl)
       return
 
@@ -755,11 +680,10 @@ export function useMediaControls(
   }, [])
 
   /**
-   * Mute the media — upstream writes `muted.value = true` (watch →
-   * `el.muted = true`).
+   * Mute the media — upstream writes `muted.value = true` (watch → `el.muted = true`).
    */
   const mute = useCallback(() => {
-    const mediaEl = toValue(targetRef.current)
+    const mediaEl = unrefElement(targetRef.current)
     if (!mediaEl)
       return
 
@@ -769,11 +693,10 @@ export function useMediaControls(
   }, [])
 
   /**
-   * Unmute the media — upstream writes `muted.value = false` (watch →
-   * `el.muted = false`).
+   * Unmute the media — upstream writes `muted.value = false` (watch → `el.muted = false`).
    */
   const unmute = useCallback(() => {
-    const mediaEl = toValue(targetRef.current)
+    const mediaEl = unrefElement(targetRef.current)
     if (!mediaEl)
       return
 
@@ -793,13 +716,12 @@ export function useMediaControls(
   }, [mute, unmute])
 
   /**
-   * Set the media playback rate — upstream writes `rate.value` (watch →
-   * `el.playbackRate = rate`).
+   * Set the media playback rate — upstream writes `rate.value` (watch → `el.playbackRate = rate`).
    *
    * @param rate Playback rate (e.g. 0.5, 1, 2)
    */
   const setRate = useCallback((nextRate: number) => {
-    const mediaEl = toValue(targetRef.current)
+    const mediaEl = unrefElement(targetRef.current)
     if (!mediaEl)
       return
 

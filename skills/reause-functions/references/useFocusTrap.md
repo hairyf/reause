@@ -87,15 +87,15 @@ function reveal() {
 
 ```ts
 /**
- * Activate options accepted by `useFocusTrap().activate()` — mirrors
- * focus-trap's non-exported `ActivateOptions`.
+ * Activate options accepted by `useFocusTrap().activate()` — mirrors focus-trap's non-exported
+ * `ActivateOptions`.
  */
 type ActivateOptions = NonNullable<
   Parameters<FocusTrap.FocusTrap["activate"]>[0]
 >
 /**
- * Deactivate options accepted by `useFocusTrap().deactivate()` — mirrors
- * focus-trap's non-exported `DeactivateOptions`.
+ * Deactivate options accepted by `useFocusTrap().deactivate()` — mirrors focus-trap's non-exported
+ * `DeactivateOptions`.
  */
 type DeactivateOptions = NonNullable<
   Parameters<FocusTrap.FocusTrap["deactivate"]>[0]
@@ -106,18 +106,16 @@ export interface UseFocusTrapOptions extends FocusTrap.Options {
    */
   immediate?: boolean
   /**
-   * Called when the trap is activated. Focus-trap's own `Options.onActivate` is
-   * typed (and, in the pinned version, invoked) without arguments; this port
-   * re-declares it with the optional activation params so they are forwarded
-   * exactly like upstream (`options.onActivate(params)`).
+   * Called when the trap is activated. Focus-trap's own `Options.onActivate` is typed (and, in the
+   * pinned version, invoked) without arguments; this port re-declares it with the optional
+   * activation params so they are forwarded exactly like upstream (`options.onActivate(params)`).
    */
   onActivate?: (params?: ActivateOptions) => void
   /**
-   * Called when the trap is deactivated, receiving the deactivation params.
-   * Focus-trap's own `Options.onDeactivate` is typed (and, in the pinned
-   * version, invoked) without arguments; this port re-declares it with the
-   * optional deactivation params so they are forwarded exactly like upstream
-   * (`options.onDeactivate(params)`).
+   * Called when the trap is deactivated, receiving the deactivation params. Focus-trap's own
+   * `Options.onDeactivate` is typed (and, in the pinned version, invoked) without arguments; this
+   * port re-declares it with the optional deactivation params so they are forwarded exactly like
+   * upstream (`options.onDeactivate(params)`).
    */
   onDeactivate?: (params?: DeactivateOptions) => void
 }
@@ -159,41 +157,17 @@ export interface UseFocusTrapReturn {
 }
 /** Accepted DOM target kinds — mirrors upstream's `MaybeElement`. */
 type MaybeElement = HTMLElement | SVGElement | null | undefined
-/** A plain element or a React ref-like object (`{ current }`) — upstream `MaybeElementRef`. */
-type MaybeElementRef =
-  | MaybeElement
-  | {
-      readonly current: MaybeElement
-    }
-/** One item of the focus-trap target list (upstream `MaybeComputedElementRef`, without its getter branch). */
-type FocusTrapTarget = RefOrValue<string> | MaybeElementRef
 /**
- * React port of VueUse's `useFocusTrap` — trap focus within one or more
- * elements.
- *
+ * One item of the focus-trap target list (upstream `MaybeComputedElementRef`, without its getter
+ * branch): a selector string or a React ref object holding the element.
+ */
+type FocusTrapTarget = string | RefObject<MaybeElement>
+/**
  * Map from @vueuse/integrations `useFocusTrap`
- * (`source/vueuse/packages/integrations/useFocusTrap/`), a reactive wrapper
- * around the [`focus-trap`](https://github.com/focus-trap/focus-trap) library
- * that keeps focus trapped inside the target element(s) while the trap is
- * active.
+ * (`source/vueuse/packages/integrations/useFocusTrap/`).
  *
- * Adjustment for React: upstream creates the trap inside a `watch` over the
- * resolved targets and exposes `ShallowRef`s for `hasFocus` / `isPaused`. The
- * React port creates the `createFocusTrap` instance in an effect keyed on the
- * resolved targets (mirroring the `watch`), keeps it for the lifetime of the
- * component — target changes go through `updateContainerElements` — and
- * deactivates it on unmount (`tryOnScopeDispose`). `hasFocus` / `isPaused`
- * are plain booleans driven by focus-trap's `onActivate` / `onDeactivate`
- * events plus the pause / unpause calls, and `activate` / `deactivate` /
- * `pause` / `unpause` are stable callbacks delegating to the current trap
- * instance. The `immediate` option activates the trap as soon as the target
- * elements are available.
- *
- * SSR-safe: no `window` or DOM access at module scope — the trap is created
- * lazily inside the effect.
- *
- * @param target - element, React ref object (`{ current }`), selector string,
- *   or an array of them
+ * @param target - React ref object (`RefObject`) holding the element, a
+ *   selector string, or an array of them
  * @param options - focus-trap options (see
  *   https://github.com/focus-trap/focus-trap#createoptions) plus the
  *   `immediate` shortcut
@@ -204,7 +178,7 @@ type FocusTrapTarget = RefOrValue<string> | MaybeElementRef
  * activate() // traps focus inside target
  */
 export declare function useFocusTrap(
-  target: RefOrValue<FocusTrapTarget | FocusTrapTarget[]>,
+  target: FocusTrapTarget | FocusTrapTarget[],
   options?: UseFocusTrapOptions,
 ): UseFocusTrapReturn
 ```

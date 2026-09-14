@@ -187,13 +187,13 @@ describe('useBroadcastChannel', () => {
     expect(result.current.error).toBe(event)
   })
 
-  it('returned `off` handle unsubscribes the listener', async () => {
+  it('the returned `off` function unsubscribes the listener', async () => {
     const onMessage = vi.fn()
 
     const { result, act } = await renderHook(() => useBroadcastChannel<string, string>({ name: 'test-channel' }))
     const channel = mockChannel(result.current.channel)
 
-    const { off } = result.current.onMessage(onMessage)
+    const off = result.current.onMessage(onMessage)
 
     await act(() => {
       channel.emit('message', new MessageEvent('message', { data: 1 }))

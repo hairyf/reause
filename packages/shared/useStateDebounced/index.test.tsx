@@ -90,19 +90,20 @@ describe('useStateDebounced', () => {
     expect(result.current[2]).toBe('c')
   })
 
-  it('re-reads a ref-like ms ({ current }) on every write', async () => {
-    const delay = { current: 100 }
-    const { result, act } = await renderHook(() => useStateDebounced('', delay))
+  it('re-reads ms from the latest render on every write', async () => {
+    const { result, act, rerender } = await renderHook(
+      ({ ms }: { ms: number } = { ms: 100 }) => useStateDebounced('', ms),
+      { initialProps: { ms: 100 } },
+    )
 
     await act(() => result.current[1]('a'))
+    await rerender({ ms: 300 })
     await act(async () => {
-      delay.current = 300
       result.current[1]('b')
     })
 
     // 'a' was superseded with the old delay — its timer was cleared; 'b' uses
-    // the new 300ms delay (RefOrValue<number> accepts a plain number or a
-    // ref-like `{ current }` — getters are not supported)
+    // the new 300ms delay (ms is a plain number, re-read on every write)
     await act(async () => {
       vi.advanceTimersByTime(100)
     })

@@ -7,7 +7,7 @@
 - 上游仓库以 git submodule 挂载于根目录 `source/` 下（清单见 [.gitmodules](../.gitmodules)），当前为 `source/vueuse`（VueUse）与 `source/react-use`（react-use）。
 - **首次轮询某个上游前先初始化对应 submodule**：`git submodule update --init source/react-use`（未初始化时 `git submodule status` 会在该条目行首输出 `-`）。
 - 新增上游时以同一模式加入 `source/*`。
-- **除 `source/vueuse` 外的 `source/*` 挂载只用于溯源（provenance-only），不纳入监控**：`source/react-use`、`source/react-hookz`、`source/mantine`、`source/ahooks`（以及已挂载但尚无移植的 `source/usehooks`）仅供 `scripts/update.ts` 的 source registry 解析端口自身的 `Map from <source> \`<上游名>\``注解（#915）；本节至 §3 的轮询仍只覆盖`source/vueuse`（所有者决定：仅 VueUse 更新频繁）。`react-spring` 没有 submodule——它是纯再导出依赖，`meta/functions.md`记为`source = react-spring`、路径 `—`、状态 `✅ re-exported`。
+- **除 `source/vueuse` 外的 `source/*` 挂载只用于溯源（provenance-only），不纳入监控**：`source/react-use`、`source/react-hookz`、`source/mantine`、`source/ahooks`（以及已挂载但尚无移植的 `source/usehooks`）仅供 `scripts/update.ts` 的 source registry 解析端口自身的 `Map from <source> \`<上游名>\``注解（#915）；本节至 §3 的轮询仍只覆盖`source/vueuse`（所有者决定：仅 VueUse 更新频繁）。
 - 监控内容：对应上游仓库**默认分支**的 Merged PR，判断改动是否适用于 reause。默认分支按上游而异：`source/vueuse` 为 `main`，`source/react-use` 为 `master`。
 
 ## 2. 轮询频率（指数退避）

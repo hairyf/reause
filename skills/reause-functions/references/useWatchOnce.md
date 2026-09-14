@@ -21,20 +21,13 @@ useWatchOnce(source, () => {
 })
 ```
 
-- `immediate: true` — fire the callback once on mount with the current value;
-  the mount call counts as the single fire.
-- The return value is `{ stop }` — call `stop()` to ignore further source
-  changes before the callback has fired (a no-op afterwards). The full
-  `WatchHandle` is otherwise not ported; watching ends when the component
-  unmounts.
-
 ## Type Declarations
 
 ```ts
 export interface UseWatchOnceReturn {
   /**
-   * Stop watching before the callback has fired — further source changes are
-   * ignored. Calling it after the callback fired is a no-op.
+   * Stop watching before the callback has fired — further source changes are ignored. Calling it
+   * after the callback fired is a no-op.
    */
   stop: () => void
 }

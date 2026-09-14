@@ -1,13 +1,7 @@
 import { useEffect, useRef } from 'react'
 
 /**
- * React port of react-use's `useUnmount`.
- *
- * Map from react-use `useUnmount`
- * Mapping: react-use's `useUnmount` keeps the callback in a `useRef`,
- * reassigning it on every render so the newest callback is invoked, and runs
- * it via an empty-dependency `useEffect` cleanup (react-use's `useEffectOnce`
- * is just `useEffect(effect, [])`). This port follows the same semantics.
+ * Map from react-use `useUnmount`.
  *
  * @example
  * useUnmount(() => cleanup())

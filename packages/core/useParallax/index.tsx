@@ -1,6 +1,8 @@
-import type { ConfigurableWindow, RefOrValue } from '@reause/shared'
-import { isClient, toValue } from '@reause/shared'
+import type { ConfigurableWindow } from '@reause/shared'
+import type { RefObject } from 'react'
+import { isClient } from '@reause/shared'
 import { useEffect, useRef, useState } from 'react'
+import { unrefElement } from '../unrefElement'
 import { useScreenOrientation } from '../useScreenOrientation'
 
 export interface UseParallaxOptions extends ConfigurableWindow {
@@ -43,8 +45,8 @@ export interface UseParallaxReturn {
 }
 
 /**
- * Device orientation data tracked for the parallax effect (upstream
- * `useDeviceOrientation`), flattened into one state object.
+ * Device orientation data tracked for the parallax effect (upstream `useDeviceOrientation`),
+ * flattened into one state object.
  */
 interface DeviceOrientationState {
   isSupported: boolean
@@ -54,9 +56,8 @@ interface DeviceOrientationState {
 }
 
 /**
- * Cursor position relative to the target element (upstream
- * `useMouseInElement` with `handleOutside: false`), flattened into one state
- * object. Outside the element the last values are kept.
+ * Cursor position relative to the target element (upstream `useMouseInElement` with `handleOutside:
+ * false`), flattened into one state object. Outside the element the last values are kept.
  */
 interface MouseInElementState {
   x: number
@@ -66,42 +67,11 @@ interface MouseInElementState {
 }
 
 /**
- * Create parallax effect easily. It uses `useDeviceOrientation` and fallback to `useMouse`
- * if orientation is not supported.
- *
  * Map from @vueuse/core `useParallax`
- * (`source/vueuse/packages/core/useParallax/`), which composes
- * `useDeviceOrientation` + `useScreenOrientation` + `useMouseInElement(target,
- * { handleOutside: false })`: the `source` is `deviceOrientation` while the
- * device orientation is supported and reports a non-zero `alpha`/`gamma`
- * (otherwise `mouse`), and `tilt`/`roll` are derived per orientation state or
- * from the cursor position relative to the element.
+ * (`source/vueuse/packages/core/useParallax/`).
  *
- * React divergences from upstream:
- * - the Vue computeds (`tilt`/`roll`/`source`) become plain values derived
- *   during render from `useState`, so no re-render happens while they stay
- *   the same; the returned object is `{ tilt, roll, source }` (not tuple);
- * - `target` accepts a plain element or a ref-like `{ current }` object
- *   (React equivalent of `ElementRef`). It is re-resolved on
- *   every render and the listeners re-bind when the resolved element
- *   changes; ref-likes are re-read at bind time, so a `useRef` target that is
- *   `null` during first render still binds once React attaches the element;
- * - upstream's `useDeviceOrientation` and `useMouseInElement` listener
- *   wiring (`mousemove`/`scroll`/`resize`, plus the `deviceorientation`
- *   subscription) becomes self-contained `useEffect`s with cleanup — no
- *   `useMutationObserver`/`useResizeObserver` re-measuring. The window
- *   `scroll`/`resize` listeners re-measure the rect against the last cursor
- *   position (upstream keeps it in `useMouse`), so `tilt`/`roll` stay
- *   cursor-relative instead of snapping to the element corner;
- * - a zero-size or not-yet-measured rect yields `tilt`/`roll` `0`, where
- *   upstream divides by the zero `elementWidth`/`elementHeight` and yields
- *   `NaN` — deliberate, so the first render and SSR stay finite;
- * - SSR-safe: nothing touches `window`, `document` or the DOM during render —
- *   all listeners attach in mount effects and the initial values
- *   (`tilt: 0`, `roll: 0`, `source: 'mouse'`) render on the server.
- *
- * @param target - element or ref-like `{ current }` object returning
- *   the element to track the cursor over
+ * @param target - React ref object (`RefObject`) holding the element to
+ *   track the cursor over, resolved with the shared `unrefElement`
  * @param options - tilt/roll adjust callbacks per sensor source, plus a
  *   custom `window` instance
  *
@@ -110,7 +80,7 @@ interface MouseInElementState {
  * const { tilt, roll, source } = useParallax(container)
  */
 export function useParallax(
-  target: RefOrValue<HTMLElement | null | undefined>,
+  target: RefObject<HTMLElement | null | undefined>,
   options: UseParallaxOptions = {},
 ): UseParallaxReturn {
   const {
@@ -146,10 +116,10 @@ export function useParallax(
   // first mouse event, mirroring upstream's `{ x: 0, y: 0 }` initial values.
   const cursorRef = useRef<{ x: number, y: number } | null>(null)
 
-  // dependency-tracking read: ref-like targets populate after the first
+  // dependency-tracking read: the ref's `.current` populates after the first
   // render, so the effect below re-resolves fresh at bind time and re-binds
   // whenever the resolved element changes
-  const trackedTarget = toValue(target)
+  const trackedTarget = target
 
   useEffect(() => {
     const win = customWindow ?? (isClient ? window : undefined)
@@ -189,7 +159,7 @@ export function useParallax(
       if (event)
         cursorRef.current = { x: event.clientX, y: event.clientY }
 
-      const el = toValue(targetRef.current)
+      const el = unrefElement(targetRef.current)
       if (!el || !(el instanceof Element))
         return
 

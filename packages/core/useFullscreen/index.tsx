@@ -1,20 +1,17 @@
-import type { RefOrValue } from '@reause/shared'
-import { toValue } from '@reause/shared'
+import type { RefObject } from 'react'
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { unrefElement } from '../unrefElement'
 import { useEventListener } from '../useEventListener'
 
 /**
- * Element on which fullscreen is requested — a plain element (or `null` /
- * `undefined` while it is not available yet), a ref-like `{ current }` object
- * (e.g. the result of `useRef`) — the React equivalent of upstream's
- * `ElementRef`.
+ * Element on which fullscreen is requested — a React ref object (`RefObject`) holding the element
+ * (or `null` / `undefined` while it is not available yet).
  */
-export type FullscreenTarget = RefOrValue<HTMLElement | SVGElement | null | undefined>
+export type FullscreenTarget = RefObject<HTMLElement | SVGElement | null | undefined>
 
 export interface UseFullscreenOptions {
   /**
-   * Specify a custom `document` instance, e.g. working with iframes or in
-   * testing environments.
+   * Specify a custom `document` instance, e.g. working with iframes or in testing environments.
    *
    * @default typeof document !== 'undefined' ? document : undefined
    */
@@ -35,8 +32,8 @@ export interface UseFullscreenReturn {
   isSupported: boolean
 
   /**
-   * Whether the target element (or `document.documentElement` when no target
-   * is given) is currently displayed in fullscreen mode.
+   * Whether the target element (or `document.documentElement` when no target is given) is currently
+   * displayed in fullscreen mode.
    */
   isFullscreen: boolean
 
@@ -139,10 +136,9 @@ function isSupportedState(state: ResolvedFullscreenState): boolean {
 }
 
 /**
- * The browser's current fullscreen state for the resolved element — the
- * document-level flag first, with the prefixed per-target fallback for WebKit
- * / iOS Safari (upstream reads `document[fullscreenEnabled]` then
- * `target[fullscreenEnabled]`).
+ * The browser's current fullscreen state for the resolved element — the document-level flag first,
+ * with the prefixed per-target fallback for WebKit / iOS Safari (upstream reads
+ * `document[fullscreenEnabled]` then `target[fullscreenEnabled]`).
  */
 function isElementFullScreen(state: ResolvedFullscreenState): boolean {
   const { doc, target, fullscreenEnabled } = state
@@ -161,8 +157,8 @@ function isElementFullScreen(state: ResolvedFullscreenState): boolean {
 }
 
 /**
- * Whether the resolved element is the current fullscreen element (only when
- * the browser exposes `document.fullscreenElement`).
+ * Whether the resolved element is the current fullscreen element (only when the browser exposes
+ * `document.fullscreenElement`).
  */
 function isCurrentElementFullScreen(state: ResolvedFullscreenState): boolean {
   const { doc, target, fullscreenElementMethod } = state
@@ -172,8 +168,8 @@ function isCurrentElementFullScreen(state: ResolvedFullscreenState): boolean {
 }
 
 /**
- * Looks up a (possibly vendor-prefixed) fullscreen method on an object and
- * binds it to that object so the browser receives the correct `this`.
+ * Looks up a (possibly vendor-prefixed) fullscreen method on an object and binds it to that object
+ * so the browser receives the correct `this`.
  */
 function getFullscreenMethod(obj: object, name: string): (() => Promise<void>) | undefined {
   const value = (obj as unknown as Record<string, unknown>)[name]
@@ -183,38 +179,8 @@ function getFullscreenMethod(obj: object, name: string): (() => Promise<void>) |
 }
 
 /**
- * Reactive Fullscreen API — React port of VueUse's `useFullscreen`.
- *
  * Map from @vueuse/core `useFullscreen`
- * (`source/vueuse/packages/core/useFullscreen/`). Adds methods to present a
- * specific element (and its descendants) in fullscreen mode, and to exit
- * fullscreen mode once it is no longer needed. The target defaults to
- * `document.documentElement`, and some platforms (like iOS Safari) only allow
- * fullscreen on video elements.
- *
- * React divergences:
- * - upstream returns `isSupported` (`computed`) and `isFullscreen`
- *   (`shallowRef`) as reactive refs; here they are plain boolean states —
- *   `isSupported` resolves in a mount effect (SSR renders `false`) and
- *   `isFullscreen` follows the `fullscreenchange` events and the `enter` /
- *   `exit` calls;
- * - the `enter` / `exit` / `toggle` functions are stable `useCallback`s that
- *   read the latest resolved element, `document` and method names from a ref
- *   the way upstream reads its refs at call time;
- * - the vendor-prefixed method detection re-resolves in an effect whenever
- *   the resolved target or the `document` option changes (upstream
- *   `computed`), and the fullscreenchange listeners re-bind when the resolved
- *   target changes (upstream `useEventListener(() => unrefElement(targetRef))`);
- * - `tryOnMounted(handlerCallback)` becomes the same effect adopting the
- *   browser's current fullscreen state after mount, and
- *   `tryOnScopeDispose(exit)` with `autoExit` becomes an unmount cleanup (the
- *   option is read once at mount, as upstream destructures it at setup);
- * - rendering never touches the DOM: the target unwraps to a ref-like
- *   `.current` and the global `document` is only read through
- *   a guarded `typeof document === 'undefined'` check, so server rendering is
- *   safe and the state keeps its defaults until the mount effect;
- * - the component variant (`UseFullscreen` render-slot component) is not
- *   ported — React uses the hook directly.
+ * (`source/vueuse/packages/core/useFullscreen/`).
  *
  * @example
  * const el = useRef<HTMLVideoElement>(null)
@@ -245,7 +211,7 @@ export function useFullscreen(
   // the effect below, so a not-yet-populated `useRef(null)` never resolves to
   // the document root during render.
   const doc = documentOption ?? (typeof document === 'undefined' ? undefined : document)
-  const resolvedTarget = toValue(target)
+  const resolvedTarget = target ? unrefElement(target) : undefined
 
   const applyFullscreenState = useCallback((state: ResolvedFullscreenState) => {
     const isElementFullScreenValue = isElementFullScreen(state)
@@ -276,8 +242,8 @@ export function useFullscreen(
   // fullscreenchange listeners on the document and the resolved element
   // (upstream `useEventListener(document, ...)` + a reactive element target);
   // the listener effect re-binds whenever the element / `document` changes.
-  useEventListener(doc, eventHandlers, handler, listenerOptions)
-  useEventListener(resolvedTarget ?? undefined, eventHandlers, handler, listenerOptions)
+  useEventListener({ current: doc }, eventHandlers, handler, listenerOptions)
+  useEventListener({ current: resolvedTarget ?? undefined }, eventHandlers, handler, listenerOptions)
 
   const exit = useCallback(async () => {
     const state = stateRef.current

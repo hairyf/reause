@@ -14,7 +14,7 @@ import { useFloor } from '@reause/math'
 const result = useFloor(45.95) // 45
 ```
 
-`value` is a plain read-only `number` (upstream takes `MaybeRefOrGetter<number>`). Re-render with a
+`value` is a plain read-only `number`. Re-render with a
 new value — e.g. from `useState` — and the hook recomputes:
 
 ```tsx
@@ -31,19 +31,8 @@ setValue(-45.05) // triggers a re-render
 
 ```ts
 /**
- * React port of VueUse's `useFloor`.
- *
  * Map from @vueuse/math `useFloor`
- * (`source/vueuse/packages/math/useFloor/`). Reactive `Math.floor`.
- *
- * Adjustment for React: upstream wraps the computation in `computed(() => ...)`
- * and returns a `ComputedRef<number>`; the reause version is a pure derived
- * hook — the plain `number` argument is read at render time and `Math.floor` is
- * applied directly, with no effects and no `.value` wrapper (SSR-safe).
- *
- * React divergence: `value` is a plain read-only `number`, not upstream's
- * `MaybeRefOrGetter<number>`. The caller re-renders with a new value (e.g. from
- * `useState`) and the hook recomputes.
+ * (`source/vueuse/packages/math/useFloor/`).
  *
  * @see https://vueuse.org/math/useFloor/
  *

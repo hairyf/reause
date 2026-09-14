@@ -40,8 +40,8 @@ export interface UseWebSocketOptions {
     pongTimeout?: number
 
     /**
-     * Custom scheduler wiring the heartbeat callback to a timer, returning
-     * `pause`/`resume` controls (upstream defaults to `useIntervalFn`).
+     * Custom scheduler wiring the heartbeat callback to a timer, returning `pause`/`resume`
+     * controls (upstream defaults to `useIntervalFn`).
      */
     scheduler?: (fn: () => void) => { pause: () => void, resume: () => void }
   }
@@ -107,14 +107,12 @@ export interface UseWebSocketOptions {
 
 export interface UseWebSocketReturn<T> {
   /**
-   * Latest data received via the websocket; `null` until the first message
-   * arrives.
+   * Latest data received via the websocket; `null` until the first message arrives.
    */
   data: T | null
 
   /**
-   * The current websocket status, can be only one of:
-   * 'OPEN', 'CONNECTING', 'CLOSED'
+   * The current websocket status, can be only one of: 'OPEN', 'CONNECTING', 'CLOSED'
    */
   status: WebSocketStatus
 
@@ -124,8 +122,8 @@ export interface UseWebSocketReturn<T> {
   close: WebSocket['close']
 
   /**
-   * Reopen the websocket connection.
-   * If there the current one is active, will close it before opening a new one.
+   * Reopen the websocket connection. If there the current one is active, will close it before
+   * opening a new one.
    */
   open: () => void
 
@@ -152,10 +150,9 @@ function resolveNestedOptions<T>(options: T | true): T {
 }
 
 /**
- * Fallback heartbeat scheduler used when the `heartbeat.scheduler` option is
- * not provided — mirrors upstream's default `useIntervalFn(cb, 1000,
- * { immediate: false })`: the interval stays inert until `resume()` is called
- * (on `ws.onopen`), and `pause`/`resume` stop/restart it.
+ * Fallback heartbeat scheduler used when the `heartbeat.scheduler` option is not provided — mirrors
+ * upstream's default `useIntervalFn(cb, 1000, { immediate: false })`: the interval stays inert
+ * until `resume()` is called (on `ws.onopen`), and `pause`/`resume` stop/restart it.
  */
 function defaultScheduler(fn: () => void): { pause: () => void, resume: () => void } {
   let timer: ReturnType<typeof setInterval> | undefined
@@ -177,42 +174,8 @@ function defaultScheduler(fn: () => void): { pause: () => void, resume: () => vo
 }
 
 /**
- * React port of VueUse's `useWebSocket`.
- *
  * Map from @vueuse/core `useWebSocket`
- * (`source/vueuse/packages/core/useWebSocket/`), a reactive
- * [WebSocket](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/WebSocket)
- * client: it wraps the browser `WebSocket` constructor and exposes the current
- * instance, the connection status, the latest received message and `open` /
- * `close` / `send` shortcuts, with optional auto-reconnect, heartbeat pings and
- * URL-driven reconnection.
- *
- * React divergences:
- * - the Vue `ShallowRef` returns become plain state: `data`, `status` and `ws`
- *   are `useState` values, updated when a message arrives or the socket is
- *   (re)created;
- * - the socket is created in a mount `useEffect` instead of during setup
- *   (upstream opens synchronously behind an `if (isClient)` check), so SSR
- *   renders the initial `CLOSED`/`null`/`undefined` values without ever
- *   touching `WebSocket` — SSR-safe;
- * - `open`, `close` and `send` are stable callbacks reading the mounted socket
- *   and status through latest-value refs (upstream: closures over the same
- *   refs), and `close()` runs on unmount when `autoClose` is on (upstream:
- *   `tryOnScopeDispose`), including the `beforeunload` listener;
- * - `url` accepts a plain value or a ref-like `{ current }` object
- *   (upstream: `RefOrValue`); when `autoConnect` is on, a URL change between
- *   renders reconnects, mirroring upstream's `watch(urlRef, open)` — the
- *   initial connection is still only opened once by `immediate`;
- * - `heartbeat.message` / `responseMessage` accept a plain value, a ref-like
- *   `{ current }` object or a message factory function, resolved on every
- *   tick via `toValue` (upstream: `RefOrValue`); the default scheduler is a
- *   local `setInterval`-based `{ pause, resume }` pair instead of upstream's
- *   `useIntervalFn` default (which is a hook and cannot be created lazily),
- *   and — like upstream's `{ immediate: false }` default — it stays inert
- *   until the socket opens (`ws.onopen` calls `resume`), so no pings (or the
- *   pong-timeout force-close) fire while the socket is still `CONNECTING`;
- *   a custom `scheduler` option returns the same `{ pause, resume }`
- *   controls.
+ * (`source/vueuse/packages/core/useWebSocket/`).
  *
  * @example
  * const { status, data, send, open, close, ws } = useWebSocket('ws://websocketurl')
@@ -234,7 +197,7 @@ export function useWebSocket<Data = any>(
   const wsRef = useRef<WebSocket | undefined>(undefined)
   const statusRef = useRef<WebSocketStatus>(status)
   statusRef.current = status
-  const resolvedUrl = toValue(url)
+  const resolvedUrl = url
   const urlRef = useRef<WebSocketUrl>(resolvedUrl)
   urlRef.current = resolvedUrl
 

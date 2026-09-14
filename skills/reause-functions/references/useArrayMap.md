@@ -50,14 +50,7 @@ the render that passes a new array.
 ```ts
 export type UseArrayMapReturn<T = any> = T[]
 /**
- * Reactive `Array.map`
- *
- * Map from @vueuse/shared `useArrayMap`
- * React port of VueUse's `useArrayMap`.
- *
- * Mapping: Vue's `computed` → recompute per render and return a plain array
- * (no `.value`) over the plain `list` array the caller passes.
- * Pass a `useState` array directly — the result updates on the next render.
+ * Map from @vueuse/shared `useArrayMap`.
  *
  * @example
  * const [list, setList] = useState([0, 1, 2, 3, 4])

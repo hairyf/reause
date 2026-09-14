@@ -27,10 +27,12 @@ Read also: [Best Practice](./guide/best-practice.md)
 
 - **Read-only value sources** (e.g. `useTitle`'s title, `useFetch`'s url):
   accept plain values only (`T`) — not refs, getters, or `State<T>`.
-- **Internal write parameters**: accept `State<T>` (a React state tuple) so the
-  hook can be controlled.
-- **DOM hook arguments** (element targets): accept `RefOrValue<T>` — a plain
-  element, a React ref, or a ref-like `{ current }` object.
+- **Internal write parameters**: accept `State<T>` — a plain value, a getter, a
+  `[value, setter]` tuple or a `{ value, onChange }` pair (never a React ref).
+- **DOM hook arguments** (element targets): accept a React `RefObject<T | null>`
+  — the element is read with `unrefElement`, so a plain element, a getter or a
+  callback ref is not accepted. Multiple targets are an array of same-element
+  `RefObject`s (`ElementTargetOrArray<T>`).
 
 ## Configurable Globals
 

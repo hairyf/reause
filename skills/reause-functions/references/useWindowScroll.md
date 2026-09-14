@@ -23,8 +23,7 @@ setY(100) // scroll Y to 100
 ```ts
 export interface UseWindowScrollOptions {
   /**
-   * Specify a custom `window` instance, e.g. working with iframes or in
-   * testing environments.
+   * Specify a custom `window` instance, e.g. working with iframes or in testing environments.
    */
   window?: Window
   /**
@@ -34,8 +33,8 @@ export interface UseWindowScrollOptions {
    */
   throttle?: number
   /**
-   * The check time when scrolling ends.
-   * This configuration will be setting to (throttle + idle) when the `throttle` is configured.
+   * The check time when scrolling ends. This configuration will be setting to (throttle + idle)
+   * when the `throttle` is configured.
    *
    * @default 200
    */
@@ -52,13 +51,12 @@ export interface UseWindowScrollOptions {
     bottom?: number
   }
   /**
-   * Use MutationObserver to monitor specific DOM changes, such as attribute
-   * modifications, child node additions or removals, or subtree changes.
+   * Use MutationObserver to monitor specific DOM changes, such as attribute modifications, child
+   * node additions or removals, or subtree changes.
    *
-   * Accepted for signature parity with upstream, but has no effect here:
-   * upstream's `useScroll` only registers the observer when the target is an
-   * element other than `window`/`document`, and `useWindowScroll` always
-   * targets the window.
+   * Accepted for signature parity with upstream, but has no effect here: upstream's `useScroll`
+   * only registers the observer when the target is an element other than `window`/`document`, and
+   * `useWindowScroll` always targets the window.
    *
    * @default { mutation: false }
    */
@@ -82,9 +80,8 @@ export interface UseWindowScrollOptions {
    */
   eventListenerOptions?: boolean | AddEventListenerOptions
   /**
-   * Optionally specify a scroll behavior of `auto` (default, not smooth
-   * scrolling) or `smooth` (for smooth scrolling) which takes effect when
-   * scrolling with the `setX` / `setY` setters.
+   * Optionally specify a scroll behavior of `auto` (default, not smooth scrolling) or `smooth` (for
+   * smooth scrolling) which takes effect when scrolling with the `setX` / `setY` setters.
    *
    * @default 'auto'
    */
@@ -106,8 +103,8 @@ export interface UseWindowScrollReturn {
    */
   y: number
   /**
-   * Whether the window is scrolling. Resets to `false` after `idle`
-   * milliseconds without scroll events.
+   * Whether the window is scrolling. Resets to `false` after `idle` milliseconds without scroll
+   * events.
    */
   isScrolling: boolean
   /**
@@ -129,8 +126,7 @@ export interface UseWindowScrollReturn {
     bottom: boolean
   }
   /**
-   * Re-measure the current scroll position and refresh `arrivedState` /
-   * `directions` / `x` / `y`.
+   * Re-measure the current scroll position and refresh `arrivedState` / `directions` / `x` / `y`.
    */
   measure: () => void
   /**
@@ -143,33 +139,8 @@ export interface UseWindowScrollReturn {
   setY: (y: number) => void
 }
 /**
- * Reactive window scroll.
- *
  * Map from @vueuse/core `useWindowScroll`
- * (`source/vueuse/packages/core/useWindowScroll/`), which delegates to
- * upstream `useScroll(window)`: reactive `x` / `y` scroll position,
- * `isScrolling` with an `idle` timeout, `arrivedState` within `offset`
- * pixels of the edges and per-axis `directions`.
- *
- * React divergences from upstream:
- *
- * 1. Refs → plain state values: upstream returns a writable `computed` for
- *    `x` / `y` and `ShallowRef` / `reactive` objects for the rest; here
- *    every value is React state that updates on re-render. Scroll events
- *    are batched by React, so all values settle together.
- * 2. Writable refs → setter functions: scroll with the `setX` / `setY`
- *    callbacks instead of assigning `x.value`; both are stable
- *    (`useCallback`) and call `window.scrollTo` honoring the `behavior`
- *    option.
- * 3. The `scroll` / `scrollend` listeners (passive, non-capturing per
- *    upstream's `eventListenerOptions` default) are registered inline in a
- *    `useEffect` with cleanup; the idle reset is a plain `setTimeout`
- *    instead of upstream's `useDebounceFn`, and the `throttle` option is a
- *    small trailing throttle (upstream `useThrottleFn(..., { trailing:
- *    true, leading: false })`).
- * 4. The `observe` option is accepted for signature parity but inert:
- *    upstream never registers the MutationObserver when the target is the
- *    window.
+ * (`source/vueuse/packages/core/useWindowScroll/`).
  *
  * @example
  * const { x, y, isScrolling, arrivedState, directions, measure, setX, setY } = useWindowScroll()

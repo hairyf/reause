@@ -24,3 +24,4 @@ packages/.vitepress/.temp/
 packages/.vitepress/*.timestamp-*.mjs
 types/
 .agents/skills/
+.tmp*

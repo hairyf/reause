@@ -1,6 +1,6 @@
 import type { State } from '../useControllableState'
 import { useEffect, useRef } from 'react'
-import { isRefLike, toValue, writeState } from '../utils'
+import { toValue, writeState } from '../utils'
 
 export type SyncStateDirection = 'both' | 'ltr' | 'rtl'
 
@@ -13,9 +13,8 @@ export interface SyncStateOptions<L, R, D extends SyncStateDirection = 'both'> {
   /**
    * Timing for syncing, same as watch's `flush` option.
    *
-   * React note: no React equivalent — effects always run after commit, so
-   * `'sync'` / `'pre'` / `'post'` are accepted for upstream signature
-   * compatibility and all behave identically.
+   * React note: no React equivalent — effects always run after commit, so `'sync'` / `'pre'` /
+   * `'post'` are accepted for upstream signature compatibility and all behave identically.
    *
    * @default 'sync'
    */
@@ -23,10 +22,9 @@ export interface SyncStateOptions<L, R, D extends SyncStateDirection = 'both'> {
   /**
    * Watch deeply.
    *
-   * React note: no React equivalent — a `.current` write never schedules a
-   * re-render by itself, so nested mutations cannot be observed (only the
-   * value as a whole is compared, via `Object.is`). Accepted for upstream
-   * signature compatibility.
+   * React note: no React equivalent — a `.current` write never schedules a re-render by itself, so
+   * nested mutations cannot be observed (only the value as a whole is compared, via `Object.is`).
+   * Accepted for upstream signature compatibility.
    *
    * @default false
    */
@@ -44,10 +42,9 @@ export interface SyncStateOptions<L, R, D extends SyncStateDirection = 'both'> {
    */
   direction?: D
   /**
-   * Value convertors applied on the way to the other side: `ltr` maps a left
-   * value before it is written into the right state, `rtl` maps a right
-   * value before it is written into the left state. A missing convertor
-   * falls back to identity.
+   * Value convertors applied on the way to the other side: `ltr` maps a left value before it is
+   * written into the right state, `rtl` maps a right value before it is written into the left
+   * state. A missing convertor falls back to identity.
    */
   transform?: Partial<SyncStateTransform<L, R>>
 }
@@ -56,16 +53,14 @@ export interface SyncStateOptions<L, R, D extends SyncStateDirection = 'both'> {
 // performs the initial sync, mirroring upstream's default `immediate: true`
 const neverObserved = Symbol('reause.syncState.neverObserved')
 
-// write path of a `State` source: ref-like `.current` writes are synchronous,
-// tuple / `{ value, onChange }` writes land asynchronously through the setter
-// or callback, and plain values / getters are read-only — mirrors
+// write path of a `State` source: a `[value, setter]` tuple or a
+// `{ value, onChange }` pair lands asynchronously through the setter or
+// callback, while plain values / getters are read-only — mirrors
 // `writeState`'s write-path detection so a read-only side is never recorded
 // as written (a changing source must keep propagating)
-function classifyWritable(source: unknown): 'sync' | 'async' | 'readonly' {
+function classifyWritable(source: unknown): 'async' | 'readonly' {
   if (source === null || source === undefined)
     return 'readonly'
-  if (isRefLike(source as object))
-    return 'sync'
   if (Array.isArray(source) && source.length === 2 && typeof source[1] === 'function')
     return 'async'
   if (typeof source === 'object' && !Array.isArray(source)
@@ -76,41 +71,8 @@ function classifyWritable(source: unknown): 'sync' | 'async' | 'readonly' {
 }
 
 /**
- * Two-way state synchronization — keeps two writable `State<T>` sources in
- * sync, with optional direction and value transforms.
- *
  * Map from @vueuse/shared `syncRef`
- * (`source/vueuse/packages/shared/syncRef/`), renamed `syncState` for the
- * React port: the two sides are `State<T>` sources — a `[value, setter]`
- * tuple, a `{ value, onChange }` pair, a ref-like `{ current }`, a getter or
- * a plain value — instead of Vue refs. Each side is read with `toValue` and
- * written back through its writable form (tuple setter / `onChange` /
- * `.current`); plain values and getters have no write path, so that side is
- * treated as read-only (the sync becomes one-way for it).
- *
- * React Hook adaptation: upstream drives both sides through Vue's reactive
- * `watchPausable`, pausing all watchers while writing so a side never echoes
- * its own write back. React has no reactive system, so `syncState` is
- * implemented as a hook (call it unconditionally at the top of a component).
- * A `useEffect` that runs after every commit compares each side's resolved
- * value with the last observed one via `Object.is` and mirrors the changed
- * side into the other — through the optional `transform` convertors when
- * given — recording the value it just wrote as already observed on the
- * receiving side (the React analogue of upstream's pause/resume). Ref-like
- * `.current` writes are synchronous and need no absorption; writes through a
- * setter / `onChange` are asynchronous, so until the target's value reflects
- * the write the stale pre-write value is absorbed and never mistaken for an
- * external change. Read-only sides (plain values / getters) are never marked
- * as written, so a changing source keeps propagating. The initial sync
- * (upstream default `immediate: true`) runs in the mount effect and cascades
- * ltr before rtl,
- * matching upstream's watcher creation order. Because the observation happens
- * post-commit, an external mutation is only adopted on the render that
- * follows it — the mutation itself never schedules a render, so a bare
- * `.current` write outside of React is not observed (see the maintainer
- * notes on reause #40 / #41). The returned `stop` function tears the
- * synchronization down; the effect also stops doing any work once the owning
- * component unmounts.
+ * (`source/vueuse/packages/shared/syncRef/`).
  *
  * @example
  * const [a, setA] = useState('a')

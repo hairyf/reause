@@ -1,37 +1,51 @@
 import { createGlobalState } from '@reause/shared'
 import { useState } from 'react'
 
-// module-level store: every `Counter` below reads and writes the same state,
-// and it survives unmounting any of them — the argument is the initial state,
-// a plain value or a function computing it (resolved exactly once)
-const useGlobalCount = createGlobalState({ count: 0 })
+// The factory is called once, at module scope: every component below reads and
+// writes the same value, and the store outlives all of them
+const useGlobalValue = createGlobalState(0)
 
-function Counter({ label }: { label: string }) {
-  const [state, setState] = useGlobalCount()
+function CompA() {
+  const [value, setValue] = useGlobalValue()
 
-  return (
-    <div>
-      <span>{`${label}: ${state.count}`}</span>
-      {' '}
-      <button onClick={() => setState(prev => ({ count: prev.count + 1 }))}>
-        increment
-        {' '}
-        {label}
-      </button>
-    </div>
-  )
+  return <button onClick={() => setValue(value + 1)}>+</button>
+}
+
+function CompB() {
+  const [value, setValue] = useGlobalValue()
+
+  return <button onClick={() => setValue(value - 1)}>-</button>
+}
+
+function CompC() {
+  const [value] = useGlobalValue()
+
+  return <span>{`CompC reads ${value}`}</span>
 }
 
 export default function CreateGlobalStateDemo() {
+  const [value] = useGlobalValue()
   const [mounted, setMounted] = useState(true)
 
   return (
     <div>
-      <Counter label="counter-a" />
-      {mounted && <Counter label="counter-b" />}
+      <p>
+        value:
+        {' '}
+        <strong>{value}</strong>
+      </p>
+      <CompA />
+      {' '}
+      <CompB />
+      {' '}
       <button onClick={() => setMounted(current => !current)}>
-        {mounted ? 'unmount counter-b' : 'remount counter-b'}
+        {mounted ? 'unmount CompC' : 'mount CompC'}
       </button>
+      <p>
+        {mounted
+          ? <CompC />
+          : 'CompC is unmounted — the shared value above survives it, and reads the latest one when it mounts again'}
+      </p>
     </div>
   )
 }

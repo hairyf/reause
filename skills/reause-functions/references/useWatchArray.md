@@ -21,11 +21,6 @@ useWatchArray(list, (newList, oldList, added, removed) => {
 }, { immediate: true })
 ```
 
-The list is tracked by reference identity — mutate it in place (`push`,
-`splice`, etc.) and no callback fires. Produce a new array instead
-(`setList([...list, item])`). Upstream's `{ deep: true }` option has no React
-equivalent and is not ported.
-
 ## Type Declarations
 
 ```ts
@@ -44,12 +39,12 @@ export interface UseWatchArrayOptions<
 /**
  * React port of VueUse's `watchArray` — watch for an array with additions and removals.
  *
- * Mapping: built on the house `useWatch` — the list is a plain array value tracked across
- * renders, `useWatch` handles the change detection, and the previous list is diffed against
- * the next one with item-identity matching (like upstream) so the callback receives
- * `(newList, oldList, added, removed)`. The list is wrapped as a single-element watch
- * source (`[list]`) so `useWatch` tracks it by reference identity instead of spreading a
- * variable-length list into its dependency list (React requires a constant deps size).
+ * Mapping: built on the house `useWatch` — the list is a plain array value tracked across renders,
+ * `useWatch` handles the change detection, and the previous list is diffed against the next one
+ * with item-identity matching (like upstream) so the callback receives `(newList, oldList, added,
+ * removed)`. The list is wrapped as a single-element watch source (`[list]`) so `useWatch` tracks
+ * it by reference identity instead of spreading a variable-length list into its dependency list
+ * (React requires a constant deps size).
  *
  * Divergences from the upstream Vue API:
  * - `source` is a plain array value — Vue's `WatchSource` forms (ref / getter / reactive)

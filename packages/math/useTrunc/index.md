@@ -15,7 +15,7 @@ const result1 = useTrunc(0.95) // 0
 const result2 = useTrunc(-2.34) // -2
 ```
 
-`value` is a plain read-only `number` (upstream takes `MaybeRefOrGetter<number>`). Re-render with a
+`value` is a plain read-only `number`. Re-render with a
 new value — e.g. from `useState` — and the hook recomputes:
 
 ```tsx

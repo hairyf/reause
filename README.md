@@ -22,7 +22,7 @@
 `reause` is an experimental React hooks library mapped from **several upstream sources**. [VueUse](https://vueuse.org) is the foundational one — it defines the package layout, the architecture and most of the surface — but it is not the only one:
 
 - The official [vueuse/vueuse](https://github.com/vueuse/vueuse) repository is referenced as a git submodule (`source/vueuse`) and is the source of truth for every port that names no other source
-- Each other source is pinned as its own read-only checkout under `source/*` and is the source of truth for the ports that name it; `react-spring` is the exception — a re-export with no checkout
+- Each other source is pinned as its own read-only checkout under `source/*` and is the source of truth for the ports that name it
 - The package structure mirrors VueUse 1:1 and is fixed, but every API is React-flavored (`useState` / `useEffect` / `useMemo` …)
 - AI continuously maps upstream implementations to React hooks, and each port records its upstream in a `` Map from <source> `<upstream-symbol>` `` JSDoc annotation
 
@@ -30,18 +30,17 @@ See [packages/guide/architecture.md](packages/guide/architecture.md) for the ful
 
 ## Sources
 
-reause maps from six upstream sources. The `source` id in the table is the one the generated [function mapping table](meta/functions.md) records per export:
+reause maps from five upstream sources. The `source` id in the table is the one the generated [function mapping table](meta/functions.md) records per export:
 
-| source         | upstream                                                                       | how it is ported                                                                                          |
-| -------------- | ------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------- |
-| `vueuse`       | [vueuse/vueuse](https://github.com/vueuse/vueuse)                              | adapted to React — naming conversions (`ref*` → `useState*`, `on*` → `use*`) and React return conventions |
-| `react-use`    | [streamich/react-use](https://github.com/streamich/react-use)                  | direct mirror — upstream names and return shapes kept                                                     |
-| `react-hookz`  | [react-hookz/web](https://github.com/react-hookz/web)                          | direct mirror                                                                                             |
-| `mantine`      | [mantinedev/mantine](https://github.com/mantinedev/mantine) (`@mantine/hooks`) | direct mirror, detached from `@mantine/core`                                                              |
-| `ahooks`       | [alibaba/hooks](https://github.com/alibaba/hooks)                              | direct mirror with documented renames                                                                     |
-| `react-spring` | `@react-spring/web`                                                            | **re-export only** — no pinned checkout, so no 1:1 mirror is claimed                                      |
+| source        | upstream                                                                       | how it is ported                                                                                          |
+| ------------- | ------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------- |
+| `vueuse`      | [vueuse/vueuse](https://github.com/vueuse/vueuse)                              | adapted to React — naming conversions (`ref*` → `useState*`, `on*` → `use*`) and React return conventions |
+| `react-use`   | [streamich/react-use](https://github.com/streamich/react-use)                  | direct mirror — upstream names and return shapes kept                                                     |
+| `react-hookz` | [react-hookz/web](https://github.com/react-hookz/web)                          | direct mirror                                                                                             |
+| `mantine`     | [mantinedev/mantine](https://github.com/mantinedev/mantine) (`@mantine/hooks`) | direct mirror, detached from `@mantine/core`                                                              |
+| `ahooks`      | [alibaba/hooks](https://github.com/alibaba/hooks)                              | direct mirror with documented renames                                                                     |
 
-Five of the six sources are pinned as read-only submodule checkouts under `source/*` (`vueuse`, `react-use`, `react-hookz`, `mantine`, `ahooks`), and every port is checked against its own source's pin. A `source/usehooks` checkout is also mounted, but it has no ports yet and is not a registry source. **`react-spring` has no checkout**: its claim names a source with no path to verify, so the registry records it as `✅ re-exported` rather than as a hand-written port.
+All five sources are pinned as read-only submodule checkouts under `source/*` (`vueuse`, `react-use`, `react-hookz`, `mantine`, `ahooks`), and every port is checked against its own source's pin. A `source/usehooks` checkout is also mounted, but it has no ports yet and is not a registry source.
 
 Only `source/vueuse` is polled for upstream updates — the other checkouts are provenance-only ([docs/upstream-monitoring.md](docs/upstream-monitoring.md) §1). Per-source naming and return-value rules are in [AGENTS.md](https://github.com/hairyf/reause/blob/main/AGENTS.md) §1, and [`docs/mapping-issue-template.md`](https://github.com/hairyf/reause/blob/main/docs/mapping-issue-template.md) is the template for mapping decisions.
 

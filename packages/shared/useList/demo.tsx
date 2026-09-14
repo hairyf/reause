@@ -8,9 +8,9 @@ export default function UseListDemo() {
       <p>
         List:
         {' '}
-        {JSON.stringify(list)}
+        {JSON.stringify(list, null, '')}
       </p>
-      <button onClick={() => set([1, 2, 3])}>Set to [1, 2, 3]</button>
+      <button style={{ marginLeft: '0.5rem' }} onClick={() => set([1, 2, 3])}>Set to [1, 2, 3]</button>
       <button onClick={() => push(list.length + 1)}>Push next</button>
       <button onClick={() => updateAt(0, 0)}>Update index 0</button>
       <button onClick={() => insertAt(2, -1)}>Insert -1 at index 2</button>

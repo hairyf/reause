@@ -67,14 +67,6 @@ const { base64 } = useBase64(data, {
 })
 ```
 
-## React Divergences
-
-- `base64` and `promise` are plain state values (upstream returns `shallowRef`s) read directly off the hook result. `promise` is `undefined` until the first `execute()` run, and `base64` is `''` until the first transformation settles.
-- **Re-transform trigger.** Upstream watches a reactive source with `watch(target, execute, { immediate: true })` and calls `execute()` exactly once during setup for a plain value. reause resolves the source with `toValue` during render and re-runs the transformation in an effect keyed on the resolved value, so:
-  - a ref-like `{ current }` source re-transforms only after a re-render that carries a new `current` — mutating `current` alone does not trigger a transformation;
-  - an in-flight earlier transform can still overwrite a newer `base64` (the same race exists upstream).
-- **SSR.** `execute` is a no-op that resolves `undefined` outside a browser, and the automatic first transform runs only in a mount effect, so nothing touches the DOM during render.
-
 ## Type Declarations
 
 ```ts
@@ -101,13 +93,11 @@ export interface UseBase64ObjectOptions<T> extends UseBase64Options {
 }
 export interface UseBase64Return {
   /**
-   * The base64-encoded transformation result. `''` until the first
-   * transformation settles.
+   * The base64-encoded transformation result. `''` until the first transformation settles.
    */
   base64: string
   /**
-   * The promise of the current transformation. `undefined` until the first
-   * `execute()` run.
+   * The promise of the current transformation. `undefined` until the first `execute()` run.
    */
   promise: Promise<string> | undefined
   /**
@@ -116,39 +106,39 @@ export interface UseBase64Return {
   execute: () => Promise<string> | undefined
 }
 export declare function useBase64(
-  target: RefOrValue<string | undefined>,
+  target: string | undefined,
   options?: UseBase64Options,
 ): UseBase64Return
 export declare function useBase64(
-  target: RefOrValue<Blob | undefined>,
+  target: Blob | undefined,
   options?: UseBase64Options,
 ): UseBase64Return
 export declare function useBase64(
-  target: RefOrValue<ArrayBuffer | undefined>,
+  target: ArrayBuffer | undefined,
   options?: UseBase64Options,
 ): UseBase64Return
 export declare function useBase64(
-  target: RefOrValue<HTMLCanvasElement | undefined>,
+  target: HTMLCanvasElement | undefined,
   options?: ToDataURLOptions,
 ): UseBase64Return
 export declare function useBase64(
-  target: RefOrValue<HTMLImageElement | undefined>,
+  target: HTMLImageElement | undefined,
   options?: ToDataURLOptions,
 ): UseBase64Return
 export declare function useBase64<T extends Record<string, unknown>>(
-  target: RefOrValue<T>,
+  target: T,
   options?: UseBase64ObjectOptions<T>,
 ): UseBase64Return
 export declare function useBase64<T extends Map<string, unknown>>(
-  target: RefOrValue<T>,
+  target: T,
   options?: UseBase64ObjectOptions<T>,
 ): UseBase64Return
 export declare function useBase64<T extends Set<unknown>>(
-  target: RefOrValue<T>,
+  target: T,
   options?: UseBase64ObjectOptions<T>,
 ): UseBase64Return
 export declare function useBase64<T>(
-  target: RefOrValue<T[]>,
+  target: T[],
   options?: UseBase64ObjectOptions<T[]>,
 ): UseBase64Return
 ```

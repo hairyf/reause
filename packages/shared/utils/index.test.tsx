@@ -1,5 +1,7 @@
+import type { RefObject } from 'react'
 import type { MockInstance } from 'vitest'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import type { StateValue } from '../utils'
+import { afterEach, beforeEach, describe, expect, expectTypeOf, it, vi } from 'vitest'
 import {
   assert,
   clamp,
@@ -11,6 +13,7 @@ import {
   isDef,
   isIOS,
   isObject,
+  isRefLike,
   noop,
   now,
   objectOmit,
@@ -19,6 +22,8 @@ import {
   rand,
   timestamp,
   toArray,
+  toValue,
+  writeState,
 } from '../utils'
 
 // NOTE: upstream's index.server.test.ts asserts `isClient` is falsy under SSR
@@ -190,5 +195,50 @@ describe('is', () => {
 
     obj3.a = 2
     expect(hasOwn(obj3, 'a')).toBeTruthy()
+  })
+})
+
+describe('state contract', () => {
+  it('resolves the four accepted StateValue shapes with toValue', () => {
+    expect(toValue(1)).toBe(1)
+    expect(toValue(() => 2)).toBe(2)
+    expect(toValue([3, () => {}] as const)).toBe(3)
+    expect(toValue({ value: 4, onChange: () => {} })).toBe(4)
+  })
+
+  it('does not accept a React ref as a state source', () => {
+    // a `RefObject` is a DOM handle, read with `unrefElement` — never a StateValue
+    expectTypeOf<RefObject<number>>()
+      .not
+      .toMatchTypeOf<StateValue<number>>()
+    expectTypeOf<StateValue<number>>()
+      .not
+      .toMatchTypeOf<RefObject<number>>()
+  })
+
+  it('still guards ref objects with isRefLike', () => {
+    expect(isRefLike({ current: 1 })).toBe(true)
+    expect(isRefLike(1)).toBe(false)
+    expect(isRefLike(null)).toBe(false)
+    expect(isRefLike(() => {})).toBe(false)
+  })
+
+  it('writeState writes tuple setters and onChange, and skips read-only sources', () => {
+    const setTuple = vi.fn()
+    writeState([1, setTuple] as const, 2)
+    expect(setTuple).toHaveBeenCalledWith(2)
+
+    const onChange = vi.fn()
+    writeState({ value: 1, onChange }, 3)
+    expect(onChange).toHaveBeenCalledWith(3)
+
+    // plain values and getters have no write path — no throw, no write
+    expect(() => writeState(1, 2)).not.toThrow()
+    expect(() => writeState(() => 1, 2)).not.toThrow()
+
+    // a ref is not a state source any more, so it is never written through
+    const ref = { current: 1 }
+    writeState(ref as unknown as StateValue<number>, 9)
+    expect(ref.current).toBe(1)
   })
 })

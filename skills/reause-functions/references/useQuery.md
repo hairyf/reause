@@ -62,13 +62,6 @@ setPage('2') // URL: ?page=2
 setPage('1') // URL: (no page param, since it equals default)
 ```
 
-## React divergences from upstream
-
-- No router dependency: upstream proxies `route.query` through vue-router; this hook reads and writes `window.location.search` / `history` directly, so it needs no routing library.
-- Returns the React array tuple `[value, setValue]` (upstream returns a single writable Vue ref).
-- Upstream batches multi-key writes per tick through a queue and pushes one router navigation; here each `setValue` performs its own history update immediately.
-- There is no multi-page router context: the hook is scoped to the current `window.location` only.
-
 ## Type Declarations
 
 ```ts
@@ -87,9 +80,8 @@ export interface UseQueryOptions<T, K> {
    */
   mode?: "replace" | "push"
   /**
-   * Function to transform data before return, or an object with one or both
-   * functions: `get` to transform data before returning, and `set` to
-   * transform data before setting.
+   * Function to transform data before return, or an object with one or both functions: `get` to
+   * transform data before returning, and `set` to transform data before setting.
    */
   transform?:
     | ((value: T) => K)

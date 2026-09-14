@@ -1,17 +1,16 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 /**
- * The type of wake lock to request. Mirrors upstream's own
- * `WakeLockType` (defined locally rather than referenced from lib.dom, for
- * parity with older TS libs) and is re-exported from the package barrel.
+ * The type of wake lock to request. Mirrors upstream's own `WakeLockType` (defined locally rather
+ * than referenced from lib.dom, for parity with older TS libs) and is re-exported from the package
+ * barrel.
  */
 export type WakeLockType = 'screen'
 
 /**
- * Mirrors upstream's own `WakeLockSentinel` interface (upstream defines it
- * locally for older TS libs instead of referencing lib.dom directly) and is
- * re-exported from the package barrel. lib.dom's `WakeLockSentinel` is
- * assignable to this shape.
+ * Mirrors upstream's own `WakeLockSentinel` interface (upstream defines it locally for older TS
+ * libs instead of referencing lib.dom directly) and is re-exported from the package barrel.
+ * lib.dom's `WakeLockSentinel` is assignable to this shape.
  */
 export interface WakeLockSentinel extends EventTarget {
   type: WakeLockType
@@ -20,23 +19,21 @@ export interface WakeLockSentinel extends EventTarget {
 }
 
 /**
- * Specify a custom `navigator` or `document` instance, e.g. working with
- * iframes or in testing environments.
+ * Specify a custom `navigator` or `document` instance, e.g. working with iframes or in testing
+ * environments.
  *
- * Upstream composes these from the shared `ConfigurableNavigator` /
- * `ConfigurableDocument` option types; they are inlined here.
+ * Upstream composes these from the shared `ConfigurableNavigator` / `ConfigurableDocument` option
+ * types; they are inlined here.
  */
 export interface UseWakeLockOptions {
   /**
-   * Specify a custom `navigator` instance, e.g. working with iframes or in
-   * testing environments.
+   * Specify a custom `navigator` instance, e.g. working with iframes or in testing environments.
    *
    * @default typeof navigator !== 'undefined' ? navigator : undefined
    */
   navigator?: Navigator
   /**
-   * Specify a custom `document` instance, e.g. working with iframes or in
-   * testing environments.
+   * Specify a custom `document` instance, e.g. working with iframes or in testing environments.
    *
    * @default typeof document !== 'undefined' ? document : undefined
    */
@@ -45,8 +42,7 @@ export interface UseWakeLockOptions {
 
 export interface UseWakeLockReturn {
   /**
-   * The current `WakeLockSentinel` instance, or `null` when no wake lock is
-   * held.
+   * The current `WakeLockSentinel` instance, or `null` when no wake lock is held.
    */
   sentinel: WakeLockSentinel | null
   /**
@@ -58,13 +54,13 @@ export interface UseWakeLockReturn {
    */
   isActive: boolean
   /**
-   * Request a wake lock of the given type. When the document is hidden, the
-   * request is queued and replayed once the document becomes visible.
+   * Request a wake lock of the given type. When the document is hidden, the request is queued and
+   * replayed once the document becomes visible.
    */
   request: (type: WakeLockType) => Promise<void>
   /**
-   * Request a wake lock immediately, even if the document is hidden. Note
-   * that this may throw an error if the document is hidden.
+   * Request a wake lock immediately, even if the document is hidden. Note that this may throw an
+   * error if the document is hidden.
    */
   forceRequest: (type: WakeLockType) => Promise<void>
   /**
@@ -74,36 +70,8 @@ export interface UseWakeLockReturn {
 }
 
 /**
- * React port of VueUse's `useWakeLock`.
- *
  * Map from @vueuse/core `useWakeLock`
- * (`source/vueuse/packages/core/useWakeLock/`). Reactive Screen Wake Lock
- * API — prevents devices from dimming or locking the screen.
- *
- * The upstream return shape is mirrored 1:1 as a plain object: `sentinel`,
- * `isSupported` and `isActive` are plain values, while `request`,
- * `forceRequest` and `release` are stable functions.
- *
- * React divergences:
- * - the Vue `shallowRef`/`computed` returns become plain state values;
- *   `request`/`forceRequest`/`release` are stable `useCallback` functions
- *   reading sync refs (`sentinelRef`/`visibilityRef`/`navigatorRef`) the way
- *   upstream reads its refs at call time;
- * - `isSupported` is computed in a mount effect (upstream: `useSupported`),
- *   so SSR renders `false` and the global `navigator` is never touched
- *   during render;
- * - `document.visibilityState` tracking (upstream: `useDocumentVisibility`)
- *   and the queued-request replay (upstream: `whenever`) live in
- *   self-contained `useEffect`s; the initial visibility defaults to
- *   `'visible'` (upstream's server default) and syncs on mount;
- * - the sentinel `release` listener re-queues the released sentinel's type
- *   only while it is still the current sentinel — upstream achieves the
- *   same by re-binding its listener through the sentinel ref;
- * - auto-release on unmount mirrors upstream's `tryOnScopeDispose`;
- * - `WakeLockSentinel`/`WakeLockType` are defined locally and re-exported,
- *   mirroring upstream's own interfaces (defined for older TS libs rather
- *   than referenced from lib.dom directly), so `import type {
- *   WakeLockSentinel } from '@reause/core'` keeps parity.
+ * (`source/vueuse/packages/core/useWakeLock/`).
  *
  * @example
  * const { isSupported, isActive, request, release } = useWakeLock()

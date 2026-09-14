@@ -3,7 +3,7 @@ import { useState } from 'react'
 
 export default function UseClipboardDemo() {
   const [input, setInput] = useState('')
-  const { text, isSupported, copy } = useClipboard()
+  const [text, copy, { isSupported }] = useClipboard()
   const permissionRead = usePermission('clipboard-read')
   const permissionWrite = usePermission('clipboard-write')
 

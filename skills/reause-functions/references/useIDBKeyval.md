@@ -53,8 +53,8 @@ const [data] = useIDBKeyval('my-key', 'default', { listenToStorageChanges: false
 
 ```ts
 /**
- * Custom (de)serialization between the value held in state and the raw value
- * stored in IndexedDB. Defaults to an identity pair.
+ * Custom (de)serialization between the value held in state and the raw value stored in IndexedDB.
+ * Defaults to an identity pair.
  */
 export interface UseIDBKeyvalSerializer<T> {
   read: (raw: unknown) => T
@@ -62,8 +62,7 @@ export interface UseIDBKeyvalSerializer<T> {
 }
 export interface UseIDBOptions<T> {
   /**
-   * Allow a custom `window` instance, e.g. working with iframes or in testing
-   * environments.
+   * Allow a custom `window` instance, e.g. working with iframes or in testing environments.
    */
   window?: Window
   /**
@@ -83,8 +82,8 @@ export interface UseIDBOptions<T> {
    */
   serializer?: UseIDBKeyvalSerializer<T>
   /**
-   * Listen to changes from other tabs through a `BroadcastChannel`, useful for
-   * multi-tab applications.
+   * Listen to changes from other tabs through a `BroadcastChannel`, useful for multi-tab
+   * applications.
    *
    * @default true
    */
@@ -92,9 +91,8 @@ export interface UseIDBOptions<T> {
   /**
    * Watch for deep changes.
    *
-   * Accepted for upstream parity only — **no effect**: React has no deep
-   * observation, so writes happen explicitly through `setData` (see the
-   * divergence notes on `useIDBKeyval`).
+   * Accepted for upstream parity only — **no effect**: React has no deep observation, so writes
+   * happen explicitly through `setData` (see the divergence notes on `useIDBKeyval`).
    *
    * @default true
    */
@@ -102,8 +100,7 @@ export interface UseIDBOptions<T> {
   /**
    * Use a shallow reference.
    *
-   * Accepted for upstream parity only — **no effect**: React state is always
-   * replaced wholesale.
+   * Accepted for upstream parity only — **no effect**: React state is always replaced wholesale.
    *
    * @default false
    */
@@ -111,22 +108,20 @@ export interface UseIDBOptions<T> {
   /**
    * The flush timing of the (upstream) watcher.
    *
-   * Accepted for upstream parity only — **no effect**: React has no watcher to
-   * flush, so writes happen explicitly through `setData` (see the divergence
-   * notes on `useIDBKeyval`).
+   * Accepted for upstream parity only — **no effect**: React has no watcher to flush, so writes
+   * happen explicitly through `setData` (see the divergence notes on `useIDBKeyval`).
    *
    * @default 'pre'
    */
   flush?: "pre" | "post" | "sync" | "async"
 }
 /**
- * Reactive companion state of `useIDBKeyval` — the React replacement for the
- * upstream `isFinished` / `isSupported` refs (issue §2B tuple family).
+ * Reactive companion state of `useIDBKeyval` — the React replacement for the upstream `isFinished`
+ * / `isSupported` refs (issue §2B tuple family).
  */
 export interface UseIDBKeyvalControls {
   /**
-   * Whether the initial read from the store has finished (successfully or
-   * with an error).
+   * Whether the initial read from the store has finished (successfully or with an error).
    */
   isFinished: boolean
   /**
@@ -135,9 +130,9 @@ export interface UseIDBKeyvalControls {
   isSupported: boolean
 }
 /**
- * React return type: `[data, setData, controls]` — the state-like tuple family
- * used by `useStateWithControl` and `useStorage` (issue §2B). `data` is
- * `T | null` where `null` means the key was removed from the store.
+ * React return type: `[data, setData, controls]` — the state-like tuple family used by
+ * `useStateWithControl` and `useStorage` (issue §2B). `data` is `T | null` where `null` means the
+ * key was removed from the store.
  */
 export type UseIDBKeyvalReturn<T> = [
   data: T | null,
@@ -145,40 +140,8 @@ export type UseIDBKeyvalReturn<T> = [
   controls: UseIDBKeyvalControls,
 ]
 /**
- * Reactive [IndexedDB](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API)
- * store — React port of VueUse's `useIDBKeyval`.
- *
  * Map from @vueuse/integrations `useIDBKeyval`
- * (`source/vueuse/packages/integrations/useIDBKeyval/`), a reactive wrapper
- * around [`idb-keyval`](https://github.com/jakearchibald/idb-keyval). The value
- * is persisted under `key`, read once on mount and kept in sync across tabs
- * through a `BroadcastChannel`.
- *
- * React divergences:
- * - the upstream object return `{ data, isFinished, isSupported, set }` becomes
- *   the state-like tuple `[data, setData, controls]` (§2B), mirroring
- *   `useStorage`: `data` is `T | null` (`null` = removed) and `setData(null)`
- *   deletes the key through `del`;
- * - **there is no deep watcher.** Upstream writes on *any* mutation of
- *   `data.value` (`watchPausable(data, write, { deep: true })`), so
- *   `data.value.count++` persists by itself. React state has no deep
- *   observation, so writes happen **explicitly through `setData`** — that is
- *   the React contract. Mutating an object held in `data` in place does *not*
- *   persist; call `setData(next)` with a new value instead. The `deep` /
- *   `shallow` / `flush` options are accepted for parity and have no effect;
- * - `isFinished` / `isSupported` live in the third tuple slot as plain
- *   booleans (upstream: `ShallowRef` / `ComputedRef`), and `isSupported` is
- *   computed synchronously (`typeof window !== 'undefined' && 'BroadcastChannel'
- *   in window`) instead of going through `useSupported`, so a `BroadcastChannel`
- *   is available on the first mount effect;
- * - `initialValue` is the hook's **read-only value source** and takes a plain
- *   `T` (upstream: `MaybeRefOrGetter<T>`); it is resolved once at mount, as
- *   upstream's `toValue(initialValue)` is — the hook owns writes, so later
- *   prop changes are ignored;
- * - a `delete` message from another tab resets `data` to the initial value
- *   (upstream parity) but does not re-write the store: incoming syncs never
- *   write back, mirroring upstream's paused watcher;
- * - the async read and the channel listener never set state after unmount.
+ * (`source/vueuse/packages/integrations/useIDBKeyval/`).
  *
  * @__NO_SIDE_EFFECTS__
  * @example

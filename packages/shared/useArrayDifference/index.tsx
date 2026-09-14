@@ -28,16 +28,7 @@ export function useArrayDifference<T>(
 ): UseArrayDifferenceReturn<T>
 
 /**
- * React port of VueUse's `useArrayDifference`.
- *
- * Map from @vueuse/shared `useArrayDifference`
- * Mapping: upstream wraps the diff passes in `computed(...)` and returns a
- * `ComputedRef`; React has no reactive value tracking, so this is a plain
- * function recomputed on every render over the plain `list` / `values` arrays
- * the caller passes — pass state arrays and the difference is re-diffed on the
- * next render, no `.value` on the result. The same three call shapes as
- * upstream are supported: plain diff, diff by `key`, and diff by `compareFn`,
- * plus the `{ symmetric }` option.
+ * Map from @vueuse/shared `useArrayDifference`.
  *
  * @see https://vueuse.org/shared/useArrayDifference/
  *

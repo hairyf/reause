@@ -71,10 +71,14 @@ export default function CreatePromisifiedComponentDemo() {
           >
             <div
               style={{
-                border: '1px solid rgba(128, 128, 128, 0.3)',
+                border: '1px solid var(--vp-c-divider)',
                 borderRadius: '8px',
                 padding: '16px',
-                background: '#fff',
+                // Theme-aware surface: `--vp-c-bg` / `--vp-c-text-1` flip with
+                // VitePress's dark mode (`html.dark`), so the dialog stays
+                // readable instead of forcing a white card on a dark page.
+                background: 'var(--vp-c-bg)',
+                color: 'var(--vp-c-text-1)',
                 boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
               }}
             >

@@ -24,7 +24,7 @@ function Demo() {
 }
 ```
 
-`target` accepts the element itself or a ref-like `{ current }` object — bind it to the element you
+`target` is a React ref object (`RefObject`) holding the element — bind it to the element you
 want to listen on (a `useRef` that is not attached to any node listens to nothing). The resolved
 element is re-read after every commit, so a ref that is still `null` while rendering binds as soon
 as React attaches the element.
@@ -48,10 +48,3 @@ as React attaches the element.
 - `coordsStart` / `coordsEnd` (`{ x: number, y: number }`): start and last touch coordinates.
 - `lengthX` / `lengthY` (`number`): `coordsStart.x - coordsEnd.x` / `coordsStart.y - coordsEnd.y`.
 - `stop` (`() => void`): permanently detach the listeners for this hook instance.
-
-## React divergences
-
-The Vue return object (`isSwiping` ref, `direction` / `lengthX` / `lengthY` computeds, reactive
-coords) becomes plain values backed by state. React refs are not reactive like Vue's, so a
-`ref.current` write that triggers no re-render cannot be observed — re-render (for example through
-state) after mutating the ref to re-bind the listeners.

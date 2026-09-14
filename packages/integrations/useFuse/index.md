@@ -53,39 +53,3 @@ const { results } = useFuse(input, data)
  *
  */
 ```
-
-### Value sources
-
-`search` and `data` are the hook's **read-only value sources** and take plain values (`string` and
-`readonly DataItem[]`; upstream: `MaybeRefOrGetter`). A changed `search`/`data` prop recomputes on the
-next render:
-
-```tsx
-const [search, setSearch] = useState('Jhon D')
-const { results } = useFuse(search, data) // setSearch('Peter') recomputes on the next render
-```
-
-`options` stays `RefOrValue` (a config object, not a value source).
-
-Mutating the `data` array in place is not detected (upstream's deep watcher was) — pass a new array
-reference when the collection changes.
-
-Options are passed through `fuseOptions`, plus `resultLimit` and `matchAllWhenSearchEmpty`:
-
-```tsx
-import { useFuse } from '@reause/integrations'
-import { useMemo, useState } from 'react'
-
-const [search, setSearch] = useState('')
-
-// memoized so the Fuse index is not rebuilt on every render
-const options = useMemo(() => ({
-  fuseOptions: { keys: ['firstName', 'lastName'] },
-  resultLimit: 10,
-  matchAllWhenSearchEmpty: true,
-}), [])
-
-const { fuse, results } = useFuse(search, data, options)
-
-fuse.search('john') // search the same index directly
-```

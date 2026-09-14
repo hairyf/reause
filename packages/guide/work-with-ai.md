@@ -105,7 +105,7 @@ export default function App() {
   }
 
   // copy button for each todo item
-  const { copy, copied, isSupported } = useClipboard()
+  const [, copy, { copied, isSupported }] = useClipboard()
 
   async function handleCopy(todo: Todo) {
     await copy(todo.text)

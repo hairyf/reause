@@ -181,7 +181,7 @@ describe('useDevicesList', () => {
     await expect.poll(() => result.current.devices).toEqual(allDevices)
 
     const calls: MediaDeviceInfo[][] = []
-    const { off } = result.current.onUpdated(next => calls.push(next))
+    const off = result.current.onUpdated(next => calls.push(next))
     expect(calls).toHaveLength(0)
 
     emitDeviceChange()

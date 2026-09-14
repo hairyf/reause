@@ -1,6 +1,17 @@
+import type { RefObject } from 'react'
+import type { UseIntersectionObserverOptions } from '../useIntersectionObserver'
 import { beforeEach, describe, expect, expectTypeOf, it, vi } from 'vitest'
 import { renderHook } from 'vitest-browser-react'
 import { useIntersectionObserver } from '../useIntersectionObserver'
+
+/**
+ * The hook binds DOM targets to React refs only — a plain element, a getter or
+ * a callback ref is not accepted, so every test wraps its element in a
+ * `{ current }` holder.
+ */
+function refOf<T>(value: T | null): RefObject<T | null> {
+  return { current: value }
+}
 
 describe('useIntersectionObserver', () => {
   beforeEach(() => {
@@ -8,8 +19,19 @@ describe('useIntersectionObserver', () => {
   })
 
   it('accepts an array of element refs as target', () => {
-    expectTypeOf<Array<{ current: HTMLElement }>>()
+    expectTypeOf<RefObject<HTMLElement | null>[]>()
       .toExtend<Parameters<typeof useIntersectionObserver>[0]>()
+    // a plain element is deliberately rejected — refs are the only DOM target
+    expectTypeOf<HTMLDivElement>()
+      .not
+      .toMatchTypeOf<Parameters<typeof useIntersectionObserver>[0]>()
+    // the callback form of React's `Ref<T>` is rejected too
+    expectTypeOf<(instance: HTMLElement | null) => void>()
+      .not
+      .toMatchTypeOf<Parameters<typeof useIntersectionObserver>[0]>()
+    // `rootMargin` is a plain CSS margin string, not a ref/value union
+    expectTypeOf<UseIntersectionObserverOptions['rootMargin']>()
+      .toEqualTypeOf<string | undefined>()
   })
 
   const expectFunctionHasNotBeenCalled = async (callbackMock: any) => {
@@ -209,7 +231,7 @@ describe('useIntersectionObserver', () => {
 
   it('target is reactive', async () => {
     const callbackMock = vi.fn()
-    const target = { current: null as HTMLDivElement | null }
+    const target = refOf<HTMLDivElement>(null)
 
     const spacer = document.createElement('div')
     spacer.style.height = 'calc(100vh + 10px)'
@@ -222,7 +244,7 @@ describe('useIntersectionObserver', () => {
     document.body.append(spacer, targetNode1, targetNode2)
 
     const { rerender, unmount } = await renderHook(
-      (props?: { target: { current: HTMLDivElement | null } }) =>
+      (props?: { target: RefObject<HTMLDivElement | null> }) =>
         useIntersectionObserver(props?.target ?? { current: null }, callbackMock),
       { initialProps: { target } },
     )
@@ -271,7 +293,7 @@ describe('useIntersectionObserver', () => {
 
   it('root is reactive', async () => {
     const callbackMock = vi.fn()
-    const rootRef = { current: null as HTMLDivElement | null }
+    const rootRef = refOf<HTMLDivElement>(null)
 
     const spacer = document.createElement('div')
     spacer.style.height = 'calc(100vh + 10px)'
@@ -288,7 +310,7 @@ describe('useIntersectionObserver', () => {
     document.body.append(spacer, rootNode)
 
     const { rerender, unmount } = await renderHook(
-      (props?: { root: { current: HTMLDivElement | null } }) =>
+      (props?: { root: RefObject<HTMLDivElement | null> }) =>
         useIntersectionObserver(
           { current: target },
           callbackMock,

@@ -13,23 +13,21 @@ export type UseWatchTriggerableOldValues<T extends readonly any[]> = { [K in key
 
 export interface UseWatchTriggerableReturn<R = void> {
   /**
-   * Execute the callback immediately with the current source value — the old
-   * value is unknown (`undefined`, per-element for array sources) for a manual
-   * call, and the invocation does not count as a source change: a source
-   * change queued inside the callback is itself ignored.
+   * Execute the callback immediately with the current source value — the old value is unknown
+   * (`undefined`, per-element for array sources) for a manual call, and the invocation does not
+   * count as a source change: a source change queued inside the callback is itself ignored.
    */
   trigger: () => R
 
   /**
-   * Run `updater`, ignoring the watch for the source changes it makes — as
-   * long as no other changes follow, the callback is not fired for that batch.
+   * Run `updater`, ignoring the watch for the source changes it makes — as long as no other changes
+   * follow, the callback is not fired for that batch.
    */
   ignoreUpdates: IgnoredUpdater
 
   /**
-   * Ignore the source changes made since the last time the callback fired —
-   * as long as no other changes follow, the callback is not fired for that
-   * batch.
+   * Ignore the source changes made since the last time the callback fired — as long as no other
+   * changes follow, the callback is not fired for that batch.
    */
   ignorePrevAsyncUpdates: () => void
 
@@ -48,65 +46,7 @@ export interface UseWatchTriggerableOptions {
 }
 
 /**
- * Watch that can be triggered manually — extended watch that returns
- * `trigger()` to execute the callback immediately — React port of VueUse's
- * `watchTriggerable`.
- * Map from @vueuse/shared watchTriggerable.
- *
- * The API follows the maintainer-directed adjustment of issue #263: the
- * source is the caller's own state value (house `useWatch` source convention)
- * and the return is the upstream `WatchTriggerableReturn` object shape — this
- * deliberately overrides the house array-destructure return convention, and
- * the hook holds no observable state of its own (the internal render tick is
- * invisible to the caller).
- *
- * Mapping: upstream builds on `watchIgnorable`, which counts every source
- * modification with a hidden `flush: 'sync'` shadow watcher (`syncCounter`),
- * accumulates the changes to skip in `ignoreCounter`, and skips a trigger
- * only when every counted change came from `ignoreUpdates`
- * (`ignoreCounter === syncCounter`); `trigger()` calls the callback with the
- * current source value wrapped in `ignoreUpdates` so the manual invocation
- * does not disturb that accounting, and the previously registered `onCleanup`
- * side effect is cleaned up before every new invocation.
- *
- * React sees the caller's changes only at commit — there is no way to observe
- * (let alone intercept) `setSource`, and automatic batching has already
- * collapsed consecutive updates into a single render by then. The counters
- * are therefore approximated with a one-shot "ignore barrier":
- * `ignoreUpdates(updater)` snapshots the latest observed value, runs `updater`
- * synchronously and arms the barrier; the next change the watch observes is
- * skipped (upstream skips it too when no other changes follow) and the flag is
- * consumed either way, so later genuine changes fire again.
- * `ignorePrevAsyncUpdates()` arms the same barrier for the changes queued
- * before the call. The barrier is disarmed again when a commit carries no
- * source change (the updater produced nothing observable); an internal render
- * tick guarantees such a commit even when the updater is a no-op `setState`
- * that React would otherwise bail out of entirely — so a no-op updater can
- * never consume a later genuine change (upstream counts 0 changes and fires).
- *
- * `trigger()` fires synchronously at the call site — it does not wait for
- * React to commit and is unaffected by batching: it hands the current source
- * value straight to the callback with the old value `undefined` (upstream
- * cannot know it either; array sources get a per-element `undefined`) and
- * returns the callback's return value so async work can be awaited. Like
- * upstream, the invocation is wrapped in `ignoreUpdates`: a source change
- * queued by the callback inside `trigger()` is suppressed after its commit
- * (upstream counts it in `ignoreCounter`), and a callback that makes no
- * source change is disarmed by the forced commit, so a later genuine change
- * still fires.
- *
- * Divergences from upstream (React batching):
- * - Changes made inside `ignoreUpdates` and further changes made afterwards
- *   in the same synchronous batch collapse into one render, which the
- *   barrier skips as a whole — upstream would fire the callback with the
- *   latest value. Let the updater's batch commit before making changes that
- *   must fire.
- * - The `flush` option is not ported — the callback fires in the effect after
- *   commit (upstream `flush: 'pre'` timing); `eventFilter` and the other
- *   `WatchWithFilterOptions` members (`deep`, pause/resume) are not ported —
- *   only `immediate`.
- * - `stop()` keeps the effect registered but the callback becomes a no-op —
- *   observable behavior is identical (the callback never fires again).
+ * Map from @vueuse/shared `watchTriggerable`.
  *
  * @example
  * ```ts

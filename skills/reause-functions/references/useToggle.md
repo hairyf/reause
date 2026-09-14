@@ -57,21 +57,6 @@ toggle() // 'on'
 Upstream allows the custom values to be reactive refs; this port accepts plain
 values only.
 
-## Caution
-
-Be aware that the toggle function accepts the first argument as the override
-value. You might want to avoid directly passing the function to event handlers,
-as the event object will be passed in:
-
-```tsx
-<>
-  {/* caution: the click event will be passed in as the forced value */}
-  <button onClick={toggle} />
-  {/* recommended to do this */}
-  <button onClick={() => toggle()} />
-</>
-```
-
 ## Type Declarations
 
 ```ts
@@ -94,20 +79,7 @@ export type UseToggleReturn<T extends boolean | number | string = boolean> = [
   (value?: T | ((current: T) => T)) => void,
 ]
 /**
- * React port of VueUse's `useToggle` — a toggler between a truthy and a falsy
- * value, both configurable.
- *
- * Map from @vueuse/shared `useToggle`
- * Mapping: `ref(initialValue)` → `useControllableState(initialValue)`,
- * `toggle()` → stable `useCallback`; accepts the full `State<T>` input.
- * `truthyValue` / `falsyValue` are plain values (upstream: `MaybeRefOrGetter` —
- * reactive refs/getters are not supported, see `RefOrValue`). Upstream's
- * `toggle` returns the new value synchronously; React state updates are async,
- * so here `toggle` is `() => void` and the new value is read from `value` on
- * the next render. Like upstream, a bare `toggle()` flips between
- * `truthyValue` and `falsyValue`, `toggle(value)` (including an explicit
- * `undefined`) forces the value, and a function argument is applied as a
- * functional update (React adaptation).
+ * Map from @vueuse/shared `useToggle`.
  *
  * @example
  * const [value, toggle] = useToggle()

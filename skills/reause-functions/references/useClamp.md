@@ -53,24 +53,8 @@ setMax(3) // clamped is 3 on the next render
 
 ```ts
 /**
- * Reactively clamp a value between two other values.
- *
  * Map from @vueuse/math `useClamp`
- * (`source/vueuse/packages/math/useClamp/`). React port of VueUse's writable
- * `useClamp` — returns a `[value, setValue]` tuple whose setter clamps on
- * write. `value`, `min` and `max` are plain read-only numbers resolved on every
- * render: `value` seeds the hook's internal state (and re-syncs when it
- * changes), and bounds are re-resolved on every render and on every set, so
- * shrinking `max` / raising `min` re-clamps the current value automatically.
- *
- * React divergence: all three parameters are plain `number`, not upstream's
- * `MaybeRefOrGetter<number>`. The caller re-renders with new values (e.g. from
- * `useState`) instead of passing a ref/getter. Upstream's writable computed
- * also writes the clamped value back into its internal ref on every read, so an
- * out-of-bounds seed stays clamped even after the bounds loosen; here `value`
- * is a plain prop that re-seeds internal state when it changes and the raw seed
- * is re-clamped on every render, so loosening the bounds re-exposes the raw
- * seed until the next `setValue`.
+ * (`source/vueuse/packages/math/useClamp/`).
  *
  * @__NO_SIDE_EFFECTS__
  *

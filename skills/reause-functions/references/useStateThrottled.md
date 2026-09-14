@@ -18,7 +18,10 @@ The first argument is a `State<T>` source. Besides a plain value, you can pass a
 
 ```tsx
 const [value, setValue] = useState('')
-const [input, setInput, throttled] = useStateThrottled([value, setValue], 1000)
+const [input, setInput, throttled] = useStateThrottled(
+  { value, onChange: setValue },
+  1000
+)
 // or: useStateThrottled({ value, onChange: setValue }, 1000)
 ```
 
@@ -27,10 +30,10 @@ An example with an object value.
 ```tsx
 import { useStateThrottled } from '@reause/shared'
 
-const [data, setData, throttled] = useStateThrottled({
-  count: 0,
-  name: 'foo',
-}, 1000)
+const [data, setData, throttled] = useStateThrottled(
+  { count: 0, name: 'foo', },
+  1000
+)
 
 setData({ count: 1, name: 'foo' })
 console.log(throttled) // { count: 1, name: 'foo' } (immediate, leading edge)
@@ -81,13 +84,12 @@ export type UseStateThrottledReturn<T = any> = [
 /**
  * Throttle changing of a state value — React port of VueUse's `refThrottled`.
  *
- * The `value` argument accepts any `State<T>` supported by
- * `useControllableState`: a plain value, lazy initializer, controlled tuple,
- * or `{ value, onChange }` source. The returned tuple contains the current
- * value, its setter, and a throttled mirror.
+ * The `value` argument accepts any `State<T>` supported by `useControllableState`: a plain value,
+ * lazy initializer, controlled tuple, or `{ value, onChange }` source. The returned tuple contains
+ * the current value, its setter, and a throttled mirror.
  *
- * A `delay <= 0` short-circuits like upstream (`if (delay <= 0) return value`):
- * the throttled element is the input itself — no throttling, no timers.
+ * A `delay <= 0` short-circuits like upstream (`if (delay <= 0) return value`): the throttled
+ * element is the input itself — no throttling, no timers.
  *
  * @param value State source accepted by `useControllableState`.
  * @param delay Delay in milliseconds between commits (default: 200).

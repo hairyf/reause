@@ -60,8 +60,7 @@ const [title] = useTitle('New Title', {
 ```ts
 export interface UseTitleOptionsBase {
   /**
-   * Specify a custom `document` instance, e.g. working with iframes or in
-   * testing environments.
+   * Specify a custom `document` instance, e.g. working with iframes or in testing environments.
    */
   document?: Document | null
   /**
@@ -83,8 +82,8 @@ export type UseTitleOptions = UseTitleOptionsBase &
   (
     | {
         /**
-         * Observe `document.title` changes using a MutationObserver.
-         * Cannot be used together with `titleTemplate` option.
+         * Observe `document.title` changes using a MutationObserver. Cannot be used together with
+         * `titleTemplate` option.
          *
          * @default false
          */
@@ -92,8 +91,8 @@ export type UseTitleOptions = UseTitleOptionsBase &
       }
     | {
         /**
-         * The template string to parse the title (e.g., '%s | My Website')
-         * Cannot be used together with `observe` option.
+         * The template string to parse the title (e.g., '%s | My Website') Cannot be used together with
+         * `observe` option.
          *
          * @default '%s'
          */
@@ -105,35 +104,8 @@ export type UseTitleReturn = [
   setTitle: Dispatch<SetStateAction<string | null | undefined>>,
 ]
 /**
- * React port of VueUse's `useTitle`.
- *
  * Map from @vueuse/core `useTitle`
- * (`source/vueuse/packages/core/useTitle/`). Reactive document title: keeps
- * the document title in component state and writes it back to
- * `document.title` on change.
- *
- * Return tuple follows this repo's React idiom:
- * `const [title, setTitle] = useTitle()` (upstream returns a single Vue ref
- * — a readonly `ComputedRef` when the source is a ref).
- *
- * React divergences:
- * - upstream adopts the current title synchronously at setup
- *   (`newTitle ?? document.title`); React state must initialize during
- *   render without touching `document` (SSR-safe), so the adoption happens
- *   in a mount effect — during the first render (and on the server) `title`
- *   is `newTitle ?? null`;
- * - the title write is a `useEffect` on the state instead of a Vue watcher;
- *   setting `null`/`undefined` through the setter writes `format('')` like
- *   upstream (`document.title = format(newValue ?? '')`);
- * - a plain `newTitle` argument is re-synced when it changes across renders
- *   (React has no reactive refs; upstream only propagates ref sources
- *   and then returns a readonly computed — here the setter stays writable);
- * - `observe` registers a raw `MutationObserver` on the `<title>` element in
- *   an effect (upstream composes `useMutationObserver`); as upstream it is
- *   ignored when `titleTemplate` is set, and the options keep upstream's
- *   `observe`|`titleTemplate` union type.
- *
- * It's not SSR compatible: your value will be applied only on client-side.
+ * (`source/vueuse/packages/core/useTitle/`).
  *
  * @example
  * const [title, setTitle] = useTitle()

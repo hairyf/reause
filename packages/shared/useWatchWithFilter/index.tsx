@@ -1,31 +1,25 @@
-import type { FunctionArgs, RefOrValue } from '../index'
+import type { FunctionArgs } from '../index'
 import type { DebounceFilterOptions } from '../useDebounceFn'
 import type { UseWatchCallback } from '../useWatch'
 import { useCallback, useEffect, useRef } from 'react'
 import { useWatch } from '../useWatch'
-import { toValue } from '../utils'
 
 /**
- * Filter for if events should to be received — the house equivalent of
- * upstream's `EventFilter` (`@vueuse/shared` `utils/filters.ts`).
+ * Filter for if events should to be received — the house equivalent of upstream's `EventFilter`
+ * (`@vueuse/shared` `utils/filters.ts`).
  *
- * Upstream is generic over the wrapped function
- * (`EventFilter<Args, This, Invoke>` returning
- * `ReturnType<Invoke> | Promisify<ReturnType<Invoke>>`); the watch path
- * discards the wrapped callback's return value, so the contract collapses
- * to `(invoke: FunctionArgs, options?: Record<string, unknown>) => void`.
- * The optional second argument mirrors upstream's placeholder
- * `FunctionWrapperOptions` (e.g. `useMouse` passes `{}`), so a chained
- * filter reads an object instead of `undefined`.
+ * Upstream is generic over the wrapped function (`EventFilter<Args, This, Invoke>` returning
+ * `ReturnType<Invoke> | Promisify<ReturnType<Invoke>>`); the watch path discards the wrapped
+ * callback's return value, so the contract collapses to `(invoke: FunctionArgs, options?:
+ * Record<string, unknown>) => void`. The optional second argument.g. `useMouse` passes `{}`), so a
+ * chained filter reads an object instead of `undefined`.
  */
 export type EventFilter = (invoke: FunctionArgs, options?: Record<string, unknown>) => void
 
 /**
- * An `EventFilter` that carries cancellation controls (upstream:
- * `CancelableEventFilter`), as returned by `debounceFilter`.
+ * An `EventFilter` that carries cancellation controls, as returned by `debounceFilter`.
  *
- * `isPending` is a plain (non-reactive) getter — React has no reactive refs,
- * read it imperatively.
+ * `isPending` is a plain (non-reactive) getter — React has no reactive refs, read it imperatively.
  */
 export interface CancelableEventFilter extends EventFilter {
   cancel: () => void
@@ -35,13 +29,11 @@ export interface CancelableEventFilter extends EventFilter {
 
 export interface UseWatchWithFilterOptions {
   /**
-   * Filter for if events should to be received (upstream:
-   * `ConfigurableEventFilter`).
+   * Filter for if events should to be received.
    *
-   * The filter instance is captured once on mount — like upstream, where the
-   * watch options are evaluated once during setup — so an inline
-   * `debounceFilter(300)` is safe; pass a getter-based delay
-   * (`debounceFilter(() => ms)`) when the delay must change over time.
+   * The filter instance is captured once on mount — like upstream, where the watch options are
+   * evaluated once during setup — so an inline `debounceFilter(300)` is safe; pass a getter-based
+   * delay (`debounceFilter(() => ms)`) when the delay must change over time.
    *
    * @default bypassFilter (invoke directly)
    */
@@ -55,9 +47,8 @@ export interface UseWatchWithFilterOptions {
 }
 
 /**
- * The stop function returned by `useWatchWithFilter` — upstream's
- * `WatchHandle`, reduced to the stop capability (house `useWatch` has no
- * stop-handle infrastructure).
+ * The stop function returned by `useWatchWithFilter` — upstream's `WatchHandle`, reduced to the
+ * stop capability (house `useWatch` has no stop-handle infrastructure).
  */
 export type UseWatchWithFilterReturn = () => void
 
@@ -68,26 +59,23 @@ function bypassFilter(invoke: FunctionArgs): void {
 }
 
 /**
- * Create an EventFilter that debounce the events — in-house port of upstream
- * `@vueuse/shared` `debounceFilter` (trailing edge + `maxWait`).
+ * Create an EventFilter that debounce the events — in-house port of upstream `@vueuse/shared`
+ * `debounceFilter` (trailing edge + `maxWait`).
  *
- * Mapping: same collapsing semantics as upstream (a newer call supersedes the
- * pending one; the `maxWait` timer survives re-scheduling and forces the call
- * with the latest `invoke`). Divergences: the promise-settlement plumbing
- * (`lastRejector` / `rejectOnCancel`) is dropped — the house `EventFilter`
- * contract returns `void` and the watch path consumes no promise, so
- * `rejectOnCancel` has no observable effect — and `isPending` is a plain
- * getter instead of a reactive ref. `ms` accepts a plain number or a React
- * ref (upstream: `RefOrValue<number>`) and is re-read on every call. Pending
- * timers are cleared by `cancel()` — the `useWatchWithFilter` hook calls it
- * on stop / unmount.
+ * Mapping: same collapsing semantics as upstream (a newer call supersedes the pending one; the
+ * `maxWait` timer survives re-scheduling and forces the call with the latest `invoke`).
+ * Divergences: the promise-settlement plumbing (`lastRejector` / `rejectOnCancel`) is dropped — the
+ * house `EventFilter` contract returns `void` and the watch path consumes no promise, so
+ * `rejectOnCancel` has no observable effect — and `isPending` is a plain getter instead of a
+ * reactive ref. `ms` is a plain number, re-read on every call. Pending timers are cleared by
+ * `cancel()` — the `useWatchWithFilter` hook calls it on stop / unmount.
  *
  * @example
  * ```ts
  * useWatchWithFilter(input, callback, { eventFilter: debounceFilter(300, { maxWait: 1000 }) })
  * ```
  */
-export function debounceFilter(ms: RefOrValue<number> = 200, options: DebounceFilterOptions = {}): CancelableEventFilter {
+export function debounceFilter(ms: number = 200, options: DebounceFilterOptions = {}): CancelableEventFilter {
   let timer: ReturnType<typeof setTimeout> | undefined
   let maxTimer: ReturnType<typeof setTimeout> | undefined
   let pending = false
@@ -105,8 +93,8 @@ export function debounceFilter(ms: RefOrValue<number> = 200, options: DebounceFi
   }
 
   const handler = (invoke: FunctionArgs): void => {
-    const duration = toValue(ms)
-    const maxDuration = toValue(options.maxWait)
+    const duration = ms
+    const maxDuration = options.maxWait
 
     // a newer call supersedes the pending one — drop its timer without
     // invoking (upstream: `_clearTimeout` → `lastRejector`); the maxWait
@@ -178,26 +166,22 @@ export function debounceFilter(ms: RefOrValue<number> = 200, options: DebounceFi
 }
 
 /**
- * Create an EventFilter that throttle the events — in-house port of upstream
- * `@vueuse/shared` `throttleFilter` (leading/trailing edges with a trailing
- * invoke on window end).
+ * Create an EventFilter that throttle the events — in-house port of upstream `@vueuse/shared`
+ * `throttleFilter` (leading/trailing edges with a trailing invoke on window end).
  *
- * Mapping: same collapsing semantics as upstream — a call inside the throttle
- * window re-schedules the trailing timer with the remaining time, collapsing
- * bursts into one trailing call carrying the latest `invoke`. Divergences:
- * the promise-settlement plumbing (`rejectOnCancel`, upstream's fourth
- * parameter) is dropped — the house `EventFilter` contract returns `void` —
- * and the object options form is not ported (positional
- * `throttleFilter(ms, trailing, leading)` like the house `useThrottleFn`).
- * `ms` accepts a plain number or a React ref (upstream:
- * `RefOrValue<number>`) and is re-read on every call.
+ * Mapping: same collapsing semantics as upstream — a call inside the throttle window re-schedules
+ * the trailing timer with the remaining time, collapsing bursts into one trailing call carrying the
+ * latest `invoke`. Divergences: the promise-settlement plumbing (`rejectOnCancel`, upstream's
+ * fourth parameter) is dropped — the house `EventFilter` contract returns `void` — and the object
+ * options form is not ported (positional `throttleFilter(ms, trailing, leading)` like the house
+ * `useThrottleFn`). `ms` is a plain number, re-read on every call.
  *
  * @example
  * ```ts
  * useWatchWithFilter(scrollY, callback, { eventFilter: throttleFilter(100, true, false) })
  * ```
  */
-export function throttleFilter(ms: RefOrValue<number> = 200, trailing = true, leading = true): EventFilter {
+export function throttleFilter(ms: number = 200, trailing = true, leading = true): EventFilter {
   let lastExec = 0
   let timer: ReturnType<typeof setTimeout> | undefined
   let isLeading = true
@@ -210,7 +194,7 @@ export function throttleFilter(ms: RefOrValue<number> = 200, trailing = true, le
   }
 
   return (invoke: FunctionArgs): void => {
-    const duration = toValue(ms)
+    const duration = ms
     const elapsed = Date.now() - lastExec
 
     clear()
@@ -253,45 +237,7 @@ export function useWatchWithFilter<T>(source: T, callback: UseWatchCallback<T>, 
 
 // implementation
 /**
- * `watch` with additional EventFilter control — React port of VueUse's
- * `watchWithFilter`.
- * Map from @vueuse/shared watchWithFilter.
- *
- * Mapping: upstream builds `watch(source, createFilterWrapper(eventFilter, cb),
- * watchOptions)` — the event filter wraps the watch trigger, so every source
- * change hands an `invoke` closure to the filter, which decides whether and
- * when the callback actually runs. This port builds the same wrapper on the
- * house `useWatch` (Vue's reactive dependency tracking becomes the effect
- * dependency list): every source change invokes the captured `eventFilter`
- * with an `invoke` closure carrying the latest `(value, oldValue)` pair. The
- * hook holds no state of its own — the source is the caller's own value — and
- * returns a `stop` function (upstream's `WatchHandle`, reduced to the stop
- * capability): after `stop()`, further source changes and any pending
- * filtered invocation no longer fire the callback, and cancelable filters
- * (`debounceFilter`) are cancelled outright.
- *
- * Divergences from upstream:
- * - React batching: source changes made in the same tick collapse into a
- *   single effect run, so the filter sees ONE trigger where Vue's watcher
- *   would fire per mutation. For a trailing filter the collapsed call is
- *   identical (the latest `(value, oldValue)` pair); a leading-edge filter
- *   fires at most once per tick instead of once per mutation.
- * - `deep` is not ported: React values are not deeply reactive. The source is
- *   tracked by reference across renders (the effect dependency list), so
- *   mutating an object in place is invisible and `deep: true` would have
- *   nothing to recurse into — watch a derived primitive (or key) instead.
- *   The same applies to the `flush` watch option: React effects always run
- *   after the commit, there is no pre/post/sync choice.
- * - The filter instance is captured once on mount (upstream evaluates watch
- *   options once during setup) — an inline `debounceFilter(ms)` is safe; use
- *   a getter-based delay for dynamic values.
- * - `stop()` also suppresses a pending filtered invocation (upstream: an
- *   already-scheduled filtered invoke still fires after stop), and pending
- *   timers are cancelled when the component unmounts (upstream leaves
- *   disposal to the effect scope).
- * - The promise-settlement plumbing of upstream filters (`lastRejector` /
- *   `rejectOnCancel`) is dropped — the house `EventFilter` contract returns
- *   `void`, so `rejectOnCancel` has no observable effect.
+ * Map from @vueuse/shared `watchWithFilter`.
  *
  * @example
  * ```ts

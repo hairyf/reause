@@ -114,17 +114,7 @@ export interface UseTimeoutReturn {
   stop: () => void
 }
 /**
- * React port of VueUse's `useTimeout`.
- *
- * Map from @vueuse/shared `useTimeout`
- * Mapping: upstream `useTimeout` wraps `useTimeoutFn` and derives
- * `ready` as `!isPending`; since `useTimeoutFn` is mapped in its own module,
- * this port inlines the timer logic to stay self-contained — `ref` →
- * `useState` for `isPending`, `ready` derived as `!isPending` like upstream,
- * the setup-time `start()` (immediate) becomes an empty-dependency `useEffect`
- * on mount, and `tryOnScopeDispose(stop)` becomes the effect cleanup.
- * `interval` accepts a number or a React ref (upstream: `RefOrValue<number>`);
- * `start` / `stop` are stable `useCallback`s.
+ * Map from @vueuse/shared `useTimeout`.
  *
  * @example
  * const ready = useTimeout(1000) // boolean, becomes true after 1s
@@ -132,11 +122,11 @@ export interface UseTimeoutReturn {
  * const { ready, start, stop } = useTimeout(1000, { controls: true })
  */
 export declare function useTimeout(
-  interval?: RefOrValue<number>,
+  interval?: number,
   options?: UseTimeoutOptions<false>,
 ): boolean
 export declare function useTimeout(
-  interval: RefOrValue<number>,
+  interval: number,
   options: UseTimeoutOptions<true>,
 ): UseTimeoutReturn
 ```

@@ -8,33 +8,14 @@ import type { NextObserver } from 'rxjs'
  * - a setter function (`(value: T) => void` — the second tuple member of
  *   `useState`, or a `useReducer` dispatch).
  *
- * Plain values are deliberately NOT accepted: writing to a value is
- * meaningless, so the target is always something that can receive a write.
+ * Plain values are deliberately NOT accepted: writing to a value is meaningless, so the target is
+ * always something that can receive a write.
  */
 export type ObserverTarget<T> = { current: T } | ((value: T) => void)
 
 /**
- * Sugar function converting a write sink into an RxJS
- * [Observer](https://rxjs.dev/guide/observer).
- *
  * Map from @vueuse/rxjs `toObserver`
- * (`source/vueuse/packages/rxjs/toObserver/index.ts`). Upstream is
- * `toObserver<T>(value: Ref<T>): NextObserver<T>` — it returns an observer
- * whose only method is `next`, which synchronously writes the emission into
- * `value.value`.
- *
- * Adjustment for React: a `useRef` write never schedules a re-render, so a
- * 1:1 mirror accepting only a Vue-style `Ref` would silently pin consumers to
- * non-rendering state. The reause version therefore accepts either a
- * ref-like object (`{ current }`, written through `.current`) or a setter
- * function (`(value: T) => void`, called directly) — pass a `useState` setter
- * when the UI must update, or a `useRef` when the latest value only needs to
- * be read later. Everything else matches upstream: the returned observer has
- * ONLY `next` (no `error`/`complete`), each emission is written synchronously,
- * and `toObserver` itself has no side effects.
- *
- * The parameter is named `target` (upstream `value`) because it is a write
- * sink, not a value — there is no Vue-style ref object exposed to users.
+ * (`source/vueuse/packages/rxjs/toObserver/index.ts`).
  *
  * @__NO_SIDE_EFFECTS__
  *

@@ -1,7 +1,7 @@
-import type { ConfigurableWindow, RefOrValue } from '@reause/shared'
-import type { Dispatch, SetStateAction } from 'react'
-import { toValue } from '@reause/shared'
+import type { ConfigurableWindow } from '@reause/shared'
+import type { Dispatch, RefObject, SetStateAction } from 'react'
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { unrefElement } from '../unrefElement'
 
 export interface UseFocusOptions extends ConfigurableWindow {
   /**
@@ -12,7 +12,7 @@ export interface UseFocusOptions extends ConfigurableWindow {
   initialValue?: boolean
 
   /**
-   * Replicate the :focus-visible behavior of CSS
+   * Replicate the:focus-visible behavior of CSS
    *
    * @default false
    */
@@ -28,49 +28,22 @@ export interface UseFocusOptions extends ConfigurableWindow {
 
 export type UseFocusReturn = readonly [
   /**
-   * If read as true, then the element has focus. If read as false, then the
-   * element does not have focus. This is the plain React state updated by the
-   * target's `focus` / `blur` events.
+   * If read as true, then the element has focus. If read as false, then the element does not have
+   * focus. This is the plain React state updated by the target's `focus` / `blur` events.
    */
   isFocused: boolean,
   /**
-   * If set to true, then the element will be focused. If set to false, the
-   * element will be blurred. Accepts the React functional updater
-   * (`setFocused(prev => !prev)`). As upstream, the assignment itself only
-   * calls `focus()` / `blur()` on the element — the state is then updated by
-   * the `focus` / `blur` events.
+   * If set to true, then the element will be focused. If set to false, the element will be blurred.
+   * Accepts the React functional updater (`setFocused(prev => !prev)`). As upstream, the assignment
+   * itself only calls `focus()` / `blur()` on the element — the state is then updated by the
+   * `focus` / `blur` events.
    */
   setFocused: Dispatch<SetStateAction<boolean>>,
 ]
 
 /**
- * React port of VueUse's `useFocus`.
- *
  * Map from @vueuse/core `useFocus`
- * (`source/vueuse/packages/core/useFocus/`). Reactive utility to track or set
- * the focus state of a DOM element. Listens to the target's `focus` / `blur`
- * events and exposes the state as the first element of a React tuple;
- * calling `setFocused(true)` / `setFocused(false)` focuses / blurs the
- * target. As upstream, the setter itself only calls `focus()` / `blur()` on
- * the element — the state is then updated by the `focus` / `blur` events.
- *
- * React divergences:
- * - upstream returns `{ focused: WritableComputedRef<boolean> }`, so consumers
- *   read and write `focused.value`; reause returns the React tuple
- *   `[isFocused, setFocused]` (array destructuring, no `.value`) — read the
- *   state from element 0 and focus / blur the target with element 1
- *   (`Dispatch<SetStateAction<boolean>>`, so the functional updater
- *   `setFocused(prev => !prev)` is supported);
- * - upstream composes `useEventListener` + `computed` + `watch`; here the
- *   `focus` / `blur` listeners live in a `useEffect` that re-attaches when
- *   the resolved target changes, and upstream's immediate
- *   `watch(targetElement, …)` that applies `initialValue` becomes a mount /
- *   target-change effect. Options are read through latest-value refs, so the
- *   listeners and the setter stay stable and never re-subscribe (upstream
- *   reads the options once in setup);
- * - the target is resolved with `toValue` during render (a plain element or a
- *   ref-like `{ current }` object), so SSR renders the default
- *   `false` state without touching the DOM.
+ * (`source/vueuse/packages/core/useFocus/`).
  *
  * @example
  * const input = useRef<HTMLInputElement>(null)
@@ -80,7 +53,7 @@ export type UseFocusReturn = readonly [
  * setFocused(false) // blur the input
  */
 export function useFocus(
-  target: RefOrValue<HTMLElement | SVGElement | null | undefined>,
+  target: RefObject<HTMLElement | SVGElement | null | undefined>,
   options: UseFocusOptions = {},
 ): UseFocusReturn {
   const { initialValue = false, focusVisible = false, preventScroll = false } = options
@@ -99,11 +72,24 @@ export function useFocus(
   const preventScrollRef = useRef(preventScroll)
   preventScrollRef.current = preventScroll
 
-  // resolve the target during render — a pure unwrap (ref-like `.current`
-  // read), no DOM access — so SSR renders the bare default state
-  const elementRef = useRef<HTMLElement | SVGElement | null | undefined>(undefined)
-  const element = toValue(target)
-  elementRef.current = element
+  // The resolved target is state, not a render-time ref read: a React ref is
+  // only populated during commit, so `target.current` is always `null` on the
+  // first render and never changes identity afterwards. Reading it during
+  // render would freeze `element` at `undefined` forever (no re-render, so the
+  // listeners below would never attach and `initialValue` would never apply).
+  // The effect resolves the element after commit and stores it in state, which
+  // re-renders once and lets the effects keyed on `element` run against the
+  // real node.
+  const [element, setElement] = useState<HTMLElement | SVGElement | null | undefined>(undefined)
+
+  // latest-value ref of the target, so the effect re-resolves without taking a
+  // dependency on the (possibly unstable) ref object identity
+  const targetRef = useRef(target)
+  targetRef.current = target
+
+  useEffect(() => {
+    setElement(unrefElement(targetRef.current))
+  }, [target])
 
   // mirror of upstream's focus/blur listeners (bound via `useEventListener`
   // with passive options): re-attach whenever the resolved target changes.
@@ -122,17 +108,16 @@ export function useFocus(
   }, [])
 
   useEffect(() => {
-    const el = elementRef.current
-    if (!el)
+    if (!element)
       return
 
     const listenerOptions = { passive: true }
-    el.addEventListener('focus', onFocus, listenerOptions)
-    el.addEventListener('blur', onBlur, listenerOptions)
+    element.addEventListener('focus', onFocus, listenerOptions)
+    element.addEventListener('blur', onBlur, listenerOptions)
 
     return () => {
-      el.removeEventListener('focus', onFocus)
-      el.removeEventListener('blur', onBlur)
+      element.removeEventListener('focus', onFocus)
+      element.removeEventListener('blur', onBlur)
     }
   }, [element, onFocus, onBlur])
 
@@ -141,18 +126,23 @@ export function useFocus(
   // state itself is updated by the `focus` / `blur` events (upstream
   // behavior); the ref is kept in sync synchronously so reads in the same tick
   // are correct. The functional updater form resolves against that ref, like
-  // `useState`'s setter.
+  // `useState`'s setter. Upstream's setter calls `focus()` / `blur()`
+  // unconditionally (no already-focused guard), so this mirrors it exactly —
+  // a redundant `focus()` on the focused element is a silent no-op, while the
+  // guard would have swallowed a focus request whenever the tracked state had
+  // drifted from the DOM (e.g. after a click moved focus elsewhere).
   const setFocused = useCallback<Dispatch<SetStateAction<boolean>>>((action) => {
     const next = typeof action === 'function' ? action(isFocusedRef.current) : action
-    const el = elementRef.current
-    if (!next && isFocusedRef.current)
-      el?.blur()
-    else if (next && !isFocusedRef.current)
-      el?.focus({ preventScroll: preventScrollRef.current })
-  }, [])
+    if (next)
+      element?.focus({ preventScroll: preventScrollRef.current })
+    else
+      element?.blur()
+  }, [element])
 
   // mirror of upstream's immediate `watch(targetElement, …)`: apply
-  // `initialValue` on mount and whenever the resolved target changes
+  // `initialValue` on mount and whenever the resolved target changes. Runs
+  // after the element state settles, so `setFocused(true)` reaches the real
+  // node (upstream reads the already-mounted template ref here).
   useEffect(() => {
     setFocused(initialValueRef.current)
   }, [element, setFocused])

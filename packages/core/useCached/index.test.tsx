@@ -152,58 +152,43 @@ describe('useCached', () => {
     expect(result.current).toEqual({ value: 43, extra: 1 })
   })
 
-  it('should work with a ref-like `{ current }` source', async () => {
+  it('caches a ref-like `{ current }` object as a plain value (refs are not unwrapped)', async () => {
     interface Data {
       value: number
       extra: number
     }
 
-    const source: { current: Data } = { current: { value: 42, extra: 0 } }
-    const comparator = vi.fn((newSourceValue: Data, cachedValue: Data) => newSourceValue.value === cachedValue.value)
+    let source: { current: Data } = { current: { value: 42, extra: 0 } }
 
-    const { result, rerender } = await renderHook(() => useCached(source, comparator))
+    const { result, rerender } = await renderHook(() => useCached(source))
 
-    expect(result.current).toEqual({ value: 42, extra: 0 })
-    expect(comparator).not.toHaveBeenCalled()
+    // the object itself is the cached value — `.current` is never unwrapped
+    expect(result.current).toBe(source)
+    expect(result.current.current).toEqual({ value: 42, extra: 0 })
 
-    // the ref's `current` changed, but the comparator deems it insignificant
-    source.current = { value: 42, extra: 1 }
+    // a new identity is adopted like any other plain value
+    source = { current: { value: 43, extra: 1 } }
     await rerender()
-
-    expect(comparator).toHaveBeenCalledWith({ value: 42, extra: 1 }, { value: 42, extra: 0 })
-    expect(result.current).toEqual({ value: 42, extra: 0 })
-
-    // significant change — the cache follows the ref
-    source.current = { value: 43, extra: 1 }
-    await rerender()
-
-    expect(result.current).toEqual({ value: 43, extra: 1 })
+    expect(result.current).toBe(source)
   })
 
-  it('should work with a `useRef` source', async () => {
+  it('caches a `useRef` object as a plain value, never unwrapping `current`', async () => {
     interface Data {
       value: number
       extra: number
     }
 
-    // placeholder so the variable is definitely assigned before the hook runs
-    let sourceRef: RefObject<Data> = { current: { value: 42, extra: 0 } }
-    const comparator = (newSourceValue: Data, cachedValue: Data) => newSourceValue.value === cachedValue.value
-
     const { result, rerender } = await renderHook(() => {
-      sourceRef = useRef<Data>({ value: 42, extra: 0 })
-      return useCached(sourceRef, comparator)
+      const sourceRef = useRef<Data>({ value: 42, extra: 0 })
+      return useCached(sourceRef)
     })
 
-    expect(result.current).toEqual({ value: 42, extra: 0 })
+    // the ref object is the source, not its `current`
+    expect(result.current.current).toEqual({ value: 42, extra: 0 })
+    expectTypeOf(result.current).toEqualTypeOf<RefObject<Data>>()
 
-    sourceRef.current = { value: 42, extra: 1 }
     await rerender()
-    expect(result.current).toEqual({ value: 42, extra: 0 })
-
-    sourceRef.current = { value: 43, extra: 1 }
-    await rerender()
-    expect(result.current).toEqual({ value: 43, extra: 1 })
+    expect(result.current.current).toEqual({ value: 42, extra: 0 })
   })
 })
 

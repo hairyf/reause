@@ -1,7 +1,17 @@
+import type { RefObject } from 'react'
 import type { Mock } from 'vitest'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, expectTypeOf, it, vi } from 'vitest'
 import { renderHook } from 'vitest-browser-react'
 import { useElementRemoval } from '../useElementRemoval'
+
+/**
+ * The hook binds DOM targets to React refs only — a plain element, a getter or
+ * a callback ref is not accepted, so every test wraps its element in a
+ * `{ current }` holder.
+ */
+function refOf<T>(value: T | null): RefObject<T | null> {
+  return { current: value }
+}
 
 /**
  * MutationObserver delivers records asynchronously on a microtask; waiting on a
@@ -38,8 +48,17 @@ describe('useElementRemoval', () => {
     expect(useElementRemoval).toBeDefined()
   })
 
+  it('accepts only a React ref object as the DOM target', () => {
+    expectTypeOf<Parameters<typeof useElementRemoval>[0]>()
+      .toEqualTypeOf<RefObject<Element | null | undefined>>()
+    // a plain element is deliberately rejected — refs are the only DOM target
+    expectTypeOf<HTMLDivElement>()
+      .not
+      .toMatchTypeOf<Parameters<typeof useElementRemoval>[0]>()
+  })
+
   it('should be called when the element is removed', async () => {
-    await renderHook(() => useElementRemoval(targetElement, callBackFn))
+    await renderHook(() => useElementRemoval(refOf(targetElement), callBackFn))
 
     parentElement.removeChild(targetElement)
     await flush()
@@ -57,7 +76,7 @@ describe('useElementRemoval', () => {
   })
 
   it('should be called when any element containing the target element is removed', async () => {
-    await renderHook(() => useElementRemoval(targetElement, callBackFn))
+    await renderHook(() => useElementRemoval(refOf(targetElement), callBackFn))
 
     grandElement.removeChild(parentElement)
     await flush()
@@ -75,7 +94,7 @@ describe('useElementRemoval', () => {
   })
 
   it('should not be called when an unrelated element is removed', async () => {
-    await renderHook(() => useElementRemoval(targetElement, callBackFn))
+    await renderHook(() => useElementRemoval(refOf(targetElement), callBackFn))
 
     const otherElement = document.createElement('div')
     grandElement.appendChild(otherElement)
@@ -95,7 +114,7 @@ describe('useElementRemoval', () => {
     const shadowRoot = grandElement.attachShadow({ mode: 'open' })
     shadowRoot.appendChild(parentElement)
 
-    await renderHook(() => useElementRemoval(targetElement, callBackFn, { document: shadowRoot }))
+    await renderHook(() => useElementRemoval(refOf(targetElement), callBackFn, { document: shadowRoot }))
 
     parentElement.removeChild(targetElement)
     await flush()
@@ -114,19 +133,16 @@ describe('useElementRemoval', () => {
 
   it('should correctly triggered even if the element is assigned a value after initialization', async () => {
     const el = document.createElement('div')
-    const targetRef: { current: HTMLElement | null } = { current: null }
+    const targetRef = refOf<HTMLElement>(null)
 
-    const { rerender } = await renderHook<{ current: HTMLElement | null }, () => void>(
-      props => useElementRemoval(props, callBackFn),
-      { initialProps: targetRef },
-    )
+    const { rerender } = await renderHook(() => useElementRemoval(targetRef, callBackFn))
 
     // same object identity with `current` still null — nothing to watch yet
     parentElement.appendChild(el)
-    await rerender(targetRef)
+    await rerender()
 
     targetRef.current = el
-    await rerender(targetRef)
+    await rerender()
 
     parentElement.removeChild(el)
     await flush()
@@ -134,7 +150,7 @@ describe('useElementRemoval', () => {
   })
 
   it('should stop observing after called the stop handle', async () => {
-    const { result } = await renderHook(() => useElementRemoval(targetElement, callBackFn))
+    const { result } = await renderHook(() => useElementRemoval(refOf(targetElement), callBackFn))
 
     result.current()
 
@@ -144,7 +160,7 @@ describe('useElementRemoval', () => {
   })
 
   it('should stop observing after unmount', async () => {
-    const { unmount } = await renderHook(() => useElementRemoval(targetElement, callBackFn))
+    const { unmount } = await renderHook(() => useElementRemoval(refOf(targetElement), callBackFn))
 
     await unmount()
 
@@ -155,7 +171,7 @@ describe('useElementRemoval', () => {
 
   it('should not observe when window is not available', async () => {
     await renderHook(() =>
-      useElementRemoval(targetElement, callBackFn, { window: null as unknown as Window }),
+      useElementRemoval(refOf(targetElement), callBackFn, { window: null as unknown as Window }),
     )
 
     parentElement.removeChild(targetElement)

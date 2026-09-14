@@ -1,6 +1,6 @@
 /* eslint-disable antfu/top-level-function */
 // Ported from VueUse @vueuse/shared utils (source/vueuse/packages/shared/utils)
-import type { Ref, RefObject } from 'react'
+import type { RefObject } from 'react'
 
 // ---------------------------------------------------------------------------
 // general.ts
@@ -22,8 +22,7 @@ export function promiseTimeout(
 export interface SingletonPromiseReturn<T> {
   (): Promise<T>
   /**
-   * Reset current staled promise.
-   * await it to have proper shutdown.
+   * Reset current staled promise. await it to have proper shutdown.
    */
   reset: () => Promise<void>
 }
@@ -80,8 +79,8 @@ export function increaseWithUnit(target: string | number, delta: number): string
 }
 
 /**
- * Get a px value for SSR use, do not rely on this method outside of SSR as REM
- * unit is assumed at 16px, which might not be the case on the client
+ * Get a px value for SSR use, do not rely on this method outside of SSR as REM unit is assumed at
+ * 16px, which might not be the case on the client
  *
  * @example pxValue('37rem') // 592
  * @example pxValue('500px') // 500
@@ -177,33 +176,38 @@ export const hyphenate = cacheStringFunction((str: string) => str.replace(hyphen
 // these from @reause/shared, never re-implement; see MONITORING-HANDOFF §2C)
 // ---------------------------------------------------------------------------
 
-/** A plain value or a React ref. Zero-argument getter values are not supported. */
-export type RefOrValue<T> = T | Ref<T>
-
-/** Values accepted by controllable state hooks. */
-export type StateValue<T> = RefOrValue<T> | (() => T) | readonly [T, (value: T | ((prev: T) => T)) => void] | { value: T, onChange?: (value: T) => void }
+/**
+ * Values accepted by controllable state hooks: a plain value, a zero-argument getter, a `[value,
+ * setter]` tuple or a `{ value, onChange }` pair. React refs are deliberately **not** part of this
+ * union — a ref is a DOM handle, so it is passed as a `RefObject` to DOM hooks and read with
+ * `unrefElement` (`@reause/core`) instead of being treated as a state source.
+ */
+export type StateValue<T> = T | (() => T) | readonly [T, (value: T | ((prev: T) => T)) => void] | { value: T, onChange?: (value: T) => void }
 
 /**
- * Allow a custom `window` instance, e.g. working with iframes or in testing
- * environments. Single source of truth — VueUse defines this in shared too.
+ * Allow a custom `window` instance, e.g. working with iframes or in testing environments. Single
+ * source of truth — VueUse defines this in shared too.
  */
 export interface ConfigurableWindow {
   window?: Window
 }
 
 /**
- * Type guard for React ref objects (`RefObject` — `{ current }` holders).
- * Callback refs are functions and cannot be read synchronously, so they are
- * not ref-like.
+ * Type guard for React ref objects (`RefObject` — `{ current }` holders). Callback refs are
+ * functions and cannot be read synchronously, so they are not ref-like. Refs are DOM handles here,
+ * never state sources: use it to detect a `RefObject` when a value may still be `undefined`/`null`.
  */
-export function isRefLike<T>(value: RefOrValue<T> | undefined | null): value is RefObject<T | null> {
+export function isRefLike(value: unknown): value is RefObject<unknown> {
   return value !== null && value !== undefined && typeof value === 'object' && 'current' in value
 }
 
 /**
- * Resolve a plain value or a React ref to its current value — the React
- * replacement for VueUse's `toValue`. Getters are not supported: pass a
- * React ref (`useRef`) when the latest value must be read lazily.
+ * Resolve a controllable-state source to its current value — the React replacement for VueUse's
+ * `toValue`. A `[value, setter]` tuple resolves to its first element, a `{ value, onChange }` pair
+ * to `.value`, a zero-argument getter is invoked, and a plain value is returned as-is.
+ *
+ * React refs are not resolved here: a `RefObject` is a DOM handle, read with `unrefElement`
+ * (`@reause/core`) instead.
  */
 export function toValue<T>(value: StateValue<T>): T
 export function toValue<T>(value: StateValue<T> | undefined | null): T | undefined | null
@@ -214,27 +218,20 @@ export function toValue<T>(value: StateValue<T> | undefined | null): T | undefin
     return value.value
   if (typeof value === 'function')
     return (value as () => T)()
-  if (isRefLike(value as RefOrValue<T>))
-    return (value as RefObject<T | null>).current as T
   return value as T | undefined | null
 }
 
 /**
- * Write a value back through a writable `State<T>` source — a ref-like
- * `.current`, a `[value, setter]` tuple or a `{ value, onChange }` pair.
- * Plain values and getters have no write path and are skipped. This is the
- * write-side counterpart of `toValue`; hooks that push values into a
- * `State<T>` import it from here rather than re-implementing the branches.
+ * Write a value back through a writable `State<T>` source — a `[value, setter]` tuple or a `{
+ * value, onChange }` pair. Plain values and getters have no write path and are skipped. This is the
+ * write-side counterpart of `toValue`; hooks that push values into a `State<T>` import it from here
+ * rather than re-implementing the branches.
  */
 export function writeState<T>(source: StateValue<T> | undefined | null, value: T): void {
   if (source === null || source === undefined)
     return
   if (Array.isArray(source) && source.length === 2 && typeof source[1] === 'function') {
     (source as unknown as readonly [T, (next: T) => void])[1](value)
-    return
-  }
-  if (isRefLike(source as RefOrValue<T>)) {
-    (source as { current: T }).current = value
     return
   }
   if (typeof source === 'object' && !Array.isArray(source)

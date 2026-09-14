@@ -216,12 +216,12 @@ describe('useConfirmDialog', () => {
     expect(isCanceled).toBe(true)
   })
 
-  it('returned `off` handle unsubscribes the listener', async () => {
+  it('the returned `off` function unsubscribes the listener', async () => {
     const calls = vi.fn()
 
     const { result, act } = await renderHook(() => useConfirmDialog())
 
-    const { off } = result.current.onConfirm(() => {
+    const off = result.current.onConfirm(() => {
       calls()
     })
 

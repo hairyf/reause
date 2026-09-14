@@ -1,6 +1,5 @@
 import type { Dispatch, SetStateAction } from 'react'
 import type { State } from '../useControllableState'
-import type { RefOrValue } from '../utils'
 import { useCallback, useEffect, useRef } from 'react'
 import { useControllableState } from '../useControllableState'
 import { toValue } from '../utils'
@@ -8,20 +7,8 @@ import { toValue } from '../utils'
 export type UseStateAutoResetReturn<T = any> = [T, Dispatch<SetStateAction<T>>]
 
 /**
- * A state which will be reset to the default value after some time.
- *
  * Map from @vueuse/shared `refAutoReset`
- * (`source/vueuse/packages/shared/refAutoReset/`). Upstream returns a single
- * writable Vue ref; per this repo's `useState*` family convention the return
- * is the React `[value, setValue]` tuple — `value` is the state, `setValue`
- * is a `useState`-style setter (value or updater form, `Dispatch<SetStateAction>`)
- * that also (re)schedules a timer to restore `defaultValue` after `afterMs`
- * milliseconds. `defaultValue` accepts the shared `State<T>` form (plain value,
- * lazy getter, ref-like object, state tuple, or controlled `{ value, onChange }` pair).
- * `afterMs` accepts the shared `RefOrValue<number>` form and is resolved with `toValue` at fire time
- * (upstream: `toValue`); the pending timer is cleared on unmount (upstream:
- * `tryOnScopeDispose`, timers in the effect scope). The deprecated `autoResetRef`
- * alias is not ported.
+ * (`source/vueuse/packages/shared/refAutoReset/`).
  *
  * @param defaultValue The value which will be set.
  * @param afterMs      A zero-or-greater delay in milliseconds.
@@ -34,12 +21,12 @@ export type UseStateAutoResetReturn<T = any> = [T, Dispatch<SetStateAction<T>>]
  */
 export function useStateAutoReset<T = any>(
   defaultValue: State<T>,
-  afterMs: RefOrValue<number> = 10000,
+  afterMs: number = 10000,
 ): UseStateAutoResetReturn<T> {
   const [value, setValue] = useControllableState(defaultValue, { passive: true })
 
   // keep the latest arguments in refs so the reset always uses the newest
-  // `defaultValue` / `afterMs` without re-scheduling on every render
+  // `defaultValue` without re-scheduling on every render
   const defaultValueRef = useRef(defaultValue)
   const afterMsRef = useRef(afterMs)
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -47,8 +34,8 @@ export function useStateAutoReset<T = any>(
   defaultValueRef.current = defaultValue
   afterMsRef.current = afterMs
 
-  // schedule a reset, replacing any pending one; both the delay and the value
-  // to restore are resolved with `toValue` when the timer fires
+  // schedule a reset, replacing any pending one; the value to restore is
+  // resolved with `toValue` when the timer fires
   const scheduleReset = useCallback(() => {
     if (timerRef.current)
       clearTimeout(timerRef.current)
@@ -58,7 +45,7 @@ export function useStateAutoReset<T = any>(
       // re-resolve the newest defaultValue when the timer fires
       // (upstream: `toValue(defaultValue)` at fire time)
       setValue(toValue(defaultValueRef.current))
-    }, toValue(afterMsRef.current))
+    }, afterMsRef.current)
   }, [])
 
   const setValueWithReset = useCallback<Dispatch<SetStateAction<T>>>((next) => {

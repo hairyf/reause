@@ -53,16 +53,24 @@ exported from the package (`@reause/core`, `@reause/shared`, …) named by its
 | Function | Description | Invocation |
 |----------|-------------|------------|
 | [`createGlobalState`](references/createGlobalState.md) | Keep state in the global scope | AUTO |
-| [`createInjectionState`](references/createInjectionState.md) | Create global state that can be injected into components | AUTO |
+| [`createScopedHook`](references/createScopedHook.md) | Create global state that can be injected into components | AUTO |
 | [`createSharedHook`](references/createSharedHook.md) | Make a composable function usable with multiple React components | AUTO |
+| [`useAsyncFn`](references/useAsyncFn.md) | Returns state and a callback for an `async` function (or any function returning a promise) | AUTO |
 | [`useAsyncState`](references/useAsyncState.md) | Reactive async state | AUTO |
 | [`useControllableState`](references/useControllableState.md) | A hook for combining controlled and uncontrolled state sources | AUTO |
 | [`useCounter`](references/useCounter.md) | A basic counter with `inc` / `dec` / `set` / `reset` and optional `min` / `max` bounds | AUTO |
 | [`useLastChanged`](references/useLastChanged.md) | Records the timestamp of the last change | AUTO |
 | [`useLatest`](references/useLatest.md) | Returns a ref object whose `.current` always holds the latest value of the render that produced it — React port of react-use's [`useLatest`](https://github.com/streamich/react-use/blob/master/docs/useLatest.md) (upstream mapping files: `source/react-use/src/useLatest.ts` | AUTO |
+| [`useList`](references/useList.md) | Tracks an array and returns it with a stable set of immutable mutators — React port of react-use's `useList` | AUTO |
 | [`useListener`](references/useListener.md) | Bind a callback to a listener registration function returned by a reause hook | AUTO |
 | [`useLocalStorage`](references/useLocalStorage.md) | Reactive [LocalStorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage) | AUTO |
+| [`useMap`](references/useMap.md) | A real `Map` whose mutations re-render — React port of react-hookz's `useMap` | AUTO |
+| [`useMethods`](references/useMethods.md) | `useReducer` sugar — turn an object of pure state transitions into a state value plus one callable method per transition | AUTO |
+| [`usePreviousDistinct`](references/usePreviousDistinct.md) | Just like `usePrevious` | AUTO |
+| [`useQueue`](references/useQueue.md) | State hook that implements a simple FIFO queue — React port of react-use's `useQueue` | AUTO |
+| [`useSafeState`](references/useSafeState.md) | A `useState` whose setter is a no-op once the component has unmounted | AUTO |
 | [`useSessionStorage`](references/useSessionStorage.md) | Reactive [SessionStorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage) | AUTO |
+| [`useSet`](references/useSet.md) | A real `Set` whose mutations re-render — React port of react-hookz's `useSet` | AUTO |
 | [`useStateDebouncedHistory`](references/useStateDebouncedHistory.md) | Shorthand for `useStateHistory` with debounced filter | AUTO |
 | [`useStateHistory`](references/useStateHistory.md) | Track the change history of a state automatically — every change commits a history record — also provides undo and redo functionality | AUTO |
 | [`useStateManualHistory`](references/useStateManualHistory.md) | Manually track the change history of a state when the user calls `commit()` | AUTO |
@@ -115,6 +123,7 @@ exported from the package (`@reause/core`, `@reause/shared`, …) named by its
 | [`useHash`](references/useHash.md) | Shorthand for a reactive `window.location.hash` | AUTO |
 | [`useImage`](references/useImage.md) | Reactive load an image in the browser | AUTO |
 | [`useLiveAnnouncer`](references/useLiveAnnouncer.md) | Accessible way to announce messages to screen reader users (ARIA live regions) | AUTO |
+| [`useMask`](references/useMask.md) | Input masking engine | AUTO |
 | [`useMediaControls`](references/useMediaControls.md) | Reactive media controls for both `audio` and `video` elements | AUTO |
 | [`useMediaQuery`](references/useMediaQuery.md) | Reactive [Media Query](https://developer.mozilla.org/en-US/docs/Web/CSS/Media_Queries/Testing_media_queries) | AUTO |
 | [`useMemory`](references/useMemory.md) | Reactive Memory Info | AUTO |
@@ -152,7 +161,7 @@ exported from the package (`@reause/core`, `@reause/shared`, …) named by its
 | Function | Description | Invocation |
 |----------|-------------|------------|
 | [`useBattery`](references/useBattery.md) | Reactive [Battery Status API](https://developer.mozilla.org/en-US/docs/Web/API/Battery_Status_API) | AUTO |
-| [`useClickAway`](references/useClickAway.md) | Fire a handler when a click lands outside one or more target elements — the reause port of ahooks' [`useClickAway`](https://github.com/alibaba/hooks/blob/master/packages/hooks/src/useClickAway/index.ts) (upstream mapping files: `source/ahooks/packages/hooks/src/useClickAway/index.ts` | AUTO |
+| [`useClickAway`](references/useClickAway.md) | Fire a handler when a click lands outside one or more target elements | AUTO |
 | [`useClickOutside`](references/useClickOutside.md) | Listen for clicks outside of an element | AUTO |
 | [`useDeviceMotion`](references/useDeviceMotion.md) | Reactive [DeviceMotionEvent](https://developer.mozilla.org/en-US/docs/Web/API/DeviceMotionEvent) | AUTO |
 | [`useDeviceOrientation`](references/useDeviceOrientation.md) | Reactive [DeviceOrientationEvent](https://developer.mozilla.org/en-US/docs/Web/API/DeviceOrientationEvent) | AUTO |
@@ -171,6 +180,7 @@ exported from the package (`@reause/core`, `@reause/shared`, …) named by its
 | [`useIdle`](references/useIdle.md) | Tracks whether the user is being inactive | AUTO |
 | [`useInfiniteScroll`](references/useInfiniteScroll.md) | Infinite scrolling of the element | AUTO |
 | [`useKeyModifier`](references/useKeyModifier.md) | Reactive [Modifier State](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/getModifierState) | AUTO |
+| [`useKeyPress`](references/useKeyPress.md) | Listen for a key press by `keyCode` | AUTO |
 | [`useKeyStroke`](references/useKeyStroke.md) | Listen for keyboard keystrokes | AUTO |
 | [`useLongPress`](references/useLongPress.md) | Listen for a long press on an element | AUTO |
 | [`useMagicKeys`](references/useMagicKeys.md) | Reactive keys pressed state | AUTO |
@@ -205,9 +215,9 @@ exported from the package (`@reause/core`, `@reause/shared`, …) named by its
 | Function | Description | Invocation |
 |----------|-------------|------------|
 | [`useAnimate`](references/useAnimate.md) | Reactive [Web Animations API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Animations_API) | AUTO |
-| [`useCollapse`](references/useCollapse.md) | Animate an element's height between `0` and its measured content height — a four-state machine (`entered` / `entering` / `exiting` / `exited`) plus a `getCollapseProps()` bundle you spread on the collapsible element | AUTO |
 | [`useInterval`](references/useInterval.md) | Reactive counter that increases on every interval | AUTO |
 | [`useIntervalFn`](references/useIntervalFn.md) | Wrapper for `setInterval` with controls | AUTO |
+| [`useIntervalRafFn`](references/useIntervalRafFn.md) | Fire a callback repeatedly on animation frames | AUTO |
 | [`useNow`](references/useNow.md) | Reactive current Date instance | AUTO |
 | [`useRafFn`](references/useRafFn.md) | Call function on every `requestAnimationFrame` | AUTO |
 | [`useRafState`](references/useRafState.md) | State updates coalesced into an animation frame — React port of react-use's `useRafState` | AUTO |
@@ -224,7 +234,7 @@ exported from the package (`@reause/core`, `@reause/shared`, …) named by its
 |----------|-------------|------------|
 | [`createPortalSlot`](references/createPortalSlot.md) | Define and reuse a template inside the component scope | AUTO |
 | [`createPromisifiedComponent`](references/createPromisifiedComponent.md) | Template as Promise | AUTO |
-| [`unrefElement`](references/unrefElement.md) | Get the DOM element of a React ref-like object or a plain element | AUTO |
+| [`unrefElement`](references/unrefElement.md) | Get the DOM element a React ref object currently holds | AUTO |
 | [`useMounted`](references/useMounted.md) | Mounted state in ref | AUTO |
 | [`useRefsList`](references/useRefsList.md) | Shorthand for binding refs to elements rendered inside a list | AUTO |
 | [`useVirtualList`](references/useVirtualList.md) | Create virtual lists with ease | AUTO |
@@ -295,7 +305,7 @@ exported from the package (`@reause/core`, `@reause/shared`, …) named by its
 | Function | Description | Invocation |
 |----------|-------------|------------|
 | [`createEventHook`](references/createEventHook.md) | Utility for creating event hooks | AUTO |
-| [`isDefined`](references/isDefined.md) | Non-nullish checking type guard for ref-like objects | AUTO |
+| [`isDefined`](references/isDefined.md) | Non-nullish checking type guard for React ref objects and plain values | AUTO |
 | [`makeDestructurable`](references/makeDestructurable.md) | Make isomorphic destructurable for object and array at the same time | AUTO |
 | [`useAsyncQueue`](references/useAsyncQueue.md) | Executes each asynchronous task sequentially and passes the current task result to the next task | AUTO |
 | [`useBase64`](references/useBase64.md) | Reactive base64 transforming | AUTO |
@@ -306,7 +316,7 @@ exported from the package (`@reause/core`, `@reause/shared`, …) named by its
 | [`useCycleList`](references/useCycleList.md) | Cycle through a list of items | AUTO |
 | [`useDebounceFn`](references/useDebounceFn.md) | Debounce execution of a function | AUTO |
 | [`useEventBus`](references/useEventBus.md) | A basic event bus | AUTO |
-| [`useId`](references/useId.md) | SSR-safe id with an optional static override — React port of `@mantine/hooks`' `useId` (upstream mapping files: `source/mantine/packages/@mantine/hooks/src/use-id/use-id.ts` | AUTO |
+| [`useId`](references/useId.md) | SSR-safe id with an optional static override | AUTO |
 | [`useMemoize`](references/useMemoize.md) | Cache results of functions depending on arguments | AUTO |
 | [`useOffsetPagination`](references/useOffsetPagination.md) | Reactive offset pagination | AUTO |
 | [`usePrevious`](references/usePrevious.md) | Holds the previous value of a source | AUTO |
@@ -317,7 +327,6 @@ exported from the package (`@reause/core`, `@reause/shared`, …) named by its
 | [`useToggle`](references/useToggle.md) | A boolean (or value) toggler with controllable state support | AUTO |
 | [`useToNumber`](references/useToNumber.md) | Convert a string or number value to a number | AUTO |
 | [`useToString`](references/useToString.md) | Convert a value to its string representation | AUTO |
-| [`utils`](references/utils.md) | Framework-agnostic helper functions ported 1:1 from VueUse's internal [`@vueuse/shared`](https://vueuse.org/shared/) utils group (`is.ts` / `general.ts`) — plain TypeScript with no React state | AUTO |
 
 ### @Electron
 
@@ -381,7 +390,7 @@ exported from the package (`@reause/core`, `@reause/shared`, …) named by its
 
 | Function | Description | Invocation |
 |----------|-------------|------------|
-| [`toObserver`](references/toObserver.md) | Sugar function to convert a ref-like object (`{ current }`) or a setter function into an RxJS [Observer](https://rxjs.dev/guide/observer) — a `useRef` write does not re-render | EXTERNAL |
+| [`toObserver`](references/toObserver.md) | Sugar function to convert a ref object (`RefObject`) or a setter function into an RxJS [Observer](https://rxjs.dev/guide/observer) — a `useRef` write does not re-render | EXTERNAL |
 | [`useExtractedObservable`](references/useExtractedObservable.md) | Use an RxJS [`Observable`](https://rxjs.dev/guide/observable) as extracted from one or more hooks | EXTERNAL |
 | [`useFrom`](references/useFrom.md) | Create an [`Observable`](https://rxjs.dev/guide/observable) from an rxjs `ObservableInput` — passed straight to RxJS's [`from()`](https://rxjs.dev/api/index/function/from) — or from a plain value that re-emits whenever it changes across renders | EXTERNAL |
 | [`useObservable`](references/useObservable.md) | Use an RxJS [`Observable`](https://rxjs.dev/guide/observable) | EXTERNAL |
@@ -400,19 +409,30 @@ exported from the package (`@reause/core`, `@reause/shared`, …) named by its
 
 | Function | Description | Invocation |
 |----------|-------------|------------|
-| [`useDeepCompareEffect`](references/useDeepCompareEffect.md) | `useEffect` whose dependency comparison is **deep** — the effect re-runs only when `deps` differ structurally | AUTO |
+| [`useDeepCompareEffect`](references/useDeepCompareEffect.md) | `useEffect` whose dependency comparison is **deep** | AUTO |
 | [`useEffectOnce`](references/useEffectOnce.md) | Runs an effect once after the component mounts | AUTO |
+| [`useIsFirstRender`](references/useIsFirstRender.md) | `true` on the very first render of a component instance and `false` on every render after it | AUTO |
 | [`useIsomorphicLayoutEffect`](references/useIsomorphicLayoutEffect.md) | `useLayoutEffect` on the client | AUTO |
+| [`useLogger`](references/useLogger.md) | Console-log a component's lifecycle transitions — mount | AUTO |
 | [`useMount`](references/useMount.md) | Runs a callback once after the component mounts — React port of react-use's `useMount` | AUTO |
-| [`useShallowCompareEffect`](references/useShallowCompareEffect.md) | `useEffect` whose dependency list is compared by one-level (shallow) equality instead of reference identity — a React port of react-use's [`useShallowCompareEffect`](https://raw.githubusercontent.com/streamich/react-use/master/docs/useShallowCompareEffect.md) (docs page fetched; the rendered `https://streamich.github.io/react-use/?path=/story/lifecycle-useshallowcompareeffect--docs` page is unverified) | AUTO |
+| [`useShallowCompareEffect`](references/useShallowCompareEffect.md) | `useEffect` whose dependency list is compared by one-level (shallow) equality instead of reference identity | AUTO |
+| [`useTrackedEffect`](references/useTrackedEffect.md) | `useEffect` that also reports **which** dependencies changed | AUTO |
 | [`useUnmount`](references/useUnmount.md) | Runs a callback when the component unmounts — React port of react-use's [`useUnmount`](https://streamich.github.io/react-use/?path=/story/lifecycle-useunmount--docs) | AUTO |
-| [`useUpdateEffect`](references/useUpdateEffect.md) | `useEffect` that skips the first render — React port of react-use's [`useUpdateEffect`](https://streamich.github.io/react-use/?path=/story/lifecycle-useupdateeffect--docs) | AUTO |
+| [`useUnmountedRef`](references/useUnmountedRef.md) | A ref that reports whether the component has unmounted | AUTO |
+| [`useUpdateEffect`](references/useUpdateEffect.md) | `useEffect` that skips the first render | AUTO |
 
 ### Side-effects
 
 | Function | Description | Invocation |
 |----------|-------------|------------|
-| [`useAsyncFn`](references/useAsyncFn.md) | Returns state and a callback for an `async` function (or any function returning a promise) — React port of react-use's [`useAsyncFn`](https://github.com/streamich/react-use/blob/master/docs/useAsyncFn.md) (upstream mapping files: `source/react-use/src/useAsyncFn.ts` | AUTO |
 | [`useError`](references/useError.md) | Returns a referentially stable error dispatcher whose error is re-thrown from a `useEffect` on the next render | AUTO |
+| [`useLockFn`](references/useLockFn.md) | Add a lock to an async function so overlapping calls are dropped rather than run in parallel — React port of ahooks' `useLockFn` | AUTO |
+
+### Uncategorized
+
+| Function | Description | Invocation |
+|----------|-------------|------------|
+| [`useCollapse`](references/useCollapse.md) | Animate an element's height between `0` and its measured content height | AUTO |
+| [`useSplitter`](references/useSplitter.md) | A hook for resizable panel layouts that supports dragging and keyboard interactions | AUTO |
 
 

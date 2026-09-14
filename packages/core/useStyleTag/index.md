@@ -68,17 +68,3 @@ useStyleTag('.foo { margin-top: 32px; }', { media: 'print' })
   }
 </style>
 ```
-
-## Return Values
-
-- `css` — the current CSS text of the style tag (plain state, seeded by the initial argument).
-- `setCss(next | prev => next)` — replaces the CSS text: updates the injected `<style>` while loaded, and
-  is stored for the next `load()` otherwise.
-- `controls.id` — the DOM id of the style tag.
-- `controls.load()` — inject the style tag into `document.head` (no-op when already loaded).
-- `controls.unload()` — remove the style tag from `document.head` (reference-counted, so style tags
-  shared by id are only removed with the last unloaded instance).
-- `controls.isLoaded` — whether the style tag is currently injected.
-
-The return is a React tuple `[css, setCss, { id, load, unload, isLoaded }]` — upstream returns an object
-`{ id, css: ShallowRef<string>, load, unload, isLoaded }`, where `css` is a writable ref.

@@ -1,4 +1,5 @@
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import type { UseClipboardReturn } from '../useClipboard'
+import { afterEach, describe, expect, expectTypeOf, it, vi } from 'vitest'
 import { renderHook } from 'vitest-browser-react'
 import { useClipboard } from '../useClipboard'
 import { usePermission } from '../usePermission'
@@ -72,7 +73,7 @@ describe('useClipboard', () => {
 
   it('should be supported', async () => {
     const { result } = await renderHook(() => useClipboard())
-    await expect.poll(() => result.current.isSupported).toBe(true)
+    await expect.poll(() => result.current[2].isSupported).toBe(true)
   })
 
   describe('without permissions', () => {
@@ -94,32 +95,32 @@ describe('useClipboard', () => {
         await new Promise(resolve => setTimeout(resolve, 0))
       })
 
-      expect(result.current.text).toBe('')
-      expect(result.current.copied).toBe(false)
+      expect(result.current[0]).toBe('')
+      expect(result.current[2].copied).toBe(false)
 
-      await result.current.copy('hello')
+      await result.current[1]('hello')
 
       expect(clipboard.write).not.toHaveBeenCalled()
       expect(execCommand).toHaveBeenCalledWith('copy')
-      await expect.poll(() => result.current.text).toBe('hello')
-      await expect.poll(() => result.current.copied).toBe(true)
+      await expect.poll(() => result.current[0]).toBe('hello')
+      await expect.poll(() => result.current[2].copied).toBe(true)
     })
 
     it('should copy text from async function', async () => {
       const { result } = await renderHook(() => useClipboard())
-      expect(result.current.text).toBe('')
-      expect(result.current.copied).toBe(false)
+      expect(result.current[0]).toBe('')
+      expect(result.current[2].copied).toBe(false)
 
-      const promise = result.current.copy(async () => {
+      const promise = result.current[1](async () => {
         await new Promise(resolve => setTimeout(resolve, 200))
         return 'async text'
       })
-      await expect.poll(() => result.current.copyPending, { interval: 10 }).toBe(true)
+      await expect.poll(() => result.current[2].copyPending, { interval: 10 }).toBe(true)
 
       await promise
 
-      await expect.poll(() => result.current.text).toBe('async text')
-      await expect.poll(() => result.current.copied).toBe(true)
+      await expect.poll(() => result.current[0]).toBe('async text')
+      await expect.poll(() => result.current[2].copied).toBe(true)
     })
 
     it('should fall back to legacy clipboard if write fails', async () => {
@@ -132,14 +133,14 @@ describe('useClipboard', () => {
       const execCommand = installExecCommandSpy()
 
       const { result } = await renderHook(() => useClipboard())
-      await expect.poll(() => result.current.isSupported).toBe(true)
+      await expect.poll(() => result.current[2].isSupported).toBe(true)
 
-      await result.current.copy('hello')
+      await result.current[1]('hello')
 
       expect(clipboard.write).toHaveBeenCalledTimes(1)
       expect(execCommand).toHaveBeenCalledWith('copy')
-      await expect.poll(() => result.current.text).toBe('hello')
-      await expect.poll(() => result.current.copied).toBe(true)
+      await expect.poll(() => result.current[0]).toBe('hello')
+      await expect.poll(() => result.current[2].copied).toBe(true)
     })
 
     it.todo('should read from legacy clipboard')
@@ -152,5 +153,33 @@ describe('useClipboard', () => {
     it.todo('should read from clipboard')
 
     it.todo('should fall back to legacy clipboard if read fails')
+  })
+
+  it('returns a React tuple [text, copy, { copied, isSupported, copyPending }]', async () => {
+    const { result } = await renderHook(() => useClipboard())
+
+    expectTypeOf(result.current).toEqualTypeOf<UseClipboardReturn<false>>()
+    expectTypeOf(result.current[0]).toEqualTypeOf<string>()
+    expectTypeOf(result.current[1]).toEqualTypeOf<(text: string | (() => Promise<string | undefined>)) => Promise<void>>()
+    expectTypeOf(result.current[2].copied).toEqualTypeOf<boolean>()
+    expectTypeOf(result.current[2].isSupported).toEqualTypeOf<boolean>()
+    expectTypeOf(result.current[2].copyPending).toEqualTypeOf<boolean>()
+
+    expect(Array.isArray(result.current)).toBe(true)
+    expect(result.current).toHaveLength(3)
+    expect(result.current[0]).toBe('')
+    expect(result.current[1]).toBeTypeOf('function')
+    expect(result.current[2].copied).toBe(false)
+    expect(result.current[2].copyPending).toBe(false)
+  })
+
+  it('keeps the controls object identity while its members are unchanged', async () => {
+    const { result, rerender } = await renderHook(() => useClipboard())
+    await expect.poll(() => result.current[2].isSupported).toBe(true)
+
+    const first = result.current[2]
+    await rerender()
+
+    expect(result.current[2]).toBe(first)
   })
 })

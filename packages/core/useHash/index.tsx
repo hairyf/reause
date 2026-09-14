@@ -21,18 +21,17 @@ export type UseHashReturn = [
 ]
 
 /**
- * Resolve the global `window`, or `undefined` on the server. Never called
- * during render.
+ * Resolve the global `window`, or `undefined` on the server. Never called during render.
  */
 function getWindow(): Window | undefined {
   return typeof window === 'undefined' ? undefined : window
 }
 
 /**
- * Normalise a hash for the URL: `window.location.hash` always keeps a leading
- * `#`, so `'foobar'` becomes `'#foobar'` while an already-prefixed `'#foobar'`
- * is left untouched. An empty string — and the bare `'#'`, which the browser
- * canonicalises to an empty fragment anyway — clears the hash.
+ * Normalise a hash for the URL: `window.location.hash` always keeps a leading `#`, so `'foobar'`
+ * becomes `'#foobar'` while an already-prefixed `'#foobar'` is left untouched. An empty string —
+ * and the bare `'#'`, which the browser canonicalises to an empty fragment anyway — clears the
+ * hash.
  */
 function normaliseHash(value: string): string {
   if (!value || value === '#')
@@ -41,49 +40,8 @@ function normaliseHash(value: string): string {
 }
 
 /**
- * Shorthand for a reactive `window.location.hash`.
- *
  * Map from @vueuse/router `useRouteHash`
- * (`source/vueuse/packages/router/useRouteHash/`), which proxies `route.hash`
- * through the router. Here the document hash is the single source of truth, so
- * the router dependency is dropped entirely: the hook reads and writes
- * `window.location` / `history` directly.
- *
- * Return tuple follows this repo's React idiom:
- * `const [hash, setHash] = useHash()` (upstream returns a single writable Vue
- * ref).
- *
- * Hash normalisation:
- *
- * - Reading mirrors upstream's `route.hash || toValue(defaultValue)`: while a
- *   fragment is present the value is `window.location.hash`, which always
- *   keeps its leading `#` (`'#foobar'`). When the fragment is empty
- *   `defaultValue` is exposed verbatim, so `useHash('baz')` exposes `'baz'` —
- *   and `''` when no default was given (upstream exposes `undefined`).
- * - Writing normalises the leading `#`: `setHash('foobar')` writes `#foobar`.
- *   Two adjacent `#` are not collapsed (`setHash('#foobar')` also writes
- *   `#foobar`). The exposed value is then read back from `window.location`, so
- *   any canonicalisation the browser applies (percent-encoding, removal of a
- *   bare `#`) is reflected in the state as well.
- *
- * React divergences from upstream:
- *
- * 1. The `route` / `router` options are gone — `window.location` and `history`
- *    are the driver, and `mode` picks `history.replaceState` (default,
- *    mirroring upstream's `'replace'`) or `history.pushState`.
- * 2. `hash` is React state rather than a `customRef`, so it settles on the
- *    next render after `setHash` instead of upstream's synchronous
- *    `trigger()`; the URL write itself is still synchronous.
- * 3. Neither `replaceState` nor `pushState` fires a `hashchange` event, so the
- *    setter refreshes its own state. `hashchange` (manual edits, anchor
- *    navigation) and `popstate` (back/forward over `mode: 'push'` entries) are
- *    subscribed in an effect and removed on unmount.
- * 4. SSR-safe: render never touches `window` (state starts at
- *    `defaultValue`), the URL is first read in a mount effect, and `setHash`
- *    is a no-op without a `window`.
- * 5. A `defaultValue` that changes across renders is re-synced while the
- *    fragment is empty (the React equivalent of upstream's reactive
- *    `toValue(defaultValue)`).
+ * (`source/vueuse/packages/router/useRouteHash/`).
  *
  * @see https://vueuse.org/router/useRouteHash/
  *

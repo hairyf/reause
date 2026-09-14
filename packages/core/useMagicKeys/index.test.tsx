@@ -19,13 +19,15 @@ function dispatchKeyboardEvent(options: DispatchKeyboardEventOptions): void {
 
 describe('useMagicKeys', () => {
   let target: HTMLInputElement
+  let targetRef: { current: HTMLInputElement | null }
 
   beforeEach(() => {
     target = document.createElement('input')
+    targetRef = { current: target }
   })
 
   it('single key', async () => {
-    const { act, result } = await renderHook(() => useMagicKeys({ target }))
+    const { act, result } = await renderHook(() => useMagicKeys({ target: targetRef }))
     expect(result.current.A).toBe(false)
 
     await act(() => {
@@ -35,7 +37,7 @@ describe('useMagicKeys', () => {
   })
 
   it('multiple keys', async () => {
-    const { act, result } = await renderHook(() => useMagicKeys({ target }))
+    const { act, result } = await renderHook(() => useMagicKeys({ target: targetRef }))
     expect(result.current.Ctrl_Shift_Period).toBe(false)
 
     await act(() => {
@@ -55,7 +57,7 @@ describe('useMagicKeys', () => {
   })
 
   it('multiple keys(for MacOS meta won\'t trigger keyup)', async () => {
-    const { act, result } = await renderHook(() => useMagicKeys({ target }))
+    const { act, result } = await renderHook(() => useMagicKeys({ target: targetRef }))
     expect(result.current.command).toBe(false)
     expect(result.current.a).toBe(false)
 
@@ -85,7 +87,7 @@ describe('useMagicKeys', () => {
   })
 
   it('multiple keys(in a different order)', async () => {
-    const { act, result } = await renderHook(() => useMagicKeys({ target }))
+    const { act, result } = await renderHook(() => useMagicKeys({ target: targetRef }))
     expect(result.current.Ctrl_Shift_Period).toBe(false)
 
     await act(() => {
@@ -105,7 +107,7 @@ describe('useMagicKeys', () => {
   })
 
   it('prevent incorrect clearing of other keys after releasing shift', async () => {
-    const { act, result } = await renderHook(() => useMagicKeys({ target }))
+    const { act, result } = await renderHook(() => useMagicKeys({ target: targetRef }))
     const { v, u, e, shift } = result.current
     expect([v, u, e, shift].every(val => val === false)).toBe(true)
 
@@ -133,7 +135,7 @@ describe('useMagicKeys', () => {
 
   it('prevent incorrect clearing of other keys after releasing alt', async () => {
     // #5035
-    const { act, result } = await renderHook(() => useMagicKeys({ target }))
+    const { act, result } = await renderHook(() => useMagicKeys({ target: targetRef }))
 
     await act(() => {
       dispatchKeyboardEvent({ target, key: 'v' })
@@ -151,7 +153,7 @@ describe('useMagicKeys', () => {
   })
 
   it('current return value', async () => {
-    const { act, result } = await renderHook(() => useMagicKeys({ target }))
+    const { act, result } = await renderHook(() => useMagicKeys({ target: targetRef }))
     expect(result.current.v).toBe(false)
     await act(() => {
       dispatchKeyboardEvent({ target, key: 'v' })
@@ -162,7 +164,7 @@ describe('useMagicKeys', () => {
   })
 
   it('alias map option', async () => {
-    const { act, result } = await renderHook(() => useMagicKeys({ aliasMap: { ct: 'control' }, target }))
+    const { act, result } = await renderHook(() => useMagicKeys({ aliasMap: { ct: 'control' }, target: targetRef }))
     expect(result.current.ct).toBe(false)
 
     await act(() => {
@@ -174,7 +176,7 @@ describe('useMagicKeys', () => {
   it('reactive option: plain booleans in both modes', async () => {
     // `reactive` is accepted for API compatibility only — React state is
     // always reactive, so both modes return plain boolean values
-    const { act, result } = await renderHook(() => useMagicKeys({ target, reactive: true }))
+    const { act, result } = await renderHook(() => useMagicKeys({ target: targetRef, reactive: true }))
     expect(result.current.a).toBeTypeOf('boolean')
 
     await act(() => {
@@ -183,14 +185,14 @@ describe('useMagicKeys', () => {
     expect(result.current.a).toBe(true)
     expect(result.current.current.has('a')).toBe(true)
 
-    const { result: defaultResult } = await renderHook(() => useMagicKeys({ target }))
+    const { result: defaultResult } = await renderHook(() => useMagicKeys({ target: targetRef }))
     expect(defaultResult.current.a).toBeTypeOf('boolean')
   })
 
   it('tracks a key pressed before it was first read (eager tracking)', async () => {
     // divergence from upstream's lazy per-key refs: presses are recorded
     // eagerly, so reading a key afterwards reports the truth
-    const { act, result } = await renderHook(() => useMagicKeys({ target }))
+    const { act, result } = await renderHook(() => useMagicKeys({ target: targetRef }))
 
     await act(() => {
       dispatchKeyboardEvent({ target, key: 'x' })
@@ -201,7 +203,7 @@ describe('useMagicKeys', () => {
 
   it('target blur', async () => {
     // #1350
-    const { act, result } = await renderHook(() => useMagicKeys({ target }))
+    const { act, result } = await renderHook(() => useMagicKeys({ target: targetRef }))
     expect(result.current.alt_tab).toBe(false)
 
     await act(() => {
@@ -218,7 +220,7 @@ describe('useMagicKeys', () => {
 
   it('target focus', async () => {
     // #1350
-    const { act, result } = await renderHook(() => useMagicKeys({ target }))
+    const { act, result } = await renderHook(() => useMagicKeys({ target: targetRef }))
     expect(result.current.alt_tab).toBe(false)
 
     await act(() => {
@@ -234,7 +236,7 @@ describe('useMagicKeys', () => {
   })
 
   it('should handle empty or undefined key events without errors', async () => {
-    const { act, result } = await renderHook(() => useMagicKeys({ target }))
+    const { act, result } = await renderHook(() => useMagicKeys({ target: targetRef }))
 
     // Test empty key
     await act(() => {
@@ -250,7 +252,7 @@ describe('useMagicKeys', () => {
   })
 
   it('should be robust when key is explicitly undefined', async () => {
-    const { act, result } = await renderHook(() => useMagicKeys({ target }))
+    const { act, result } = await renderHook(() => useMagicKeys({ target: targetRef }))
 
     const event = new KeyboardEvent('keyup', {})
     Object.defineProperty(event, 'key', { value: undefined })

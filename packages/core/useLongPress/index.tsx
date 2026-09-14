@@ -1,6 +1,6 @@
-import type { RefOrValue } from '@reause/shared'
-import { toValue } from '@reause/shared'
+import type { RefObject } from 'react'
 import { useCallback, useEffect, useRef } from 'react'
+import { unrefElement } from '../unrefElement'
 import { useEventListener } from '../useEventListener'
 
 const DEFAULT_DELAY = 500
@@ -50,8 +50,8 @@ export interface UseLongPressOptions {
   modifiers?: UseLongPressModifiers
 
   /**
-   * Allowance of moving distance in pixels,
-   * the action will get canceled when moving too far from the pointerdown position.
+   * Allowance of moving distance in pixels, the action will get canceled when moving too far from
+   * the pointerdown position.
    *
    * @default 10
    */
@@ -71,32 +71,8 @@ export interface UseLongPressOptions {
 export type UseLongPressReturn = () => void
 
 /**
- * Listen for a long press on an element.
- *
  * Map from @vueuse/core `onLongPress`
- * (`source/vueuse/packages/core/onLongPress/`). A long press is detected via
- * `pointerdown` / `pointerup` (and `pointerleave` / `pointercancel`) /
- * `pointermove` events: after `pointerdown` the handler fires once the
- * `delay` has elapsed while the pointer stays pressed, and the press is
- * canceled when the pointer is released early or moves beyond
- * `distanceThreshold` pixels (set to `false` to disable movement detection).
- * `modifiers` apply the upstream event flags (`prevent` / `stop` / `self` /
- * `once` / `capture`), and `onMouseUp` is notified on release with the press
- * duration, the travelled distance, whether the press was a long press and the
- * native `PointerEvent`.
- *
- * React divergences:
- * - React has no composable-function API, so this is a hook (upstream's
- *   `onLongPress` is a plain function): the listeners are registered in a
- *   mount effect and removed on unmount;
- * - all callbacks and options are read through latest-value refs, so new
- *   inline handler identities or changing options never re-subscribe the
- *   listeners — only a resolved target / event-set change re-binds them;
- * - the returned value is a stop function (`() => void`) that clears any
- *   pending long-press timer and removes the currently registered listeners
- *   (upstream returns a Vue `Fn` that stops its internal watcher);
- * - SSR-safe: nothing touches `window` during render — binding happens in the
- *   mount effect only.
+ * (`source/vueuse/packages/core/onLongPress/`).
  *
  * @see https://vueuse.org/core/onLongPress/
  *
@@ -112,7 +88,7 @@ export type UseLongPressReturn = () => void
  * stop()
  */
 export function useLongPress(
-  target: RefOrValue<EventTarget | null | undefined>,
+  target: RefObject<EventTarget | null | undefined>,
   handler: (evt: PointerEvent) => void,
   options: UseLongPressOptions = {},
 ): UseLongPressReturn {
@@ -146,7 +122,7 @@ export function useLongPress(
       modifiers: pressModifiers,
     } = latest.current
 
-    if (pressModifiers?.self && evt.target !== toValue(pressTarget))
+    if (pressModifiers?.self && evt.target !== (pressTarget ? unrefElement(pressTarget) : undefined))
       return
 
     clear()
@@ -178,7 +154,7 @@ export function useLongPress(
       modifiers: moveModifiers,
     } = latest.current
 
-    if (moveModifiers?.self && evt.target !== toValue(moveTarget))
+    if (moveModifiers?.self && evt.target !== (moveTarget ? unrefElement(moveTarget) : undefined))
       return
 
     if (!posStart.current || moveThreshold === false)
@@ -214,7 +190,7 @@ export function useLongPress(
     if (!releaseMouseUp || !releasePosStart || !releaseStartTimestamp)
       return
 
-    if (releaseModifiers?.self && evt.target !== toValue(releaseTarget))
+    if (releaseModifiers?.self && evt.target !== (releaseTarget ? unrefElement(releaseTarget) : undefined))
       return
 
     if (releaseModifiers?.prevent)

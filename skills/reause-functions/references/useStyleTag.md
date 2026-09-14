@@ -69,20 +69,6 @@ useStyleTag('.foo { margin-top: 32px; }', { media: 'print' })
 </style>
 ```
 
-## Return Values
-
-- `css` — the current CSS text of the style tag (plain state, seeded by the initial argument).
-- `setCss(next | prev => next)` — replaces the CSS text: updates the injected `<style>` while loaded, and
-  is stored for the next `load()` otherwise.
-- `controls.id` — the DOM id of the style tag.
-- `controls.load()` — inject the style tag into `document.head` (no-op when already loaded).
-- `controls.unload()` — remove the style tag from `document.head` (reference-counted, so style tags
-  shared by id are only removed with the last unloaded instance).
-- `controls.isLoaded` — whether the style tag is currently injected.
-
-The return is a React tuple `[css, setCss, { id, load, unload, isLoaded }]` — upstream returns an object
-`{ id, css: ShallowRef<string>, load, unload, isLoaded }`, where `css` is a writable ref.
-
 ## Type Declarations
 
 ```ts
@@ -116,21 +102,18 @@ export interface UseStyleTagOptions {
    */
   nonce?: string
   /**
-   * Specify a custom `document` instance, e.g. working with iframes or in
-   * testing environments.
+   * Specify a custom `document` instance, e.g. working with iframes or in testing environments.
    */
   document?: Document
 }
 export type UseStyleTagReturn = readonly [
   /**
-   * Current CSS text of the style tag — React state seeded by the initial
-   * `css` argument (upstream: a writable `css` ref).
+   * Current CSS text of the style tag — React state seeded by the initial `css` argument.
    */
   css: string,
   /**
-   * Update the CSS text of the style tag — `setCss('...')` or
-   * `setCss(prev => '...')`. Updates the live `<style>` element while loaded,
-   * and is stored for the next `load()` otherwise. Upstream:
+   * Update the CSS text of the style tag — `setCss('...')` or `setCss(prev => '...')`. Updates the
+   * live `<style>` element while loaded, and is stored for the next `load()` otherwise. Upstream:
    * `css.value = '...'`.
    */
   setCss: Dispatch<SetStateAction<string>>,
@@ -144,8 +127,8 @@ export type UseStyleTagReturn = readonly [
      */
     load: () => void
     /**
-     * Remove the style tag from `document.head` (reference-counted, so style
-     * tags shared by id are only removed with the last unloaded instance)
+     * Remove the style tag from `document.head` (reference-counted, so style tags shared by id are
+     * only removed with the last unloaded instance)
      */
     unload: () => void
     /**
@@ -155,32 +138,8 @@ export type UseStyleTagReturn = readonly [
   },
 ]
 /**
- * React port of VueUse's `useStyleTag`.
- *
  * Map from @vueuse/core `useStyleTag`
- * (`source/vueuse/packages/core/useStyleTag/`). Injects a `<style>` element
- * into `document.head` and keeps its text in sync with the given CSS.
- *
- * React divergences:
- * - the return is a React tuple `[css, setCss, { id, load, unload, isLoaded }]`
- *   instead of upstream's object `{ id, css: ShallowRef<string>, load, unload,
- *   isLoaded }` — `css` is plain state and `setCss` replaces it with the React
- *   immutable-update protocol, `setCss('...')` or `setCss(prev => '...')`
- *   (upstream: writable ref, `css.value = '...'`). The `controls` object keeps
- *   a stable identity while `load`, `unload` and `isLoaded` are unchanged;
- * - the initial `css` argument seeds that state once, like upstream's
- *   `shallowRef(css)`; later updates go through `setCss`;
- * - the `isLoaded` ref return becomes a plain boolean state;
- * - upstream's `watch(cssRef, ..., { immediate: true })` becomes an initial
- *   `el.textContent` write in `load()` plus direct writes from `setCss` while
- *   loaded;
- * - `tryOnMounted(load)` / `tryOnScopeDispose(unload)` become a mount
- *   `useEffect` whose cleanup calls `unload` (skipped with `manual: true`);
- * - SSR-safe: `document` is only touched inside the mount effect and the
- *   callbacks, never during render — with no `document` available `load()`
- *   and `unload()` are no-ops (upstream's `defaultDocument` guard);
- * - auto-generated ids use the `reause_styletag_` prefix (upstream:
- *   `vueuse_styletag_`).
+ * (`source/vueuse/packages/core/useStyleTag/`).
  *
  * @example
  * const [css, setCss, { id, load, unload, isLoaded }] = useStyleTag('.foo { margin-top: 32px; }')

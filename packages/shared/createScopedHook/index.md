@@ -2,7 +2,7 @@
 category: State
 ---
 
-# createInjectionState
+# createScopedHook
 
 Create global state that can be injected into components.
 
@@ -10,10 +10,10 @@ Create global state that can be injected into components.
 
 ```tsx
 // useCounterStore.ts
-import { createInjectionState } from '@reause/shared'
+import { createScopedHook } from '@reause/shared'
 import { useState } from 'react'
 
-const [CounterStoreProvider, useCounterStore] = createInjectionState(({ initialValue }: { initialValue: number }) => {
+const [CounterStoreProvider, useCounterStore] = createScopedHook(({ initialValue }: { initialValue: number }) => {
   // state
   const [count, setCount] = useState(initialValue)
 
@@ -102,13 +102,13 @@ export function ButtonComponent() {
 
 ```tsx
 // useCounterStore.ts
-import { createInjectionState } from '@reause/shared'
+import { createScopedHook } from '@reause/shared'
 import { createContext, useState } from 'react'
 
 // custom injectionKey
 const CounterStoreKey = createContext<{ count: number, double: number, increment: () => void } | undefined>(undefined)
 
-const [CounterStoreProvider, useCounterStore] = createInjectionState(({ initialValue }: { initialValue: number }) => {
+const [CounterStoreProvider, useCounterStore] = createScopedHook(({ initialValue }: { initialValue: number }) => {
   // state
   const [count, setCount] = useState(initialValue)
 
@@ -130,11 +130,11 @@ When a custom `injectionKey` is supplied, `defaultValue` is not used — the cus
 
 ```tsx
 // useCounterStore.ts
-import { createInjectionState } from '@reause/shared'
+import { createScopedHook } from '@reause/shared'
 import { useState } from 'react'
 
 // useCounterStore does not return undefined when defaultValue is specified
-const [CounterStoreProvider, useCounterStore] = createInjectionState(({ initialValue }: { initialValue: number }) => {
+const [CounterStoreProvider, useCounterStore] = createScopedHook(({ initialValue }: { initialValue: number }) => {
   // state
   const [count, setCount] = useState(initialValue)
 

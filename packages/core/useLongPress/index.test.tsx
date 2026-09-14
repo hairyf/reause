@@ -20,18 +20,18 @@ describe('useLongPress', () => {
     vi.useRealTimers()
   })
 
-  async function triggerCallback(isRef: boolean) {
+  async function triggerCallback() {
     const onLongPressCallback = vi.fn()
-    await renderHook(() => useLongPress(isRef ? elementRef : element, onLongPressCallback))
+    await renderHook(() => useLongPress(elementRef, onLongPressCallback))
     element.dispatchEvent(pointerdownEvent)
     expect(onLongPressCallback).toHaveBeenCalledTimes(0)
     await vi.advanceTimersByTimeAsync(500)
     expect(onLongPressCallback).toHaveBeenCalledTimes(1)
   }
 
-  async function triggerCallbackWithDelay(isRef: boolean, delay = 1000) {
+  async function triggerCallbackWithDelay(delay = 1000) {
     const onLongPressCallback = vi.fn()
-    await renderHook(() => useLongPress(isRef ? elementRef : element, onLongPressCallback, { delay }))
+    await renderHook(() => useLongPress(elementRef, onLongPressCallback, { delay }))
     // first pointer down
     element.dispatchEvent(pointerdownEvent)
 
@@ -54,10 +54,10 @@ describe('useLongPress', () => {
     expect(onLongPressCallback).toHaveBeenCalledTimes(1)
   }
 
-  async function triggerCallbackWithDelayFunction(isRef: boolean) {
+  async function triggerCallbackWithDelayFunction() {
     const onLongPressCallback = vi.fn()
     const delayFn = vi.fn((_ev: PointerEvent) => 2000)
-    await renderHook(() => useLongPress(isRef ? elementRef : element, onLongPressCallback, { delay: delayFn }))
+    await renderHook(() => useLongPress(elementRef, onLongPressCallback, { delay: delayFn }))
 
     element.dispatchEvent(pointerdownEvent)
 
@@ -72,11 +72,11 @@ describe('useLongPress', () => {
     expect(onLongPressCallback).toHaveBeenCalledTimes(1)
   }
 
-  async function notTriggerCallbackOnChildLongPress(isRef: boolean) {
+  async function notTriggerCallbackOnChildLongPress() {
     const onLongPressCallback = vi.fn()
     const child = document.createElement('span')
     element.appendChild(child)
-    await renderHook(() => useLongPress(isRef ? elementRef : element, onLongPressCallback, { modifiers: { self: true } }))
+    await renderHook(() => useLongPress(elementRef, onLongPressCallback, { modifiers: { self: true } }))
 
     // the press starts on a child element — `self` rejects it
     child.dispatchEvent(new PointerEvent('pointerdown', { cancelable: true, bubbles: true }))
@@ -89,9 +89,9 @@ describe('useLongPress', () => {
     expect(onLongPressCallback).toHaveBeenCalledTimes(1)
   }
 
-  async function workOnceAndPreventModifiers(isRef: boolean) {
+  async function workOnceAndPreventModifiers() {
     const onLongPressCallback = vi.fn()
-    await renderHook(() => useLongPress(isRef ? elementRef : element, onLongPressCallback, { modifiers: { once: true, prevent: true } }))
+    await renderHook(() => useLongPress(elementRef, onLongPressCallback, { modifiers: { once: true, prevent: true } }))
 
     element.dispatchEvent(pointerdownEvent)
 
@@ -108,13 +108,13 @@ describe('useLongPress', () => {
     expect(onLongPressCallback).toHaveBeenCalledTimes(1)
   }
 
-  async function stopPropagation(isRef: boolean) {
+  async function stopPropagation() {
     const onLongPressCallback = vi.fn()
     const onParentPointerDown = vi.fn()
     const parent = document.createElement('div')
     parent.appendChild(element)
     parent.addEventListener('pointerdown', onParentPointerDown)
-    await renderHook(() => useLongPress(isRef ? elementRef : element, onLongPressCallback, { modifiers: { stop: true } }))
+    await renderHook(() => useLongPress(elementRef, onLongPressCallback, { modifiers: { stop: true } }))
 
     element.dispatchEvent(pointerdownEvent)
 
@@ -124,7 +124,7 @@ describe('useLongPress', () => {
     expect(onParentPointerDown).toHaveBeenCalledTimes(0)
   }
 
-  async function captureModifier(isRef: boolean) {
+  async function captureModifier() {
     const onLongPressCallback = vi.fn()
     const bubblePhaseDefaultPrevented = vi.fn()
     const child = document.createElement('span')
@@ -134,7 +134,7 @@ describe('useLongPress', () => {
     element.addEventListener('pointerdown', (evt) => {
       bubblePhaseDefaultPrevented(evt.defaultPrevented)
     })
-    await renderHook(() => useLongPress(isRef ? elementRef : element, onLongPressCallback, { modifiers: { capture: true, prevent: true } }))
+    await renderHook(() => useLongPress(elementRef, onLongPressCallback, { modifiers: { capture: true, prevent: true } }))
 
     child.dispatchEvent(new PointerEvent('pointerdown', { cancelable: true, bubbles: true }))
 
@@ -144,12 +144,12 @@ describe('useLongPress', () => {
     expect(onLongPressCallback).toHaveBeenCalledTimes(1)
   }
 
-  async function triggerCallbackWithDistanceThreshold(isRef: boolean) {
+  async function triggerCallbackWithDistanceThreshold() {
     const onLongPressCallback = vi.fn()
     const positionPointerdownEvent = new PointerEvent('pointerdown', { cancelable: true, bubbles: true, clientX: 20, clientY: 20 })
     const moveWithinThresholdEvent = new PointerEvent('pointermove', { cancelable: true, bubbles: true, clientX: 17, clientY: 25 })
     const moveOutsideThresholdEvent = new PointerEvent('pointermove', { cancelable: true, bubbles: true, clientX: 4, clientY: 30 })
-    await renderHook(() => useLongPress(isRef ? elementRef : element, onLongPressCallback, { distanceThreshold: 15, delay: 1000 }))
+    await renderHook(() => useLongPress(elementRef, onLongPressCallback, { distanceThreshold: 15, delay: 1000 }))
     // first pointer down
     element.dispatchEvent(positionPointerdownEvent)
 
@@ -176,9 +176,9 @@ describe('useLongPress', () => {
     expect(onLongPressCallback).toHaveBeenCalledTimes(1)
   }
 
-  async function ignoreMovementWithDisabledDistanceThreshold(isRef: boolean) {
+  async function ignoreMovementWithDisabledDistanceThreshold() {
     const onLongPressCallback = vi.fn()
-    await renderHook(() => useLongPress(isRef ? elementRef : element, onLongPressCallback, { distanceThreshold: false, delay: 1000 }))
+    await renderHook(() => useLongPress(elementRef, onLongPressCallback, { distanceThreshold: false, delay: 1000 }))
 
     element.dispatchEvent(new PointerEvent('pointerdown', { cancelable: true, bubbles: true, clientX: 0, clientY: 0 }))
     element.dispatchEvent(new PointerEvent('pointermove', { cancelable: true, bubbles: true, clientX: 500, clientY: 500 }))
@@ -187,10 +187,10 @@ describe('useLongPress', () => {
     expect(onLongPressCallback).toHaveBeenCalledTimes(1)
   }
 
-  async function notTriggerOnMouseUpAfterMovingTooFar(isRef: boolean) {
+  async function notTriggerOnMouseUpAfterMovingTooFar() {
     const onLongPressCallback = vi.fn()
     const onMouseUpCallback = vi.fn()
-    await renderHook(() => useLongPress(isRef ? elementRef : element, onLongPressCallback, { distanceThreshold: 15, onMouseUp: onMouseUpCallback }))
+    await renderHook(() => useLongPress(elementRef, onLongPressCallback, { distanceThreshold: 15, onMouseUp: onMouseUpCallback }))
 
     element.dispatchEvent(new PointerEvent('pointerdown', { cancelable: true, bubbles: true, clientX: 20, clientY: 20 }))
     // moving beyond the threshold silently clears the press — no release callback
@@ -203,10 +203,10 @@ describe('useLongPress', () => {
     expect(onLongPressCallback).toHaveBeenCalledTimes(0)
   }
 
-  async function triggerOnMouseUp(isRef: boolean) {
+  async function triggerOnMouseUp() {
     const onLongPressCallback = vi.fn()
     const onMouseUpCallback = vi.fn()
-    await renderHook(() => useLongPress(isRef ? elementRef : element, onLongPressCallback, { onMouseUp: onMouseUpCallback }))
+    await renderHook(() => useLongPress(elementRef, onLongPressCallback, { onMouseUp: onMouseUpCallback }))
 
     // first pointer down
     element.dispatchEvent(new PointerEvent('pointerdown', { cancelable: true, bubbles: true }))
@@ -239,10 +239,10 @@ describe('useLongPress', () => {
     expect(onMouseUpCallback).toHaveBeenLastCalledWith(expect.any(Number), 0, true, expect.any(PointerEvent))
   }
 
-  async function notTriggerCallbackOnPointerCancel(isRef: boolean) {
+  async function notTriggerCallbackOnPointerCancel() {
     const onLongPressCallback = vi.fn()
     const onMouseUpCallback = vi.fn()
-    await renderHook(() => useLongPress(isRef ? elementRef : element, onLongPressCallback, { onMouseUp: onMouseUpCallback }))
+    await renderHook(() => useLongPress(elementRef, onLongPressCallback, { onMouseUp: onMouseUpCallback }))
 
     element.dispatchEvent(new PointerEvent('pointerdown', { cancelable: true, bubbles: true }))
 
@@ -258,11 +258,11 @@ describe('useLongPress', () => {
     expect(onLongPressCallback).toHaveBeenCalledTimes(0)
   }
 
-  async function stopEventListeners(isRef: boolean) {
+  async function stopEventListeners() {
     const onLongPressCallback = vi.fn()
     let stop: (() => void) | undefined
     await renderHook(() => {
-      stop = useLongPress(isRef ? elementRef : element, onLongPressCallback)
+      stop = useLongPress(elementRef, onLongPressCallback)
     })
 
     // before calling stop, the callback should be called
@@ -279,11 +279,11 @@ describe('useLongPress', () => {
     expect(onLongPressCallback).toHaveBeenCalledTimes(0)
   }
 
-  async function stopClearsPendingTimer(isRef: boolean) {
+  async function stopClearsPendingTimer() {
     const onLongPressCallback = vi.fn()
     let stop: (() => void) | undefined
     await renderHook(() => {
-      stop = useLongPress(isRef ? elementRef : element, onLongPressCallback)
+      stop = useLongPress(elementRef, onLongPressCallback)
     })
 
     element.dispatchEvent(pointerdownEvent)
@@ -297,37 +297,37 @@ describe('useLongPress', () => {
     expect(onLongPressCallback).toHaveBeenCalledTimes(0)
   }
 
-  function suites(isRef: boolean) {
+  function suites() {
     describe('given no options', () => {
-      it('should trigger longpress after 500ms', () => triggerCallback(isRef))
+      it('should trigger longpress after 500ms', () => triggerCallback())
     })
 
     describe('given options', () => {
-      it('should trigger longpress after options.delay ms', () => triggerCallbackWithDelay(isRef))
+      it('should trigger longpress after options.delay ms', () => triggerCallbackWithDelay())
 
-      it('should trigger longpress after options.delay ms when options.delay is a function', () => triggerCallbackWithDelayFunction(isRef))
+      it('should trigger longpress after options.delay ms when options.delay is a function', () => triggerCallbackWithDelayFunction())
 
-      it('should not trigger longpress when child element on longpress', () => notTriggerCallbackOnChildLongPress(isRef))
+      it('should not trigger longpress when child element on longpress', () => notTriggerCallbackOnChildLongPress())
 
-      it('should work with once and prevent modifiers', () => workOnceAndPreventModifiers(isRef))
+      it('should work with once and prevent modifiers', () => workOnceAndPreventModifiers())
 
-      it('should stop propagation', () => stopPropagation(isRef))
+      it('should stop propagation', () => stopPropagation())
 
-      it('should use capture mode', () => captureModifier(isRef))
+      it('should use capture mode', () => captureModifier())
 
-      it('should trigger longpress if the pointer is moved within the distance threshold', () => triggerCallbackWithDistanceThreshold(isRef))
+      it('should trigger longpress if the pointer is moved within the distance threshold', () => triggerCallbackWithDistanceThreshold())
 
-      it('should ignore pointer movement when distanceThreshold is false', () => ignoreMovementWithDisabledDistanceThreshold(isRef))
+      it('should ignore pointer movement when distanceThreshold is false', () => ignoreMovementWithDisabledDistanceThreshold())
 
-      it('should not trigger onMouseUp when the pointer moved beyond the distance threshold', () => notTriggerOnMouseUpAfterMovingTooFar(isRef))
+      it('should not trigger onMouseUp when the pointer moved beyond the distance threshold', () => notTriggerOnMouseUpAfterMovingTooFar())
 
-      it('should trigger onMouseUp with duration, distance and isLongPress when the pointer is released', () => triggerOnMouseUp(isRef))
+      it('should trigger onMouseUp with duration, distance and isLongPress when the pointer is released', () => triggerOnMouseUp())
 
-      it('should not trigger longpress when the pointer is canceled', () => notTriggerCallbackOnPointerCancel(isRef))
+      it('should not trigger longpress when the pointer is canceled', () => notTriggerCallbackOnPointerCancel())
 
-      it('should remove event listeners after being stopped', () => stopEventListeners(isRef))
+      it('should remove event listeners after being stopped', () => stopEventListeners())
 
-      it('should clear the pending timer after being stopped', () => stopClearsPendingTimer(isRef))
+      it('should clear the pending timer after being stopped', () => stopClearsPendingTimer())
     })
   }
 
@@ -335,7 +335,5 @@ describe('useLongPress', () => {
     expect(useLongPress).toBeDefined()
   })
 
-  describe('given argument is ref-like', () => suites(true))
-
-  describe('given argument is element', () => suites(false))
+  describe('given the target is a ref', () => suites())
 })

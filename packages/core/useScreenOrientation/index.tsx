@@ -15,8 +15,7 @@ export interface ScreenOrientation extends EventTarget {
 }
 
 /**
- * Specify a custom `window` instance, e.g. working with iframes or in
- * testing environments.
+ * Specify a custom `window` instance, e.g. working with iframes or in testing environments.
  */
 export interface UseScreenOrientationOptions {
   window?: Window
@@ -28,8 +27,8 @@ export interface UseScreenOrientationReturn {
    */
   isSupported: boolean
   /**
-   * The current orientation type. `undefined` during SSR and before the
-   * mount effect has read `screen.orientation`.
+   * The current orientation type. `undefined` during SSR and before the mount effect has read
+   * `screen.orientation`.
    */
   orientation: OrientationType | undefined
   /**
@@ -37,9 +36,9 @@ export interface UseScreenOrientationReturn {
    */
   angle: number
   /**
-   * Lock the screen orientation. Returns the underlying promise from
-   * `screen.orientation.lock` (rejections propagate unchanged), or rejects
-   * with `'Not supported'` when the API is unavailable.
+   * Lock the screen orientation. Returns the underlying promise from `screen.orientation.lock`
+   * (rejections propagate unchanged), or rejects with `'Not supported'` when the API is
+   * unavailable.
    */
   lockOrientation: (type: OrientationLockType) => Promise<void>
   /**
@@ -60,26 +59,8 @@ function resolveScreenOrientation(customWindow?: Window): { win: Window, screenO
 }
 
 /**
- * React port of VueUse's `useScreenOrientation`.
- *
  * Map from @vueuse/core `useScreenOrientation`
- * (`source/vueuse/packages/core/useScreenOrientation/`). Reactive Screen
- * Orientation API — the current orientation type and angle, plus
- * lock/unlock controls.
- *
- * React divergences:
- * - the Vue `orientation`/`angle` shallowRefs become plain state values;
- * - `isSupported` (upstream `useSupported`) starts `false` and is computed in
- *   the mount effect, so nothing touches `screen` during render (SSR-safe);
- * - the initial `screen.orientation` read happens in the same mount effect
- *   (upstream reads it during setup);
- * - the window `orientationchange` listener (upstream `useEventListener`,
- *   passive) lives in a self-contained `useEffect` and is removed on unmount;
- * - `lockOrientation`/`unlockOrientation` use the `screen.orientation`
- *   instance captured once by that mount effect, mirroring upstream's
- *   setup-time capture (gated on `isSupported`): a later replacement or
- *   polyfill of `screen.orientation` is ignored and lock rejects
- *   `'Not supported'`, exactly as upstream does.
+ * (`source/vueuse/packages/core/useScreenOrientation/`).
  *
  * @example
  * const { isSupported, orientation, angle, lockOrientation, unlockOrientation } = useScreenOrientation()

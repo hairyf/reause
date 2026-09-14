@@ -70,15 +70,15 @@ import { collection } from 'firebase/firestore'
 const todos = useFirestore(collection(db, 'todos'), undefined, { autoDispose: false })
 ```
 
-or use `createGlobalState` from the shared package
+or share one subscription between components with `createSharedHook` from the shared package — the port of `createSharedComposable`. (Upstream's page recommends `createGlobalState`, but reause's `createGlobalState` mirrors react-use: its initial state is resolved at module scope, so it cannot host a hook.)
 
 ```ts
 // store.ts
 import { useFirestore } from '@reause/firebase'
-import { createGlobalState } from '@reause/shared'
+import { createSharedHook } from '@reause/shared'
 import { collection } from 'firebase/firestore'
 
-export const useTodos = createGlobalState(
+export const useTodos = createSharedHook(
   () => useFirestore(collection(db, 'todos')),
 )
 ```
@@ -94,9 +94,8 @@ export interface UseFirestoreOptions {
    */
   errorHandler?: (err: Error) => void
   /**
-   * Automatically unsubscribe when the component unmounts. Pass a number to
-   * delay the unsubscribe by that many milliseconds (upstream's
-   * `useTimeoutFn`-based delayed dispose).
+   * Automatically unsubscribe when the component unmounts. Pass a number to delay the unsubscribe
+   * by that many milliseconds (upstream's `useTimeoutFn`-based delayed dispose).
    *
    * @default true
    */

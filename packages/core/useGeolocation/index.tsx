@@ -1,10 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 /**
- * Specify a custom `navigator` instance, e.g. working with iframes or in
- * testing environments. Declared inline instead of re-exporting upstream's
- * configurable-navigator interface (see `useUserMedia`) to keep the barrel
- * export collision-free.
+ * Specify a custom `navigator` instance, e.g. working with iframes or in testing environments.
+ * Declared inline instead of re-exporting upstream's configurable-navigator interface (see
+ * `useUserMedia`) to keep the barrel export collision-free.
  */
 interface ConfigurableNavigator {
   navigator?: Navigator
@@ -21,9 +20,8 @@ export interface UseGeolocationOptions extends Partial<PositionOptions>, Configu
 
 export interface UseGeolocationReturn {
   /**
-   * Whether the `navigator.geolocation` API is available in the current
-   * environment. `false` during render and on the server, resolved in a
-   * mount effect.
+   * Whether the `navigator.geolocation` API is available in the current environment. `false` during
+   * render and on the server, resolved in a mount effect.
    */
   isSupported: boolean
   /**
@@ -49,28 +47,8 @@ export interface UseGeolocationReturn {
 }
 
 /**
- * Reactive Geolocation API.
- *
  * Map from @vueuse/core `useGeolocation`
- * (`source/vueuse/packages/core/useGeolocation/`). Returns an object
- * mirroring the upstream members: `{ isSupported, coords, locatedAt, error,
- * resume, pause }`. `coords` holds the latest
- * [`GeolocationCoordinates`](https://developer.mozilla.org/en-US/docs/Web/API/GeolocationCoordinates)
- * (defaults as upstream: `accuracy: 0` and infinite latitude/longitude,
- * nulls elsewhere), `locatedAt` the timestamp of the last position update,
- * `error` the last `GeolocationPositionError` if any.
- *
- * React divergences:
- * - the Vue shallow refs returned by upstream become plain values read off
- *   the result object (`coords`/`locatedAt`/`error` are state values, and
- *   `isSupported` is a plain boolean settled in the mount effect), so no
- *   `.value` is involved;
- * - the watcher is started in a mount effect (upstream: during setup) when
- *   `immediate` (default `true`), and `resume`/`pause` are stable callbacks
- *   wrapping `navigator.geolocation.watchPosition` / `clearWatch`;
- * - unmount clears the active watch (upstream: `tryOnScopeDispose`), and
- *   there is no `navigator` access during render, so SSR renders the
- *   defaults without starting anything.
+ * (`source/vueuse/packages/core/useGeolocation/`).
  *
  * @see https://vueuse.org/core/useGeolocation/
  * @param options

@@ -149,8 +149,8 @@ export interface UseAxiosReturn<
   /**
    * Axios response data
    *
-   * `O extends UseAxiosOptionsWithInitialData<T>` is `T` (upstream's
-   * `Ref<T>` branch), otherwise `T | undefined`.
+   * `O extends UseAxiosOptionsWithInitialData<T>` is `T` (upstream's `Ref<T>` branch), otherwise `T
+   * | undefined`.
    */
   data: O extends UseAxiosOptionsWithInitialData<T> ? T : T | undefined
   /**
@@ -189,11 +189,10 @@ export interface StrictUseAxiosReturn<
   O extends UseAxiosOptions = UseAxiosOptions<T>,
 > extends UseAxiosReturn<T, R, D, O> {
   /**
-   * Manually call the axios request — returns the shared thenable shell
-   * (upstream `return promise`): `await execute()` resolves with the shell
-   * once the request finished, rejecting with the request error on failure;
-   * a bare unawaited call never settles eagerly, so it cannot produce an
-   * unhandled rejection.
+   * Manually call the axios request — returns the shared thenable shell (upstream `return
+   * promise`): `await execute()` resolves with the shell once the request finished, rejecting with
+   * the request error on failure; a bare unawaited call never settles eagerly, so it cannot produce
+   * an unhandled rejection.
    */
   execute: (
     url?: string | AxiosRequestConfig<D>,
@@ -202,11 +201,10 @@ export interface StrictUseAxiosReturn<
 }
 export interface EasyUseAxiosReturn<T, R, D> extends UseAxiosReturn<T, R, D> {
   /**
-   * Manually call the axios request — returns the shared thenable shell
-   * (upstream `return promise`): `await execute(url)` resolves with the shell
-   * once the request finished, rejecting with the request error on failure;
-   * a bare unawaited call never settles eagerly, so it cannot produce an
-   * unhandled rejection.
+   * Manually call the axios request — returns the shared thenable shell (upstream `return
+   * promise`): `await execute(url)` resolves with the shell once the request finished, rejecting
+   * with the request error on failure; a bare unawaited call never settles eagerly, so it cannot
+   * produce an unhandled rejection.
    */
   execute: (
     url: string,
@@ -214,11 +212,9 @@ export interface EasyUseAxiosReturn<T, R, D> extends UseAxiosReturn<T, R, D> {
   ) => Promise<EasyUseAxiosReturn<T, R, D>>
 }
 /**
- * The thenable half of the returned shell — upstream's
- * `promise = { then, catch }` object. `then`/`catch` settle once the latest
- * request finished, resolving with the shell itself (so
- * `const { data } = await useAxios(...)` works) or rejecting with the request
- * error.
+ * The thenable half of the returned shell — upstream's `promise = { then, catch }` object.
+ * `then`/`catch` settle once the latest request finished, resolving with the shell itself (so
+ * `const { data } = await useAxios(...)` works) or rejecting with the request error.
  */
 export interface UseAxiosThenable<X> extends PromiseLike<X> {
   catch: <TResult = never>(
@@ -228,7 +224,6 @@ export interface UseAxiosThenable<X> extends PromiseLike<X> {
 export interface UseAxiosOptionsBase<T = any> {
   /**
    * Will automatically run axios request when `useAxios` is used
-   *
    */
   immediate?: boolean
   /**

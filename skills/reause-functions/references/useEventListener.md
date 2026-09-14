@@ -94,37 +94,24 @@ interface InferEventTarget<Events> {
   removeEventListener: (event: Events, fn?: any, options?: any) => any
 }
 /**
- * Use EventListener with ease. Register using
- * [`addEventListener`](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener)
- * on mounted, and
- * [`removeEventListener`](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/removeEventListener)
- * automatically on unmounted.
- *
+ * A React ref object holding one event target. `undefined` is accepted alongside `null` so a bare
+ * `useRef<T>()` is assignable.
+ */
+export type EventTargetRef<T> = RefObject<T | null | undefined>
+/**
+ * One or more event targets: a single ref, a ref holding an array of targets, or an array of
+ * same-typed refs. Plain targets, getters and callback refs are not accepted — every target is read
+ * from its ref's `current`, the same `.current` read `unrefElement` performs for element targets.
+ */
+export type EventTargetRefs<T> =
+  EventTargetRef<T> | RefObject<T[] | null | undefined> | EventTargetRef<T>[]
+/**
  * Map from @vueuse/core `useEventListener`
- * (`source/vueuse/packages/core/useEventListener/`). Registers one or more
- * listeners on one or more targets; the target defaults to `window` when
- * omitted. Events, listeners and targets may be passed as arrays (React
- * `Arrayable`), and the target accepts a plain element, a ref-like
- * `{ current }` object or a React ref (`RefOrValue`).
- *
- * React divergences:
- * - re-binding follows upstream's `watchImmediate` over the resolved targets,
- *   events, listeners and options: a ref-wrapped listener (a `{ current }`
- *   object or React ref) re-registers when its `.current` changes; plain
- *   function listeners are latest-tracked (each render syncs the newest
- *   listener into the subscription), so an inline listener's new identity on
- *   re-render never churns the binding — React cannot compare function
- *   identities across renders without an infinite loop, unlike Vue's reactive
- *   ref comparison;
- * - the returned cleanup function detaches the currently registered listeners
- *   (upstream returns a `Fn` that stops the internal watcher); the listeners
- *   are also removed automatically on unmount;
- * - SSR-safe: nothing touches `window` during render — the default window
- *   target only resolves when `window` is defined and binding happens in the
- *   mount effect.
+ * (`source/vueuse/packages/core/useEventListener/`).
  *
  * @example
- * useEventListener(document, 'visibilitychange', (evt) => {
+ * const root = useRef(document)
+ * useEventListener(root, 'visibilitychange', (evt) => {
  *   console.log(evt)
  * })
  *
@@ -134,9 +121,9 @@ interface InferEventTarget<Events> {
  * })
  */
 export declare function useEventListener<E extends keyof WindowEventMap>(
-  event: RefOrValue<Arrayable<E>>,
-  listener: RefOrValue<Arrayable<(this: Window, ev: WindowEventMap[E]) => any>>,
-  options?: RefOrValue<boolean | AddEventListenerOptions>,
+  event: Arrayable<E>,
+  listener: Arrayable<(this: Window, ev: WindowEventMap[E]) => any>,
+  options?: boolean | AddEventListenerOptions,
 ): Fn
 /**
  * Register using addEventListener on mounted, and removeEventListener automatically on unmounted.
@@ -146,10 +133,10 @@ export declare function useEventListener<E extends keyof WindowEventMap>(
  * @see https://vueuse.org/useEventListener
  */
 export declare function useEventListener<E extends keyof WindowEventMap>(
-  target: Window,
-  event: RefOrValue<Arrayable<E>>,
-  listener: RefOrValue<Arrayable<(this: Window, ev: WindowEventMap[E]) => any>>,
-  options?: RefOrValue<boolean | AddEventListenerOptions>,
+  target: EventTargetRefs<Window>,
+  event: Arrayable<E>,
+  listener: Arrayable<(this: Window, ev: WindowEventMap[E]) => any>,
+  options?: boolean | AddEventListenerOptions,
 ): Fn
 /**
  * Register using addEventListener on mounted, and removeEventListener automatically on unmounted.
@@ -159,12 +146,10 @@ export declare function useEventListener<E extends keyof WindowEventMap>(
  * @see https://vueuse.org/useEventListener
  */
 export declare function useEventListener<E extends keyof DocumentEventMap>(
-  target: Document,
-  event: RefOrValue<Arrayable<E>>,
-  listener: RefOrValue<
-    Arrayable<(this: Document, ev: DocumentEventMap[E]) => any>
-  >,
-  options?: RefOrValue<boolean | AddEventListenerOptions>,
+  target: EventTargetRefs<Document>,
+  event: Arrayable<E>,
+  listener: Arrayable<(this: Document, ev: DocumentEventMap[E]) => any>,
+  options?: boolean | AddEventListenerOptions,
 ): Fn
 /**
  * Register using addEventListener on mounted, and removeEventListener automatically on unmounted.
@@ -174,12 +159,10 @@ export declare function useEventListener<E extends keyof DocumentEventMap>(
  * @see https://vueuse.org/useEventListener
  */
 export declare function useEventListener<E extends keyof ShadowRootEventMap>(
-  target: RefOrValue<Arrayable<ShadowRoot> | null | undefined>,
-  event: RefOrValue<Arrayable<E>>,
-  listener: RefOrValue<
-    Arrayable<(this: ShadowRoot, ev: ShadowRootEventMap[E]) => any>
-  >,
-  options?: RefOrValue<boolean | AddEventListenerOptions>,
+  target: EventTargetRefs<ShadowRoot>,
+  event: Arrayable<E>,
+  listener: Arrayable<(this: ShadowRoot, ev: ShadowRootEventMap[E]) => any>,
+  options?: boolean | AddEventListenerOptions,
 ): Fn
 /**
  * Register using addEventListener on mounted, and removeEventListener automatically on unmounted.
@@ -189,10 +172,10 @@ export declare function useEventListener<E extends keyof ShadowRootEventMap>(
  * @see https://vueuse.org/useEventListener
  */
 export declare function useEventListener<E extends keyof HTMLElementEventMap>(
-  target: RefOrValue<Arrayable<HTMLElement> | null | undefined>,
-  event: RefOrValue<Arrayable<E>>,
-  listener: RefOrValue<(this: HTMLElement, ev: HTMLElementEventMap[E]) => any>,
-  options?: RefOrValue<boolean | AddEventListenerOptions>,
+  target: EventTargetRefs<HTMLElement>,
+  event: Arrayable<E>,
+  listener: Arrayable<GeneralEventListener<HTMLElementEventMap[E]>>,
+  options?: boolean | AddEventListenerOptions,
 ): Fn
 /**
  * Register using addEventListener on mounted, and removeEventListener automatically on unmounted.
@@ -205,10 +188,10 @@ export declare function useEventListener<
   Names extends string,
   EventType = Event,
 >(
-  target: RefOrValue<Arrayable<InferEventTarget<Names>> | null | undefined>,
-  event: RefOrValue<Arrayable<Names>>,
-  listener: RefOrValue<Arrayable<GeneralEventListener<EventType>>>,
-  options?: RefOrValue<boolean | AddEventListenerOptions>,
+  target: EventTargetRefs<InferEventTarget<Names>>,
+  event: Arrayable<Names>,
+  listener: Arrayable<GeneralEventListener<EventType>>,
+  options?: boolean | AddEventListenerOptions,
 ): Fn
 /**
  * Register using addEventListener on mounted, and removeEventListener automatically on unmounted.
@@ -218,9 +201,9 @@ export declare function useEventListener<
  * @see https://vueuse.org/useEventListener
  */
 export declare function useEventListener<EventType = Event>(
-  target: RefOrValue<Arrayable<EventTarget> | null | undefined>,
-  event: RefOrValue<Arrayable<string>>,
-  listener: RefOrValue<Arrayable<GeneralEventListener<EventType>>>,
-  options?: RefOrValue<boolean | AddEventListenerOptions>,
+  target: EventTargetRefs<EventTarget>,
+  event: Arrayable<string>,
+  listener: Arrayable<GeneralEventListener<EventType>>,
+  options?: boolean | AddEventListenerOptions,
 ): Fn
 ```

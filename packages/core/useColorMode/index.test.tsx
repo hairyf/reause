@@ -195,7 +195,7 @@ describe('useColorMode', () => {
   it('should call classList.add/classList.remove only if mode changed', async () => {
     const target = document.createElement('div')
 
-    const { result, act } = await renderHook(() => useColorMode({ selector: target, initialValue: 'light' }))
+    const { result, act } = await renderHook(() => useColorMode({ selector: { current: target }, initialValue: 'light' }))
 
     const addClass = vi.spyOn(target.classList, 'add')
     const removeClass = vi.spyOn(target.classList, 'remove')
@@ -216,7 +216,7 @@ describe('useColorMode', () => {
   it('should call setAttribute only if mode changed', async () => {
     const target = document.createElement('div')
 
-    const { result, act } = await renderHook(() => useColorMode({ selector: target, initialValue: 'light', attribute: 'data-color-mode' }))
+    const { result, act } = await renderHook(() => useColorMode({ selector: { current: target }, initialValue: 'light', attribute: 'data-color-mode' }))
 
     const setAttr = vi.spyOn(target, 'setAttribute')
 

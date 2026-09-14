@@ -56,18 +56,3 @@ toggle() // 'on'
 
 Upstream allows the custom values to be reactive refs; this port accepts plain
 values only.
-
-## Caution
-
-Be aware that the toggle function accepts the first argument as the override
-value. You might want to avoid directly passing the function to event handlers,
-as the event object will be passed in:
-
-```tsx
-<>
-  {/* caution: the click event will be passed in as the forced value */}
-  <button onClick={toggle} />
-  {/* recommended to do this */}
-  <button onClick={() => toggle()} />
-</>
-```

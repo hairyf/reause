@@ -1,76 +1,60 @@
-import type { RefOrValue } from '@reause/shared'
-import { toArray, toValue, useLatest } from '@reause/shared'
-import { useMemo } from 'react'
-import { useEventListener } from '../useEventListener'
+import type { RefObject } from 'react'
+import { useLatest, useUnmount } from '@reause/shared'
+import { useEffect, useRef } from 'react'
+import { unrefElement } from '../unrefElement'
+
+/** Event names `eventName` accepts — upstream's `DocumentEventKey`. */
+type DocumentEventKey = keyof DocumentEventMap
 
 /**
- * Resolve the listener root the way upstream `getDocumentOrShadow` does: when
- * **all** targets sit inside a shadow root, listen on that shared `ShadowRoot`
- * so clicks originating inside the shadow tree are seen; otherwise fall back to
- * `document`. A missing target counts as "not in a shadow root", which keeps
- * the root on `document` — upstream `checkIfAllInShadow` returns `false` for an
- * unresolved target the same way.
+ * One target: a React ref object holding the element, resolved with `unrefElement` (AGENTS.md §2).
+ * is wider — it also takes a plain element and a `() => Element` getter, neither of which reause
+ * supports.
  */
-function resolveListenerRoot(targetElements: (Element | null | undefined)[]): Document | ShadowRoot {
-  const doc = typeof document === 'undefined' ? undefined : document
-  if (!doc || !targetElements.length || !targetElements.every(element => !!element))
-    return doc as Document
+type ClickAwayTarget = RefObject<Element | null | undefined>
 
-  const roots = targetElements.map(element => element!.getRootNode())
-  return roots.every(root => root instanceof ShadowRoot)
-    ? roots[0] as ShadowRoot
-    : doc
+/**
+ * Upstream `depsAreSame`: identity first, then element-wise `Object.is`. An equal-but-new array —
+ * the inline `['mousedown', 'touchstart']` literal — is equal, so it never re-binds the listeners.
+ */
+function depsAreSame(oldDeps: readonly unknown[], deps: readonly unknown[]): boolean {
+  if (oldDeps === deps)
+    return true
+  for (let i = 0; i < oldDeps.length; i++) {
+    if (!Object.is(oldDeps[i], deps[i]))
+      return false
+  }
+  return true
 }
 
 /**
- * Fire a handler when a click (or any other configured event) lands outside one
- * or more target elements.
- *
+ * Upstream `checkIfAllInShadow`: every target must resolve **and** sit inside a shadow root. A
+ * missing target fails the check, so the root stays `document`.
+ */
+function checkIfAllInShadow(targets: ClickAwayTarget[]): boolean {
+  return targets.every((item) => {
+    const targetElement = unrefElement(item)
+    if (!targetElement)
+      return false
+    return targetElement.getRootNode() instanceof ShadowRoot
+  })
+}
+
+/** Upstream `getShadow`. */
+function getShadow(node: Element | undefined): Document | ShadowRoot {
+  return node ? node.getRootNode() as Document | ShadowRoot : document
+}
+
+/** Upstream `getDocumentOrShadow`: the shared `ShadowRoot`, else `document`. */
+function getDocumentOrShadow(targets: ClickAwayTarget[]): Document | ShadowRoot {
+  if (!targets.length || !document.getRootNode)
+    return document
+  return checkIfAllInShadow(targets) ? getShadow(unrefElement(targets[0])) : document
+}
+
+/**
  * Map from ahooks `useClickAway`
- * (`source/ahooks/packages/hooks/src/useClickAway/index.ts`). The listener is
- * registered on `document` — or on the shared `ShadowRoot` when every target
- * lives inside one — and calls `handler` with the event as soon as the event
- * lands outside **all** of the targets.
- *
- * React divergences:
- * - **argument order is reversed on purpose.** Upstream ahooks is
- *   `(onClickAway, target, eventName)`; reause puts the target/ref first, so
- *   the call reads `useClickAway(target, handler, eventName)` — consistent with
- *   every other reause DOM hook, where the element comes first. This is an
- *   intentional signature deviation, not a mirroring mistake. (The upstream
- *   order is `(handler, target, eventName)`);
- * - a target is a plain element or a React ref-like `{ current }`, singly or in
- *   an array, per the DOM-hook rule in AGENTS.md §2 (`RefOrValue<T>`); both
- *   resolve through the shared `toValue`, which leaves DOM elements alone
- *   (it only unwraps a ref-like `.current`, a `{ value }` plain object or a
- *   getter). ahooks additionally accepts a getter function, which `RefOrValue`
- *   deliberately does not;
- * - `handler` is read through `useLatest`, so an inline arrow gets a new
- *   identity on every render without re-registering the listeners;
- * - the subscription follows the resolved target: when the target moves to
- *   another element — or into/out of a shadow root — the listener is removed
- *   from the old root and registered on the new one, mirroring upstream's
- *   `useEffectWithTarget(target)`. Both the root and the elements a click is
- *   containment-tested against are read through refs, so a re-render that keeps
- *   the same root (`document` → `document`) correctly keeps the listener and
- *   still compares against the **new** element;
- * - a target that is missing or never attached is **outside**: upstream
- *   `!targetElement || targetElement.contains(event.target)` counts an
- *   unresolved target as a match and short-circuits, so with no element to be
- *   inside of, the click fires the handler;
- * - a shadow root is a **separate event tree**. When every target lives inside
- *   one, the listener binds there and events from the outer tree — including
- *   the host's own clicks, which the composed path retargets to the host — do
- *   not reach it. That is upstream's consequence too, kept rather than changed;
- * - SSR-safe: nothing touches `document` during render besides the guarded
- *   lookup, and the listeners bind in the mount effect.
- *
- * Not a duplicate of `useClickOutside` (VueUse `onClickOutside`): the two are
- * kept side by side on purpose. `useClickAway` is the small ahooks port — a
- * single event name or an array of them, containment by `Element.contains`, and
- * no return value; `useClickOutside` carries the VueUse surface (listening on
- * `window` with `capture: true`, `ignore` selectors, `detectIframe`, a custom
- * `window`) and returns a stop function.
+ * (`source/ahooks/packages/hooks/src/useClickAway/index.ts`).
  *
  * @example
  * const target = useRef<HTMLDivElement | null>(null)
@@ -81,45 +65,75 @@ function resolveListenerRoot(targetElements: (Element | null | undefined)[]): Do
  * useClickAway([target, panelRef], handler, ['mousedown', 'touchstart'])
  */
 export function useClickAway<T extends Element>(
-  target: RefOrValue<T> | RefOrValue<T>[],
+  target: RefObject<T | null> | RefObject<T | null>[],
   handler: (event: Event) => void,
-  eventName?: string | string[],
+  eventName: DocumentEventKey | DocumentEventKey[] = 'click',
 ): void {
   const handlerRef = useLatest(handler)
 
-  // `target` is usually an inline array or a fresh element on every render; the
-  // memo keys on the caller's identity so an unchanged target does not churn
-  // the values below into a re-bind.
-  const targetElements = useMemo(
-    () => toArray(target).map(item => toValue(item)),
-    [target],
-  )
+  // ── upstream `useEffectWithTarget` ──
+  // No dependency array on purpose: the effect runs after **every** commit,
+  // re-resolves the targets and re-binds only when the resolved elements or the
+  // event names actually changed. The cleanup is held in a ref and run on
+  // unmount, so a re-render that changes nothing keeps the current listeners.
+  const hasInitRef = useRef(false)
+  const lastElementRef = useRef<(Element | undefined)[]>([])
+  const lastDepsRef = useRef<readonly unknown[]>([])
+  const unLoadRef = useRef<(() => void) | undefined>(undefined)
 
-  // Where the listener binds (`document` or the shared `ShadowRoot`) is derived
-  // from the resolved elements, so it changes exactly when the targets move
-  // between roots.
-  const listenerRoot = useMemo(() => resolveListenerRoot(targetElements), [targetElements])
+  useEffect(() => {
+    const targets = Array.isArray(target) ? target : [target]
+    const els = targets.map(item => unrefElement(item))
+    const deps: readonly unknown[] = Array.isArray(eventName) ? eventName : [eventName]
 
-  // Latest-value mirror of the resolved elements, read by the bound listener.
-  // The listener itself is latest-tracked by `useEventListener`, but it must not
-  // *close over* one render's targets: two different elements share the
-  // `document` root, so the subscription may legitimately stay in place while
-  // the target changes — without this ref it would keep testing the old element.
-  const targetElementsRef = useLatest(targetElements)
+    const effect = (): (() => void) => {
+      const eventHandler = (event: Event) => {
+        // Upstream's containment test: a target that does not resolve counts as
+        // a match, so a missing target swallows the click instead of firing.
+        const inside = targets.some((item) => {
+          const targetElement = unrefElement(item)
+          return !targetElement || targetElement.contains(event.target as Node)
+        })
 
-  // A fresh array every render is fine: `useEventListener` compares the
-  // resolved names element-wise, so an equal-but-new array never re-binds while
-  // a genuinely different set of names does.
-  const eventNames = Array.isArray(eventName) ? eventName : [eventName ?? 'click']
+        if (!inside)
+          handlerRef.current(event)
+      }
 
-  useEventListener([listenerRoot], eventNames, (event: Event) => {
-    const outside = targetElementsRef.current.every((targetElement) => {
-      if (!targetElement)
-        return true
-      return !(event.target instanceof Node) || !targetElement.contains(event.target)
-    })
+      const documentOrShadow = getDocumentOrShadow(targets)
+      const eventNames = Array.isArray(eventName) ? eventName : [eventName]
 
-    if (outside)
-      handlerRef.current(event)
+      eventNames.forEach(event => documentOrShadow.addEventListener(event, eventHandler))
+
+      return () => {
+        eventNames.forEach(event => documentOrShadow.removeEventListener(event, eventHandler))
+      }
+    }
+
+    // init run
+    if (!hasInitRef.current) {
+      hasInitRef.current = true
+      lastElementRef.current = els
+      lastDepsRef.current = deps
+      unLoadRef.current = effect()
+      return
+    }
+
+    if (
+      els.length !== lastElementRef.current.length
+      || !depsAreSame(lastElementRef.current, els)
+      || !depsAreSame(lastDepsRef.current, deps)
+    ) {
+      unLoadRef.current?.()
+      lastElementRef.current = els
+      lastDepsRef.current = deps
+      unLoadRef.current = effect()
+    }
+  })
+
+  useUnmount(() => {
+    unLoadRef.current?.()
+    // for react-refresh: a remount must init again, not compare against a
+    // listener that was already removed (upstream `createEffectWithTarget`)
+    hasInitRef.current = false
   })
 }

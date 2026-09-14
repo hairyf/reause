@@ -1,4 +1,3 @@
-import type { WebSocketHeartbeatMessage } from '../useWebSocket'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { renderHook } from 'vitest-browser-react'
 import { useWebSocket } from '../useWebSocket'
@@ -425,10 +424,12 @@ describe('useWebSocket', () => {
       expect(mockWebSocket.prototype.send).toBeCalledWith('ping')
     })
 
-    it('should unwrap a ref-like responseMessage', async () => {
+    it('should resolve a responseMessage factory on every tick', async () => {
       const { result, act } = await renderHook(() => useWebSocket('ws://localhost', {
         heartbeat: {
-          responseMessage: { current: 'pong' } as unknown as WebSocketHeartbeatMessage,
+          // reause keeps the message-factory arm of upstream's `MaybeRefOrGetter`
+          // and drops the ref arm — a `{ current }` object is not unwrapped
+          responseMessage: () => 'pong',
         },
       }))
 

@@ -52,16 +52,7 @@ export type UseArrayReducer<PV, CV, R> = (
 ) => R
 export type UseArrayReduceReturn<T = any> = T
 /**
- * Reactive `Array.reduce`
- *
- * Map from @vueuse/shared `useArrayReduce`
- * React port of VueUse's `useArrayReduce`.
- *
- * Mapping: upstream wraps `toValue(list).reduce(...)` in `computed(() => ...)`
- * and returns a `ComputedRef`; React has no reactive value tracking, so this
- * is a plain function recomputed on every render over the plain `list` array
- * the caller passes. Hold the array in `useState` and pass a new array to
- * observe a change — the reduced result recomputes on the next render.
+ * Map from @vueuse/shared `useArrayReduce`.
  *
  * @see https://vueuse.org/shared/useArrayReduce/
  *

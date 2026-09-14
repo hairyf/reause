@@ -40,16 +40,7 @@ the render that passes a new array.
 ```ts
 export type UseArrayFindLastReturn<T = any> = T | undefined
 /**
- * React port of VueUse's `useArrayFindLast`.
- *
- * Map from @vueuse/shared `useArrayFindLast`
- * Mapping: upstream wraps native `Array.prototype.findLast` (with a loop
- * fallback for runtimes without it) in `computed(() => ...)` and returns a
- * `ComputedRef`; React has no reactive value tracking, so this is a plain
- * function recomputed on every render over the plain `list` array the caller
- * passes — the loop helper stands in for the native method since the repo
- * targets lib ES2022. Hold the array in `useState` and pass a new array to
- * observe a change — the last match is returned on the next render.
+ * Map from @vueuse/shared `useArrayFindLast`.
  *
  * @see https://vueuse.org/shared/useArrayFindLast/
  *

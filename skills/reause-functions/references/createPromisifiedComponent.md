@@ -160,13 +160,6 @@ The render prop provides the following props:
 </Promisified>
 ```
 
-### React divergences from upstream
-
-- **children-as-function replaces `v-slot`.** The template is a render function passed as the children of the component; it receives the instance props (promise, resolve, reject, args, isResolving, options, key).
-- **`resolve` / `reject` from event handlers or effects.** Vue's reactivity tolerates calling `resolve` during the slot render; React does not allow store updates during render, so call them from handlers (see the demo).
-- **`transition` is a no-op.** Accepted for API parity; see the Transition section.
-- **Promises survive unmount.** Instances live in the factory closure, so unmounting the component does not settle its pending promises — they resolve once `resolve` is called, and re-mounting the component re-renders the remaining instances.
-
 ## Motivation
 
 The common approach to call a dialog or a modal programmatically would be like this:
@@ -229,9 +222,8 @@ export interface PromisifiedComponentProps<Return, Args extends any[] = []> {
    */
   args: Args
   /**
-   * Indicates if the promise is resolving.
-   * When passing another promise to `resolve`, this will be set to `true`
-   * until the promise is resolved.
+   * Indicates if the promise is resolving. When passing another promise to `resolve`, this will be
+   * set to `true` until the promise is resolved.
    */
   isResolving: boolean
   /**
@@ -251,10 +243,9 @@ export interface PromisifiedComponentOptions {
    */
   singleton?: boolean
   /**
-   * Transition props for the promise. Accepted for API parity with upstream
-   * (Vue's `TransitionGroupProps`); React has no built-in transition-group
-   * system, so this has no runtime effect — animate the rendered template
-   * with CSS or a transition library instead.
+   * Transition props for the promise. Accepted for API parity with upstream (Vue's
+   * `TransitionGroupProps`); React has no built-in transition-group system, so this has no runtime
+   * effect — animate the rendered template with CSS or a transition library instead.
    */
   transition?: Record<string, any>
 }
@@ -263,45 +254,16 @@ export type PromisifiedComponent<
   Args extends any[] = [],
 > = ComponentType<{
   /**
-   * The template to render for each active promise instance — a render prop
-   * receiving the instance props (the React equivalent of upstream's
-   * `v-slot`).
+   * The template to render for each active promise instance — a render prop receiving the instance
+   * props (the React equivalent of upstream's `v-slot`).
    */
   children: (props: PromisifiedComponentProps<Return, Args>) => ReactNode
 }> & {
   start: (...args: Args) => Promise<Return>
 }
 /**
- * Creates a promisified component — React port of VueUse's
- * `createTemplatePromise`.
- *
  * Map from @vueuse/core `createTemplatePromise`
- * (`source/vueuse/packages/core/createTemplatePromise/`). The factory returns
- * a component that renders one template instance per active promise: each
- * `start(...)` call creates an instance (with the passed args), mounts the
- * template and returns a promise that settles when the template calls
- * `resolve` / `reject`. Once settled, the instance is removed and the
- * template unmounts automatically.
- *
- * React divergences from upstream:
- * - the template is a **children-as-function render prop** instead of a
- *   `v-slot`: the function receives the instance props (promise, resolve,
- *   reject, args, isResolving, options, key);
- * - the reactive instances list (upstream: a `deepRef` array) is backed by a
- *   `useSyncExternalStore` store in the factory closure, so mutations from
- *   `start` / `resolve` / `reject` re-render the mounted templates;
- * - `resolve` / `reject` must be called from event handlers or effects, not
- *   during render (Vue's reactivity tolerates in-render mutation, React does
- *   not);
- * - `transition` is accepted for API parity but has no runtime effect — React
- *   has no built-in transition-group system;
- * - instances live in the factory closure, so an unmounted component does not
- *   settle its pending promises: they resolve once `resolve` is called, and
- *   re-mounting the component re-renders the remaining instances.
- *
- * SSR-safe: nothing touches `window` or the DOM during render — the instance
- * list only gains entries when `start()` is called (i.e. in effects or event
- * handlers), so server renders are empty.
+ * (`source/vueuse/packages/core/createTemplatePromise/`).
  *
  * @see https://vueuse.org/core/createTemplatePromise/
  *

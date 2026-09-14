@@ -5,12 +5,11 @@ export type RouteParamValueRaw = string | number | boolean | null | (string | nu
 
 export interface UseParamsOptions<T, K> {
   /**
-   * Path template used to locate the param in `window.location.pathname`,
-   * e.g. `'/users/:userId'`. A segment starting with `:` captures the
-   * corresponding pathname segment; plain segments must match literally. In
-   * vue-router this route config comes from the router itself, so here it has
-   * to be passed explicitly — without it the hook cannot locate the param and
-   * exposes `defaultValue` (it never throws).
+   * Path template used to locate the param in `window.location.pathname`, e.g. `'/users/:userId'`.
+   * A segment starting with `:` captures the corresponding pathname segment; plain segments must
+   * match literally. In vue-router this route config comes from the router itself, so here it has
+   * to be passed explicitly — without it the hook cannot locate the param and exposes
+   * `defaultValue` (it never throws).
    */
   pattern?: string
 
@@ -27,9 +26,8 @@ export interface UseParamsOptions<T, K> {
   mode?: 'replace' | 'push'
 
   /**
-   * Function to transform data before return, or an object with one or both
-   * functions: `get` to transform data before returning, and `set` to
-   * transform data before setting.
+   * Function to transform data before return, or an object with one or both functions: `get` to
+   * transform data before returning, and `set` to transform data before setting.
    */
   transform?:
     | ((value: T) => K)
@@ -40,17 +38,15 @@ export interface UseParamsOptions<T, K> {
 }
 
 /**
- * Resolve the global `window`, or `undefined` on the server. Never called
- * during render.
+ * Resolve the global `window`, or `undefined` on the server. Never called during render.
  */
 function getWindow(): Window | undefined {
   return typeof window === 'undefined' ? undefined : window
 }
 
 /**
- * Decode a captured path segment, falling back to the raw segment when the
- * browser hands us a malformed percent-encoding (`decodeURIComponent` throws
- * on input like `'100%'`).
+ * Decode a captured path segment, falling back to the raw segment when the browser hands us a
+ * malformed percent-encoding (`decodeURIComponent` throws on input like `'100%'`).
  */
 function decodeSegment(segment: string): string {
   try {
@@ -62,12 +58,11 @@ function decodeSegment(segment: string): string {
 }
 
 /**
- * Match `pathname` against the `pattern` path template: a pattern segment
- * starting with `:` captures the corresponding pathname segment (decoded), a
- * plain segment must match literally, and both sides need the same number of
- * segments. The value of every `:name` capture is collected, so a repeated
- * `:name` in the pattern yields a `string[]`; a single occurrence yields the
- * bare string, and a mismatch (or an absent pattern) is `undefined`.
+ * Match `pathname` against the `pattern` path template: a pattern segment starting with `:`
+ * captures the corresponding pathname segment (decoded), a plain segment must match literally, and
+ * both sides need the same number of segments. The value of every `:name` capture is collected, so
+ * a repeated `:name` in the pattern yields a `string[]`; a single occurrence yields the bare
+ * string, and a mismatch (or an absent pattern) is `undefined`.
  */
 function readRawParam(win: Window, name: string, pattern: string | undefined): string | string[] | undefined {
   if (!pattern)
@@ -102,66 +97,8 @@ export function useParams<T extends RouteParamValueRaw = string, K = T>(
 ): [K, (value: K) => void]
 
 /**
- * Shorthand for a reactive path parameter, read from `window.location.pathname`
- * against a `pattern` path template.
- *
  * Map from @vueuse/router `useRouteParams`
- * (`source/vueuse/packages/router/useRouteParams/`), which proxies
- * `route.params[name]` through vue-router. Here `window.location.pathname` is
- * the single source of truth, so the router dependency is dropped entirely:
- * the hook reads and writes `window.location` / `history` directly.
- *
- * Return tuple follows this repo's React idiom:
- * `const [userId, setUserId] = useParams('userId', '', { pattern: '/users/:userId' })`
- * (upstream returns a single writable Vue ref).
- *
- * Reading:
- *
- * - `pattern` is the route config that vue-router would otherwise own — a path
- *   template (`'/users/:userId'`) whose `:name` segments capture the matching
- *   `window.location.pathname` segment. Plain segments must match literally.
- *   Without a `pattern` the hook cannot locate the param, so it exposes
- *   `defaultValue` (upstream throws without a matching route; here it never
- *   throws).
- * - A present capture is the decoded segment: the bare string, or a
- *   `string[]` when the same `:name` repeats in the pattern. An absent or
- *   empty (`''`) capture counts as missing and falls back to `defaultValue`
- *   (upstream: `param !== undefined && param !== '' ? param :
- *   toValue(defaultValue)`). A `pattern` that does not match the current
- *   pathname also yields `defaultValue`.
- * - The `transformGet` (default identity) applies to whichever value wins.
- * - Writing mirrors upstream's setter: the value is passed through
- *   `transformSet` (default identity) and every `:name` segment of the
- *   pattern is replaced with the encoded value (`encodeURIComponent`). A value
- *   strictly equal to `defaultValue` — or `null` — removes the param instead
- *   (the segment is emptied; upstream stores `undefined`). The current search
- *   and hash are preserved.
- *
- * React divergences from upstream:
- *
- * 1. The `route` / `router` options are gone — `window.location.pathname` and
- *    `history` are the driver, and `mode` picks `history.replaceState`
- *    (default, mirroring upstream's `'replace'`) or `history.pushState`.
- * 2. The value is React state rather than a `customRef`, so it settles on the
- *    next render after `setValue` instead of upstream's synchronous
- *    `trigger()`; the URL write itself is still synchronous.
- * 3. Neither `replaceState` nor `pushState` fires a `hashchange`/`popstate`
- *    event, so the setter refreshes its own state. `popstate` (back/forward)
- *    and `hashchange` (manual edits, anchor navigation) are subscribed in an
- *    effect and removed on unmount. `pushState` by other code fires neither,
- *    matching how `useHash` handles it.
- * 4. Upstream batches multi-key writes per tick through a queue and pushes a
- *    single router navigation; here each `setValue` performs its own history
- *    update immediately.
- * 5. There is no multi-page router context to resolve — the hook is scoped to
- *    the current `window.location` only.
- * 6. SSR-safe: render never touches `window` (state starts at
- *    `defaultValue`), the URL is first read in a mount effect, and `setValue`
- *    is a no-op without a `window` — or without a `pattern` to place the value
- *    in.
- * 7. A `defaultValue` that changes across renders is re-synced while the
- *    capture is absent or empty (the React equivalent of upstream's reactive
- *    `toValue(defaultValue)`).
+ * (`source/vueuse/packages/router/useRouteParams/`).
  *
  * @see https://vueuse.org/router/useRouteParams/
  *

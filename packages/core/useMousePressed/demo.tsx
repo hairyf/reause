@@ -14,7 +14,7 @@ export default function UseMousePressedDemo() {
         {`pressed: ${pressed}\nsourceType: ${sourceType}`}
       </pre>
       <div>
-        Tracking on
+        <p>Tracking on</p>
         <button className="ml-2 button small" onClick={() => setWithTarget(v => !v)}>
           {withTarget ? 'Demo section' : 'Entire page'}
         </button>

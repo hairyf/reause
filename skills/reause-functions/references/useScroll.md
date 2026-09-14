@@ -86,8 +86,8 @@ export interface UseScrollOptions extends ConfigurableWindow {
    */
   throttle?: number
   /**
-   * The check time when scrolling ends.
-   * This configuration will be setting to (throttle + idle) when the `throttle` is configured.
+   * The check time when scrolling ends. This configuration will be setting to (throttle + idle)
+   * when the `throttle` is configured.
    *
    * @default 200
    */
@@ -102,8 +102,8 @@ export interface UseScrollOptions extends ConfigurableWindow {
     bottom?: number
   }
   /**
-   * Use MutationObserver to monitor specific DOM changes,
-   * such as attribute modifications, child node additions or removals, or subtree changes.
+   * Use MutationObserver to monitor specific DOM changes, such as attribute modifications, child
+   * node additions or removals, or subtree changes.
    * @default { mutation: boolean }
    */
   observe?:
@@ -126,11 +126,11 @@ export interface UseScrollOptions extends ConfigurableWindow {
    */
   eventListenerOptions?: boolean | AddEventListenerOptions
   /**
-   * Optionally specify a scroll behavior of `auto` (default, not smooth scrolling) or
-   * `smooth` (for smooth scrolling) which takes effect when scrolling via `setX` / `setY`.
+   * Optionally specify a scroll behavior of `auto` (default, not smooth scrolling) or `smooth` (for
+   * smooth scrolling) which takes effect when scrolling via `setX` / `setY`.
    *
-   * React divergence: plain value only — upstream also accepts a getter/`ref` here, but
-   * this read-only value-source option stays a plain `ScrollBehavior`.
+   * React divergence: plain value only — upstream also accepts a getter/`ref` here, but this
+   * read-only value-source option stays a plain `ScrollBehavior`.
    *
    * @default 'auto'
    */
@@ -152,8 +152,8 @@ export interface UseScrollReturn {
    */
   y: number
   /**
-   * Whether the element is scrolling. Resets to `false` after `idle`
-   * milliseconds without scroll events.
+   * Whether the element is scrolling. Resets to `false` after `idle` milliseconds without scroll
+   * events.
    */
   isScrolling: boolean
   /**
@@ -188,37 +188,8 @@ export interface UseScrollReturn {
   setY: (y: number) => void
 }
 /**
- * Reactive scroll position and state.
- *
  * Map from @vueuse/core `useScroll`
- * (`source/vueuse/packages/core/useScroll/`): tracks the scroll position of an
- * element (or `window` / `document`), whether it is currently scrolling, which
- * edges it has arrived at within `offset` pixels and the per-axis scroll
- * `directions`. The optional `observe` flag registers a MutationObserver that
- * re-measures after DOM changes (attribute, child or subtree mutations).
- *
- * React divergences from upstream:
- *
- * 1. Upstream's writable `x` / `y` computed refs become plain `number` state
- *    plus the `setX` / `setY` callbacks that scroll the element (write the
- *    refs instead). Scroll events are batched by React, so all values settle
- *    together.
- * 2. The `scroll` / `scrollend` listeners are registered inline in a
- *    `useEffect` with cleanup (upstream composes `useEventListener`), and the
- *    idle reset is a `useDebounceFn` from `@reause/shared` (upstream composes
- *    it from `@vueuse/shared` too). The scroll handler is wrapped in a shared
- *    `useThrottleFn` when `throttle > 0`; at `throttle = 0` the raw handler is
- *    registered instead, mirroring upstream.
- * 3. The optional MutationObserver (upstream composes `useMutationObserver`)
- *    is a self-contained observer inside the same effect, disconnected on
- *    unmount.
- * 4. `element` accepts a plain element or a ref-like `{ current }` object
- *    (upstream: `RefOrValue`). It is re-resolved on every render
- *    and the listeners re-bind when the resolved element changes, so a
- *    `useRef` target that is `null` during first render still binds once
- *    React attaches the element.
- * 5. SSR-safe: nothing touches `window` or the DOM during render — the
- *    initial measure and the listeners live in the mount effect only.
+ * (`source/vueuse/packages/core/useScroll/`).
  *
  * @example
  * const el = useRef<HTMLDivElement>(null)
@@ -226,7 +197,7 @@ export interface UseScrollReturn {
  * setX(100) // scroll to x = 100
  */
 export declare function useScroll(
-  element: RefOrValue<UseScrollElement>,
+  element: RefObject<UseScrollElement | null>,
   options?: UseScrollOptions,
 ): UseScrollReturn
 ```

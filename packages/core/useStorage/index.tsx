@@ -10,9 +10,8 @@ interface Serializer<T> {
 }
 
 /**
- * Minimal storage backend contract — `Storage` satisfies it structurally, so
- * `window.localStorage` / `window.sessionStorage` and custom Map-backed
- * implementations all work.
+ * Minimal storage backend contract — `Storage` satisfies it structurally, so `window.localStorage`
+ * / `window.sessionStorage` and custom Map-backed implementations all work.
  */
 export interface StorageLike {
   getItem: (key: string) => string | null
@@ -21,8 +20,8 @@ export interface StorageLike {
 }
 
 /**
- * Event payload shared by real `storage` events and the custom
- * same-document sync event dispatched for `StorageLike` backends.
+ * Event payload shared by real `storage` events and the custom same-document sync event dispatched
+ * for `StorageLike` backends.
  */
 export interface StorageEventLike {
   storageArea: StorageLike | null
@@ -32,16 +31,15 @@ export interface StorageEventLike {
 }
 
 /**
- * Event name used for same-document sync when the backend is a custom
- * `StorageLike` (a real `StorageEvent` cannot be constructed with a
- * non-built-in storage area, mirroring upstream).
+ * Event name used for same-document sync when the backend is a custom `StorageLike` (a real
+ * `StorageEvent` cannot be constructed with a non-built-in storage area, mirroring upstream).
  */
 export const customStorageEventName = 'reause-storage'
 
 /**
- * Serializer registry selected automatically from the type of the default
- * value: strings stay raw, `boolean`/`number` via `String()`, objects via
- * JSON, `Map`/`Set` via JSON entries, `Date` via ISO string.
+ * Serializer registry selected automatically from the type of the default value: strings stay raw,
+ * `boolean`/`number` via `String()`, objects via JSON, `Map`/`Set` via JSON entries, `Date` via ISO
+ * string.
  */
 export const StorageSerializers: Record<'boolean' | 'object' | 'number' | 'any' | 'string' | 'map' | 'set' | 'date', Serializer<any>> = {
   boolean: {
@@ -79,23 +77,20 @@ export const StorageSerializers: Record<'boolean' | 'object' | 'number' | 'any' 
 }
 
 /**
- * Options captured from upstream's `UseStorageOptions` — only the parts that
- * translate to a React hook. Vue reactivity options (`flush`, `deep`,
- * `eventFilter`, `shallow`, `initOnMounted`) have no equivalent and are
- * omitted; see the hook's divergence notes. Upstream extends
- * `ConfigurableWindow`, but the interface stays expanded here so the option
- * can be declared inline.
+ * Options captured from upstream's `UseStorageOptions` — only the parts that translate to a React
+ * hook. Vue reactivity options (`flush`, `deep`, `eventFilter`, `shallow`, `initOnMounted`) have no
+ * equivalent and are omitted; see the hook's divergence notes. Upstream extends
+ * `ConfigurableWindow`, but the interface stays expanded here so the option can be declared inline.
  */
 export interface UseStorageOptions<T> {
   /**
-   * Specify a custom `window` instance, e.g. working with iframes or in
-   * testing environments.
+   * Specify a custom `window` instance, e.g. working with iframes or in testing environments.
    */
   window?: Window
 
   /**
-   * Listen to storage changes — useful for multiple tabs applications and
-   * for hook instances sharing the same key within the same document.
+   * Listen to storage changes — useful for multiple tabs applications and for hook instances
+   * sharing the same key within the same document.
    *
    * @default true
    */
@@ -111,16 +106,15 @@ export interface UseStorageOptions<T> {
   /**
    * Merge the default value with the value read from the storage.
    *
-   * When setting it to `true`, it will perform a **shallow merge** for
-   * objects. You can pass a function to perform a custom merge, for example:
+   * When setting it to `true`, it will perform a **shallow merge** for objects. You can pass a
+   * function to perform a custom merge, for example:
    *
    * @default false
    */
   mergeDefaults?: boolean | ((storageValue: T, defaults: T) => T)
 
   /**
-   * Custom data serialization. Defaults are selected per type from
-   * `StorageSerializers`.
+   * Custom data serialization. Defaults are selected per type from `StorageSerializers`.
    */
   serializer?: Serializer<T>
 
@@ -174,41 +168,8 @@ export function useStorage<T>(key: string, defaults: T | (() => T), storage?: St
 export function useStorage<T = unknown>(key: string, defaults: null, storage?: StorageLike, options?: UseStorageOptions<T>): UseStorageReturn<T>
 
 /**
- * Reactive LocalStorage/SessionStorage — React port of VueUse's `useStorage`.
- *
  * Map from @vueuse/core `useStorage`
- * (`source/vueuse/packages/core/useStorage/`). Create a state tuple synced to
- * [LocalStorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage)
- * (or a custom `StorageLike` backend): the value is persisted under `key`,
- * re-read on mount and key change, and kept in sync across tabs and across
- * hook instances sharing the same key.
- *
- * React divergences:
- * - the Vue `RemovableRef<T>` return becomes a `useState`-backed tuple;
- *   `setValue` also accepts a function updater. `setValue(null)` removes the
- *   entry from storage and the state falls back to the initial value,
- *   mirroring upstream where the self storage-event echo restores the raw
- *   defaults;
- * - `key` and `defaults` are plain values (upstream takes `RefOrValue`);
- *   changing `key` between renders re-reads the new key, and writes always go
- *   to the key of the current render. A function `defaults` is a lazy
- *   initializer (React `useState` convention, like upstream's getter form)
- *   and is resolved once at mount;
- * - storage is never touched during render: the first read happens in the
- *   mount effect (SSR-safe — the server renders the initial value). When no
- *   storage is available the hook degrades to in-memory state without
- *   touching storage, mirroring upstream's early return; the fallback reads
- *   `window.localStorage` directly instead of going through upstream's
- *   `getSSRHandler('getDefaultStorage')` indirection;
- * - real `storage` events only fire across documents, so same-document sync
- *   re-dispatches a synthetic event on `window` — a real `StorageEvent` for
- *   `Storage` backends, `customStorageEventName` for custom `StorageLike`
- *   ones (mirroring upstream);
- * - Vue reactivity options have no React equivalent and are omitted:
- *   `flush`/`deep`/`eventFilter` (writes happen synchronously inside
- *   `setValue`), `shallow` (React state is replaced wholesale) and
- *   `initOnMounted` (effectively always on — the first read happens in the
- *   mount effect).
+ * (`source/vueuse/packages/core/useStorage/`).
  *
  * @example
  * const [state, setState] = useStorage('my-store', { hello: 'hi', greeting: 'Hello' })

@@ -102,7 +102,7 @@ describe('useDraggable', () => {
 
   describe('core functionality', () => {
     it('should have default values', async () => {
-      const { result } = await renderHook(() => useDraggable(undefined))
+      const { result } = await renderHook(() => useDraggable({ current: undefined }))
 
       expect(result.current.x).toBe(0)
       expect(result.current.y).toBe(0)
@@ -112,7 +112,7 @@ describe('useDraggable', () => {
     })
 
     it('should respect initial values', async () => {
-      const { result } = await renderHook(() => useDraggable(el, { initialValue: { x: 100, y: 200 } }))
+      const { result } = await renderHook(() => useDraggable({ current: el }, { initialValue: { x: 100, y: 200 } }))
 
       expect(result.current.x).toBe(100)
       expect(result.current.y).toBe(200)
@@ -134,8 +134,8 @@ describe('useDraggable', () => {
       expect(result.current.y).toBe(7)
     })
 
-    it('should accept a plain element target', async () => {
-      const { result, act } = await renderHook(() => useDraggable(el))
+    it('should accept an inline ref target', async () => {
+      const { result, act } = await renderHook(() => useDraggable({ current: el }))
 
       await act(() => {
         el.dispatchEvent(new PointerEvent('pointerdown', { clientX: 0, clientY: 0 }))
@@ -154,7 +154,7 @@ describe('useDraggable', () => {
       const onMove = vi.fn()
       const onEnd = vi.fn()
 
-      const { result, act } = await renderHook(() => useDraggable(el, {
+      const { result, act } = await renderHook(() => useDraggable({ current: el }, {
         preventDefault: true,
         onMove,
         onEnd,
@@ -199,7 +199,7 @@ describe('useDraggable', () => {
     it('ends the drag when the pointer is canceled', async () => {
       const onEnd = vi.fn()
 
-      const { result, act } = await renderHook(() => useDraggable(el, { onEnd }))
+      const { result, act } = await renderHook(() => useDraggable({ current: el }, { onEnd }))
 
       await act(() => {
         el.dispatchEvent(new PointerEvent('pointerdown', { clientX: 0, clientY: 0 }))
@@ -219,7 +219,7 @@ describe('useDraggable', () => {
     it('does not start dragging when onStart returns false', async () => {
       const onStart = vi.fn(() => false as const)
 
-      const { result, act } = await renderHook(() => useDraggable(el, { onStart }))
+      const { result, act } = await renderHook(() => useDraggable({ current: el }, { onStart }))
 
       await act(() => {
         el.dispatchEvent(new PointerEvent('pointerdown', { clientX: 0, clientY: 0 }))
@@ -239,7 +239,7 @@ describe('useDraggable', () => {
     it('should support dragging behavior to the correct position', async () => {
       const initialValue = { x: 50, y: 50 }
 
-      const { result, act } = await renderHook(() => useDraggable(el, { initialValue }))
+      const { result, act } = await renderHook(() => useDraggable({ current: el }, { initialValue }))
 
       await act(() => {
         el.dispatchEvent(new PointerEvent('pointerdown', { clientX: 0, clientY: 0, ...basePointerEventOptions }))
@@ -256,7 +256,7 @@ describe('useDraggable', () => {
     it('should respect axis constraints during drag operations', async () => {
       const initialValue = { x: 50, y: 50 }
 
-      const { result, act } = await renderHook(() => useDraggable(el, { initialValue, axis: 'y' }))
+      const { result, act } = await renderHook(() => useDraggable({ current: el }, { initialValue, axis: 'y' }))
 
       await act(() => {
         el.dispatchEvent(new PointerEvent('pointerdown', { clientX: 0, clientY: 0, ...basePointerEventOptions }))
@@ -272,7 +272,7 @@ describe('useDraggable', () => {
     it('should disable dragging behaviour', async () => {
       const initialValue = { x: 50, y: 50 }
 
-      const { result, act } = await renderHook(() => useDraggable(el, { initialValue, disabled: true }))
+      const { result, act } = await renderHook(() => useDraggable({ current: el }, { initialValue, disabled: true }))
 
       await act(() => {
         el.dispatchEvent(new PointerEvent('pointerdown', { clientX: 0, clientY: 0, ...basePointerEventOptions }))
@@ -287,7 +287,7 @@ describe('useDraggable', () => {
     })
 
     it('should update position when x/y changed via setX/setY', async () => {
-      const { result, act } = await renderHook(() => useDraggable(el))
+      const { result, act } = await renderHook(() => useDraggable({ current: el }))
 
       await act(() => {
         result.current.setX(50)
@@ -302,7 +302,7 @@ describe('useDraggable', () => {
     })
 
     it('should filter dragging by the allowed mouse buttons', async () => {
-      const { result, act } = await renderHook(() => useDraggable(el))
+      const { result, act } = await renderHook(() => useDraggable({ current: el }))
 
       // default `buttons: [0]` — a right-button (2) drag must not start
       await act(() => {
@@ -317,7 +317,7 @@ describe('useDraggable', () => {
     })
 
     it('should respect a custom buttons option', async () => {
-      const { result, act } = await renderHook(() => useDraggable(el, { buttons: [2] }))
+      const { result, act } = await renderHook(() => useDraggable({ current: el }, { buttons: [2] }))
 
       await act(() => {
         el.dispatchEvent(new PointerEvent('pointerdown', { clientX: 0, clientY: 0, button: 2, ...basePointerEventOptions }))
@@ -347,9 +347,9 @@ describe('useDraggable', () => {
       document.body.appendChild(container)
 
       try {
-        const { result, act } = await renderHook(() => useDraggable(dragEl, {
+        const { result, act } = await renderHook(() => useDraggable({ current: dragEl }, {
           initialValue: { x: 100, y: 100 },
-          containerElement: container,
+          containerElement: { current: container },
           restrictInView: true,
         }))
 
@@ -416,10 +416,10 @@ describe('useDraggable', () => {
 
     it('should auto-scroll horizontally when dragging near right edge', async () => {
       const { container, el, initialValue, autoScroll } = mountDraggableAutoScroll()
-      const { unmount } = await renderHook(() => useDraggable(el, {
+      const { unmount } = await renderHook(() => useDraggable({ current: el }, {
         initialValue,
         autoScroll,
-        containerElement: container,
+        containerElement: { current: container },
       }))
 
       const dragOffset = 10
@@ -442,10 +442,10 @@ describe('useDraggable', () => {
 
     it('should auto-scroll vertically when dragging near bottom edge', async () => {
       const { container, el, initialValue, autoScroll } = mountDraggableAutoScroll()
-      const { unmount } = await renderHook(() => useDraggable(el, {
+      const { unmount } = await renderHook(() => useDraggable({ current: el }, {
         initialValue,
         autoScroll,
-        containerElement: container,
+        containerElement: { current: container },
       }))
 
       const dragOffset = 10
@@ -468,10 +468,10 @@ describe('useDraggable', () => {
 
     it('should NOT auto-scroll when dragging outside the margin', async () => {
       const { container, el, initialValue, autoScroll } = mountDraggableAutoScroll()
-      const { unmount } = await renderHook(() => useDraggable(el, {
+      const { unmount } = await renderHook(() => useDraggable({ current: el }, {
         initialValue,
         autoScroll,
-        containerElement: container,
+        containerElement: { current: container },
       }))
 
       const dragOffset = 10
@@ -498,10 +498,10 @@ describe('useDraggable', () => {
 
     it('should auto-scroll both axes when dragging in the bottom-right corner', async () => {
       const { container, el, initialValue, autoScroll } = mountDraggableAutoScroll()
-      const { unmount } = await renderHook(() => useDraggable(el, {
+      const { unmount } = await renderHook(() => useDraggable({ current: el }, {
         initialValue,
         autoScroll,
-        containerElement: container,
+        containerElement: { current: container },
       }))
 
       const dragOffset = 10
@@ -529,10 +529,10 @@ describe('useDraggable', () => {
       const { container, el, initialValue, autoScroll } = mountDraggableAutoScroll({
         autoScroll: { margin: 30, speed: customSpeed },
       })
-      const { unmount } = await renderHook(() => useDraggable(el, {
+      const { unmount } = await renderHook(() => useDraggable({ current: el }, {
         initialValue,
         autoScroll,
-        containerElement: container,
+        containerElement: { current: container },
       }))
 
       const dragOffset = 10

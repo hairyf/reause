@@ -17,9 +17,8 @@ export interface UseJwtOptions<Fallback> {
 }
 
 /**
- * React return type: a plain object with two distinct-typed named fields —
- * the value analog of the upstream `ComputedRef`s. `header` and `payload` are
- * decoded values (or `Fallback`), NOT refs.
+ * React return type: a plain object with two distinct-typed named fields — the value analog of the
+ * upstream `ComputedRef`s. `header` and `payload` are decoded values (or `Fallback`), NOT refs.
  */
 export interface UseJwtReturn<Payload, Header, Fallback> {
   header: Header | Fallback
@@ -27,24 +26,8 @@ export interface UseJwtReturn<Payload, Header, Fallback> {
 }
 
 /**
- * React port of VueUse's `useJwt`.
- *
  * Map from @vueuse/integrations `useJwt`
- * (`source/vueuse/packages/integrations/useJwt/`), a wrapper for
- * [`jwt-decode`](https://github.com/auth0/jwt-decode). `encodedJwt` is the
- * hook's **read-only value source** and takes a plain string (upstream:
- * `MaybeRefOrGetter<string>`); the decode is memoized on the token, so a
- * stable token keeps `header`/`payload` referentially stable across renders.
- *
- * Adjustment for React:
- * - upstream returns `{ header, payload }` as `ComputedRef`s; here the two
- *   fields are plain decoded values (the issue's own `const { header, payload }
- *   = useJwt(encodedJwt)` shape), so read them directly instead of `.value`;
- * - `fallbackValue` defaults to `null`, and `onError` is kept in a ref so an
- *   inline arrow callback does not churn the memo dependencies;
- * - decoding happens during render, so under React StrictMode's dev
- *   double-render a bad token may invoke `onError` twice. This is unavoidable
- *   while decoding during render; guard the callback if it must fire once.
+ * (`source/vueuse/packages/integrations/useJwt/`).
  *
  * @__NO_SIDE_EFFECTS__
  * @see https://vueuse.org/useJwt

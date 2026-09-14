@@ -88,8 +88,8 @@ export interface UseIntervalOptions<Controls extends boolean = false> {
    */
   callback?: (count: number) => void
   /**
-   * Increment the counter (and fire `callback`) immediately when the interval
-   * starts or `resume` is called
+   * Increment the counter (and fire `callback`) immediately when the interval starts or `resume` is
+   * called
    *
    * @default false
    */
@@ -119,24 +119,7 @@ export interface UseIntervalControls {
 }
 export type UseIntervalReturn = number | UseIntervalControls
 /**
- * React port of VueUse's `useInterval`.
- *
- * Map from @vueuse/shared `useInterval`
- * Mapping: upstream wraps `useIntervalFn` and returns a readonly
- * `ShallowRef<number>`; since `useIntervalFn` is mapped in its own module,
- * this port inlines the interval logic to stay self-contained — the counter
- * is a plain `number` state (no `.value`), the setup-time `resume()`
- * (`immediate`) becomes a mount `useEffect` (guarded against the StrictMode
- * double-invocation so `immediateCallback` fires only once), and
- * `tryOnScopeDispose(pause)` becomes the effect cleanup. `{ controls: true }`
- * exposes `counter` / `reset` plus the `Pausable` controls (`isActive` /
- * `pause` / `resume`). `interval` accepts a number or a React ref (upstream:
- * `RefOrValue<number>`); like upstream's reactive watch, a changed interval
- * live-restarts the timer while it is active (a ref's `.current` mutation is
- * only picked up on the next render — React has no reactive refs).
- * `immediateCallback` follows `useIntervalFn`'s semantics (upstream
- * `useInterval` doesn't forward it). `pause` / `resume` / `reset` are stable
- * `useCallback`s.
+ * Map from @vueuse/shared `useInterval`.
  *
  * @example
  * // count will increase every 200ms
@@ -145,11 +128,11 @@ export type UseIntervalReturn = number | UseIntervalControls
  * const { counter, isActive, pause, resume, reset } = useInterval(200, { controls: true })
  */
 export declare function useInterval(
-  interval?: RefOrValue<number>,
+  interval?: number,
   options?: UseIntervalOptions<false>,
 ): number
 export declare function useInterval(
-  interval: RefOrValue<number>,
+  interval: number,
   options: UseIntervalOptions<true>,
 ): UseIntervalControls
 ```

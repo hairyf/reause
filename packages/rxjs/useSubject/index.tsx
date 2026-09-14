@@ -7,16 +7,15 @@ import { BehaviorSubject } from 'rxjs'
 /**
  * Options for `useSubject`.
  *
- * Upstream `UseSubjectOptions` is `useObservable`'s options minus
- * `initialValue`: a `BehaviorSubject` seeds the state with its own current
- * value and a plain `Subject` starts out `undefined`, so there is nothing for
- * the caller to supply.
+ * Upstream `UseSubjectOptions` is `useObservable`'s options minus `initialValue`: a
+ * `BehaviorSubject` seeds the state with its own current value and a plain `Subject` starts out
+ * `undefined`, so there is nothing for the caller to supply.
  */
 export type UseSubjectOptions<I = undefined> = Omit<UseObservableOptions<I>, 'initialValue'>
 
 /**
- * Return of `useSubject`: a writable `[value, setValue]` tuple (upstream
- * returns a single `Ref<H>` / `Ref<H | undefined>`).
+ * Return of `useSubject`: a writable `[value, setValue]` tuple (upstream returns a single `Ref<H>`
+ * / `Ref<H | undefined>`).
  */
 export type UseSubjectReturn<H> = [
   value: H,
@@ -24,49 +23,16 @@ export type UseSubjectReturn<H> = [
 ]
 
 /**
- * Runtime counterpart of the `BehaviorSubject` overload: only a
- * `BehaviorSubject` replays a current value, so only it can seed the state.
+ * Runtime counterpart of the `BehaviorSubject` overload: only a `BehaviorSubject` replays a current
+ * value, so only it can seed the state.
  */
 function isBehaviorSubject<H>(subject: Subject<H>): subject is BehaviorSubject<H> {
   return subject instanceof BehaviorSubject
 }
 
 /**
- * Bind an RxJS [`Subject`](https://rxjs.dev/guide/subject) to a controllable
- * state and propagate value changes both ways.
- *
  * Map from @vueuse/rxjs `useSubject`
- * (`source/vueuse/packages/rxjs/useSubject/`): the state is initialized from a
- * `BehaviorSubject`'s current value (or `undefined` for a plain `Subject`),
- * every emission is written into the state, and writing through the returned
- * setter is pushed back into the subject.
- *
- * React divergences:
- * - upstream returns a `Ref<H>` / `Ref<H | undefined>` that the caller mutates
- *   directly; the React port returns a `useState`-like writable
- *   `[value, setValue]` tuple (hairyf/reause#218).
- * - `setValue` calls `subject.next(...)` — it does **not** set React state
- *   directly. Upstream keeps two writable places (`value.value` and the
- *   subject, bridged by `watch`); here the subject is the single source of
- *   truth, so a write is observable by every other subscriber of the subject
- *   and the exposed value follows the emission that comes back through the
- *   subscription. Unlike upstream's `watch` — which skips an unchanged
- *   primitive — the write is forwarded unconditionally, so `setValue(current)`
- *   still calls `subject.next(current)` and other subscribers see it
- *   (hairyf/reause#218).
- * - the setter accepts a functional update (`useState` parity, hairyf/reause#174);
- *   it is resolved against the latest value seen by the hook, so two functional
- *   updates in the same tick compose instead of both reading the same stale
- *   value.
- * - upstream's `tryOnScopeDispose` becomes the effect cleanup: the subscription
- *   is created once when the component mounts and unsubscribed on unmount.
- * - the `subject` argument is deliberately **not** an effect dependency — a new
- *   identity on a later render neither re-subscribes (Vue's `tryOnScopeDispose`
- *   also registers exactly once, during `setup`) nor re-targets `setValue`,
- *   which keeps writing into the subject the hook is subscribed to.
- * - `onError` is read when the subscription is created.
- * - SSR-safe: nothing touches `window` / `document`, and the subscription is
- *   only created in the mount effect.
+ * (`source/vueuse/packages/rxjs/useSubject/`).
  *
  * @see https://vueuse.org/rxjs/useSubject/
  * @example

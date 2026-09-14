@@ -35,13 +35,13 @@ describe('useFocusWithin', () => {
   })
 
   it('should initialize properly', async () => {
-    const { result } = await renderHook(() => useFocusWithin(parent))
+    const { result } = await renderHook(() => useFocusWithin({ current: parent }))
 
     expect(result.current.focused).toBeFalsy()
   })
 
   it('should track the state of the target itself', async () => {
-    const { result, act } = await renderHook(() => useFocusWithin(parent))
+    const { result, act } = await renderHook(() => useFocusWithin({ current: parent }))
 
     expect(result.current.focused).toBeFalsy()
 
@@ -57,7 +57,7 @@ describe('useFocusWithin', () => {
   })
 
   it('should track the state of the targets descendants', async () => {
-    const { result, act } = await renderHook(() => useFocusWithin(parent))
+    const { result, act } = await renderHook(() => useFocusWithin({ current: parent }))
 
     expect(result.current.focused).toBeFalsy()
 
@@ -83,7 +83,7 @@ describe('useFocusWithin', () => {
   })
 
   it('should track the state while the descendants switch focus state', async () => {
-    const { result, act } = await renderHook(() => useFocusWithin(parent))
+    const { result, act } = await renderHook(() => useFocusWithin({ current: parent }))
 
     expect(result.current.focused).toBeFalsy()
 
@@ -117,7 +117,7 @@ describe('useFocusWithin', () => {
         return window[prop]
       },
     })
-    const { result, act } = await renderHook(() => useFocusWithin(parent, { window: mockWindow }))
+    const { result, act } = await renderHook(() => useFocusWithin({ current: parent }, { window: mockWindow }))
 
     expect(result.current.focused).toBeFalsy()
 
@@ -175,7 +175,7 @@ describe('useFocusWithin', () => {
 
   it('should remove the listeners on unmount', async () => {
     const removeSpy = vi.spyOn(parent, 'removeEventListener')
-    const { unmount } = await renderHook(() => useFocusWithin(parent))
+    const { unmount } = await renderHook(() => useFocusWithin({ current: parent }))
 
     await unmount()
 
@@ -193,7 +193,7 @@ describe('useFocusWithin', () => {
       },
     })
     const { result, act, rerender } = await renderHook(
-      (props?: { win?: typeof window }) => useFocusWithin(parent, { window: props?.win }),
+      (props?: { win?: typeof window }) => useFocusWithin({ current: parent }, { window: props?.win }),
     )
 
     // valid window: listeners attach and focus is tracked

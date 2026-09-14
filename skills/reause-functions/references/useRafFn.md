@@ -30,7 +30,9 @@ export interface UseRafFnCallbackArguments {
    */
   delta: number
   /**
-   * Time elapsed since the creation of the web page. See {@link https://developer.mozilla.org/en-US/docs/Web/API/DOMHighResTimeStamp#the_time_origin Time origin}.
+   * Time elapsed since the creation of the web page. See {@link
+   * https://developer.mozilla.org/en-US/docs/Web/API/DOMHighResTimeStamp#the_time_origin Time
+   * origin}.
    */
   timestamp: DOMHighResTimeStamp
 }
@@ -42,12 +44,11 @@ export interface UseRafFnOptions extends ConfigurableWindow {
    */
   immediate?: boolean
   /**
-   * The maximum frame per second to execute the function.
-   * Set to `null` to disable the limit.
+   * The maximum frame per second to execute the function. Set to `null` to disable the limit.
    *
    * @default null
    */
-  fpsLimit?: RefOrValue<number | null>
+  fpsLimit?: number | null
   /**
    * After the requestAnimationFrame loop executed once, it will be automatically stopped.
    *
@@ -61,8 +62,7 @@ export interface UseRafFnReturn {
    */
   isActive: boolean
   /**
-   * Stop the loop — the pending frame is cancelled and no further frames are
-   * scheduled
+   * Stop the loop — the pending frame is cancelled and no further frames are scheduled
    */
   pause: () => void
   /**
@@ -71,33 +71,8 @@ export interface UseRafFnReturn {
   resume: () => void
 }
 /**
- * React port of VueUse's `useRafFn`.
- *
  * Map from @vueuse/core `useRafFn`
- * (`source/vueuse/packages/core/useRafFn/`): a self-contained
- * `requestAnimationFrame` chain that calls the callback with
- * `{ delta, timestamp }` on every frame, with controls of pausing and
- * resuming.
- *
- * React divergences:
- * - the returned control object keeps upstream's `Pausable` members
- *   (`isActive` / `pause` / `resume`), but the `isActive` shallow ref becomes
- *   a plain boolean state flipped by `resume` / `pause`;
- * - the setup-time auto `resume()` (`immediate`, client-only) becomes a
- *   mount `useEffect`, and `tryOnScopeDispose(pause)` becomes its cleanup —
- *   `immediate` is read exactly once on mount, like upstream reads it once
- *   during setup: a later change to the option neither restarts nor stops the
- *   loop. Frames are only ever scheduled inside effects, so SSR renders never
- *   touch `window.requestAnimationFrame`;
- * - `fn`, `fpsLimit`, `once` and `window` are read through refs on every
- *   frame instead of from the setup closure, so the running loop always sees
- *   the latest values (upstream recomputes on watchers);
- * - `fpsLimit` is a `RefOrValue` resolved with `toValue` per frame
- *   (upstream: `MaybeRefOrGetter` + `computed`), so a React ref-like
- *   `{ current }` limit updates live without re-running the hook. The
- *   upstream getter form (`() => number | null`) is deliberately not part of
- *   `RefOrValue` — zero-argument getters were removed repo-wide (#462/#490) —
- *   so it is rejected at the type level.
+ * (`source/vueuse/packages/core/useRafFn/`).
  *
  * @example
  * const { pause, resume } = useRafFn(() => setCount(c => c + 1))

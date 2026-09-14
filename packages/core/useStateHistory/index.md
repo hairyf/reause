@@ -13,7 +13,10 @@ import { useStateHistory } from '@reause/core'
 import { useState } from 'react'
 
 const [count, setCount] = useState(0)
-const { history, undo, redo, canUndo, canRedo } = useStateHistory([count, setCount])
+const { history, undo, redo, canUndo, canRedo } = useStateHistory({
+  value: count,
+  onChange: setCount,
+})
 
 setCount(1) // every change commits a history record
 
@@ -26,8 +29,6 @@ console.log(history)
 undo() // count back to the previous record
 redo() // count forward again
 ```
-
-The source is the controlled `[state, setState]` tuple of an existing `useState`; commits are driven by an effect on state changes (upstream: `useWatchIgnorable`).
 
 Internally, an effect is used to trigger a history point when the state is modified. This means that history points are triggered asynchronously batching modifications in the same "tick".
 

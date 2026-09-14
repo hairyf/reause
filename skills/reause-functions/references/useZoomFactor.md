@@ -44,38 +44,13 @@ setFactor(2) // zoom factor will change
 
 ```ts
 /**
- * Setter returned by `useZoomFactor`: validates the factor, writes it to
- * `WebFrame.setZoomFactor` and updates the value returned by the hook.
+ * Setter returned by `useZoomFactor`: validates the factor, writes it to `WebFrame.setZoomFactor`
+ * and updates the value returned by the hook.
  */
 export type ZoomFactorSetter = (value: number) => void
 /**
- * Reactive `WebFrame` zoom factor — React port of VueUse's `useZoomFactor`.
- *
  * Map from @vueuse/electron `useZoomFactor`
- * (`source/vueuse/packages/electron/useZoomFactor/`). Upstream returns a
- * writable Vue `Ref<number>` whose setter writes to
- * `WebFrame.setZoomFactor`; this port follows the repo's state-like writable
- * rule and returns the React tuple `[factor, setFactor]` instead.
- *
- * Adjustment for React:
- * - the writable ref becomes `const [factor, setFactor] = useZoomFactor()` —
- *   `setFactor(value)` validates the value, calls
- *   `webFrame.setZoomFactor(value)` and updates the returned factor;
- * - upstream's `watch(factor, cb, { immediate: true })` maps to a single
- *   effect keyed on `[webFrame, external factor]`: because the last-written ref
- *   starts as `null`, the immediate run is covered by the first effect run,
- *   which applies an explicitly passed factor once on mount and re-applies
- *   whenever the source value changes. The last factor written to `webFrame`
- *   is tracked in a ref, so a redundant render never re-writes the same
- *   factor;
- * - upstream's `0` guard is kept verbatim — `useZoomFactor(webFrame, 0)` and
- *   `setFactor(0)` both throw `the factor must be greater than 0.0.`;
- * - the `WebFrame` instance is resolved once per render through the internal
- *   `resolveWebFrame` helper: pass it explicitly, or enable `nodeIntegration`
- *   so it can be read from `window.require('electron').webFrame`;
- * - `useZoomFactor()` reads the current factor from `getZoomFactor()`, while
- *   `useZoomFactor(2)` / `useZoomFactor(webFrame, 2)` apply the factor given
- *   as a plain number or a React ref.
+ * (`source/vueuse/packages/electron/useZoomFactor/`).
  *
  * @see https://www.electronjs.org/docs/api/web-frame#webframesetzoomfactorfactor
  * @see https://vueuse.org/useZoomFactor
@@ -91,10 +66,10 @@ export type ZoomFactorSetter = (value: number) => void
  * @__NO_SIDE_EFFECTS__
  */
 export declare function useZoomFactor(
-  factor?: RefOrValue<number>,
+  factor?: number,
 ): [number, ZoomFactorSetter]
 export declare function useZoomFactor(
   webFrame: WebFrame,
-  factor?: RefOrValue<number>,
+  factor?: number,
 ): [number, ZoomFactorSetter]
 ```

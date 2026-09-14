@@ -1,7 +1,17 @@
+import type { RefObject } from 'react'
 import type { ElementTarget } from '../useResizeObserver'
-import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, expectTypeOf, it } from 'vitest'
 import { renderHook } from 'vitest-browser-react'
 import { useElementSize } from '../useElementSize'
+
+/**
+ * The hook binds DOM targets to React refs only — a plain element, a getter or
+ * a callback ref is not accepted, so every test wraps its element in a
+ * `{ current }` holder.
+ */
+function refOf<T>(value: T | null): RefObject<T | null> {
+  return { current: value }
+}
 
 /**
  * Let two rendering frames pass plus a slack timeout — the platform
@@ -30,22 +40,31 @@ describe('useElementSize', () => {
     el.remove()
   })
 
+  it('accepts only a React ref object as the DOM target', () => {
+    expectTypeOf<Parameters<typeof useElementSize>[0]>()
+      .toEqualTypeOf<ElementTarget>()
+    // a plain element is deliberately rejected — refs are the only DOM target
+    expectTypeOf<HTMLDivElement>()
+      .not
+      .toMatchTypeOf<Parameters<typeof useElementSize>[0]>()
+  })
+
   it('should prefill with border-box dimensions when box is border-box', async () => {
-    const { result } = await renderHook(() => useElementSize(el, { width: 0, height: 0 }, { box: 'border-box' }))
+    const { result } = await renderHook(() => useElementSize(refOf(el), { width: 0, height: 0 }, { box: 'border-box' }))
 
     expect(result.current.width).toBe(200)
     expect(result.current.height).toBe(100)
   })
 
   it('should prefill with content-box dimensions when box is content-box', async () => {
-    const { result } = await renderHook(() => useElementSize(el, { width: 0, height: 0 }, { box: 'content-box' }))
+    const { result } = await renderHook(() => useElementSize(refOf(el), { width: 0, height: 0 }, { box: 'content-box' }))
 
     expect(result.current.width).toBe(170)
     expect(result.current.height).toBe(70)
   })
 
   it('should prefill with content-box dimensions by default', async () => {
-    const { result } = await renderHook(() => useElementSize(el))
+    const { result } = await renderHook(() => useElementSize(refOf(el)))
 
     expect(result.current.width).toBe(170)
     expect(result.current.height).toBe(70)
@@ -60,7 +79,7 @@ describe('useElementSize', () => {
     // same `renderHook` round-trip, so record the sizes as they render.
     const sizes: Array<{ width: number, height: number }> = []
     await renderHook(() => {
-      const size = useElementSize(el, { width: 0, height: 0 }, { window: null as unknown as undefined, box: 'content-box' })
+      const size = useElementSize(refOf(el), { width: 0, height: 0 }, { window: null as unknown as undefined, box: 'content-box' })
       sizes.push({ width: size.width, height: size.height })
       return size
     })
@@ -72,7 +91,7 @@ describe('useElementSize', () => {
 
   it('updates width/height when the element is resized', async () => {
     const { result, unmount } = await renderHook(() =>
-      useElementSize(el, { width: 0, height: 0 }, { box: 'border-box' }),
+      useElementSize(refOf(el), { width: 0, height: 0 }, { box: 'border-box' }),
     )
 
     el.style.width = '300px'
@@ -84,7 +103,7 @@ describe('useElementSize', () => {
 
   it('stop() disconnects the observer', async () => {
     const { result, unmount } = await renderHook(() =>
-      useElementSize(el, { width: 0, height: 0 }, { box: 'border-box' }),
+      useElementSize(refOf(el), { width: 0, height: 0 }, { box: 'border-box' }),
     )
 
     await expect.poll(() => result.current.width).toBe(200)
@@ -98,7 +117,7 @@ describe('useElementSize', () => {
   })
 
   it('reports the size when a ref target attaches between renders', async () => {
-    const ref = { current: null as HTMLDivElement | null }
+    const ref = refOf<HTMLDivElement>(null)
 
     const { result, rerender, unmount } = await renderHook(
       (props?: { target: ElementTarget }) =>

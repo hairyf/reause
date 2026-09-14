@@ -47,10 +47,11 @@ function mockPointerEvents(target: Element, coords: Array<[number, number]>) {
 describe('usePointerSwipe', () => {
   it('threshold is not exceeded', async () => {
     const el = createTarget()
+    const elRef = { current: el }
     const onSwipeStart = vi.fn()
     const onSwipe = vi.fn()
     const onSwipeEnd = vi.fn()
-    const { act } = await renderHook(() => usePointerSwipe(el, { threshold, onSwipeStart, onSwipe, onSwipeEnd }))
+    const { act } = await renderHook(() => usePointerSwipe(elRef, { threshold, onSwipeStart, onSwipe, onSwipeEnd }))
 
     await act(() => {
       mockPointerEvents(el, [[0, 0], [threshold - 1, 0], [threshold - 1, 0]])
@@ -63,10 +64,11 @@ describe('usePointerSwipe', () => {
 
   it('threshold is exceeded', async () => {
     const el = createTarget()
+    const elRef = { current: el }
     const onSwipeStart = vi.fn()
     const onSwipe = vi.fn()
     const onSwipeEnd = vi.fn()
-    const { act } = await renderHook(() => usePointerSwipe(el, { threshold, onSwipeStart, onSwipe, onSwipeEnd }))
+    const { act } = await renderHook(() => usePointerSwipe(elRef, { threshold, onSwipeStart, onSwipe, onSwipeEnd }))
 
     await act(() => {
       mockPointerEvents(el, [[0, 0], [threshold / 2, 0], [threshold, 0], [threshold, 0]])
@@ -80,10 +82,11 @@ describe('usePointerSwipe', () => {
 
   it('threshold is exceeded in between', async () => {
     const el = createTarget()
+    const elRef = { current: el }
     const onSwipeStart = vi.fn()
     const onSwipe = vi.fn()
     const onSwipeEnd = vi.fn()
-    const { act } = await renderHook(() => usePointerSwipe(el, { threshold, onSwipeStart, onSwipe, onSwipeEnd }))
+    const { act } = await renderHook(() => usePointerSwipe(elRef, { threshold, onSwipeStart, onSwipe, onSwipeEnd }))
 
     await act(() => {
       mockPointerEvents(el, [[0, 0], [threshold / 2, 0], [threshold, 0], [threshold - 1, 0], [threshold - 1, 0]])
@@ -97,10 +100,11 @@ describe('usePointerSwipe', () => {
 
   it('reactivity', async () => {
     const el = createTarget()
+    const elRef = { current: el }
     const onSwipeStart = vi.fn()
     const onSwipe = vi.fn()
     const onSwipeEnd = vi.fn()
-    const { result, act } = await renderHook(() => usePointerSwipe(el, { threshold, onSwipeStart, onSwipe, onSwipeEnd }))
+    const { result, act } = await renderHook(() => usePointerSwipe(elRef, { threshold, onSwipeStart, onSwipe, onSwipeEnd }))
 
     await act(() => {
       el.dispatchEvent(mockPointerDown(0, 0))
@@ -129,7 +133,8 @@ describe('usePointerSwipe', () => {
 
   it('not reactivity when pointer types not matched', async () => {
     const el = createTarget()
-    const { result, act } = await renderHook(() => usePointerSwipe(el, { threshold, pointerTypes: ['touch'] }))
+    const elRef = { current: el }
+    const { result, act } = await renderHook(() => usePointerSwipe(elRef, { threshold, pointerTypes: ['touch'] }))
 
     await act(() => {
       el.dispatchEvent(mockPointerDown(0, 0))
@@ -158,7 +163,8 @@ describe('usePointerSwipe', () => {
 
   it('not reactivity when pointer not down', async () => {
     const el = createTarget()
-    const { result, act } = await renderHook(() => usePointerSwipe(el, { threshold }))
+    const elRef = { current: el }
+    const { result, act } = await renderHook(() => usePointerSwipe(elRef, { threshold }))
 
     await act(() => {
       el.dispatchEvent(mockPointerMove(threshold, threshold / 2))
@@ -171,10 +177,11 @@ describe('usePointerSwipe', () => {
 
   it('stop detaches the pointer listeners', async () => {
     const el = createTarget()
+    const elRef = { current: el }
     const onSwipeStart = vi.fn()
     const onSwipe = vi.fn()
     const onSwipeEnd = vi.fn()
-    const { result, act } = await renderHook(() => usePointerSwipe(el, { threshold, onSwipeStart, onSwipe, onSwipeEnd }))
+    const { result, act } = await renderHook(() => usePointerSwipe(elRef, { threshold, onSwipeStart, onSwipe, onSwipeEnd }))
 
     // a real swipe while listening fires the callbacks
     await act(() => {
@@ -208,8 +215,9 @@ describe('usePointerSwipe', () => {
 
   it.each(directionTests)('detects swipes to the %s', async (expected, coords) => {
     const el = createTarget()
+    const elRef = { current: el }
     const onSwipeEnd = vi.fn()
-    const { result, act } = await renderHook(() => usePointerSwipe(el, { threshold, onSwipeEnd }))
+    const { result, act } = await renderHook(() => usePointerSwipe(elRef, { threshold, onSwipeEnd }))
 
     await act(() => {
       mockPointerEvents(el, coords)

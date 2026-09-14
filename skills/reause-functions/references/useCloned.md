@@ -11,9 +11,12 @@ Reactive clone of a value. By default, it use `JSON.parse(JSON.stringify())` to 
 ```tsx
 import { useCloned } from '@reause/core'
 
-const original = { key: 'value' }
+const [original, setOriginal] = useState({ key: 'value' })
 
-const [cloned, setCloned, { isModified, sync }] = useCloned(original)
+const [cloned, setCloned, { isModified, sync }] = useCloned({
+  value: original,
+  onChange: setOriginal,
+})
 
 // on the next render `cloned` is the new state and `isModified` is true
 setCloned({ key: 'some new value' })
@@ -23,80 +26,19 @@ console.log(cloned.key) // 'some new value' (next render)
 sync() // re-clone from the source, isModified back to false
 ```
 
-The return is a React tuple `[cloned, setCloned, { isModified, sync }]` — upstream returns an object
-`{ cloned: Ref<T>, isModified, sync }`. `cloned` is a plain state value (not a writable ref), and
-`setCloned` replaces it with the React immutable-update protocol: it never re-syncs from the source
-(use `sync()` for that). Changes to the source are not reflected in the cloned controllable state
-immediately.
-
-## Source Forms
-
-`source` is a React `State<T>` and every form is resolved through `toValue`. The snippets below show
-the values on the render that follows the change:
-
-```tsx
-import { useCloned } from '@reause/core'
-
-const [cloned] = useCloned(plainValue) // plain value
-const [cloned] = useCloned(() => value) // getter
-const [cloned] = useCloned(ref) // React ref (`{ current }`)
-const [cloned] = useCloned([value, setValue]) // state tuple
-const [cloned] = useCloned({ value, onChange: setValue }) // value/onChange pair
-```
-
-Every form except a plain value is treated as reactive, so `immediate: false` skips the initial sync
-for them too. This is a deliberate difference from upstream `MaybeRefOrGetter<T>`
-(`T | Ref<T> | (() => T)`): the `[value, setter]` tuple and `{ value, onChange }` pair are the React
-state protocol and have no upstream equivalent.
-
-## Return Values
-
-- `cloned` — the current clone (plain state).
-- `setCloned(next | prev => next)` — replaces the clone. This is the React-idiomatic way to edit it: it
-  does not re-sync from the source, and it updates `isModified` by comparing the new value with the
-  last synced source.
-- `controls.isModified` — `true` while the clone differs from the last synced source.
-- `controls.sync()` — re-clone from the source and reset `isModified` to `false`.
-
-The `controls` object (`{ isModified, sync }`) keeps a stable identity while `isModified` and `sync`
-are unchanged.
-
-Mutating `cloned` in place is still detected on the next render as a legacy fallback, but prefer
-`setCloned` — mutating state in place is not idiomatic React.
-
-## Watch Options
-
-`deep` and `immediate` control how the clone follows the source. Both default to `true`:
-`immediate: true` syncs the clone on mount, and `deep: true` re-syncs on in-place mutations of the
-source (set `deep: false` to only re-sync when the source reference is replaced).
-
-```tsx
-import { useCloned } from '@reause/core'
-
-const original = { current: { key: 'value' } }
-
-// no initial sync, and in-place mutations are ignored
-const [cloned] = useCloned(original, { immediate: false, deep: false })
-
-console.log(cloned) // {}
-
-original.current.key = 'ignored' // deep: false — no re-sync
-
-original.current = { key: 'replaced' } // new reference — re-syncs on the next render
-
-console.log(cloned) // { key: 'replaced' }
-```
-
 ## Manual cloning
 
 ```tsx
 import { useCloned } from '@reause/core'
 
-const original = { current: { key: 'value' } }
+const [original, setOriginal] = useState({ key: 'value' })
 
-const [cloned, , { sync }] = useCloned(original, { manual: true })
+const [cloned, , { sync }] = useCloned(
+  { value: original, onChange: setOriginal },
+  { manual: true }
+)
 
-original.current.key = 'manual'
+setOriginal({ key: 'manual' })
 
 console.log(cloned.key) // 'value'
 
@@ -113,9 +55,12 @@ Using [`klona`](https://www.npmjs.com/package/klona) for example:
 import { useCloned } from '@reause/core'
 import { klona } from 'klona'
 
-const original = { key: 'value' }
+const [original, setOriginal] = useState({ key: 'value' })
 
-const [cloned, , { isModified, sync }] = useCloned(original, { clone: klona })
+const [cloned, , { isModified, sync }] = useCloned(
+  { value: original, onChange: setOriginal },
+  { clone: klona }
+)
 ```
 
 ## Type Declarations
@@ -135,9 +80,8 @@ export interface UseClonedOptions<T = any> {
    */
   manual?: boolean
   /**
-   * Track changes inside the source value, not only reference replacements
-   * (upstream: watch option `deep`). When `false`, a new reference is needed
-   * to re-sync — in-place mutations are ignored.
+   * Track changes inside the source value, not only reference replacements. When `false`, a new
+   * reference is needed to re-sync — in-place mutations are ignored.
    *
    * @default true
    */
@@ -155,9 +99,9 @@ export type UseClonedReturn<T> = readonly [
    */
   cloned: T,
   /**
-   * Replace the clone state with the React immutable-update protocol:
-   * `setCloned(next)` or `setCloned(prev => next)`. It does not re-sync from
-   * the source — use `controls.sync()` for that.
+   * Replace the clone state with the React immutable-update protocol: `setCloned(next)` or
+   * `setCloned(prev => next)`. It does not re-sync from the source — use `controls.sync()` for
+   * that.
    */
   setCloned: Dispatch<SetStateAction<T>>,
   controls: {
@@ -174,46 +118,8 @@ export type UseClonedReturn<T> = readonly [
 export type CloneFn<F, T = F> = (x: F) => T
 export declare function cloneFnJSON<T>(source: T): T
 /**
- * React port of VueUse's `useCloned`.
- *
  * Map from @vueuse/core `useCloned`
- * (`source/vueuse/packages/core/useCloned/`). Returns a deep clone of the
- * source as React state. The clone follows the source automatically: it
- * re-syncs whenever the resolved source changes, unless `manual` is set.
- *
- * `source` accepts a React `State<T>` — a plain value, a getter
- * (`() => value`), a React ref (`{ current }`), a `[value, setter]` tuple, or
- * a `{ value, onChange }` pair. The tuple and `{ value, onChange }` forms are
- * the React state protocol and have no upstream equivalent (upstream takes
- * `MaybeRefOrGetter<T>` — `T | Ref<T> | (() => T)`); every form is resolved
- * through `toValue`.
- *
- * React divergences:
- * - the return is a React tuple `[cloned, setCloned, { isModified, sync }]`
- *   instead of upstream's object `{ cloned: Ref<T>, isModified, sync }`.
- *   `cloned` is plain state and `setCloned` replaces it with the React
- *   immutable-update protocol — `setCloned(next)` or
- *   `setCloned(prev => next)`. `setCloned` never re-syncs from the source
- *   (use `sync()` for that); it recomputes `isModified` against the last
- *   synced source (`deepEqual` for `deep: true`, `Object.is` for
- *   `deep: false`). The `controls` object keeps a stable identity while
- *   `isModified` and `sync` are unchanged;
- * - `setCloned` is the idiomatic way to edit the clone. In-place mutation of
- *   `cloned` is still detected on the next render as a legacy fallback
- *   (structural comparison — upstream: `watch(cloned, ..., { deep: true })`),
- *   flipping `isModified` to `true`; `sync()` re-clones from the source and
- *   resets it;
- * - the source watcher becomes an effect comparing the resolved source
- *   against an isolated snapshot of the last synced source on every render:
- *   `deep: true` re-syncs on structural change, `deep: false` only when the
- *   reference was replaced. A plain value is re-evaluated every render like
- *   any React argument, so it re-syncs when it changes between renders
- *   (upstream only watches refs — plain values are static there);
- * - `immediate: false` skips the initial sync and `cloned` starts as `{}`
- *   (upstream initializes the clone ref to `{}` and lets the watch fill it);
- * - Vue watch options with no React equivalent are omitted (`flush`,
- *   `onTrack`, `onTrigger`). Ref-like sources should hold a stable reference
- *   — with `deep: false` a new object in `.current` re-syncs on every render.
+ * (`source/vueuse/packages/core/useCloned/`).
  *
  * @example
  * const [cloned, setCloned, { isModified, sync }] = useCloned(original)

@@ -6,8 +6,8 @@ import { guessSerializerType, StorageSerializers } from '../useStorage'
 type Awaitable<T> = T | Promise<T>
 
 /**
- * Custom data serialization with async support — `read`/`write` may return a
- * promise for backends that need asynchronous (de)serialization.
+ * Custom data serialization with async support — `read`/`write` may return a promise for backends
+ * that need asynchronous (de)serialization.
  */
 export interface SerializerAsync<T> {
   read: (raw: string) => Awaitable<T>
@@ -15,9 +15,8 @@ export interface SerializerAsync<T> {
 }
 
 /**
- * Minimal async storage backend contract — like `StorageLike`, but every
- * operation may return a promise (IndexedDB, remote key-value stores, async
- * wrappers around `localStorage`, …).
+ * Minimal async storage backend contract — like `StorageLike`, but every operation may return a
+ * promise (IndexedDB, remote key-value stores, async wrappers around `localStorage`, …).
  */
 export interface StorageLikeAsync {
   getItem: (key: string) => Awaitable<string | null>
@@ -27,8 +26,7 @@ export interface StorageLikeAsync {
 
 export interface UseStorageAsyncOptions<T> extends Omit<UseStorageOptions<T>, 'serializer'> {
   /**
-   * Custom data serialization — same as `useStorage`, but the serializer may
-   * be asynchronous.
+   * Custom data serialization — same as `useStorage`, but the serializer may be asynchronous.
    */
   serializer?: SerializerAsync<T>
 
@@ -58,49 +56,8 @@ export function useStorageAsync<T>(key: string, initialValue: T | (() => T), sto
 export function useStorageAsync<T = unknown>(key: string, initialValue: null, storage?: StorageLikeAsync, options?: UseStorageAsyncOptions<T>): UseStorageAsyncReturn<T>
 
 /**
- * Reactive Storage with async support — React port of VueUse's
- * `useStorageAsync`.
- *
  * Map from @vueuse/core `useStorageAsync`
- * (`source/vueuse/packages/core/useStorageAsync/`). Like `useStorage`, but the
- * backend is an async `StorageLikeAsync` — every operation may return a
- * promise — so the stored value is loaded after mount: the value starts as the
- * initial default and is replaced once the async storage is ready (upstream
- * returns a ref that doubles as a Promise; the React tuple cannot be awaited,
- * so the value simply updates itself and the `onReady` option fires).
- *
- * React divergences:
- * - the Vue `RemovableRef<T> & Promise<RemovableRef<T>>` return becomes a
- *   `useState`-backed tuple `[value, setValue]` (the setter also accepts a
- *   function updater). There is no thenable to `await`; instead the value
- *   updates when the async read settles and `onReady` fires at that point —
- *   equivalent to awaiting upstream's returned promise;
- * - `setValue(null)` removes the entry from storage and leaves the state at
- *   `null` (mirroring upstream, where the removal watch sets `data.value` to
- *   `null`; unlike the sync `useStorage` port there is no self storage-event
- *   echo that would restore `rawInit`);
- * - async writes are serialized through an internal promise queue so they
- *   commit in call order — upstream's pre-flush `watch` batches synchronous
- *   changes into one write, the queue keeps ordering deterministic in React;
- * - storage is never touched during render: the first read happens in the
- *   mount effect (SSR-safe — the server renders the initial value). When no
- *   storage is available the hook degrades to in-memory state without touching
- *   storage, reading `window.localStorage` directly instead of going through
- *   upstream's `getSSRHandler('getDefaultStorageAsync')` indirection;
- * - `key` is a plain React string; changing it between renders re-reads the
- *   new key (upstream takes a reactive `RefOrValue` key). Writes always
- *   go to the key of the current render, and when `writeDefaults` is on, a
- *   new key with no stored value is seeded with the initial value;
- * - real `storage` events are listened to when `listenToStorageChanges` is on
- *   (mirroring upstream's `useEventListener`); like upstream there is no
- *   `storageArea` guard, so any matching-key event re-reads the storage — a
- *   custom async backend never appears as an event's `storageArea`, and the
- *   cross-tab reload relies on this. Unlike the sync `useStorage` port, no
- *   same-document synthetic events are dispatched — upstream's async variant
- *   writes through its watch without echoing;
- * - Vue reactivity options have no React equivalent and are omitted:
- *   `flush`/`deep`/`eventFilter` (writes are queued per `setValue` call) and
- *   `shallow` (React state is replaced wholesale).
+ * (`source/vueuse/packages/core/useStorageAsync/`).
  *
  * @example
  * const [accessToken, setAccessToken] = useStorageAsync('access.token', '', SomeAsyncStorage)

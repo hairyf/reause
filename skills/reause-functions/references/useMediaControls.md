@@ -29,19 +29,6 @@ useEffect(() => {
 // <span>{formatDuration(currentTime)} / {formatDuration(duration)}</span>
 ```
 
-### Source Forms
-
-`src` and `tracks` are read-only value sources and take plain values (upstream:
-`MaybeRefOrGetter`). Resolve a React ref or state value at the call site; the element `target` stays
-a plain element or React ref (`RefOrValue`) because it is a DOM target, not a value source:
-
-```tsx
-const [src, setSrc] = useState('video.mp4')
-
-useMediaControls(videoRef, { src, tracks: subtitleTracks })
-useMediaControls(videoRef, { src: srcRef.current }) // resolve a React ref at the call site
-```
-
 ### Providing Captions, Subtitles, etc...
 
 You can provide captions, subtitles, etc in the `tracks` options of the
@@ -106,8 +93,8 @@ const {
 
 ```ts
 /**
- * Many of the jsdoc definitions here are modified version of the
- * documentation from MDN(https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement)
+ * Many of the jsdoc definitions here are modified version of the documentation from
+ * MDN(https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement)
  */
 export interface UseMediaSource {
   /**
@@ -125,8 +112,8 @@ export interface UseMediaSource {
 }
 export interface UseMediaTextTrackSource {
   /**
-   * Indicates that the track should be enabled unless the user's preferences indicate
-   * that another track is more appropriate
+   * Indicates that the track should be enabled unless the user's preferences indicate that another
+   * track is more appropriate
    */
   default?: boolean
   /**
@@ -134,41 +121,35 @@ export interface UseMediaTextTrackSource {
    */
   kind: TextTrackKind
   /**
-   * A user-readable title of the text track which is used by the browser
-   * when listing available text tracks.
+   * A user-readable title of the text track which is used by the browser when listing available
+   * text tracks.
    */
   label: string
   /**
-   * Address of the track (.vtt file). Must be a valid URL. This attribute
-   * must be specified and its URL value must have the same origin as the document
+   * Address of the track (.vtt file). Must be a valid URL. This attribute must be specified and its
+   * URL value must have the same origin as the document
    */
   src: string
   /**
-   * Language of the track text data. It must be a valid BCP 47 language tag.
-   * If the kind attribute is set to subtitles, then srclang must be defined.
+   * Language of the track text data. It must be a valid BCP 47 language tag. If the kind attribute
+   * is set to subtitles, then srclang must be defined.
    */
   srcLang: string
 }
 export interface UseMediaControlsOptions {
   /**
-   * Specify a custom `document` instance, e.g. working with iframes or in
-   * testing environments. Inlined here — `ConfigurableDocument` is not ported
-   * to @reause/shared.
+   * Specify a custom `document` instance, e.g. working with iframes or in testing environments.
    *
    * @default typeof document !== 'undefined' ? document : undefined
    */
   document?: Document
   /**
-   * The source for the media, may either be a string, a `UseMediaSource` object, or a list
-   * of `UseMediaSource` objects. A read-only value source — pass a plain value
-   * (upstream: `MaybeRefOrGetter`; resolve a React ref or getter at the call
-   * site).
+   * The source for the media, may either be a string, a `UseMediaSource` object, or a list of
+   * `UseMediaSource` objects. A read-only value source — pass a plain value.
    */
   src?: string | UseMediaSource | UseMediaSource[]
   /**
-   * A list of text tracks for the media. A read-only value source — pass a
-   * plain array (upstream: `MaybeRefOrGetter`; resolve a React ref or getter
-   * at the call site).
+   * A list of text tracks for the media. A read-only value source — pass a plain array.
    */
   tracks?: UseMediaTextTrackSource[]
 }
@@ -182,13 +163,12 @@ export interface UseMediaTextTrack {
    */
   label: string
   /**
-   * Language of the track text data. It must be a valid BCP 47 language tag.
-   * If the kind attribute is set to subtitles, then srclang must be defined.
+   * Language of the track text data. It must be a valid BCP 47 language tag. If the kind attribute
+   * is set to subtitles, then srclang must be defined.
    */
   language: string
   /**
-   * Specifies the display mode of the text track, either `disabled`,
-   * `hidden`, or `showing`
+   * Specifies the display mode of the text track, either `disabled`, `hidden`, or `showing`
    */
   mode: TextTrackMode
   /**
@@ -209,12 +189,11 @@ export interface UseMediaTextTrack {
   activeCues: TextTrackCueList | null
 }
 /**
- * Target media element accepted by `useMediaControls` — a plain element or a
- * ref-like `{ current }` object (e.g. `useRef<HTMLVideoElement>(null)`, whose
- * `current` is populated after mount) — the React analog of upstream's
- * media-element target.
+ * Target media element accepted by `useMediaControls` — a React ref object (`RefObject`) holding
+ * the element (e.g. `useRef<HTMLVideoElement>(null)`, whose `current` is populated after mount),
+ * resolved with the shared `unrefElement` — the React analog of upstream's media-element target.
  */
-export type UseMediaControlsTarget = RefOrValue<
+export type UseMediaControlsTarget = RefObject<
   HTMLMediaElement | null | undefined
 >
 export interface UseMediaControlsReturn {
@@ -253,64 +232,8 @@ export interface UseMediaControlsReturn {
 }
 type EventHookOn<T = any> = (fn: (param: T) => void) => () => void
 /**
- * Reactive media controls for both `audio` and `video` elements.
- *
  * Map from @vueuse/core `useMediaControls`
- * (`source/vueuse/packages/core/useMediaControls/`). Listens to the media
- * element's events (`play` / `pause` / `timeupdate` / `durationchange` /
- * `volumechange` / `ratechange` / `seeked` / `ended` / ...) and mirrors the
- * playback state into plain React state. The `src` and `tracks` options are
- * injected into the element as `<source>` / `<track>` children (upstream
- * `watchEffect`s), and the returned controls drive the element directly.
- *
- * React divergences from upstream:
- *
- * 1. The Vue `ShallowRef` returns become plain state values
- *    (`currentTime`, `duration`, `playing`, `volume`, `muted`, `rate`,
- *    `tracks`, `selectedTrack`, ...) returned in a single object — read them
- *    like upstream's `xxx.value`.
- * 2. Writable refs → control methods: upstream writes
- *    `playing.value = true`, `currentTime.value = 60`, `volume.value = 0.5`,
- *    `rate.value = 2`, `muted.value = true`; here those writes become
- *    `play()` / `pause()` / `toggle()`, `seek(time)`, `setVolume(volume)`,
- *    `setRate(rate)`, `mute()` / `unmute()` / `toggleMute()`. Each method
- *    writes through to the element (mirroring upstream's ignorable watches).
- *    `enableTrack` / `disableTrack` / `togglePictureInPicture` are ported
- *    as-is (they were methods upstream too).
- * 3. Upstream's per-event `useEventListener(target, ...)` bindings and the
- *    nested text-track listeners become a single binding effect that resolves
- *    the current element via `toValue` at effect run time — so a `useRef`
- *    target populated after mount still binds, exactly like upstream's
- *    element-aware watches — and re-binds with cleanup whenever the resolved
- *    element changes or the hook unmounts.
- * 4. The upstream `watchEffect`s that inject `<source>` / `<track>` children
- *    and call `el.load()` become effects that clean up the injected elements
- *    (removing them from the previous element when the target or options
- *    change) and that are SSR-safe — `document` is only reached through a
- *    guarded default and the effects run after mount. `options.src` and
- *    `options.tracks` are read-only value sources and take plain values
- *    (upstream: `MaybeRefOrGetter`; resolve a React ref or getter at the call
- *    site). The `target` element param stays
- *    `RefOrValue<HTMLMediaElement | null | undefined>` (a DOM target, not a
- *    value source).
- * 5. `supportsPictureInPicture` is resolved once at setup (upstream reads a
- *    computed at setup too) and state defaults (`volume: 1`, `muted: false`,
- *    `rate: 1`, `currentTime: 0`, ...) stay until the events fill them in.
- * 6. The `onSourceError` / `onPlaybackError` event hooks (upstream
- *    `createEventHook`) are inlined — the shared `createEventHook` is not yet
- *    ported to @reause/shared. Upstream's `play()` failure path also rethrows
- *    so Vue's global error handler observes it; React has no equivalent global
- *    handler for unhandled promise rejections, so here the failure is only
- *    routed to `onPlaybackError`.
- * 7. SSR-safe: nothing touches `document` or the media element during render
- *    — the element is only accessed inside effects and control methods, so
- *    the server renders the initial defaults.
- * 8. Upstream's non-immediate `watch([target, volume|muted|rate])`
- *    apply-watchers are replaced by the control methods writing through to
- *    the element directly; the binding effect only applies the current
- *    `volume` / `muted` / `playbackRate` when re-binding to a *different*
- *    element (target swap), so the first bind never clobbers pre-set element
- *    state (e.g. a `<video muted>` attribute).
+ * (`source/vueuse/packages/core/useMediaControls/`).
  *
  * @example
  * const video = useRef<HTMLVideoElement>(null)

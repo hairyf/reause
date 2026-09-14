@@ -20,7 +20,7 @@ function Key({ value, children }: { value: boolean, children: ReactNode }) {
 }
 
 export default function UseMagicKeysDemo() {
-  const { shift, v, u, e, s, v_u_e, u_s_e, current } = useMagicKeys()
+  const { shift, r, e, a, s, u, v_u_e, u_s_e, current } = useMagicKeys()
   const keys = useMemo(() => Array.from(current), [current])
 
   return (
@@ -29,9 +29,9 @@ export default function UseMagicKeysDemo() {
         Press the following keys to test out
       </div>
       <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
-        <Key value={v}>V</Key>
-        <Key value={u}>u</Key>
+        <Key value={r}>R</Key>
         <Key value={e}>e</Key>
+        <Key value={a}>a</Key>
         <span style={{ width: 8 }} />
         <Key value={u}>U</Key>
         <Key value={s}>s</Key>

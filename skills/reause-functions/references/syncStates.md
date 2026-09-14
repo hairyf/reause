@@ -17,7 +17,10 @@ function Form() {
   const [source, setSource] = useState('hello')
   const [target, setTarget] = useState('target')
 
-  const stop = syncStates(source, [target, setTarget])
+  const stop = syncStates(source, {
+    value: target,
+    onChange: setTarget,
+  })
 
   // the sync effect runs after the commit, not during render — at this point
   // `target` is still 'target'; once the component has mounted it becomes
@@ -28,8 +31,6 @@ function Form() {
   // stop()
 }
 ```
-
-`syncStates` is a hook: call it unconditionally at the top level of a component (or another hook). The `source` is a `State<T>` resolved with `toValue` — a plain value, a getter, a ref-like `{ current }`, a `[value, setter]` tuple or a `{ value, onChange }` pair; the effect compares it after every commit and writes changes into each target. Targets are writable `State<T>` sources, written back through their writable form (tuple setter, `onChange` callback or `.current`); pair ref-likes with a state bridge (e.g. `{ get current() { return state }, set current(v) { setState(v) } }`) so the synced values become visible on the re-renders that follow them.
 
 ### Sync with multiple targets
 
@@ -44,7 +45,10 @@ function Form() {
   const [target1, setTarget1] = useState('target1')
   const [target2, setTarget2] = useState('target2')
 
-  const stop = syncStates(source, [[target1, setTarget1], [target2, setTarget2]])
+  const stop = syncStates(source, [
+    { value: target1, onChange: setTarget1 },
+    { value: target2, onChange: setTarget2 },
+  ])
 
   // the sync effect runs after the commit — target1/target2 are still
   // 'target1'/'target2' here and become 'hello' once the component has mounted
@@ -55,33 +59,6 @@ function Form() {
 }
 ```
 
-## Options
-
-The options mirror upstream's `SyncRefsOptions`. `flush` and `deep` are accepted for signature compatibility but have no React behavior — effects always run after commit, and only the value as a whole (compared with `Object.is`) can be observed, never nested mutation.
-
-```ts
-export interface SyncStatesOptions {
-  /**
-   * Timing for syncing, same as watch's flush option
-   *
-   * @default 'sync'
-   */
-  flush?: 'sync' | 'pre' | 'post'
-  /**
-   * Watch deeply
-   *
-   * @default false
-   */
-  deep?: boolean
-  /**
-   * Sync values immediately
-   *
-   * @default true
-   */
-  immediate?: boolean
-}
-```
-
 ## Type Declarations
 
 ```ts
@@ -89,9 +66,9 @@ export interface SyncStatesOptions {
   /**
    * Timing for syncing, same as watch's `flush` option.
    *
-   * React note: there is no React equivalent — effects always run after
-   * commit, so `'sync'` / `'pre'` / `'post'` are accepted for upstream
-   * signature compatibility and all behave identically.
+   * React note: there is no React equivalent — effects always run after commit, so `'sync'` /
+   * `'pre'` / `'post'` are accepted for upstream signature compatibility and all behave
+   * identically.
    *
    * @default 'sync'
    */
@@ -99,10 +76,9 @@ export interface SyncStatesOptions {
   /**
    * Watch deeply.
    *
-   * React note: no React equivalent — a `.current` write never schedules a
-   * re-render by itself, so nested mutations cannot be observed (only the
-   * source value as a whole is compared, via `Object.is`). Accepted for
-   * upstream signature compatibility.
+   * React note: no React equivalent — a write through a setter / `onChange` updates the target only
+   * on the following commit, so nested mutations cannot be observed (only the source value as a
+   * whole is compared, via `Object.is`). Accepted for upstream signature compatibility.
    *
    * @default false
    */
@@ -115,29 +91,8 @@ export interface SyncStatesOptions {
   immediate?: boolean
 }
 /**
- * Keep target state(s) in sync with a source value — React port of VueUse's
- * `syncRefs`.
- *
  * Map from @vueuse/shared `syncRefs`
- * (`source/vueuse/packages/shared/syncRefs/`), renamed `syncStates` for the
- * React port: the source is a `State<T>` — a plain value, getter, ref-like,
- * `[value, setter]` tuple or `{ value, onChange }` pair (upstream:
- * `WatchSource`) — resolved with `toValue`; the targets are writable
- * `State<T>` sources written back through their writable form (tuple setter /
- * `onChange` / `.current`); upstream's `flush` / `deep` / `immediate` options
- * are kept for signature compatibility.
- *
- * React Hook adaptation: upstream syncs through Vue's reactive `watch`, and
- * React has no reactive system — so `syncStates` is implemented as a hook
- * (call it unconditionally at the top of a component). Internally a
- * `useEffect` that runs after every commit compares the resolved source value
- * with the last observed one via `Object.is`; a change is written through to
- * all targets. Because the observation happens post-commit, the caller must
- * re-render (e.g. `setState`) for a new source value to reach the targets —
- * a bare mutation outside of React is never observed (see the maintainer
- * notes on reause #40 / #41). The returned `stop` function tears the
- * synchronization down; the effect also stops doing any work once the owning
- * component unmounts.
+ * (`source/vueuse/packages/shared/syncRefs/`).
  *
  * @example
  * function Form() {

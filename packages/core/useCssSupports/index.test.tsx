@@ -5,8 +5,8 @@ import { render, renderHook } from 'vitest-browser-react'
 import { useCssSupports } from '../useCssSupports'
 
 // Mirrors upstream `source/vueuse/packages/core/useCssSupports/index.browser.test.ts`.
-// Vue `shallowRef` + template bindings become React state; the ref-like
-// inputs are additionally exercised with `renderHook` re-renders.
+// Vue `shallowRef` + template bindings become React state; the plain inputs are
+// additionally exercised with `renderHook` re-renders.
 
 function BasicComponent() {
   const { isSupported: textDecoration } = useCssSupports(
@@ -75,17 +75,11 @@ function ConditionTextComponent() {
 function PropValueOverloadComponent() {
   const { isSupported: conditionOnlyResult } = useCssSupports('display: flex')
   const { isSupported: withUndefinedResult } = useCssSupports('display: flex', undefined)
-  const { isSupported: withRefUndefinedResult } = useCssSupports(
-    'display: flex',
-    // @ts-expect-error overload catches this issue correctly
-    { current: undefined },
-  )
 
   return (
     <>
       <pre data-testid="conditionOnly">{String(conditionOnlyResult)}</pre>
       <pre data-testid="withUndefined">{String(withUndefinedResult)}</pre>
-      <pre data-testid="withRefUndefined">{String(withRefUndefinedResult)}</pre>
     </>
   )
 }
@@ -151,45 +145,36 @@ describe('useCssSupports', () => {
     const screen = await render(<PropValueOverloadComponent />)
     const conditionOnly = screen.getByTestId('conditionOnly')
     const withUndefined = screen.getByTestId('withUndefined')
-    const withRefUndefined = screen.getByTestId('withRefUndefined')
     await expect.element(conditionOnly).toBeVisible()
     await expect.element(withUndefined).toBeVisible()
-    await expect.element(withRefUndefined).toBeVisible()
 
     expect(conditionOnly.query()!.textContent!.trim()).toBe('true')
     expect(withUndefined.query()!.textContent!.trim()).toBe('false')
-    expect(withRefUndefined.query()!.textContent!.trim()).toBe('false')
   })
 
-  it('should re-evaluate when a ref-like condition changes', async () => {
-    const condition = { current: 'display: flex' }
+  it('should re-evaluate when the condition changes', async () => {
     const { result, rerender } = await renderHook(
-      (_props?: { force: number }) => useCssSupports(condition),
-      { initialProps: { force: 0 } },
+      ({ condition }: { condition: string } = { condition: 'display: flex' }) => useCssSupports(condition),
+      { initialProps: { condition: 'display: flex' } },
     )
     expect(result.current.isSupported).toBe(true)
 
-    condition.current = 'e18e'
-    await rerender({ force: 1 })
+    await rerender({ condition: 'e18e' })
     expect(result.current.isSupported).toBe(false)
   })
 
-  it('should re-evaluate when ref property / value change', async () => {
-    const prop = { current: 'transform-origin' }
-    const value = { current: '5%' }
+  it('should re-evaluate when the prop / value change', async () => {
     const { result, rerender } = await renderHook(
-      (_props?: { force: number }) => useCssSupports(prop, value),
-      { initialProps: { force: 0 } },
+      ({ prop, value }: { prop: string, value: string } = { prop: 'transform-origin', value: '5%' }) =>
+        useCssSupports(prop, value),
+      { initialProps: { prop: 'transform-origin', value: '5%' } },
     )
     expect(result.current.isSupported).toBe(true)
 
-    value.current = 'e18e'
-    await rerender({ force: 1 })
+    await rerender({ prop: 'transform-origin', value: 'e18e' })
     expect(result.current.isSupported).toBe(false)
 
-    prop.current = 'display'
-    value.current = 'flex'
-    await rerender({ force: 2 })
+    await rerender({ prop: 'display', value: 'flex' })
     expect(result.current.isSupported).toBe(true)
   })
 

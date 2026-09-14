@@ -83,12 +83,6 @@ const { result } = useAsyncQueue([p1, p2], {
 controller.abort()
 ```
 
-### React Divergences
-
-- `activeIndex` is a `number` and `result` is a plain array — read them directly, without `.value` (upstream returns a `ShallowRef` and a `reactive` array).
-- The queue starts from a mount effect (after the first render) instead of synchronously during setup. A started ref keeps it running exactly once under React StrictMode's double-mounted effect.
-- Once a task is marked `aborted`, a late resolution from an in-flight task does not overwrite the aborted entry.
-
 ## Type Declarations
 
 ```ts
@@ -115,12 +109,10 @@ export interface UseAsyncQueueOptions {
   interrupt?: boolean
   /**
    * Trigger it when the tasks fails.
-   *
    */
   onError?: () => void
   /**
    * Trigger it when the tasks ends.
-   *
    */
   onFinished?: () => void
   /**
@@ -129,26 +121,8 @@ export interface UseAsyncQueueOptions {
   signal?: AbortSignal
 }
 /**
- * Asynchronous queue task controller.
- *
  * Map from @vueuse/core `useAsyncQueue`
- * (`source/vueuse/packages/core/useAsyncQueue/`). Executes each asynchronous
- * task sequentially, passing the current task result to the next one, and
- * exposes the currently running task index (`activeIndex`) together with the
- * per-task results (`result`, an array of `{ state, data }` entries).
- *
- * React divergences:
- * - upstream returns `activeIndex` as a `ShallowRef` and `result` as a
- *   `reactive` array; this port is an object mirror whose members are plain
- *   React state values — `activeIndex` is a number (the current task index,
- *   `-1` before the first task), `result` is the results array and updates
- *   trigger a re-render (no `.value`);
- * - upstream runs the reduce chain synchronously during setup; here it starts
- *   from a mount effect (after the first render). React StrictMode (dev)
- *   mounts effects twice, so a started ref keeps the queue running exactly
- *   once — the promise chain itself is identical: sequential execution,
- *   `interrupt` stops subsequent tasks after a failure, `signal` aborts the
- *   current task via `Promise.race`.
+ * (`source/vueuse/packages/core/useAsyncQueue/`).
  *
  * @example
  * const { activeIndex, result } = useAsyncQueue([p1, p2])

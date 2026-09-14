@@ -44,7 +44,7 @@ describe('usePointerLock', () => {
 
     let promise!: Promise<Element | null>
     await act(async () => {
-      promise = result.current.lock(target)
+      promise = result.current.lock({ current: target })
     })
 
     expect(requestSpy).toHaveBeenCalledTimes(1)
@@ -166,7 +166,7 @@ describe('usePointerLock', () => {
     // acquire failure
     let promise!: Promise<Element | null>
     await act(async () => {
-      promise = result.current.lock(target)
+      promise = result.current.lock({ current: target })
     })
     promise.catch(() => {})
 
@@ -216,7 +216,7 @@ describe('usePointerLock', () => {
     spyRequestPointerLock(target)
     let locked!: Promise<Element | null>
     await act(async () => {
-      locked = result.current.lock(target)
+      locked = result.current.lock({ current: target })
     })
     expect(result.current.element).toBeNull()
 
@@ -254,7 +254,7 @@ describe('usePointerLock', () => {
 
     let promise!: Promise<Element | null>
     await act(async () => {
-      promise = result.current.lock(document.createElement('div'))
+      promise = result.current.lock({ current: document.createElement('div') })
     })
     await expect(promise).rejects.toThrow('Pointer Lock API is not supported by your browser.')
   })
@@ -267,7 +267,7 @@ describe('usePointerLock', () => {
 
     let locked!: Promise<Element | null>
     await act(async () => {
-      locked = result.current.lock(target)
+      locked = result.current.lock({ current: target })
     })
     stubPointerLockElement(target)
     await act(() => {

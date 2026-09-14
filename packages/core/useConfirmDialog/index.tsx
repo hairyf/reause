@@ -18,75 +18,44 @@ export interface UseConfirmDialogReturn<RevealData, ConfirmData, CancelData> {
   isRevealed: boolean
 
   /**
-   * Opens the dialog.
-   * Create promise and return it. Triggers `onReveal` hook.
+   * Opens the dialog. Create promise and return it. Triggers `onReveal` hook.
    */
   reveal: (data?: RevealData) => Promise<UseConfirmDialogRevealResult<ConfirmData, CancelData>>
 
   /**
-   * Confirms and closes the dialog. Triggers a callback inside `onConfirm` hook.
-   * Resolves promise from `reveal()` with `data` and `isCanceled` ref with `false` value.
-   * Can accept any data and to pass it to `onConfirm` hook.
+   * Confirms and closes the dialog. Triggers a callback inside `onConfirm` hook. Resolves promise
+   * from `reveal()` with `data` and `isCanceled` ref with `false` value. Can accept any data and to
+   * pass it to `onConfirm` hook.
    */
   confirm: (data?: ConfirmData) => void
 
   /**
-   * Cancels and closes the dialog. Triggers a callback inside `onCancel` hook.
-   * Resolves promise from `reveal()` with `data` and `isCanceled` ref with `true` value.
-   * Can accept any data and to pass it to `onCancel` hook.
+   * Cancels and closes the dialog. Triggers a callback inside `onCancel` hook. Resolves promise
+   * from `reveal()` with `data` and `isCanceled` ref with `true` value. Can accept any data and to
+   * pass it to `onCancel` hook.
    */
   cancel: (data?: CancelData) => void
 
   /**
-   * Event Hook to be triggered right before dialog creating.
+   * Event Hook to be triggered right before dialog creating. Returns the off function that removes
+   * the listener.
    */
-  onReveal: (fn: (data: RevealData) => void) => { off: () => void }
+  onReveal: (fn: (data: RevealData) => void) => () => void
 
   /**
-   * Event Hook to be called on `confirm()`.
-   * Gets data object from `confirm` function.
+   * Event Hook to be called on `confirm()`. Gets data object from `confirm` function.
    */
-  onConfirm: (fn: (data: ConfirmData) => void) => { off: () => void }
+  onConfirm: (fn: (data: ConfirmData) => void) => () => void
 
   /**
-   * Event Hook to be called on `cancel()`.
-   * Gets data object from `cancel` function.
+   * Event Hook to be called on `cancel()`. Gets data object from `cancel` function.
    */
-  onCancel: (fn: (data: CancelData) => void) => { off: () => void }
+  onCancel: (fn: (data: CancelData) => void) => () => void
 }
 
 /**
- * React port of VueUse's `useConfirmDialog`.
- *
  * Map from @vueuse/core `useConfirmDialog`
- * (`source/vueuse/packages/core/useConfirmDialog/`). Creates event hooks to
- * support modals and confirmation dialog chains.
- *
- * The hook exposes `isRevealed` (boolean state), the `reveal` / `confirm` /
- * `cancel` controls and three listener registration functions (`onReveal` /
- * `onConfirm` / `onCancel`) following the `useListener` protocol.
- *
- * React divergences:
- * - upstream's `isRevealed` computed ref becomes plain boolean state; the
- *   optional external `shallowRef` parameter becomes a React ref object
- *   (`RefObject<boolean>`) that the controls keep in sync when provided.
- *   Upstream's computed reads `revealed.value` live, so an out-of-band write
- *   is visible immediately; React state re-syncs on the next render only
- *   (render-time comparison), so a write with no subsequent re-render cannot
- *   be observed;
- * - `reveal()` still returns a promise that resolves with `{ data,
- *   isCanceled }` when `confirm()` / `cancel()` is called;
- * - upstream's `createEventHook()` on* members become stable subscribe
- *   functions with the `(fn) => { off }` shape, managed with Sets, so they
- *   are identity-stable across renders and compatible with the `useListener`
- *   protocol;
- * - listener return values are collected with `Promise.all`, mirroring
- *   upstream `createEventHook().trigger()`: a rejected async listener surfaces
- *   as an unhandled rejection on the discarded aggregate promise, while a
- *   synchronous throw propagates to the `reveal()` / `confirm()` / `cancel()`
- *   caller in both implementations;
- * - the event subscriptions are cleared on unmount (upstream:
- *   `tryOnScopeDispose` inside `createEventHook`'s `on`).
+ * (`source/vueuse/packages/core/useConfirmDialog/`).
  *
  * @example
  * const { isRevealed, reveal, confirm, cancel, onReveal, onConfirm, onCancel } = useConfirmDialog()
@@ -125,36 +94,30 @@ export function useConfirmDialog<
     setIsRevealed(revealed.current)
 
   // Event hooks: upstream `createEventHook()` — one stable subscribe function
-  // per event, returning an `off` handle to unsubscribe. The sets are stored
-  // in refs so the subscribe functions stay identity-stable.
+  // per event, returning the off function that unsubscribes it. The sets are
+  // stored in refs so the subscribe functions stay identity-stable.
   const revealFns = useRef(new Set<(data: RevealData) => void>())
   const confirmFns = useRef(new Set<(data: ConfirmData) => void>())
   const cancelFns = useRef(new Set<(data: CancelData) => void>())
 
   const onReveal = useCallback((fn: (data: RevealData) => void) => {
     revealFns.current.add(fn)
-    return {
-      off: () => {
-        revealFns.current.delete(fn)
-      },
+    return () => {
+      revealFns.current.delete(fn)
     }
   }, [])
 
   const onConfirm = useCallback((fn: (data: ConfirmData) => void) => {
     confirmFns.current.add(fn)
-    return {
-      off: () => {
-        confirmFns.current.delete(fn)
-      },
+    return () => {
+      confirmFns.current.delete(fn)
     }
   }, [])
 
   const onCancel = useCallback((fn: (data: CancelData) => void) => {
     cancelFns.current.add(fn)
-    return {
-      off: () => {
-        cancelFns.current.delete(fn)
-      },
+    return () => {
+      cancelFns.current.delete(fn)
     }
   }, [])
 

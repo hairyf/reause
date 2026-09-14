@@ -4,7 +4,7 @@ category: Side-effects
 
 # useError
 
-Returns a referentially stable error dispatcher whose error is re-thrown from a `useEffect` on the next render, so the nearest Error Boundary catches it — React port of react-use's [`useError`](https://streamich.github.io/react-use/?path=/story/side-effects-useerror--docs) (mapped from `source/react-use/src/useError.ts` and `source/react-use/docs/useError.md`).
+Returns a stable error dispatcher that re-throws on the next render.
 
 ## Usage
 

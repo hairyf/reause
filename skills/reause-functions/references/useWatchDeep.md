@@ -47,45 +47,24 @@ deepEqual(deepClone({ foo: { bar: 1 } }), { foo: { bar: 1 } }) // true
 
 ```ts
 /**
- * Structural equality, mirroring the semantics of test `toEqual`: primitives
- * are compared with `Object.is`, and `Date`, `RegExp`, `Array`, `Map`, `Set`
- * and objects (plain or class instances) are compared by contents. Functions
- * compare by reference, and `Map` keys are matched by reference because key
- * lookups cannot deep-match, while `Map` values and `Set` items are compared
- * deeply.
+ * Structural equality, mirroring the semantics of test `toEqual`: primitives are compared with
+ * `Object.is`, and `Date`, `RegExp`, `Array`, `Map`, `Set` and objects (plain or class instances)
+ * are compared by contents. Functions compare by reference, and `Map` keys are matched by reference
+ * because key lookups cannot deep-match, while `Map` values and `Set` items are compared deeply.
  *
- * Shared single source of truth — used by {@link useWatchDeep} and imported
- * from `@reause/shared` by core hooks that need deep change detection
- * (e.g. `useCloned`).
+ * Shared single source of truth — used by {@link useWatchDeep} and imported from `@reause/shared`
+ * by core hooks that need deep change detection (e.g. `useCloned`).
  */
 export declare function deepEqual(a: unknown, b: unknown): boolean
 /**
- * Deep clone pairing with {@link deepEqual}'s type coverage — `Date`, `RegExp`,
- * `Array`, `Map`, `Set` and objects (plain or class instances) are copied
- * structurally, primitives and functions pass through. Used to snapshot a live
- * value into an isolated baseline for change detection (e.g. `useCloned`'s
- * source / cloned baselines, which must stay unaffected by in-place mutations).
+ * Deep clone pairing with {@link deepEqual}'s type coverage — `Date`, `RegExp`, `Array`, `Map`,
+ * `Set` and objects (plain or class instances) are copied structurally, primitives and functions
+ * pass through. Used to snapshot a live value into an isolated baseline for change detection (e.g.
+ * `useCloned`'s source / cloned baselines, which must stay unaffected by in-place mutations).
  */
 export declare function deepClone<T>(value: T): T
 /**
- * React port of VueUse's `watchDeep` — shorthand for watching a value with
- * `{ deep: true }`. Built on top of {@link useWatch}.
- *
- * Map from @vueuse/shared `watchDeep`
- * Mapping: Vue's deep watcher traverses reactive proxies and fires on in-place
- * mutation of any nested property. React state is immutable — a nested change
- * always arrives as a new top-level value — so `useWatchDeep` deep-compares
- * the newly rendered value against the previously rendered one and invokes the
- * callback only when they differ deeply. A re-render that replaces the value
- * with a deep-equal one stays silent (unlike `useWatch`, which fires on every
- * reference change).
- *
- * Documented divergences from Vue's deep watch:
- * - In-place mutation of a value that is never replaced cannot be observed
- *   (React immutability) — replace the state instead; the callback then fires
- *   when the next rendered value deep-differs from the previous one.
- * - Reassigning the state to a deep-equal value does not fire. Vue's ref-based
- *   watch fires on every reassignment of the ref, even when deeply equal.
+ * Map from @vueuse/shared `watchDeep`.
  *
  * @example
  * ```ts

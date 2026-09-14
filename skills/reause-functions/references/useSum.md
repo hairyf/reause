@@ -25,39 +25,12 @@ const [b, setB] = useState(3)
 const sum = useSum(a, b, 2) // 6
 ```
 
-## Argument Forms
-
-Arguments are plain read-only numbers (upstream takes `MaybeRefOrGetter<number>[]`). The
-single-array form accepts a `readonly number[]`:
-
-```tsx
-useSum([1, 2, 3]) // array
-useSum(1, 2, 3) // variadic
-useSum([1, 2, 3] as const) // readonly array
-```
-
-Re-render with new values — e.g. from `useState` — and the hook recomputes.
-
 ## Type Declarations
 
 ```ts
 /**
- * React port of VueUse's `useSum`.
- *
  * Map from @vueuse/math `useSum`
- * (`source/vueuse/packages/math/useSum/`). Reactively get the sum of values.
- *
- * Adjustment for React: upstream wraps the computation in `computed(() => ...)`
- * and returns a `ComputedRef<number>`; the reause version is a pure derived
- * hook — the plain numbers (variadic arguments or a single `readonly number[]`)
- * are read at render time and the sum is returned directly as a `number`, with
- * no `.value` wrapper (SSR-safe).
- *
- * React divergence: arguments are plain read-only numbers, not upstream's
- * `MaybeRefOrGetter<number>[]`. In particular, the getter form (`() => number`)
- * is NOT accepted — getters as data sources are rejected repo-wide (issue #462)
- * — so the upstream getter test is intentionally not ported. The caller
- * re-renders with new values (e.g. from `useState`) and the hook recomputes.
+ * (`source/vueuse/packages/math/useSum/`).
  *
  * @see https://vueuse.org/math/useSum/
  *

@@ -66,11 +66,4 @@ useSubscription(count$.subscribe((value) => {
 }))
 ```
 
-Only plain values are accepted — never a getter, `State<T>` or `RefOrValue`.
-
-## React divergences from upstream
-
-- upstream's `Ref<T>` branch becomes the plain-value re-emit branch: React has no reactive refs, so the port takes a plain value and pushes changes through an internal effect instead of a `watch`.
-- upstream's `WatchOptions` (`immediate` / `deep` / `flush`) is dropped — React has no Vue `watch`. `immediate` is covered by subscribing-receives-current-value (the seeded `BehaviorSubject`); `deep` and `flush` are not mapped — handle extra control at the call site with rxjs operators or effect dependencies.
-- the hook is named `useFrom` (not `from`) to avoid colliding with rxjs's own `from` export.
-- upstream's `fromEvent` (the second export of the same upstream module) is not part of this mapping.
+Only plain values are accepted — never a getter, `State<T>` or a React ref.

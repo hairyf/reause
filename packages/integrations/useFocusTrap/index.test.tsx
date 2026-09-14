@@ -35,14 +35,14 @@ describe('useFocusTrap', () => {
   })
 
   it('should initialize with hasFocus and isPaused false', async () => {
-    const { result } = await renderHook(() => useFocusTrap(container))
+    const { result } = await renderHook(() => useFocusTrap({ current: container }))
 
     expect(result.current.hasFocus).toBe(false)
     expect(result.current.isPaused).toBe(false)
   })
 
   it('should activate the trap and keep focus inside the element', async () => {
-    const { result, act } = await renderHook(() => useFocusTrap(container))
+    const { result, act } = await renderHook(() => useFocusTrap({ current: container }))
 
     await act(async () => {
       result.current.activate()
@@ -86,7 +86,7 @@ describe('useFocusTrap', () => {
   })
 
   it('should deactivate the trap and release focus', async () => {
-    const { result, act } = await renderHook(() => useFocusTrap(container))
+    const { result, act } = await renderHook(() => useFocusTrap({ current: container }))
 
     await act(() => {
       result.current.activate()
@@ -106,7 +106,7 @@ describe('useFocusTrap', () => {
   })
 
   it('should pause and unpause the trap', async () => {
-    const { result, act } = await renderHook(() => useFocusTrap(container))
+    const { result, act } = await renderHook(() => useFocusTrap({ current: container }))
 
     expect(result.current.isPaused).toBe(false)
 
@@ -132,7 +132,7 @@ describe('useFocusTrap', () => {
   })
 
   it('should activate the trap on mount when immediate is set to true', async () => {
-    const { result, act } = await renderHook(() => useFocusTrap(container, { immediate: true }))
+    const { result, act } = await renderHook(() => useFocusTrap({ current: container }, { immediate: true }))
 
     expect(result.current.hasFocus).toBe(true)
 
@@ -144,7 +144,7 @@ describe('useFocusTrap', () => {
 
   it('should deactivate the trap on unmount', async () => {
     const onDeactivate = vi.fn()
-    const { result, act, unmount } = await renderHook(() => useFocusTrap(container, { onDeactivate }))
+    const { result, act, unmount } = await renderHook(() => useFocusTrap({ current: container }, { onDeactivate }))
 
     await act(() => {
       result.current.activate()
@@ -159,7 +159,7 @@ describe('useFocusTrap', () => {
   it('should invoke user-provided onActivate and onDeactivate callbacks', async () => {
     const onActivate = vi.fn()
     const onDeactivate = vi.fn()
-    const { result, act } = await renderHook(() => useFocusTrap(container, { onActivate, onDeactivate }))
+    const { result, act } = await renderHook(() => useFocusTrap({ current: container }, { onActivate, onDeactivate }))
 
     await act(() => {
       result.current.activate()

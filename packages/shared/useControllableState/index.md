@@ -6,29 +6,20 @@ category: State
 
 A hook for combining controlled and uncontrolled state sources.
 
+## Usage
+
 ```tsx
-const [value, setValue] = useControllableState(props.value, {
-  defaultValue: 'initial',
-  passive: true,
-})
+import { useControllableState } from '@reause/shared'
+import { useState } from 'react'
+
+// tuple state: `value` is the external value and `setValue` writes through to `setExternal`
+const [external, setExternal] = useState('controlled')
+const [value, setValue] = useControllableState([external, setExternal])
+
+// passive plain-value state: initialized from the source, local updates persist
+const [draft, setDraft] = useControllableState('draft', { passive: true })
 ```
 
-- Tuple `[value, setter]` and `{ value, onChange }` sources are always controlled: the current value is the resolved source and `setValue` writes through to the tuple setter / `onChange`.
-- With `passive: true`, plain values, refs, and getters are treated as uncontrolled: the hook initializes from the source and local updates persist, and external source changes are synced back.
-- With the default `passive: false`, a plain value, getter, or ref source is controlled — the external value wins on every render. `setValue` then has no channel back to the caller, so it warns instead of silently discarding the update; pass a tuple, a `{ value, onChange }` pair, or use `passive: true` to write.
-- `defaultValue` accepts a value or lazy initializer; it seeds the internal state of uncontrolled sources.
-- `setValue` accepts both values and updater functions wherever it has a write channel (tuple, `{ value, onChange }`, or uncontrolled sources).
-- `shouldUpdate(prev, next)` returns `true` when the value should be committed; unchanged values are ignored — the passive sync honors it too.
-- Note: plain object/array sources with `passive: true` are not synced back (an inline literal is a new identity on every render, so syncing it would re-render forever). Use a ref-like `{ current }` or getter source for object sync.
+Tuple `[value, setter]` and `{ value, onChange }` sources are always controlled: the current value is the resolved source and `setValue` writes through to the tuple setter / `onChange`.
 
 `toValue` resolution is applied on every render, so lazy getters, refs, tuples, and value objects are supported consistently.
-
-## API
-
-```ts
-interface UseControllableStateOptions<T> {
-  defaultValue?: T | (() => T)
-  shouldUpdate?: (prev: T, next: T) => boolean
-  passive?: boolean
-}
-```

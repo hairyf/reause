@@ -15,239 +15,223 @@ describe('syncState', () => {
   })
 
   it('should work', async () => {
-    const a = { current: 'foo' }
-    const b = { current: 'bar' }
-
-    const { result, rerender } = await renderHook(() => syncState(a, b))
+    const { result, act } = await renderHook(() => {
+      const [a, setA] = useState('foo')
+      const [b, setB] = useState('bar')
+      const stop = syncState([a, setA], [b, setB])
+      return { a, b, setA, setB, stop }
+    })
 
     // upstream: immediate sync on setup (default `immediate: true`) — here the
     // initial sync runs in the mount effect, i.e. once the hook has rendered
-    expect(b.current).toBe('foo')
+    expect(result.current.b).toBe('foo')
 
-    // upstream: `a.value = 'bar'` fires the watcher synchronously — in React
-    // the mutation is adopted on the following render
-    a.current = 'bar'
-    await rerender()
+    // a left-side write lands in the right side through its setter
+    await act(() => result.current.setA('bar'))
+    expect(result.current.a).toBe('bar')
+    expect(result.current.b).toBe('bar')
 
-    expect(a.current).toBe('bar')
-    expect(b.current).toBe('bar')
+    // a right-side write propagates back to the left side
+    await act(() => result.current.setB('foo'))
+    expect(result.current.a).toBe('foo')
+    expect(result.current.b).toBe('foo')
 
-    b.current = 'foo'
-    await rerender()
+    result.current.stop()
 
-    expect(a.current).toBe('foo')
-    expect(b.current).toBe('foo')
-
-    result.current() // stop
-
-    a.current = 'bar2'
-    await rerender()
-
-    expect(a.current).toBe('bar2')
-    expect(b.current).toBe('foo')
+    await act(() => result.current.setA('bar2'))
+    expect(result.current.a).toBe('bar2')
+    expect(result.current.b).toBe('foo')
   })
 
   it('works with rtl direction', async () => {
-    const left = { current: 'left' }
-    const right = { current: 'right' }
+    const { result, act } = await renderHook(() => {
+      const [left, setLeft] = useState('left')
+      const [right, setRight] = useState('right')
+      syncState([left, setLeft], [right, setRight], { direction: 'rtl' })
+      return { left, right, setLeft, setRight }
+    })
 
-    const { rerender } = await renderHook(() => syncState(left, right, { direction: 'rtl' }))
-
-    expect(left.current).toBe('right')
-    expect(right.current).toBe('right')
+    // immediate sync right → left
+    expect(result.current.left).toBe('right')
+    expect(result.current.right).toBe('right')
 
     // rtl: changing left does not propagate back to right
-    left.current = 'bar'
-    await rerender()
+    await act(() => result.current.setLeft('bar'))
+    expect(result.current.left).toBe('bar')
+    expect(result.current.right).toBe('right')
 
-    expect(left.current).toBe('bar')
-    expect(right.current).toBe('right')
-
-    right.current = 'foobar'
-    await rerender()
-
-    expect(left.current).toBe('foobar')
-    expect(right.current).toBe('foobar')
+    await act(() => result.current.setRight('foobar'))
+    expect(result.current.left).toBe('foobar')
+    expect(result.current.right).toBe('foobar')
   })
 
   it('works with ltr direction', async () => {
-    const left = { current: 'left' }
-    const right = { current: 'right' }
+    const { result, act } = await renderHook(() => {
+      const [left, setLeft] = useState('left')
+      const [right, setRight] = useState('right')
+      syncState([left, setLeft], [right, setRight], { direction: 'ltr' })
+      return { left, right, setLeft, setRight }
+    })
 
-    const { rerender } = await renderHook(() => syncState(left, right, { direction: 'ltr' }))
-
-    expect(left.current).toBe('left')
-    expect(right.current).toBe('left')
+    // immediate sync left → right
+    expect(result.current.left).toBe('left')
+    expect(result.current.right).toBe('left')
 
     // ltr: changing right does not propagate back to left
-    right.current = 'bar'
-    await rerender()
+    await act(() => result.current.setRight('bar'))
+    expect(result.current.left).toBe('left')
+    expect(result.current.right).toBe('bar')
 
-    expect(left.current).toBe('left')
-    expect(right.current).toBe('bar')
-
-    left.current = 'foobar'
-    await rerender()
-
-    expect(left.current).toBe('foobar')
-    expect(right.current).toBe('foobar')
+    await act(() => result.current.setLeft('foobar'))
+    expect(result.current.left).toBe('foobar')
+    expect(result.current.right).toBe('foobar')
   })
 
   it('works with mutual convertors', async () => {
-    const left = { current: 10 }
-    const right = { current: 2 }
-
-    const { rerender } = await renderHook(() => syncState(left, right, {
-      transform: {
-        ltr: left => left * 2,
-        rtl: right => Math.floor(right / 3),
-      },
-    }))
+    const { result, act } = await renderHook(() => {
+      const [left, setLeft] = useState(10)
+      const [right, setRight] = useState(2)
+      syncState([left, setLeft], [right, setRight], {
+        transform: {
+          ltr: left => left * 2,
+          rtl: right => Math.floor(right / 3),
+        },
+      })
+      return { left, right, setLeft, setRight }
+    })
 
     // check immediately sync
-    expect(right.current).toBe(20)
-    expect(left.current).toBe(6)
+    expect(result.current.right).toBe(20)
+    expect(result.current.left).toBe(6)
 
-    left.current = 30
-    await rerender()
-    expect(right.current).toBe(60)
-    expect(left.current).toBe(30)
+    await act(() => result.current.setLeft(30))
+    expect(result.current.right).toBe(60)
+    expect(result.current.left).toBe(30)
 
-    right.current = 10
-    await rerender()
-    expect(right.current).toBe(10)
-    expect(left.current).toBe(3)
+    await act(() => result.current.setRight(10))
+    expect(result.current.right).toBe(10)
+    expect(result.current.left).toBe(3)
   })
 
   it('works with only rtl convertor', async () => {
-    const left = { current: 10 }
-    const right = { current: 2 }
-
-    const { rerender } = await renderHook(() => syncState(left, right, {
-      direction: 'rtl',
-      transform: {
-        rtl: right => Math.round(right / 2),
-      },
-    }))
+    const { result, act } = await renderHook(() => {
+      const [left, setLeft] = useState(10)
+      const [right, setRight] = useState(2)
+      syncState([left, setLeft], [right, setRight], {
+        direction: 'rtl',
+        transform: {
+          rtl: right => Math.round(right / 2),
+        },
+      })
+      return { left, right, setLeft, setRight }
+    })
 
     // check immediately sync
-    expect(right.current).toBe(2)
-    expect(left.current).toBe(1)
+    expect(result.current.right).toBe(2)
+    expect(result.current.left).toBe(1)
 
-    left.current = 10
-    await rerender()
-    expect(right.current).toBe(2)
-    expect(left.current).toBe(10)
+    await act(() => result.current.setLeft(10))
+    expect(result.current.right).toBe(2)
+    expect(result.current.left).toBe(10)
 
-    right.current = 10
-    await rerender()
-    expect(right.current).toBe(10)
-    expect(left.current).toBe(5)
+    await act(() => result.current.setRight(10))
+    expect(result.current.right).toBe(10)
+    expect(result.current.left).toBe(5)
   })
 
   it('does not sync on mount when immediate is false', async () => {
-    const a = { current: 'foo' }
-    const b = { current: 'bar' }
+    const { result, act } = await renderHook(() => {
+      const [a, setA] = useState('foo')
+      const [b, setB] = useState('bar')
+      syncState([a, setA], [b, setB], { immediate: false })
+      return { a, b, setA }
+    })
 
-    const { rerender } = await renderHook(() => syncState(a, b, { immediate: false }))
+    expect(result.current.a).toBe('foo')
+    expect(result.current.b).toBe('bar')
 
-    expect(a.current).toBe('foo')
-    expect(b.current).toBe('bar')
+    await act(() => result.current.setA('baz'))
 
-    a.current = 'baz'
-    await rerender()
-
-    expect(a.current).toBe('baz')
-    expect(b.current).toBe('baz')
+    expect(result.current.a).toBe('baz')
+    expect(result.current.b).toBe('baz')
   })
 
-  it('syncs a [value, setter] tuple side two-way', async () => {
-    const left = { current: 'left' }
-    const { result, rerender } = await renderHook(() => {
+  it('syncs two [value, setter] tuple sides two-way', async () => {
+    const { result, act } = await renderHook(() => {
+      const [left, setLeft] = useState('left')
       const [right, setRight] = useState('right')
-      const stop = syncState(left, [right, setRight])
-      return { right, setRight, stop }
+      const stop = syncState([left, setLeft], [right, setRight])
+      return { left, right, setLeft, setRight, stop }
     })
 
-    // immediate sync: left → tuple side (through the setter)
-    await vi.waitFor(() => {
-      expect(result.current.right).toBe('left')
-    })
-    expect(left.current).toBe('left')
+    // immediate sync: left → right (through the setter)
+    expect(result.current.right).toBe('left')
+    expect(result.current.left).toBe('left')
 
-    // external left change propagates into the tuple side
-    left.current = 'from-left'
-    await rerender()
-    await vi.waitFor(() => {
-      expect(result.current.right).toBe('from-left')
-    })
+    // external left change propagates into the right side
+    await act(() => result.current.setLeft('from-left'))
+    expect(result.current.right).toBe('from-left')
 
-    // setter-driven change propagates back into the ref-like left side
-    result.current.setRight('from-right')
-    await rerender()
-    expect(left.current).toBe('from-right')
+    // setter-driven change propagates back into the left side
+    await act(() => result.current.setRight('from-right'))
+    expect(result.current.left).toBe('from-right')
 
     // stop tears the sync down
     result.current.stop()
-    left.current = 'stopped'
-    await rerender()
+    await act(() => result.current.setLeft('stopped'))
     expect(result.current.right).toBe('from-right')
   })
 
-  it('syncs a { value, onChange } pair and propagates value changes back', async () => {
-    const left = { current: 'left' }
+  it('syncs a tuple side with a { value, onChange } pair and propagates value changes back', async () => {
     const onChange = vi.fn()
-    const { result, rerender } = await renderHook(
+    const { result, act, rerender } = await renderHook(
       ({ value }: { value: string } = { value: 'right' }) => {
-        const stop = syncState(left, { value, onChange })
-        return { stop }
+        const [left, setLeft] = useState('left')
+        const stop = syncState([left, setLeft], { value, onChange })
+        return { left, setLeft, stop }
       },
       { initialProps: { value: 'right' } },
     )
 
     // immediate sync publishes through onChange
-    await vi.waitFor(() => {
-      expect(onChange).toHaveBeenCalledWith('left')
-    })
-    expect(left.current).toBe('left')
+    expect(onChange).toHaveBeenCalledWith('left')
+    expect(result.current.left).toBe('left')
 
     // a left-side change publishes through onChange
-    left.current = 'from-left'
-    await rerender({ value: 'right' })
-    await vi.waitFor(() => {
-      expect(onChange).toHaveBeenLastCalledWith('from-left')
-    })
-    expect(left.current).toBe('from-left')
+    await act(() => result.current.setLeft('from-left'))
+    expect(onChange).toHaveBeenLastCalledWith('from-left')
+    expect(result.current.left).toBe('from-left')
 
     // a changed `value` prop propagates back to the left side
     await rerender({ value: 'from-pair' })
-    expect(left.current).toBe('from-pair')
+    expect(result.current.left).toBe('from-pair')
 
     // stop tears the sync down — no further onChange calls
     result.current.stop()
     const callsAfterStop = onChange.mock.calls.length
-    left.current = 'stopped'
-    await rerender({ value: 'from-pair' })
+    await act(() => result.current.setLeft('stopped'))
     expect(onChange).toHaveBeenCalledTimes(callsAfterStop)
   })
 
   it('treats a plain-value side as read-only', async () => {
     const plain = 'static'
-    const target = { current: 'target' }
-    const { rerender } = await renderHook(() => syncState(plain, target))
+    const { result, act, rerender } = await renderHook(() => {
+      const [target, setTarget] = useState('target')
+      syncState(plain, [target, setTarget])
+      return { target, setTarget }
+    })
 
     // immediate sync: plain → target
-    expect(target.current).toBe('static')
+    expect(result.current.target).toBe('static')
 
     // the plain side has no write path — a target change never writes back
-    target.current = 'changed'
-    await rerender()
-    expect(target.current).toBe('changed')
+    await act(() => result.current.setTarget('changed'))
+    expect(result.current.target).toBe('changed')
 
     // and a later re-render does not clobber the target with the stale plain
     // value (the read-only side is not recorded as written)
     await rerender()
-    expect(target.current).toBe('changed')
+    expect(result.current.target).toBe('changed')
   })
 
   it('should type check the transform contract', () => {
@@ -290,26 +274,9 @@ describe('syncState (component)', () => {
     const [a, setA] = useState('')
     const [b, setB] = useState('')
 
-    // ref-like bridges onto the state — the syncState effect writes a side's
-    // `.current`, which lands in state and re-renders the inputs
-    const aRef = {
-      get current() {
-        return a
-      },
-      set current(value: string) {
-        setA(value)
-      },
-    }
-    const bRef = {
-      get current() {
-        return b
-      },
-      set current(value: string) {
-        setB(value)
-      },
-    }
-
-    syncState(aRef, bRef)
+    // tuple sides — the syncState effect writes through each side's setter,
+    // which lands in state and re-renders the inputs
+    syncState([a, setA], [b, setB])
 
     return (
       <div>

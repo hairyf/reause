@@ -40,20 +40,7 @@ export interface UseTimeoutFnReturn<CallbackFn extends AnyFn> {
   start: (...args: Parameters<CallbackFn> | []) => void
 }
 /**
- * React port of VueUse's `useTimeoutFn` — wrapper for `setTimeout` with
- * controls.
- *
- * Map from @vueuse/shared `useTimeoutFn`
- * Mapping: upstream accepts `RefOrValue<number>` for the interval — this
- * port accepts a plain `number`. `isPending` becomes a boolean state
- * (upstream: a readonly shallow ref) that starts `false` and is set inside
- * the mount effect — like upstream's `shallowRef(false)` + `isClient` gate,
- * the server render does not report pending. `immediateCallback` runs the
- * callback synchronously on `start` (before the timer is armed). The timer
- * is scheduled in a mount effect (upstream starts synchronously during
- * setup) and a pending timer is cleared on unmount via effect cleanup. The
- * latest callback and interval are kept in refs so restarts always use the
- * newest ones.
+ * Map from @vueuse/shared `useTimeoutFn`.
  *
  * @example
  * const { isPending, start, stop } = useTimeoutFn(() => { ... }, 3000)

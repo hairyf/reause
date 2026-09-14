@@ -86,14 +86,15 @@ afterEach(() => {
 
 describe('useParallax', () => {
   it('returns 0 tilt/roll and mouse source before any sensor data', async () => {
-    const { result } = await renderHook(() => useParallax(null))
+    const { result } = await renderHook(() => useParallax({ current: null }))
 
     expect(result.current).toEqual({ tilt: 0, roll: 0, source: 'mouse' })
   })
 
   it('updates tilt/roll from the mouse position relative to the target element', async () => {
     const el = createTarget()
-    const { result, act } = await renderHook(() => useParallax(el))
+    const elRef = { current: el }
+    const { result, act } = await renderHook(() => useParallax(elRef))
 
     // 150px into a 200px box → tilt = (150 - 100) / 200 = 0.25,
     // roll = -(150 - 100) / 200 = -0.25
@@ -108,7 +109,8 @@ describe('useParallax', () => {
 
   it('keeps the last in-element values while the cursor is outside the element', async () => {
     const el = createTarget()
-    const { result, act } = await renderHook(() => useParallax(el))
+    const elRef = { current: el }
+    const { result, act } = await renderHook(() => useParallax(elRef))
 
     await act(() => {
       moveMouse(el.getBoundingClientRect(), 150, 150)
@@ -125,7 +127,8 @@ describe('useParallax', () => {
 
   it('applies the mouse adjust callbacks', async () => {
     const el = createTarget()
-    const { result, act } = await renderHook(() => useParallax(el, {
+    const elRef = { current: el }
+    const { result, act } = await renderHook(() => useParallax(elRef, {
       mouseTiltAdjust: i => i * 2,
       mouseRollAdjust: i => i * 3,
     }))
@@ -141,7 +144,7 @@ describe('useParallax', () => {
 
   it('falls back to device orientation values when alpha/gamma become non-zero', async () => {
     stubScreenOrientation('portrait-primary', 0)
-    const { result, act } = await renderHook(() => useParallax(null))
+    const { result, act } = await renderHook(() => useParallax({ current: null }))
 
     // supported but zero alpha/gamma → stays mouse
     await act(() => {
@@ -160,9 +163,10 @@ describe('useParallax', () => {
 
   it('keeps tilt/roll cursor-relative across scroll and resize instead of snapping to the corner', async () => {
     const el = createTarget()
+    const elRef = { current: el }
     // deterministic geometry: a 200x200 box at (100, 100) in the viewport
     const rect = mockRects(el, { left: 100, top: 100, width: 200, height: 200 })
-    const { result, act } = await renderHook(() => useParallax(el))
+    const { result, act } = await renderHook(() => useParallax(elRef))
 
     // cursor 150px into the box → tilt = (150 - 100) / 200 = 0.25,
     // roll = -(150 - 100) / 200 = -0.25
@@ -193,7 +197,7 @@ describe('useParallax', () => {
 
   it('applies the deviceOrientation adjust callbacks', async () => {
     stubScreenOrientation('portrait-primary', 0)
-    const { result, act } = await renderHook(() => useParallax(null, {
+    const { result, act } = await renderHook(() => useParallax({ current: null }, {
       deviceOrientationTiltAdjust: i => i * 2,
       deviceOrientationRollAdjust: i => i * 3,
     }))
@@ -210,8 +214,9 @@ describe('useParallax', () => {
 
   it('returns finite 0 for a zero-size rect where upstream yields NaN', async () => {
     const el = createTarget()
+    const elRef = { current: el }
     mockRects(el, { left: 0, top: 0, width: 0, height: 0 })
-    const { result, act } = await renderHook(() => useParallax(el))
+    const { result, act } = await renderHook(() => useParallax(elRef))
 
     await act(() => {
       window.dispatchEvent(new MouseEvent('mousemove', { clientX: 10, clientY: 10, bubbles: true }))
@@ -220,11 +225,11 @@ describe('useParallax', () => {
     expect(result.current).toEqual({ tilt: 0, roll: 0, source: 'mouse' })
   })
 
-  it('resolves a ref-like target at bind time, after it is populated', async () => {
+  it('resolves a ref target at bind time, after it is populated', async () => {
     const el = createTarget()
     const targetRef: { current: HTMLElement | null } = { current: null }
     const { result, act, rerender } = await renderHook<{ current: HTMLElement | null }, UseParallaxReturn>(
-      props => useParallax(props),
+      (props?: { current: HTMLElement | null }) => useParallax(props ?? targetRef),
       { initialProps: targetRef },
     )
 
@@ -250,7 +255,7 @@ describe('useParallax', () => {
     const snapshots: Array<{ tilt: number, roll: number, source: 'deviceOrientation' | 'mouse' }> = []
 
     function Probe() {
-      const parallax = useParallax(null)
+      const parallax = useParallax({ current: null })
       snapshots.push({ tilt: parallax.tilt, roll: parallax.roll, source: parallax.source })
       return <div>{parallax.tilt}</div>
     }
@@ -264,7 +269,8 @@ describe('useParallax', () => {
 
   it('removes its listeners on unmount', async () => {
     const el = createTarget()
-    const { result, act, unmount } = await renderHook(() => useParallax(el))
+    const elRef = { current: el }
+    const { result, act, unmount } = await renderHook(() => useParallax(elRef))
 
     await act(() => {
       moveMouse(el.getBoundingClientRect(), 150, 150)

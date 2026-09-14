@@ -55,8 +55,13 @@ describe('useStateWithControl', () => {
     const { result: getter } = await renderHook(() => useStateWithControl(() => 42))
     expect(getter.current[0]).toBe(42)
 
-    const { result: refLike } = await renderHook(() => useStateWithControl({ current: 42 }))
-    expect(refLike.current[0]).toBe(42)
+    // a `{ value, onChange }` pair is the object form of a State source — a
+    // ref (`{ current }`) is no longer one (refs are DOM handles)
+    const onPairChange = vi.fn()
+    const { result: pair, act: pairAct } = await renderHook(() => useStateWithControl({ value: 42, onChange: onPairChange }))
+    expect(pair.current[0]).toBe(42)
+    await pairAct(async () => pair.current[1](43))
+    expect(onPairChange).toHaveBeenCalledWith(43)
 
     const onChange = vi.fn()
     const { result: controlled, act } = await renderHook(() => useStateWithControl([42, onChange]))

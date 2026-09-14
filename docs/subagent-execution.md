@@ -36,7 +36,7 @@
 ### 3.3 useListener 协议
 
 - 凡是返回 listener callback 的 Hook，消费方式统一采用 `useListener(onXxx, cb)`。
-- 注册函数 `onXxx` 必须返回 `{ off: () => void }` 或 `void`。
+- 注册函数 `onXxx` 必须返回 off 函数 `() => void` 或 `void`；`useListener` 既可传注册函数本身，也可传带 `on` 成员的对象（如 `createEventHook()` 的返回值）。
 
 ## 4. 本地验证与提交
 

@@ -5,8 +5,8 @@ export interface UseLastChangedOptions<InitialValue extends number | null | unde
   /**
    * Value returned before any change has been recorded.
    *
-   * (Upstream also extends Vue's `WatchOptions` — `immediate` / `deep` /
-   * `flush` / `once` have no React equivalent here, see the mapping note.)
+   * (Upstream also extends Vue's `WatchOptions` — `immediate` / `deep` / `flush` / `once` have no
+   * React equivalent here, see the mapping note.)
    *
    * @default null
    */
@@ -16,10 +16,7 @@ export interface UseLastChangedOptions<InitialValue extends number | null | unde
 export type UseLastChangedReturn = number | null
 
 /**
- * React port of VueUse's `useLastChanged`.
- *
- * Map from @vueuse/shared `useLastChanged`
- * Records the timestamp of the last change
+ * Map from @vueuse/shared `useLastChanged`.
  *
  * @see https://vueuse.org/shared/useLastChanged
  */

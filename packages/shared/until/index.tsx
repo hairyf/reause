@@ -1,16 +1,16 @@
 import { promiseTimeout } from '../utils'
 
 /**
- * Polling interval (ms) used to resolve `until` promises. React has no
- * reactive watch, so the port re-reads the source at this fixed interval —
- * the same polling approach `useFetch` uses for its `refetch` watch.
+ * Polling interval (ms) used to resolve `until` promises. React has no reactive watch, so the port
+ * re-reads the source at this fixed interval — the same polling approach `useFetch` uses for its
+ * `refetch` watch.
  */
 const UNTIL_POLL_INTERVAL = 50
 
 /**
- * Minimal structural equality — `Object.is` for primitives (so `NaN` equals
- * `NaN`), arrays compared by length and element, plain objects by own-key
- * count and value. Used by `changedTimes` when `deep: true`.
+ * Minimal structural equality — `Object.is` for primitives (so `NaN` equals `NaN`), arrays compared
+ * by length and element, plain objects by own-key count and value. Used by `changedTimes` when
+ * `deep: true`.
  */
 function deepEquals(a: unknown, b: unknown): boolean {
   if (Object.is(a, b))
@@ -36,9 +36,8 @@ function deepEquals(a: unknown, b: unknown): boolean {
 }
 
 /**
- * Clone used to snapshot the source between polls when `changedTimes` runs
- * with `deep: true` — the poller re-reads the same reference, so a reference
- * copy could never see an in-place mutation.
+ * Clone used to snapshot the source between polls when `changedTimes` runs with `deep: true` — the
+ * poller re-reads the same reference, so a reference copy could never see an in-place mutation.
  */
 function cloneDeep<T>(value: T): T {
   if (value === null || typeof value !== 'object')
@@ -53,8 +52,8 @@ function cloneDeep<T>(value: T): T {
 
 export interface UntilToMatchOptions {
   /**
-   * Milliseconds timeout for promise to resolve/reject if the when condition does not meet.
-   * 0 for never timed out
+   * Milliseconds timeout for promise to resolve/reject if the when condition does not meet. 0 for
+   * never timed out
    *
    * @default 0
    */
@@ -68,9 +67,9 @@ export interface UntilToMatchOptions {
   throwOnTimeout?: boolean
 
   /**
-   * `deep` option for the internal watch — kept for API compatibility. The
-   * React poller re-reads the source on every tick, so deep observation is
-   * implicit and this option is effectively a no-op.
+   * `deep` option for the internal watch — kept for API compatibility. The React poller re-reads
+   * the source on every tick, so deep observation is implicit and this option is effectively a
+   * no-op.
    *
    * @default false
    */
@@ -110,12 +109,12 @@ export interface UntilArrayInstance<T> extends UntilBaseInstance<T> {
 }
 
 /**
- * Resolve the accepted `until` source — a plain value or a zero-argument
- * getter (the React-idiomatic live source; a `Ref` / `{ current }` object is
- * not accepted — pass `() => ref.current`).
+ * Resolve the accepted `until` source — a plain value or a zero-argument getter (the
+ * React-idiomatic live source; a `Ref` / `{ current }` object is not accepted — pass `() =>
+ * ref.current`).
  *
- * NOTE: a source value that *is* a function is treated as a getter and
- * invoked (the same ambiguity `toValue` has).
+ * NOTE: a source value that *is* a function is treated as a getter and invoked (the same ambiguity
+ * `toValue` has).
  */
 function resolveSource<T>(source: T | (() => T)): T {
   return typeof source === 'function' ? (source as () => T)() : source
@@ -258,21 +257,7 @@ function createUntil<T>(r: any, isNot = false): UntilValueInstance<T, boolean> |
 }
 
 /**
- * Promised one-time watch for changes
- *
- * Map from @vueuse/shared `until`
- * React adaptation: upstream resolves when Vue's reactive `watch` callback
- * first observes the condition holding; React has no reactive refs or watch,
- * so this port **polls** the source — a plain value or a zero-argument getter
- * — at a small fixed interval (the same polling `useFetch` uses for its
- * `refetch` watch) and resolves the promise the first time the condition
- * holds. `until` is a **pure function, not a hook** — no React hooks are
- * involved — so it can be used anywhere a plain promise utility can.
- *
- * A plain value is a snapshot: it never changes between polls, so use a getter
- * when the value may change after `until` was called (`until(() => ref.current)`).
- * A `Ref` / `{ current }` object is not accepted directly. The `value` passed to
- * `toBe` / `toContains` is a plain value too.
+ * Map from @vueuse/shared `until`.
  *
  * @example
  * let count = 0

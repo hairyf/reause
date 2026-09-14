@@ -29,6 +29,67 @@
   border: 1px solid var(--vp-c-divider);
 }
 
+/* Changelog timeline — mirrors VueUse's `Changelog.vue` grid
+   (`grid-cols-[30px_auto] -ml-1 gap-1.5`) in plain CSS so the layout does not
+   depend on UnoCSS extracting classes out of the theme components. */
+.changelog {
+  display: grid;
+  grid-template-columns: 30px auto;
+  gap: 0.375rem;
+  margin: 1rem 0;
+}
+
+.changelog > * {
+  margin-top: 0.25rem;
+  margin-bottom: 0.25rem;
+}
+
+.changelog-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  margin: auto;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  background-color: rgb(156 163 175 / 10%);
+  opacity: 0.9;
+}
+
+.changelog-commit-icon {
+  margin: auto;
+  opacity: 0.3;
+  transform: rotate(90deg);
+}
+
+.changelog-version {
+  font-weight: 700;
+  color: var(--reause-brand);
+}
+
+.changelog-hash {
+  font-size: 0.75rem;
+  color: var(--vp-c-text-2);
+}
+
+.changelog-hash:hover {
+  color: var(--reause-brand);
+}
+
+.changelog-date {
+  font-size: 0.75rem;
+  opacity: 0.5;
+}
+
+.changelog-message {
+  font-size: 0.875rem;
+}
+
+.changelog-empty {
+  opacity: 0.7;
+}
+
 /* Reload prompt */
 .reload-prompt {
   position: fixed;

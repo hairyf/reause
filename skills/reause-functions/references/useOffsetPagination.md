@@ -40,8 +40,7 @@ const {
 
 ## Source Forms
 
-`total` and `pageSize` are read-only value sources and take plain numbers (upstream:
-`MaybeRefOrGetter<number>`) — only their initial value is adopted. `page` is controllable (the hook
+`total` and `pageSize` are read-only value sources and take plain numbers — only their initial value is adopted. `page` is controllable (the hook
 writes it back), so it accepts a React `State<number>`:
 
 ```tsx
@@ -84,24 +83,20 @@ When `total` is omitted, `isLastPage` is not returned (`UseOffsetPaginationInfin
 ```ts
 export interface UseOffsetPaginationOptions {
   /**
-   * Total number of items. A read-only value source — pass a plain number
-   * (upstream: `MaybeRefOrGetter<number>`; resolve a React ref or getter at
-   * the call site).
+   * Total number of items. A read-only value source — pass a plain number.
    */
   total?: number
   /**
-   * The number of items to display per page. A read-only value source — pass
-   * a plain number (upstream: `MaybeRefOrGetter<number>`; resolve a React ref
-   * or getter at the call site). Only the initial value is adopted; navigate
-   * with `setCurrentPageSize`.
+   * The number of items to display per page. A read-only value source — pass a plain number. Only
+   * the initial value is adopted; navigate with `setCurrentPageSize`.
    * @default 10
    */
   pageSize?: number
   /**
-   * The current page number. Controllable — the hook writes it back, so it
-   * accepts a React `State<number>`: a plain number, a getter, a React ref
-   * (`{ current }`), a `[value, setter]` state tuple or a `{ value, onChange }`
-   * pair — resolved with `toValue`.
+   * The current page number. Controllable — the hook writes it back, so it accepts a React
+   * `State<number>`: a plain number, a getter, a `[value, setter]` state tuple or a `{ value,
+   * onChange }` pair — resolved with `toValue`. A React ref is not a state source and is not
+   * accepted.
    * @default 1
    */
   page?: State<number>
@@ -136,22 +131,19 @@ export interface UseOffsetPaginationReturn {
   /** Go to the next page (no-op on the last page). */
   readonly next: () => void
   /**
-   * Set the current page directly, clamped to `[1, pageCount]` — the setter
-   * half of the writable `currentPage`. React addition — upstream assigns
-   * `currentPage.value = n` on a Vue ref.
+   * Set the current page directly, clamped to `[1, pageCount]` — the setter half of the writable
+   * `currentPage`. React addition — upstream assigns `currentPage.value = n` on a Vue ref.
    */
   readonly setCurrentPage: Dispatch<SetStateAction<number>>
   /**
-   * Set the current page size directly, clamped to `>= 1` — the setter half of
-   * the writable `currentPageSize`. React addition — upstream assigns
-   * `currentPageSize.value = n` on a Vue ref.
+   * Set the current page size directly, clamped to `>= 1` — the setter half of the writable
+   * `currentPageSize`. React addition — upstream assigns `currentPageSize.value = n` on a Vue ref.
    */
   readonly setCurrentPageSize: Dispatch<SetStateAction<number>>
 }
 /**
- * Snapshot passed to the `onPageChange` / `onPageSizeChange` /
- * `onPageCountChange` callbacks — the upstream members only, without the
- * setters (upstream: `UnwrapNestedRefs<UseOffsetPaginationReturn>`).
+ * Snapshot passed to the `onPageChange` / `onPageSizeChange` / `onPageCountChange` callbacks — the
+ * upstream members only, without the setters.
  */
 export type UseOffsetPaginationCallbackReturn = Omit<
   UseOffsetPaginationReturn,
@@ -162,44 +154,8 @@ export type UseOffsetPaginationInfinityPageReturn = Omit<
   "isLastPage"
 >
 /**
- * React port of VueUse's `useOffsetPagination`.
- *
  * Map from @vueuse/core `useOffsetPagination`
- * (`source/vueuse/packages/core/useOffsetPagination/`). Reactive offset
- * pagination — navigate a page window over a `total` item count with
- * `prev`/`next`, read the derived `pageCount` / `isFirstPage` / `isLastPage`,
- * and observe changes through the `onPageChange` / `onPageSizeChange` /
- * `onPageCountChange` callbacks.
- *
- * Adjustments from upstream (Vue reactivity does not translate 1:1):
- *
- * 1. The returned object mirrors `UseOffsetPaginationReturn` member for
- *    member and pairs every writable value with its setter — `currentPage`
- *    and `currentPageSize` are `useState` state exposed as plain numbers
- *    alongside `setCurrentPage` / `setCurrentPageSize` (upstream writes
- *    `currentPage.value` / `currentPageSize.value` on writable Vue refs),
- *    while `pageCount` / `isFirstPage` / `isLastPage` are derived on every
- *    render (upstream: computed refs).
- * 2. `total` and `pageSize` are read-only value sources and take plain
- *    numbers (upstream: `MaybeRefOrGetter<number>`; resolve a React ref or
- *    getter at the call site) — only their initial value is adopted.
- *    `page` is controllable (the hook writes it), so it accepts a React
- *    `State<number>` — a plain number, a getter, a React ref (`{ current }`),
- *    a `[value, setter]` state tuple or a `{ value, onChange }` pair — all
- *    resolved with `toValue` (upstream: `MaybeRef<number>`; the tuple and
- *    `{ value, onChange }` forms are the React state protocol and have no
- *    upstream equivalent). A reactive `page` is kept in two-way sync with the
- *    internal state, mirroring upstream's `syncRef` (including writing the
- *    clamped value back through the ref-like `.current`, the tuple setter or
- *    the pair's `onChange`); external mutations are adopted on the next render.
- * 3. Change callbacks fire when the corresponding value actually changes
- *    (never on the initial render), receiving a `UseOffsetPaginationCallbackReturn`
- *    snapshot of the pagination state — upstream fires them through `watch`
- *    with the reactive return object. The snapshot contains the upstream
- *    members only (no setters).
- * 4. Upstream's `useClamp` (packages/math) is inlined — the page/pageSize
- *    clamp to `[1, pageCount]` / `[1, Infinity]`, and when `total` is
- *    omitted `pageCount` is `Infinity` (`isLastPage` stays `false`).
+ * (`source/vueuse/packages/core/useOffsetPagination/`).
  *
  * @example
  * const {

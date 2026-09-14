@@ -1,3 +1,4 @@
+import type { RefObject } from 'react'
 import { describe, expect, it } from 'vitest'
 import { renderHook } from 'vitest-browser-react'
 import { usePointer } from '../usePointer'
@@ -182,8 +183,9 @@ describe('usePointer', () => {
   it('attaches its listeners to a custom target element', async () => {
     const element = document.createElement('div')
     document.body.appendChild(element)
+    const targetRef = { current: element }
 
-    const { result, act, unmount } = await renderHook(() => usePointer({ target: element }))
+    const { result, act, unmount } = await renderHook(() => usePointer({ target: targetRef }))
 
     await act(() => {
       element.dispatchEvent(createPointerEvent('pointerdown'))
@@ -199,7 +201,7 @@ describe('usePointer', () => {
     element.remove()
   })
 
-  it('attaches its listeners to a ref-like target object', async () => {
+  it('attaches its listeners to a ref target object', async () => {
     const first = document.createElement('div')
     const second = document.createElement('div')
     document.body.append(first, second)
@@ -236,8 +238,8 @@ describe('usePointer', () => {
     second.remove()
   })
 
-  it('disables listening when target is explicitly null', async () => {
-    const { result, act } = await renderHook(() => usePointer({ target: null }))
+  it('disables listening when the target ref holds null', async () => {
+    const { result, act } = await renderHook(() => usePointer({ target: { current: null } }))
 
     await act(() => {
       window.dispatchEvent(createPointerEvent('pointermove', { clientX: 500, clientY: 500 }))
@@ -309,8 +311,8 @@ describe('usePointer', () => {
     document.body.append(first, second)
 
     const { result, act, rerender, unmount } = await renderHook(
-      (props?: { target?: EventTarget }) => usePointer(props),
-      { initialProps: { target: first } },
+      (props?: { target?: RefObject<EventTarget | null | undefined> }) => usePointer(props),
+      { initialProps: { target: { current: first } } },
     )
 
     await act(() => {
@@ -318,7 +320,7 @@ describe('usePointer', () => {
     })
     await expect.poll(() => result.current.x).toBe(1)
 
-    await rerender({ target: second })
+    await rerender({ target: { current: second } })
 
     await act(() => {
       first.dispatchEvent(createPointerEvent('pointermove', { clientX: 33, clientY: 34 }))

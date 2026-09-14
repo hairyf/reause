@@ -1,26 +1,12 @@
-import { useListener } from '@reause/shared'
+import { createEventHook, useListener } from '@reause/shared'
 import { useState } from 'react'
 
-function createHook() {
-  const fns = new Set<(value: string) => void>()
-  return {
-    onChange: (fn: (value: string) => void) => {
-      fns.add(fn)
-      return {
-        off: () => fns.delete(fn),
-      }
-    },
-    trigger: (value: string) => {
-      fns.forEach(fn => fn(value))
-    },
-  }
-}
-
 export default function Demo() {
-  const [hook] = useState(createHook)
+  const [event] = useState(() => createEventHook<string>())
   const [events, setEvents] = useState<string[]>([])
 
-  useListener(hook.onChange, (value) => {
+  // the event hook object is passed straight in — `useListener` reads its `on`
+  useListener(event, (value) => {
     setEvents(prev => [...prev, value])
   })
 
@@ -31,7 +17,7 @@ export default function Demo() {
         <code>useListener</code>
         .
       </p>
-      <button type="button" onClick={() => hook.trigger('ping')}>
+      <button type="button" onClick={() => event.trigger('ping')}>
         Trigger event
       </button>
       <ul>

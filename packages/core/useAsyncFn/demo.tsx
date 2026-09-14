@@ -17,7 +17,7 @@ function fakeRequest(shouldFail: boolean): Promise<string> {
 export default function UseAsyncFnDemo() {
   const [shouldFail, setShouldFail] = useState(false)
   const [awaited, setAwaited] = useState('nothing awaited yet')
-  const [state, doFetch] = useAsyncFn(async () => fakeRequest(shouldFail), [shouldFail])
+  const [state, doFetch] = useAsyncFn(async () => fakeRequest(shouldFail))
 
   const status = state.loading
     ? 'loading…'

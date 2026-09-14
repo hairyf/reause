@@ -4,7 +4,7 @@ category: '@RxJS'
 
 # toObserver
 
-Sugar function to convert a ref-like object (`{ current }`) or a setter function into an RxJS [Observer](https://rxjs.dev/guide/observer) — a `useRef` write does not re-render.
+Sugar function to convert a ref object (`RefObject`) or a setter function into an RxJS [Observer](https://rxjs.dev/guide/observer) — a `useRef` write does not re-render.
 
 ## Usage
 

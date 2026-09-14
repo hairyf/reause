@@ -1,10 +1,10 @@
 import type { Dispatch, SetStateAction } from 'react'
 import type { StateValue } from '../utils'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { assert, isRefLike, toValue } from '../utils'
+import { assert, toValue } from '../utils'
 
 export type StateTuple<T> = [T, Dispatch<SetStateAction<T>>]
-/** A value, lazy getter, React ref, state tuple, or value/onChange pair. */
+/** A value, lazy getter, state tuple, or value/onChange pair. */
 export type State<T> = StateValue<T>
 
 export interface UseControllableStateOptions<T> {
@@ -24,19 +24,6 @@ function isObjectState<T>(state: State<T>): state is { value: T, onChange?: (val
 /**
  * Combine controlled and uncontrolled state sources.
  *
- * `state` is resolved with `toValue` on every render. A tuple
- * `[value, setter]` or a `{ value, onChange }` pair is always controlled: the
- * current value is the resolved source and `setValue` writes through to the
- * tuple setter / `onChange`. With `passive: true` a plain value, getter, or
- * ref source is uncontrolled — the hook initializes from the source and local
- * updates persist, and external source changes are synced back (honoring
- * `shouldUpdate`). With the default `passive: false` such a source is
- * controlled (the external value wins on every render); `setValue` then has
- * no channel back to the caller, so it warns instead of silently discarding
- * the update — pass a tuple, a `{ value, onChange }` pair, or use
- * `passive: true` to write. `defaultValue` (value or lazy initializer) seeds
- * the internal state of uncontrolled sources; `shouldUpdate(prev, next)`
- * guards every commit, including the passive sync.
  */
 export function useControllableState<T>(
   state: State<T>,
@@ -57,7 +44,7 @@ export function useControllableState<T>(
   useEffect(() => {
     // plain objects/arrays are excluded from `canSync`: an inline literal is a
     // new identity on every render, so syncing it back would re-render forever
-    const canSync = typeof state === 'function' || isRefLike(state as object) || externalValue === null || typeof externalValue !== 'object'
+    const canSync = typeof state === 'function' || externalValue === null || typeof externalValue !== 'object'
     if (passive && canSync && !isTuple(state) && !isObjectState(state) && !Object.is(previousExternalRef.current, externalValue) && shouldUpdate(valueRef.current, externalValue))
       setInternal(externalValue)
     previousExternalRef.current = externalValue
@@ -76,10 +63,10 @@ export function useControllableState<T>(
     else if (!controlled)
       setInternal(next)
     else
-      // a plain value / getter / ref source with `passive: false` is
+      // a plain value / getter source with `passive: false` is
       // controlled, but there is no channel to write back to the caller —
       // surface the no-op instead of silently dropping the update
-      assert(false, 'useControllableState: `setValue` on a controlled source without a write channel (a plain value, getter, or ref with `passive: false`) is ignored. Pass a [value, setter] tuple, a { value, onChange } pair, or use `passive: true`.')
+      assert(false, 'useControllableState: `setValue` on a controlled source without a write channel (a plain value or getter with `passive: false`) is ignored. Pass a [value, setter] tuple, a { value, onChange } pair, or use `passive: true`.')
   }, [controlled, shouldUpdate])
 
   return [value, setValue]

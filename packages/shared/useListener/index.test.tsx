@@ -10,9 +10,7 @@ function createEventHook<T extends (...args: any[]) => void>() {
   return {
     on: (fn: T) => {
       fns.add(fn)
-      return {
-        off: () => fns.delete(fn),
-      }
+      return () => fns.delete(fn)
     },
     trigger: (...args: Parameters<T>) => {
       fns.forEach(fn => fn(...args))
@@ -95,7 +93,7 @@ describe('useListener', () => {
     const hookB = createEventHook<Cb>()
     const calls: string[] = []
 
-    const { rerender } = await renderHook((props?: { on?: (fn: Cb) => { off: () => boolean } }) =>
+    const { rerender } = await renderHook((props?: { on?: (fn: Cb) => () => boolean }) =>
       useListener(props?.on as any, (value) => {
         calls.push(value)
       }), { initialProps: { on: hookA.on } })
@@ -117,6 +115,39 @@ describe('useListener', () => {
     const on = (_fn: Cb) => undefined
 
     await expect(renderHook(() => useListener(on, () => {}))).resolves.toBeDefined()
+  })
+
+  it('accepts an event hook object exposing `on` and unregisters on unmount', async () => {
+    const hook = createEventHook<Cb>()
+    const calls: string[] = []
+
+    const { unmount } = await renderHook(() => useListener(hook, (value) => {
+      calls.push(value)
+    }))
+
+    await expect.poll(() => hook.size()).toBe(1)
+    hook.trigger('from-hook')
+    expect(calls).toEqual(['from-hook'])
+
+    await unmount()
+    expect(hook.size()).toBe(0)
+    hook.trigger('after-unmount')
+    expect(calls).toEqual(['from-hook'])
+  })
+
+  it('accepts a createEventHook() result directly', async () => {
+    const resultEvent = createEventHook<Cb>()
+    const calls: string[] = []
+
+    await renderHook(() => useListener(resultEvent, response => calls.push(response)))
+
+    await expect.poll(() => resultEvent.size()).toBe(1)
+    resultEvent.trigger('response')
+    expect(calls).toEqual(['response'])
+  })
+
+  it('ignores an object without a usable on member', async () => {
+    await expect(renderHook(() => useListener({} as any, () => {}))).resolves.toBeDefined()
   })
 
   it('does not register when on is not a function', async () => {

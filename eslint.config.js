@@ -33,6 +33,7 @@ export default antfu(
       '**/cache',
       '**/dist',
       'coverage/**',
+      'docs/**',
       '.issues/**',
       '**/*.svg',
     ],

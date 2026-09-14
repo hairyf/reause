@@ -101,28 +101,28 @@ describe('useZoomLevel', () => {
     expect(webFrame.setZoomLevel).toHaveBeenCalledTimes(1)
   })
 
-  it('setLevel writes back to a ref-like level source (unified channel)', async () => {
+  it('setLevel writes the level to webFrame and updates the returned value', async () => {
     const webFrame = createWebFrame(1, 0)
-    const level = { current: 1 }
-
-    const { result, act } = await renderHook(() => useZoomLevel(asWebFrame(webFrame), level))
+    const { result, act } = await renderHook(() => useZoomLevel(asWebFrame(webFrame), 1))
 
     expect(result.current[0]).toBe(1)
     expect(webFrame.setZoomLevel).toHaveBeenCalledWith(1)
 
     await act(() => result.current[1](2))
 
-    // upstream `deepRef` passthrough — the caller's ref stays the single
-    // source of truth, so the write must land on `ref.current` too
-    expect(level.current).toBe(2)
+    // the level is a plain number — there is no external source to write back
+    // to, so the write lands on `webFrame` and the hook's own state
     expect(result.current[0]).toBe(2)
+    expect(webFrame.setZoomLevel).toHaveBeenLastCalledWith(2)
   })
 
-  it('does not re-write a stale ref level after setLevel and a re-render', async () => {
+  it('does not re-write a stale level after setLevel and a re-render', async () => {
     const webFrame = createWebFrame(1, 0)
-    const level = { current: 1 }
 
-    const { result, act, rerender } = await renderHook(() => useZoomLevel(asWebFrame(webFrame), level))
+    const { result, act, rerender } = await renderHook(
+      (props?: { level?: number }) => useZoomLevel(asWebFrame(webFrame), props?.level),
+      { initialProps: { level: 1 } },
+    )
 
     await act(() => result.current[1](2))
     // mount apply + setLevel
@@ -130,10 +130,9 @@ describe('useZoomLevel', () => {
 
     webFrame.setZoomLevel.mockClear()
 
-    // the re-render re-reads the ref (already written back to 2), so no stale
-    // value is re-applied — the write-back keeps `ref.current` and the applied
-    // level in sync
-    await rerender()
+    // the re-render re-reads the external level, which still matches what was
+    // last applied, so nothing is re-written
+    await rerender({ level: 2 })
     expect(webFrame.setZoomLevel).not.toHaveBeenCalled()
     expect(result.current[0]).toBe(2)
   })

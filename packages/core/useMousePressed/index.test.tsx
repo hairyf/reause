@@ -84,7 +84,8 @@ describe('useMousePressed', () => {
 
       it('has a target element', async () => {
         const targetEle = document.createElement('button')
-        const { result, act } = await renderHook(() => useMousePressed({ target: targetEle }))
+        const targetRef = { current: targetEle }
+        const { result, act } = await renderHook(() => useMousePressed({ target: targetRef }))
         await act(() => {
           targetEle.dispatchEvent(new Event('dragstart'))
         })

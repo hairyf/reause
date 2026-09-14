@@ -7,7 +7,23 @@ describe('createGlobalState', () => {
     expect(createGlobalState).toBeTypeOf('function')
   })
 
+  it('updates both components (upstream: both components should be updated)', async () => {
+    const useGlobalValue = createGlobalState(0)
+    const first = await renderHook(() => useGlobalValue())
+    const second = await renderHook(() => useGlobalValue())
+
+    expect(first.result.current[0]).toBe(0)
+    expect(second.result.current[0]).toBe(0)
+
+    await first.act(() => first.result.current[1](1))
+
+    expect(first.result.current[0]).toBe(1)
+    expect(second.result.current[0]).toBe(1)
+  })
+
   it('shares one module-wide state and updates every consumer', async () => {
+    // the rendered twin of the test above: a write from one consumer is
+    // observed by the other one, and the other way round
     const useGlobalState = createGlobalState(() => 0)
 
     function Consumer({ label }: { label: string }) {
@@ -31,15 +47,113 @@ describe('createGlobalState', () => {
     await expect.element(screen.getByText('a: 0')).toBeVisible()
     await expect.element(screen.getByText('b: 0')).toBeVisible()
 
-    // a write from the first consumer is observed by the second one
     await screen.getByRole('button', { name: 'inc-a' }).click()
     await expect.element(screen.getByText('a: 1')).toBeVisible()
     await expect.element(screen.getByText('b: 1')).toBeVisible()
 
-    // ...and the other way round
     await screen.getByRole('button', { name: 'inc-b' }).click()
     await expect.element(screen.getByText('a: 2')).toBeVisible()
     await expect.element(screen.getByText('b: 2')).toBeVisible()
+  })
+
+  it('allows setting state with a function and the previous value', async () => {
+    const useGlobalValue = createGlobalState(0)
+    const first = await renderHook(() => useGlobalValue())
+    const second = await renderHook(() => useGlobalValue())
+
+    await first.act(() => first.result.current[1](value => value + 1))
+
+    expect(first.result.current[0]).toBe(1)
+    expect(second.result.current[0]).toBe(1)
+  })
+
+  it('allows setting state with a function and no previous value', async () => {
+    const useGlobalValue = createGlobalState(0)
+    const first = await renderHook(() => useGlobalValue())
+    const second = await renderHook(() => useGlobalValue())
+
+    await first.act(() => first.result.current[1](() => 1))
+
+    expect(first.result.current[0]).toBe(1)
+    expect(second.result.current[0]).toBe(1)
+  })
+
+  it('calls a zero-argument action with no arguments (resolveHookState arity rule)', async () => {
+    const useGlobalValue = createGlobalState(0)
+    const { result, act } = await renderHook(() => useGlobalValue())
+    const factory = vi.fn(() => 5)
+
+    await act(() => result.current[1](factory))
+
+    // upstream's `resolveHookState`: `nextState.length ? nextState(currentState) : nextState()`
+    expect(factory.mock.calls).toEqual([[]])
+    expect(result.current[0]).toBe(5)
+  })
+
+  it('accepts a plain initial value and the functional updater form', async () => {
+    const useGlobalState = createGlobalState({ count: 0 })
+    const { result, act } = await renderHook(() => useGlobalState())
+
+    expect(result.current[0]).toEqual({ count: 0 })
+
+    await act(() => result.current[1]({ count: 5 }))
+    expect(result.current[0]).toEqual({ count: 5 })
+
+    await act(() => result.current[1](prev => ({ count: prev.count * 2 })))
+    expect(result.current[0]).toEqual({ count: 10 })
+  })
+
+  it('initializes with a function, resolved exactly once at createGlobalState time', async () => {
+    const init = vi.fn(() => 5)
+    const useGlobalValue = createGlobalState(init)
+
+    // resolved eagerly, when `createGlobalState` is called (module scope) —
+    // upstream resolves `initialState instanceof Function ? initialState() : initialState`
+    expect(init).toHaveBeenCalledTimes(1)
+
+    const first = await renderHook(() => useGlobalValue())
+    const second = await renderHook(() => useGlobalValue())
+
+    // hook calls never re-run the initializer
+    expect(init).toHaveBeenCalledTimes(1)
+    expect(first.result.current[0]).toBe(5)
+    expect(second.result.current[0]).toBe(5)
+  })
+
+  it('initializes and updates with undefined', async () => {
+    const useGlobalValue = createGlobalState<number>()
+    const first = await renderHook(() => useGlobalValue())
+    const second = await renderHook(() => useGlobalValue())
+
+    expect(first.result.current[0]).toBeUndefined()
+    expect(second.result.current[0]).toBeUndefined()
+
+    await first.act(() => first.result.current[1](value => value))
+
+    expect(first.result.current[0]).toBeUndefined()
+    expect(second.result.current[0]).toBeUndefined()
+  })
+
+  it('initializes with undefined and updates with a different type', async () => {
+    const useGlobalValue = createGlobalState()
+    const { result, act } = await renderHook(() => useGlobalValue())
+
+    expect(result.current[0]).toBeUndefined()
+
+    // @ts-expect-error the state is `undefined`, so an updater returning a number is a type error
+    await act(() => result.current[1](() => 1))
+
+    expect(result.current[0]).toBe(1)
+  })
+
+  it('starts with undefined when called without arguments, and stays writable', async () => {
+    const useGlobalState = createGlobalState<undefined | string>()
+    const first = await renderHook(() => useGlobalState())
+
+    expect(first.result.current[0]).toBeUndefined()
+
+    await first.act(() => first.result.current[1]('now-defined'))
+    expect(first.result.current[0]).toBe('now-defined')
   })
 
   it('keeps the state after unmount (upstream: should work after dispose)', async () => {
@@ -80,64 +194,24 @@ describe('createGlobalState', () => {
     expect(second.result.current[0]).toBe('updated')
   })
 
-  it('accepts a plain initial value', async () => {
-    const useGlobalState = createGlobalState({ count: 0 })
-    const { result } = await renderHook(() => useGlobalState())
-
-    expect(result.current[0]).toEqual({ count: 0 })
-  })
-
-  it('supports the plain value and the functional updater form', async () => {
-    const useGlobalState = createGlobalState({ count: 0 })
-    const { result, act } = await renderHook(() => useGlobalState())
-
-    await act(() => result.current[1]({ count: 5 }))
-    expect(result.current[0]).toEqual({ count: 5 })
-
-    await act(() => result.current[1](prev => ({ count: prev.count * 2 })))
-    expect(result.current[0]).toEqual({ count: 10 })
-  })
-
-  it('resolves a function initializer exactly once, at createGlobalState time', async () => {
-    const init = vi.fn(() => 5)
-    const useGlobalState = createGlobalState(init)
-
-    // resolved eagerly, when `createGlobalState` is called (module scope) —
-    // react-use resolves `initialState instanceof Function ? initialState() : initialState`
-    expect(init).toHaveBeenCalledTimes(1)
-
-    const first = await renderHook(() => useGlobalState())
-    const second = await renderHook(() => useGlobalState())
-
-    // hook calls never re-run the initializer
-    expect(init).toHaveBeenCalledTimes(1)
-    expect(first.result.current[0]).toBe(5)
-    expect(second.result.current[0]).toBe(5)
-  })
-
-  it('starts with undefined when called without arguments, and stays writable', async () => {
-    const useGlobalState = createGlobalState<undefined | string>()
-
-    const first = await renderHook(() => useGlobalState())
-    expect(first.result.current[0]).toBeUndefined()
-
-    // the store is writable afterwards
-    await first.act(() => first.result.current[1]('now-defined'))
-    expect(first.result.current[0]).toBe('now-defined')
-  })
-
-  it('returns a stable setter, shared across renders and consumers', async () => {
+  it('returns a stable tuple per state and a setter shared across renders and consumers', async () => {
     const useGlobalState = createGlobalState(() => 0)
     const { result, act, rerender } = await renderHook(() => useGlobalState())
     const second = await renderHook(() => useGlobalState())
 
+    const tuple = result.current
     const setState = result.current[1]
-    await act(() => result.current[1](1))
+
     await rerender()
+    // memoized on the snapshot: the tuple does not churn while the state holds
+    expect(result.current).toBe(tuple)
+
+    await act(() => result.current[1](1))
 
     expect(result.current[0]).toBe(1)
+    expect(result.current).not.toBe(tuple)
     expect(result.current[1]).toBe(setState)
-    // react-use shares one `store.setState` across every consumer
+    // upstream shares one `store.setState` across every consumer
     expect(second.result.current[1]).toBe(setState)
   })
 })

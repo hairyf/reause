@@ -105,12 +105,12 @@ describe('useOffsetPagination', () => {
 
   describe('when the page is outside of the range of possible pages', () => {
     it('returns the maximum page number possible', async () => {
-      const pageRef = { current: 0 }
-      const { result, act, rerender } = await renderHook(() => useOffsetPagination({ total: 40, page: pageRef, pageSize: 10 }))
+      let page = 0
+      const { result, act, rerender } = await renderHook(() => useOffsetPagination({ total: 40, page: () => page, pageSize: 10 }))
 
       expect(result.current.currentPage).toBe(1)
 
-      pageRef.current = 123456 // outside maximum range
+      page = 123456 // outside maximum range
       await act(async () => {
         rerender()
       })
@@ -118,16 +118,16 @@ describe('useOffsetPagination', () => {
     })
 
     it('clamps the lower end of the range to 1', async () => {
-      const pageRef = { current: 1 }
-      const { result, act, rerender } = await renderHook(() => useOffsetPagination({ total: 40, page: pageRef, pageSize: 10 }))
+      let page = 1
+      const { result, act, rerender } = await renderHook(() => useOffsetPagination({ total: 40, page: () => page, pageSize: 10 }))
 
-      pageRef.current = 0
+      page = 0
       await act(async () => {
         rerender()
       })
       expect(result.current.currentPage).toBe(1)
 
-      pageRef.current = -1234
+      page = -1234
       await act(async () => {
         rerender()
       })
@@ -135,26 +135,26 @@ describe('useOffsetPagination', () => {
     })
   })
 
-  describe('when the page is a ref-like', () => {
+  describe('when the page is a getter', () => {
     it('returns the correct currentPage', async () => {
-      const pageRef = { current: 2 }
-      const { result, act, rerender } = await renderHook(() => useOffsetPagination({ total: 40, page: pageRef, pageSize: 10 }))
+      let page = 2
+      const { result, act, rerender } = await renderHook(() => useOffsetPagination({ total: 40, page: () => page, pageSize: 10 }))
 
       expect(result.current.currentPage).toBe(2)
 
-      pageRef.current = 3
+      page = 3
       await act(async () => {
         rerender()
       })
       expect(result.current.currentPage).toBe(3)
 
-      pageRef.current = 1
+      page = 1
       await act(async () => {
         rerender()
       })
       expect(result.current.currentPage).toBe(1)
 
-      pageRef.current = -1
+      page = -1
       await act(async () => {
         rerender()
       })
@@ -162,16 +162,16 @@ describe('useOffsetPagination', () => {
     })
 
     it('clamps out of range numbers to the first and last pages', async () => {
-      const pageRef = { current: 0 }
-      const { result, act, rerender } = await renderHook(() => useOffsetPagination({ total: 40, page: pageRef, pageSize: 10 }))
+      let page = 0
+      const { result, act, rerender } = await renderHook(() => useOffsetPagination({ total: 40, page: () => page, pageSize: 10 }))
 
-      pageRef.current = -1
+      page = -1
       await act(async () => {
         rerender()
       })
       expect(result.current.currentPage).toBe(1)
 
-      pageRef.current = Number.POSITIVE_INFINITY
+      page = Number.POSITIVE_INFINITY
       await act(async () => {
         rerender()
       })
@@ -313,30 +313,30 @@ describe('useOffsetPagination', () => {
   describe('onPageChange', () => {
     it('is called when the page changes', async () => {
       const onPageChange = vi.fn()
-      const pageRef = { current: 1 }
-      const { act, rerender } = await renderHook(() => useOffsetPagination({ total: 50, page: pageRef, onPageChange }))
+      let page = 1
+      const { act, rerender } = await renderHook(() => useOffsetPagination({ total: 50, page: () => page, onPageChange }))
 
       expect(onPageChange).toBeCalledTimes(0)
 
-      pageRef.current = 2
+      page = 2
       await act(async () => {
         rerender()
       })
       expect(onPageChange).toBeCalledTimes(1)
 
-      pageRef.current = 1
+      page = 1
       await act(async () => {
         rerender()
       })
       expect(onPageChange).toBeCalledTimes(2)
 
-      pageRef.current = 9999 // out of range, so we go to the last page
+      page = 9999 // out of range, so we go to the last page
       await act(async () => {
         rerender()
       })
       expect(onPageChange).toBeCalledTimes(3)
 
-      pageRef.current = 9998 // still out of range, so we stay on the last page
+      page = 9998 // still out of range, so we stay on the last page
       await act(async () => {
         rerender()
       })
@@ -345,10 +345,10 @@ describe('useOffsetPagination', () => {
 
     it('is called with the correct UseOffsetPaginationCallbackReturn values', async () => {
       const onPageChange = vi.fn()
-      const pageRef = { current: 1 }
-      const { act, rerender } = await renderHook(() => useOffsetPagination({ total: 35, page: pageRef, onPageChange }))
+      let page = 1
+      const { act, rerender } = await renderHook(() => useOffsetPagination({ total: 35, page: () => page, onPageChange }))
 
-      pageRef.current = 2
+      page = 2
       await act(async () => {
         rerender()
       })
@@ -362,7 +362,7 @@ describe('useOffsetPagination', () => {
         prev: expect.any(Function),
       })
 
-      pageRef.current = 3
+      page = 3
       await act(async () => {
         rerender()
       })
@@ -376,7 +376,7 @@ describe('useOffsetPagination', () => {
         prev: expect.any(Function),
       })
 
-      pageRef.current = 4
+      page = 4
       await act(async () => {
         rerender()
       })
@@ -390,7 +390,7 @@ describe('useOffsetPagination', () => {
         prev: expect.any(Function),
       })
 
-      pageRef.current = 1
+      page = 1
       await act(async () => {
         rerender()
       })
@@ -539,26 +539,28 @@ describe('useOffsetPagination', () => {
     })
 
     it('setCurrentPage writes the clamped page back through a reactive page', async () => {
-      const pageRef = { current: 1 }
-      const { result, act } = await renderHook(() => useOffsetPagination({ total: 40, page: pageRef, pageSize: 10 }))
+      const source: [number, Dispatch<SetStateAction<number>>] = [1, (value) => {
+        source[0] = typeof value === 'function' ? value(source[0]) : value
+      }]
+      const { result, act } = await renderHook(() => useOffsetPagination({ total: 40, page: source, pageSize: 10 }))
 
       await act(() => {
         result.current.setCurrentPage(3)
       })
       expect(result.current.currentPage).toBe(3)
-      expect(pageRef.current).toBe(3)
+      expect(source[0]).toBe(3)
 
       await act(() => {
         result.current.setCurrentPage(9999)
       })
       expect(result.current.currentPage).toBe(4)
-      expect(pageRef.current).toBe(4)
+      expect(source[0]).toBe(4)
 
       await act(() => {
         result.current.setCurrentPage(-10)
       })
       expect(result.current.currentPage).toBe(1)
-      expect(pageRef.current).toBe(1)
+      expect(source[0]).toBe(1)
     })
 
     it('setCurrentPage works when total is omitted', async () => {

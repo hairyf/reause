@@ -1,5 +1,4 @@
-import type { RefOrValue } from '@reause/shared'
-import { isClient, toValue } from '@reause/shared'
+import { isClient } from '@reause/shared'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 export interface UseBase64Options {
@@ -28,13 +27,11 @@ export interface UseBase64ObjectOptions<T> extends UseBase64Options {
 
 export interface UseBase64Return {
   /**
-   * The base64-encoded transformation result. `''` until the first
-   * transformation settles.
+   * The base64-encoded transformation result. `''` until the first transformation settles.
    */
   base64: string
   /**
-   * The promise of the current transformation. `undefined` until the first
-   * `execute()` run.
+   * The promise of the current transformation. `undefined` until the first `execute()` run.
    */
   promise: Promise<string> | undefined
   /**
@@ -43,40 +40,18 @@ export interface UseBase64Return {
   execute: () => Promise<string> | undefined
 }
 
-export function useBase64(target: RefOrValue<string | undefined>, options?: UseBase64Options): UseBase64Return
-export function useBase64(target: RefOrValue<Blob | undefined>, options?: UseBase64Options): UseBase64Return
-export function useBase64(target: RefOrValue<ArrayBuffer | undefined>, options?: UseBase64Options): UseBase64Return
-export function useBase64(target: RefOrValue<HTMLCanvasElement | undefined>, options?: ToDataURLOptions): UseBase64Return
-export function useBase64(target: RefOrValue<HTMLImageElement | undefined>, options?: ToDataURLOptions): UseBase64Return
-export function useBase64<T extends Record<string, unknown>>(target: RefOrValue<T>, options?: UseBase64ObjectOptions<T>): UseBase64Return
-export function useBase64<T extends Map<string, unknown>>(target: RefOrValue<T>, options?: UseBase64ObjectOptions<T>): UseBase64Return
-export function useBase64<T extends Set<unknown>>(target: RefOrValue<T>, options?: UseBase64ObjectOptions<T>): UseBase64Return
-export function useBase64<T>(target: RefOrValue<T[]>, options?: UseBase64ObjectOptions<T[]>): UseBase64Return
+export function useBase64(target: string | undefined, options?: UseBase64Options): UseBase64Return
+export function useBase64(target: Blob | undefined, options?: UseBase64Options): UseBase64Return
+export function useBase64(target: ArrayBuffer | undefined, options?: UseBase64Options): UseBase64Return
+export function useBase64(target: HTMLCanvasElement | undefined, options?: ToDataURLOptions): UseBase64Return
+export function useBase64(target: HTMLImageElement | undefined, options?: ToDataURLOptions): UseBase64Return
+export function useBase64<T extends Record<string, unknown>>(target: T, options?: UseBase64ObjectOptions<T>): UseBase64Return
+export function useBase64<T extends Map<string, unknown>>(target: T, options?: UseBase64ObjectOptions<T>): UseBase64Return
+export function useBase64<T extends Set<unknown>>(target: T, options?: UseBase64ObjectOptions<T>): UseBase64Return
+export function useBase64<T>(target: T[], options?: UseBase64ObjectOptions<T[]>): UseBase64Return
 /**
- * Reactive base64 transforming. Supports plain text, blobs/files, buffers,
- * canvas, images, and JSON-serializable objects/maps/sets.
- *
  * Map from @vueuse/core `useBase64`
- * (`source/vueuse/packages/core/useBase64/`), which returns an object
- * mirroring the upstream `{ base64, promise, execute }` members. The target
- * is transformed to a base64 data URL automatically and the result lands in
- * `base64`; `promise` holds the promise of the current transformation and
- * `execute` re-triggers it manually.
- *
- * React divergences:
- * - the Vue `ShallowRef<string>` returns (`base64`, `promise`) become plain
- *   state values read directly — `promise` is `undefined` until the first
- *   transformation starts;
- * - upstream watches the source (`watch(target, execute, { immediate: true
- *   })` for reactive sources, a single setup call for plain values); here the
- *   source is resolved during render with `toValue` and a `useEffect` keyed on
- *   the resolved value re-runs the transformation whenever it changes across
- *   renders. A ref-like `{ current }` source re-transforms after a re-render
- *   that carries a new `current`;
- * - `execute` is a stable callback that always transforms the latest target
- *   and latest options. It is SSR-safe like upstream: it no-ops (resolving
- *   `undefined`) outside a browser, and the automatic first transform only
- *   runs in a mount effect, so nothing touches the DOM during render.
+ * (`source/vueuse/packages/core/useBase64/`).
  *
  * @see https://vueuse.org/core/useBase64/
  *
@@ -96,7 +71,7 @@ export function useBase64(target: any, options?: any): UseBase64Return {
 
   // resolved during render so the auto-transform effect re-runs whenever the
   // target value changes across renders (upstream: `watch` on the source)
-  const resolvedTarget = toValue(target)
+  const resolvedTarget = target
 
   const execute = useCallback((): Promise<string> | undefined => {
     if (!isClient)
@@ -104,7 +79,7 @@ export function useBase64(target: any, options?: any): UseBase64Return {
 
     const next = new Promise<string>((resolve, reject) => {
       try {
-        const _target = toValue(targetRef.current)
+        const _target = targetRef.current
         if (_target == null) {
           resolve('')
         }

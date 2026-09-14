@@ -11,22 +11,19 @@ export interface UseTextDirectionOptions {
    */
   selector?: string
   /**
-   * Observe `document.querySelector(selector)` changes using a
-   * MutationObserver.
+   * Observe `document.querySelector(selector)` changes using a MutationObserver.
    *
    * @default false
    */
   observe?: boolean
   /**
-   * Initial value, also the SSR default — no `document` access happens
-   * during render.
+   * Initial value, also the SSR default — no `document` access happens during render.
    *
    * @default 'ltr'
    */
   initialValue?: UseTextDirectionValue
   /**
-   * Specify a custom `document` instance, e.g. working with iframes or in
-   * testing environments.
+   * Specify a custom `document` instance, e.g. working with iframes or in testing environments.
    */
   document?: Document
 }
@@ -41,32 +38,8 @@ function getDir(doc: Document | undefined, selector: string, initialValue: UseTe
 }
 
 /**
- * React port of VueUse's `useTextDirection`.
- *
  * Map from @vueuse/core `useTextDirection`
- * (`source/vueuse/packages/core/useTextDirection/`). Reactive
- * [dir](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/dir)
- * of the element's text — reads `document.querySelector(selector)`'s `dir`
- * attribute, keeps it in state and writes changes back to the DOM.
- *
- * Return tuple follows this repo's React idiom (upstream returns a writable
- * Vue computed ref): `const [dir, setDir] = useTextDirection()`.
- *
- * React divergences:
- *
- * 1. The writable computed ref becomes `[dir, setDir]`. `setDir` accepts a
- *    value or an updater function (like `setState`) and mirrors the
- *    computed's `set()`: it updates the state and writes `dir` back to the
- *    target element (`setAttribute`, or `removeAttribute` when empty).
- * 2. The initial DOM read happens in a mount effect instead of during setup
- *    (upstream: `shallowRef(getValue())` + `tryOnMounted` re-sync), so no
- *    `document` is touched during render and SSR renders the `initialValue`
- *    default (`'ltr'`).
- * 3. The optional MutationObserver (upstream composes `useMutationObserver`
- *    with `{ attributes: true }`) is a self-contained observer inside the
- *    same mount effect, disconnected on unmount. Like upstream it only
- *    updates the state — the DOM is already the source of the change, so no
- *    write-back happens (that would re-trigger the observer).
+ * (`source/vueuse/packages/core/useTextDirection/`).
  *
  * @example
  * const [dir, setDir] = useTextDirection()

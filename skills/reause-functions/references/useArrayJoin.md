@@ -70,20 +70,7 @@ from `useState`); the result recomputes on the render that passes a new array.
 ```ts
 export type UseArrayJoinReturn = string
 /**
- * React port of VueUse's `useArrayJoin`.
- *
- * Map from @vueuse/shared `useArrayJoin`
- * Mapping: upstream wraps `toValue(list).map(i => toValue(i)).join(toValue(separator))`
- * in `computed(...)` and accepts a `RefOrValue`; React has no reactive
- * value tracking, so this is a plain function that recomputes the join on
- * every render — pass a state array (upstream: reactive array) and re-render
- * with new state to see the updated result. The return is a plain string,
- * no `.value`.
- *
- * `list` holds plain values only: the elements are joined with
- * `Array.prototype.join`, so no per-element unwrap happens (upstream
- * `toValue`s each element). A function element would be stringified to its
- * source instead of invoked.
+ * Map from @vueuse/shared `useArrayJoin`.
  *
  * @example
  * const [list, setList] = useState(['foo', 0, { prop: 'val' }])

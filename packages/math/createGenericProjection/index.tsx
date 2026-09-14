@@ -1,20 +1,13 @@
 import type { ProjectorFunction } from '../useProjection'
 
 /**
- * A projector built by `createGenericProjection`: takes the input value and
- * returns the projected value of type `T`.
+ * A projector built by `createGenericProjection`: takes the input value and returns the projected
+ * value of type `T`.
  */
 export type UseProjection<F, T> = (input: F) => T
 
 /**
- * React port of VueUse's `createGenericProjection`.
- *
- * Map from @vueuse/math `createGenericProjection`
- * Mapping: `ComputedRef<T>` → a plain projector function returning a plain `T`.
- * React has no reactive graph, so the returned projector recomputes the
- * projection on every call (nothing is memoized) and the caller drives
- * re-renders. Domains and input are plain values (`MaybeRefOrGetter` is not
- * supported) — re-create the projector when a domain changes.
+ * Map from @vueuse/math `createGenericProjection`.
  *
  * @__NO_SIDE_EFFECTS__
  * @example

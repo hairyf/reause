@@ -1,23 +1,22 @@
-import type { RefOrValue } from '@reause/shared'
-import { toValue } from '@reause/shared'
+import type { RefObject } from 'react'
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { unrefElement } from '../unrefElement'
 
 /**
- * The callback signature for drop-zone events — the dropped files (or `null`
- * for enter/leave/over and when the drop carries no files) plus the underlying
- * `DragEvent`.
+ * The callback signature for drop-zone events — the dropped files (or `null` for enter/leave/over
+ * and when the drop carries no files) plus the underlying `DragEvent`.
  */
 export type UseDropZoneCallback = (files: File[] | null, event: DragEvent) => void
 
 export interface UseDropZoneOptions {
   /**
-   * Allowed data types, if not set, all data types are allowed.
-   * Also can be a function to check the data types.
+   * Allowed data types, if not set, all data types are allowed. Also can be a function to check the
+   * data types.
    */
-  dataTypes?: RefOrValue<readonly string[]> | ((types: readonly string[]) => boolean)
+  dataTypes?: readonly string[] | ((types: readonly string[]) => boolean)
   /**
-   * Similar to dataTypes, but exposes the DataTransferItemList for custom validation.
-   * If provided, this function takes precedence over dataTypes.
+   * Similar to dataTypes, but exposes the DataTransferItemList for custom validation. If provided,
+   * this function takes precedence over dataTypes.
    */
   checkValidity?: (items: DataTransferItemList) => boolean
   /**
@@ -39,11 +38,11 @@ export interface UseDropZoneOptions {
   /**
    * Allow multiple files to be dropped. Defaults to true.
    */
-  multiple?: RefOrValue<boolean>
+  multiple?: boolean
   /**
    * Prevent default behavior for unhandled events. Defaults to false.
    */
-  preventDefaultForUnhandled?: RefOrValue<boolean>
+  preventDefaultForUnhandled?: boolean
 }
 
 export interface UseDropZoneReturn {
@@ -52,48 +51,28 @@ export interface UseDropZoneReturn {
    */
   isOverDropZone: boolean
   /**
-   * The files of the last valid drop, or `null` when nothing has been
-   * dropped yet (mirrors upstream's `files` shallowRef).
+   * The files of the last valid drop, or `null` when nothing has been dropped yet (mirrors
+   * upstream's `files` shallowRef).
    */
   files: File[] | null
   /**
-   * Subscribe to the drop event — fires with the dropped files when a valid
-   * drop happens.
+   * Subscribe to the drop event — fires with the dropped files when a valid drop happens. Returns
+   * the off function that unsubscribes it.
    */
-  onDrop: (fn: UseDropZoneCallback) => { off: () => void }
+  onDrop: (fn: UseDropZoneCallback) => () => void
   /**
-   * Subscribe to the drag-enter event.
+   * Subscribe to the drag-enter event. Returns the off function that unsubscribes it.
    */
-  onDragEnter: (fn: UseDropZoneCallback) => { off: () => void }
+  onDragEnter: (fn: UseDropZoneCallback) => () => void
   /**
-   * Subscribe to the drag-leave event.
+   * Subscribe to the drag-leave event. Returns the off function that unsubscribes it.
    */
-  onDragLeave: (fn: UseDropZoneCallback) => { off: () => void }
+  onDragLeave: (fn: UseDropZoneCallback) => () => void
 }
 
 /**
- * React port of VueUse's `useDropZone`.
- *
  * Map from @vueuse/core `useDropZone`
- * (`source/vueuse/packages/core/useDropZone/`). Create a zone where files can
- * be dropped.
- *
- * React divergences:
- * - the Vue `isOverDropZone` and `files` shallowRefs become plain state:
- *   `files` holds the files of the last valid drop (`null` until then), and
- *   dropped files also flow through the `onDrop` callback (option and/or
- *   returned subscription);
- * - upstream's per-option callbacks (`onDrop` / `onEnter` / `onLeave` /
- *   `onOver`) are kept, and the returned `onDrop` / `onDragEnter` /
- *   `onDragLeave` are stable subscribe functions with the `(fn) => { off }`
- *   shape, managed with Sets, so they are identity-stable across renders and
- *   compatible with the `useListener` protocol;
- * - the drag listeners (`dragenter` / `dragover` / `dragleave` / `drop`) are
- *   attached in a mount effect (re-bound when the resolved target changes)
- *   instead of a `useEventListener` watcher, so nothing touches the DOM or
- *   `navigator` during render (SSR-safe);
- * - the internal enter/leave counter is scoped to each binding, so drags over
- *   nested children don't flicker `isOverDropZone`.
+ * (`source/vueuse/packages/core/useDropZone/`).
  *
  * @example
  * const zoneRef = useRef<HTMLDivElement>(null)
@@ -108,7 +87,7 @@ export interface UseDropZoneReturn {
  * })
  */
 export function useDropZone(
-  target: RefOrValue<HTMLElement | Document | null | undefined>,
+  target: RefObject<HTMLElement | Document | null | undefined>,
   options: UseDropZoneOptions | UseDropZoneOptions['onDrop'] = {},
 ): UseDropZoneReturn {
   const [isOverDropZone, setIsOverDropZone] = useState(false)
@@ -128,28 +107,22 @@ export function useDropZone(
 
   const onDrop = useCallback((fn: UseDropZoneCallback) => {
     dropFns.current.add(fn)
-    return {
-      off: () => {
-        dropFns.current.delete(fn)
-      },
+    return () => {
+      dropFns.current.delete(fn)
     }
   }, [])
 
   const onDragEnter = useCallback((fn: UseDropZoneCallback) => {
     dragEnterFns.current.add(fn)
-    return {
-      off: () => {
-        dragEnterFns.current.delete(fn)
-      },
+    return () => {
+      dragEnterFns.current.delete(fn)
     }
   }, [])
 
   const onDragLeave = useCallback((fn: UseDropZoneCallback) => {
     dragLeaveFns.current.add(fn)
-    return {
-      off: () => {
-        dragLeaveFns.current.delete(fn)
-      },
+    return () => {
+      dragLeaveFns.current.delete(fn)
     }
   }, [])
 
@@ -162,7 +135,7 @@ export function useDropZone(
     }
   }, [])
 
-  const resolvedTarget = toValue(target)
+  const resolvedTarget = unrefElement(target)
 
   useEffect(() => {
     const el = resolvedTarget
@@ -178,7 +151,7 @@ export function useDropZone(
 
     const getFiles = (event: DragEvent) => {
       const list = Array.from(event.dataTransfer?.files ?? [])
-      return list.length === 0 ? null : (toValue(getOptions().multiple ?? true) ? list : [list[0]])
+      return list.length === 0 ? null : (getOptions().multiple ?? true ? list : [list[0]])
     }
 
     const checkDataTypes = (types: string[]) => {
@@ -187,7 +160,7 @@ export function useDropZone(
       if (typeof dataTypes === 'function')
         return dataTypes(types)
 
-      const unwrapped = toValue(dataTypes)
+      const unwrapped = dataTypes
 
       if (!unwrapped?.length)
         return true
@@ -208,7 +181,7 @@ export function useDropZone(
       const types = Array.from(items ?? []).map(item => item.type)
 
       const dataTypesValid = checkDataTypes(types)
-      const multipleFilesValid = toValue(getOptions().multiple ?? true) || items.length <= 1
+      const multipleFilesValid = (getOptions().multiple ?? true) || items.length <= 1
 
       return dataTypesValid && multipleFilesValid
     }
@@ -226,7 +199,7 @@ export function useDropZone(
       const dataTransferItemList = event.dataTransfer?.items
       const isValid = (dataTransferItemList && checkValidity(dataTransferItemList)) ?? false
 
-      if (toValue(getOptions().preventDefaultForUnhandled ?? false)) {
+      if (getOptions().preventDefaultForUnhandled ?? false) {
         event.preventDefault()
       }
 

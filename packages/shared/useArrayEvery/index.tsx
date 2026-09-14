@@ -1,16 +1,7 @@
 export type UseArrayEveryReturn = boolean
 
 /**
- * React port of VueUse's `useArrayEvery`.
- *
- * Map from @vueuse/shared `useArrayEvery`
- * Mapping: upstream wraps `toValue(list).every(...)` in `computed(() => ...)`
- * and returns a `ComputedRef`; React has no reactive value tracking, so this
- * is a plain function recomputed on every render over the plain `list` array
- * the caller passes. Hold the array in `useState` (or any render-scoped value)
- * and pass a new array to observe a change — the result recomputes on the next
- * render. The predicate may return any value (coerced by truthiness, like
- * `Array.prototype.every`).
+ * Map from @vueuse/shared `useArrayEvery`.
  *
  * @see https://vueuse.org/shared/useArrayEvery/
  *

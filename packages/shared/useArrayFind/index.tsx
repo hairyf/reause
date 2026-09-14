@@ -1,14 +1,7 @@
 export type UseArrayFindReturn<T = any> = T | undefined
 
 /**
- * React port of VueUse's `useArrayFind`.
- *
- * Map from @vueuse/shared `useArrayFind`
- * Mapping: upstream wraps `toValue(list).find(...)` in `computed(() => ...)`
- * and returns a `ComputedRef`; React has no reactive value tracking, so this
- * is a plain function recomputed on every render over the plain `list` array
- * the caller passes. Hold the array in `useState` and pass a new array to
- * observe a change — the first match is returned on the next render.
+ * Map from @vueuse/shared `useArrayFind`.
  *
  * @see https://vueuse.org/shared/useArrayFind/
  *

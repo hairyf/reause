@@ -186,7 +186,7 @@ export const upstreamPaths: Record<string, string> = {
   'math/useTrunc': 'packages/math/useTrunc/index.ts',
   'rxjs/useWatchExtractedObservable': 'packages/rxjs/watchExtractedObservable/index.ts',
   'shared/createEventHook': 'packages/shared/createEventHook/index.ts',
-  'shared/createGlobalState': 'packages/shared/createGlobalState/index.ts',
+  'shared/createGlobalState': 'src/factory/createGlobalState.ts',
   'shared/isDefined': 'packages/shared/isDefined/index.ts',
   'shared/syncState': 'packages/shared/syncRef/index.ts',
   'shared/syncStates': 'packages/shared/syncRefs/index.ts',
@@ -229,7 +229,7 @@ export const upstreamPaths: Record<string, string> = {
   'shared/utils': 'packages/shared/utils/index.test.ts',
   // --- Non-VueUse sources (#974) -------------------------------------------
   // The list above is VueUse-only, so a react-use / react-hookz / mantine /
-  // ahooks / react-spring page emitted no upstream link at all. These are the
+  // ahooks page emitted no upstream link at all. These are the
   // resolver's own paths (`meta/functions.md`), each verified against the pinned
   // checkout; the source of a page — and so its footer label and repository —
   // comes from the registry, never from this map.
@@ -279,8 +279,8 @@ export interface UpstreamSource {
   /** Repository root the pinned checkout comes from. */
   repo: string
   /**
-   * Branch of the pinned checkout. Absent for a source with no pin — see
-   * `react-spring` — whose link then stops at the repository root rather than
+   * Branch of the pinned checkout. Absent for a source with no pinned module
+   * path to link, whose link then stops at the repository root rather than
    * inventing a path that cannot be verified.
    */
   branch?: string
@@ -289,7 +289,8 @@ export interface UpstreamSource {
 /**
  * The upstream repositories reause ports from, keyed by the source id the
  * provenance registry records (`scripts/update.ts`'s `SOURCES`). A source that
- * is not listed here gets no footer link.
+ * is not listed here gets no footer link. The map also carries an upstream
+ * reause only ever links to — ported from nothing, re-exported by nothing.
  */
 export const upstreamSources: Record<string, UpstreamSource> = {
   'vueuse': { label: 'VueUse', repo: 'https://github.com/vueuse/vueuse', branch: 'main' },
@@ -297,7 +298,7 @@ export const upstreamSources: Record<string, UpstreamSource> = {
   'react-hookz': { label: 'react-hookz', repo: 'https://github.com/react-hookz/web', branch: 'master' },
   'mantine': { label: 'Mantine', repo: 'https://github.com/mantinedev/mantine', branch: 'master' },
   'ahooks': { label: 'ahooks', repo: 'https://github.com/alibaba/hooks', branch: 'master' },
-  // No pinned checkout anywhere (`scripts/update.ts` registers it with no tree):
-  // the page re-exports `@react-spring/web`, so the link names that repository.
+  // External link only: reause neither ports nor re-exports `@react-spring/web`,
+  // so the entry carries the repository a link should point at and no branch.
   'react-spring': { label: 'react-spring', repo: 'https://github.com/pmndrs/react-spring' },
 }

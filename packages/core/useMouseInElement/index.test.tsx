@@ -42,10 +42,11 @@ describe('useMouseInElement', () => {
     const width = 100
     const height = 100
     const target = createElement(x, y, width, height)
+    const targetRef = { current: target }
 
     // `x`, `y`, `sourceType` are not fully tested here because they are
     // re-exported from the upstream `useMouse` port.
-    const { result, act, unmount } = await renderHook(() => useMouseInElement(target))
+    const { result, act, unmount } = await renderHook(() => useMouseInElement(targetRef))
 
     expect(result.current.elementWidth).toBe(width)
     expect(result.current.elementHeight).toBe(height)
@@ -84,7 +85,8 @@ describe('useMouseInElement', () => {
 
   it('basic usage - inline element', async () => {
     const target = createInlineElement(5, 0)
-    const { result, act, unmount } = await renderHook(() => useMouseInElement(target))
+    const targetRef = { current: target }
+    const { result, act, unmount } = await renderHook(() => useMouseInElement(targetRef))
 
     expect(result.current.isOutside).toBe(true)
 
@@ -117,7 +119,8 @@ describe('useMouseInElement', () => {
 
   it('keeps elementX/elementY frozen while outside with handleOutside: false', async () => {
     const target = createElement(10, 10, 100, 100)
-    const { result, act, unmount } = await renderHook(() => useMouseInElement(target, { handleOutside: false }))
+    const targetRef = { current: target }
+    const { result, act, unmount } = await renderHook(() => useMouseInElement(targetRef, { handleOutside: false }))
 
     await act(() => {
       window.dispatchEvent(mockMouseMoveEvent(20, 20))
@@ -139,8 +142,9 @@ describe('useMouseInElement', () => {
 
   it('forwards a custom `type` extractor to useMouse', async () => {
     const target = createElement(10, 10, 100, 100)
+    const targetRef = { current: target }
     const { result, act, unmount } = await renderHook(() =>
-      useMouseInElement(target, {
+      useMouseInElement(targetRef, {
         type: event => [event.clientX + 100, event.clientY + 200],
       }),
     )
@@ -158,7 +162,9 @@ describe('useMouseInElement', () => {
   it('listens on the `target` option instead of `window`', async () => {
     const target = createElement(0, 0, 100, 100)
     const listener = createElement(0, 0, 10, 10)
-    const { result, act, unmount } = await renderHook(() => useMouseInElement(target, { target: listener }))
+    const targetRef = { current: target }
+    const listenerRef = { current: listener }
+    const { result, act, unmount } = await renderHook(() => useMouseInElement(targetRef, { target: listenerRef }))
 
     // a non-bubbling event reaches only the `target` option element
     await act(() => {
@@ -179,9 +185,10 @@ describe('useMouseInElement', () => {
 
   it('honors the `eventFilter` option', async () => {
     const target = createElement(0, 0, 100, 100)
+    const targetRef = { current: target }
     let filtered = 0
     const { result, act, unmount } = await renderHook(() =>
-      useMouseInElement(target, {
+      useMouseInElement(targetRef, {
         eventFilter: () => {
           filtered += 1
         },
@@ -201,8 +208,9 @@ describe('useMouseInElement', () => {
 
   it('only registers the `touchend` reset inside the touch gate', async () => {
     const target = createElement(0, 0, 100, 100)
+    const targetRef = { current: target }
     const { result, act, unmount } = await renderHook(() =>
-      useMouseInElement(target, {
+      useMouseInElement(targetRef, {
         touch: false,
         resetOnTouchEnds: true,
         initialValue: { x: 5, y: 6 },
@@ -227,8 +235,9 @@ describe('useMouseInElement', () => {
 
   it('resets to `initialValue` on `touchend` when touch is enabled', async () => {
     const target = createElement(0, 0, 100, 100)
+    const targetRef = { current: target }
     const { result, act, unmount } = await renderHook(() =>
-      useMouseInElement(target, {
+      useMouseInElement(targetRef, {
         resetOnTouchEnds: true,
         initialValue: { x: 5, y: 6 },
       }),
@@ -250,7 +259,8 @@ describe('useMouseInElement', () => {
 
   it('keeps useMouse tracking and document mouseleave alive after stop()', async () => {
     const target = createElement(10, 10, 100, 100)
-    const { result, act, unmount } = await renderHook(() => useMouseInElement(target))
+    const targetRef = { current: target }
+    const { result, act, unmount } = await renderHook(() => useMouseInElement(targetRef))
 
     await act(() => {
       window.dispatchEvent(mockMouseMoveEvent(20, 20))

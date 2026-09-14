@@ -13,7 +13,7 @@ import { createEventHook, useListener } from '@reause/shared'
 
 const resultEvent = createEventHook<Response>()
 
-useListener(resultEvent.on, (response) => {
+useListener(resultEvent, (response) => {
   console.log(response)
 })
 
@@ -21,51 +21,61 @@ useListener(resultEvent.on, (response) => {
 resultEvent.trigger(response)
 ```
 
-`createEventHook`'s `on` returns an `{ off }` object, so when the component
+The registration returns the `off` function itself, so when the component
 unmounts the listener is automatically unregistered — listeners never leak
 and callbacks never fire after the component is gone. (An `on` that returns
 nothing provides no cleanup, so that guarantee cannot be made.)
 
+`useListener` accepts either form of the subscription source:
+
+```tsx
+// the registration function itself
+useListener(resultEvent.on, callback)
+
+// or any object exposing it as `on` — e.g. a `createEventHook()` result
+useListener(resultEvent, callback)
+```
+
 The callback is kept in a ref: changing `cb` across renders does not
 re-register the listener — the latest callback is used by the
-already-registered listener. Only when `on` itself changes (a new hook
-instance) does the effect re-run, unregistering the old listener and
-registering the new one.
+already-registered listener. Only when the source itself changes (a new hook
+instance, or a new event hook object) does the effect re-run, unregistering
+the old listener and registering the new one.
 
 ## Type Declarations
 
 ```ts
 /**
- * A listener registration function — the `onXxx` callbacks returned by hooks
- * such as `useFileDialog`'s `onChange` / `onCancel`. Mirror of upstream
- * `EventHookOn<T>`.
- */
-export type ListenerOn<T extends (...args: any[]) => void> = (fn: T) => {
-  off: () => void
-} | void
-/**
- * React port of the `useListener` protocol — bind a callback to an event
- * registration function returned by a reause hook, with automatic cleanup
- * on unmount.
+ * A listener registration function — the `onXxx` callbacks returned by hooks such as
+ * `useFileDialog`'s `onChange` / `onCancel`, and `createEventHook`'s `on`.
  *
- * Map from @reause/shared `useListener` (protocol: #129)
- * Motivation: hooks like `useFileDialog` return `onChange` / `onCancel`
- * registration functions (upstream `EventHookOn`). In Vue those auto-clean
- * via the effect scope; in React we need a hook to own that lifecycle.
- * `useListener` registers `cb` with `on` on mount and, when `on` returns an
- * `off` function, calls it on unmount, so listeners are cleaned up and
- * callbacks never fire after the component is gone. (An `on` that returns
- * nothing provides no cleanup — nothing can be released.) The callback is
- * kept in a ref, so changing `cb` across renders does not re-register — the
- * latest callback is used by the already-registered listener. If `on` itself
- * changes (a new hook instance), the effect re-runs and re-registers.
+ * Registration returns the cleanup function that removes that exact listener, so a caller can
+ * unsubscribe by simply invoking the return value. `void` marks a source that cannot unregister.
+ */
+export type ListenerOn<T extends (...args: any[]) => void> = (
+  fn: T,
+) => (() => void) | void
+/**
+ * Map from @reause/shared `useListener` (protocol: #129).
+ *
+ * Accepts either the registration function itself or any object carrying it as `on` (e.g. a
+ * `createEventHook()` result), and unregisters through the returned off function.
  *
  * @example
  * const { files, open, onChange } = useFileDialog()
  * useListener(onChange, (files) => { console.log(files) })
+ *
+ * @example
+ * const resultEvent = createEventHook<Response>()
+ * useListener(resultEvent, (response) => { console.log(response) })
+ * resultEvent.trigger(response)
  */
 export declare function useListener<T extends (...args: any[]) => void>(
-  on: ListenerOn<T>,
+  on:
+    | ListenerOn<T>
+    | {
+        on: ListenerOn<T>
+      },
   cb: T,
 ): void
 ```

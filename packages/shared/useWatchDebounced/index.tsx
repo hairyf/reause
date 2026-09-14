@@ -1,4 +1,3 @@
-import type { RefOrValue } from '../index'
 import type { DebounceFilterOptions } from '../useDebounceFn'
 import type { UseWatchCallback } from '../useWatch'
 import { useDebounceFn } from '../useDebounceFn'
@@ -6,12 +5,11 @@ import { useWatch } from '../useWatch'
 
 export interface UseWatchDebouncedOptions extends DebounceFilterOptions {
   /**
-   * Debounce delay in milliseconds. Accepts a plain number or a ref-like
-   * `{ current }` — re-read on every source change.
+   * Debounce delay in milliseconds — a plain number, re-read on every source change.
    *
    * @default 0
    */
-  debounce?: RefOrValue<number>
+  debounce?: number
 
   /**
    * Fire the callback once on mount with the current value (still debounced).
@@ -22,28 +20,7 @@ export interface UseWatchDebouncedOptions extends DebounceFilterOptions {
 }
 
 /**
- * Debounced watch — the callback fires only after the source stops changing
- * for the specified duration — React port of VueUse's `watchDebounced`.
- *
- * Map from @vueuse/shared `watchDebounced`
- * Mapping: upstream is a shorthand for
- * `watchWithFilter(source, cb, { eventFilter: debounceFilter(debounce, { maxWait }) })`.
- * This port composes the same pieces from house primitives: `useWatch` tracks
- * the source across renders (Vue's reactive dependency tracking becomes the
- * effect dependency list) and hands every change to `useDebounceFn`, which
- * implements the upstream `debounceFilter` (trailing edge + `maxWait`). Bursts
- * of changes collapse into a single call carrying the latest `(value, oldValue)`
- * pair captured at the last change.
- *
- * Divergences from upstream:
- * - Returns `void` — upstream returns a `WatchHandle`; here disposal follows the
- *   component lifecycle and pending timers are cancelled on unmount (via
- *   `useDebounceFn`).
- * - The source is a plain value (or array of values) tracked across renders —
- *   deep-reactive object sources and `deep` / `flush` watch options don't apply.
- * - `rejectOnCancel` (inherited from `DebounceFilterOptions`) is forwarded to
- *   `useDebounceFn` but has no observable effect — watch callbacks return
- *   nothing, so there is no promise to reject.
+ * Map from @vueuse/shared `watchDebounced`.
  *
  * @example
  * ```ts

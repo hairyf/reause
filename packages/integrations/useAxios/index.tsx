@@ -12,8 +12,8 @@ export interface UseAxiosReturn<T, R = AxiosResponse<T>, _D = any, O extends Use
   /**
    * Axios response data
    *
-   * `O extends UseAxiosOptionsWithInitialData<T>` is `T` (upstream's
-   * `Ref<T>` branch), otherwise `T | undefined`.
+   * `O extends UseAxiosOptionsWithInitialData<T>` is `T` (upstream's `Ref<T>` branch), otherwise `T
+   * | undefined`.
    */
   data: O extends UseAxiosOptionsWithInitialData<T> ? T : T | undefined
 
@@ -55,32 +55,28 @@ export interface UseAxiosReturn<T, R = AxiosResponse<T>, _D = any, O extends Use
 
 export interface StrictUseAxiosReturn<T, R, D, O extends UseAxiosOptions = UseAxiosOptions<T>> extends UseAxiosReturn<T, R, D, O> {
   /**
-   * Manually call the axios request — returns the shared thenable shell
-   * (upstream `return promise`): `await execute()` resolves with the shell
-   * once the request finished, rejecting with the request error on failure;
-   * a bare unawaited call never settles eagerly, so it cannot produce an
-   * unhandled rejection.
+   * Manually call the axios request — returns the shared thenable shell (upstream `return
+   * promise`): `await execute()` resolves with the shell once the request finished, rejecting with
+   * the request error on failure; a bare unawaited call never settles eagerly, so it cannot produce
+   * an unhandled rejection.
    */
   execute: (url?: string | AxiosRequestConfig<D>, config?: AxiosRequestConfig<D>) => Promise<StrictUseAxiosReturn<T, R, D, O>>
 }
 
 export interface EasyUseAxiosReturn<T, R, D> extends UseAxiosReturn<T, R, D> {
   /**
-   * Manually call the axios request — returns the shared thenable shell
-   * (upstream `return promise`): `await execute(url)` resolves with the shell
-   * once the request finished, rejecting with the request error on failure;
-   * a bare unawaited call never settles eagerly, so it cannot produce an
-   * unhandled rejection.
+   * Manually call the axios request — returns the shared thenable shell (upstream `return
+   * promise`): `await execute(url)` resolves with the shell once the request finished, rejecting
+   * with the request error on failure; a bare unawaited call never settles eagerly, so it cannot
+   * produce an unhandled rejection.
    */
   execute: (url: string, config?: AxiosRequestConfig<D>) => Promise<EasyUseAxiosReturn<T, R, D>>
 }
 
 /**
- * The thenable half of the returned shell — upstream's
- * `promise = { then, catch }` object. `then`/`catch` settle once the latest
- * request finished, resolving with the shell itself (so
- * `const { data } = await useAxios(...)` works) or rejecting with the request
- * error.
+ * The thenable half of the returned shell — upstream's `promise = { then, catch }` object.
+ * `then`/`catch` settle once the latest request finished, resolving with the shell itself (so
+ * `const { data } = await useAxios(...)` works) or rejecting with the request error.
  */
 export interface UseAxiosThenable<X> extends PromiseLike<X> {
   catch: <TResult = never>(
@@ -91,7 +87,6 @@ export interface UseAxiosThenable<X> extends PromiseLike<X> {
 export interface UseAxiosOptionsBase<T = any> {
   /**
    * Will automatically run axios request when `useAxios` is used
-   *
    */
   immediate?: boolean
 
@@ -153,39 +148,8 @@ export function useAxios<T = any, R = AxiosResponse<T>, D = any>(instance?: Axio
 export function useAxios<T = any, R = AxiosResponse<T>, D = any>(config?: AxiosRequestConfig<D>, instance?: AxiosInstance): EasyUseAxiosReturn<T, R, D> & UseAxiosThenable<EasyUseAxiosReturn<T, R, D>>
 
 /**
- * React port of VueUse's `useAxios` — wrapper for
- * [`axios`](https://github.com/axios/axios).
- *
  * Map from @vueuse/integrations `useAxios`
- * (`source/vueuse/packages/integrations/useAxios/`). All 12 upstream overloads
- * are kept verbatim (`(url, config?, options?)`, `(url, instance?, options?)`,
- * `(url, config, instance, options?)`, `(config)`, `(instance)`,
- * `(config, instance)`); the url-ful forms expose `execute(url?, config?)`,
- * the url-less forms require `execute(url, config?)`. The returned object
- * mirrors the upstream members — `response`, `data`, `isFinished`,
- * `isLoading`, `isAborted`/`isCanceled`, `error`, `abort`/`cancel`, `execute` —
- * but the members are plain values backed by live getters instead of refs
- * (no `.value`), and the object is thenable (`await useAxios(url)` resolves
- * with the shell once the request settled, rejecting when it failed).
- *
- * Adjustment for React:
- * - the returned object is built with `Object.create` over a getter base whose
- *   members read a synchronously-updated live mirror of the state, so a shell
- *   captured earlier (e.g. the value `await` resolved with) still exposes
- *   fresh values — the same shape `useAsyncState` uses. The base itself is
- *   deliberately NOT thenable, so resolving it can never re-adopt `then`;
- * - `execute` returns the shared thenable shell (upstream `return promise`):
- *   `await execute()` resolves with the shell once the request finished,
- *   rejecting with the request error on failure, and a bare unawaited
- *   `execute()` never settles eagerly — so no unhandled rejection can
- *   escape. `immediate` requests fire from a mount effect (upstream fires
- *   during setup), and the shell is never left without a rejection handler
- *   there;
- * - a pending request is aborted on unmount (React-safety deviation: upstream
- *   only relies on the `isAborted` guard), so a late response can never
- *   populate `data`/`response` after the component is gone;
- * - `shallow` is accepted for API parity but has no effect: React state is
- *   never deep-wrapped, so there is no `shallowRef`/`ref` distinction here.
+ * (`source/vueuse/packages/integrations/useAxios/`).
  *
  * @__NO_SIDE_EFFECTS__
  * @example
@@ -210,9 +174,9 @@ export function useAxios<T = any, R = AxiosResponse<T>, D = any>(...args: any[])
 
   if (args.length > 0 + argsPlaceholder) {
     /**
-     * Unable to use `instanceof` here because of (https://github.com/axios/axios/issues/737)
-     * so instead we are checking if there is a `request` on the object to see if it is an
-     * axios instance
+     * Unable to use `instanceof` here because of (https://github.com/axios/axios/issues/737) so
+     * instead we are checking if there is a `request` on the object to see if it is an axios
+     * instance
      */
     if (isAxiosInstance(args[0 + argsPlaceholder]))
       instance = args[0 + argsPlaceholder]

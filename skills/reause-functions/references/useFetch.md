@@ -349,9 +349,9 @@ export interface UseFetchReturn<T> {
    */
   statusCode: number | null
   /**
-   * Set `statusCode` directly — the React equivalent of writing upstream's
-   * writable `statusCode` shallowRef. Accepts the React immutable-update
-   * protocol: `setStatusCode(next)` or `setStatusCode(prev => next)`.
+   * Set `statusCode` directly — the React equivalent of writing upstream's writable `statusCode`
+   * shallowRef. Accepts the React immutable-update protocol: `setStatusCode(next)` or
+   * `setStatusCode(prev => next)`.
    */
   setStatusCode: Dispatch<SetStateAction<number | null>>
   /**
@@ -359,9 +359,9 @@ export interface UseFetchReturn<T> {
    */
   response: Response | null
   /**
-   * Set `response` directly — the React equivalent of writing upstream's
-   * writable `response` shallowRef. Accepts the React immutable-update
-   * protocol: `setResponse(next)` or `setResponse(prev => next)`.
+   * Set `response` directly — the React equivalent of writing upstream's writable `response`
+   * shallowRef. Accepts the React immutable-update protocol: `setResponse(next)` or
+   * `setResponse(prev => next)`.
    */
   setResponse: Dispatch<SetStateAction<Response | null>>
   /**
@@ -369,9 +369,8 @@ export interface UseFetchReturn<T> {
    */
   error: any
   /**
-   * Set `error` directly — the React equivalent of writing upstream's
-   * writable `error` shallowRef. Accepts the React immutable-update protocol:
-   * `setError(next)` or `setError(prev => next)`.
+   * Set `error` directly — the React equivalent of writing upstream's writable `error` shallowRef.
+   * Accepts the React immutable-update protocol: `setError(next)` or `setError(prev => next)`.
    */
   setError: Dispatch<SetStateAction<any>>
   /**
@@ -379,10 +378,9 @@ export interface UseFetchReturn<T> {
    */
   data: T | null
   /**
-   * Set `data` directly, without triggering a request — the React equivalent
-   * of writing upstream's writable `data` shallowRef (`data.value = next`).
-   * Accepts the React immutable-update protocol: `setData(next)` or
-   * `setData(prev => next)`.
+   * Set `data` directly, without triggering a request — the React equivalent of writing upstream's
+   * writable `data` shallowRef (`data.value = next`). Accepts the React immutable-update protocol:
+   * `setData(next)` or `setData(prev => next)`.
    */
   setData: Dispatch<SetStateAction<T | null>>
   /**
@@ -398,10 +396,9 @@ export interface UseFetchReturn<T> {
    */
   aborted: boolean
   /**
-   * Set `aborted` directly, without triggering a request — the React
-   * equivalent of writing upstream's writable `aborted` shallowRef. Accepts
-   * the React immutable-update protocol: `setAborted(next)` or
-   * `setAborted(prev => next)`.
+   * Set `aborted` directly, without triggering a request — the React equivalent of writing
+   * upstream's writable `aborted` shallowRef. Accepts the React immutable-update protocol:
+   * `setAborted(next)` or `setAborted(prev => next)`.
    */
   setAborted: Dispatch<SetStateAction<boolean>>
   /**
@@ -409,8 +406,7 @@ export interface UseFetchReturn<T> {
    */
   abort: (reason?: any) => void
   /**
-   * Manually call the fetch
-   * (default not throwing error)
+   * Manually call the fetch (default not throwing error)
    */
   execute: (throwOnFailed?: boolean) => Promise<any>
   /**
@@ -505,7 +501,7 @@ export interface UseFetchOptions {
    *
    * @default false
    */
-  refetch?: RefOrValue<boolean>
+  refetch?: boolean
   /**
    * Initial data before the request finished
    *
@@ -513,14 +509,14 @@ export interface UseFetchOptions {
    */
   initialData?: any
   /**
-   * Timeout for abort request after number of millisecond
-   * `0` means use browser default
+   * Timeout for abort request after number of millisecond `0` means use browser default
    *
    * @default 0
    */
   timeout?: number
   /**
-   * Allow update the `data` ref when fetch error whenever provided, or mutated in the `onFetchError` callback
+   * Allow update the `data` ref when fetch error whenever provided, or mutated in the
+   * `onFetchError` callback
    *
    * @default false
    */
@@ -535,15 +531,13 @@ export interface UseFetchOptions {
     | Partial<BeforeFetchContext>
     | void
   /**
-   * Will run immediately after the fetch request is returned.
-   * Runs after any 2xx response
+   * Will run immediately after the fetch request is returned. Runs after any 2xx response
    */
   afterFetch?: (
     ctx: AfterFetchContext,
   ) => Promise<Partial<AfterFetchContext>> | Partial<AfterFetchContext>
   /**
-   * Will run immediately after the fetch request is returned.
-   * Runs after any 4xx and 5xx response
+   * Will run immediately after the fetch request is returned. Runs after any 4xx and 5xx response
    */
   onFetchError?: (
     ctx: OnFetchErrorContext,
@@ -573,53 +567,8 @@ export declare function createFetch(
   config?: CreateFetchOptions,
 ): typeof useFetch
 /**
- * Reactive [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API)
- * that provides the ability to abort requests.
- *
  * Map from @vueuse/core `useFetch`
- * (`source/vueuse/packages/core/useFetch/`). Reactive Fetch wrapper with
- * request abort, before/after/error interception, automatic refetch on url or
- * payload change, request-timeout abort, and a `createFetch` factory that
- * builds pre-configured instances with a shared base URL and default options.
- *
- * React divergences:
- * - upstream returns a shallow-ref object whose members are accessed as
- *   `data.value`, `isFetching.value`, etc. and doubles as a
- *   `PromiseLike`; this port returns a plain **object mirror** (`UseFetchReturn`)
- *   whose members are live values (`data`, `isFetching`, `isFinished`,
- *   `statusCode`, `response`, `error`, `aborted`, `canAbort` are exposed as
- *   getters over the latest committed state, so a captured shell always reads
- *   fresh), plus the chained methods (`.get()` / `.post()` / `.json()` / …)
- *   and a `then` for PromiseLike semantics — `await useFetch(url).json()` is
- *   supported;
- * - upstream's writable shallow refs (`data`, `error`, `statusCode`,
- *   `response`, `aborted`) are each paired with a setter (`setData`,
- *   `setError`, `setStatusCode`, `setResponse`, `setAborted`) following the
- *   React immutable-update protocol (`setData(next)` / `setData(prev =>
- *   next)`), the same way `useAsyncState` pairs `setState` with its `state`;
- * - like upstream, chaining a method or return-type setter while a request is
- *   in-flight returns `undefined` instead of the shell (the mutation is
- *   ignored until the request finishes);
- * - requests are fired from a mount effect (upstream fires synchronously
- *   during setup): with `immediate` the first request starts after mount, and
- *   any in-flight request is aborted on unmount;
- * - `refetch` watches the url/payload the React way: a plain `url` value
- *   (e.g. driven by `useState`) re-fetches when the render value changes,
- *   while a ref-like (`{ current }`) or getter `refetch` flag is polled at a
- *   small interval — the React analog of upstream's `watch` over reactive
- *   refs;
- * - `url` and `baseUrl` are read-only value sources and take plain strings
- *   (upstream: `MaybeRefOrGetter<string>`; resolve a React ref or getter at
- *   the call site), and the request `payload` is a plain `unknown` (upstream:
- *   `MaybeRefOrGetter<unknown>`). `refetch` stays `RefOrValue<boolean>` (a
- *   behavior toggle, not a value source);
- * - `updateDataOnError`, `initialData`, `timeout` (via shared
- *   `useTimeoutFn`), `beforeFetch`/`afterFetch`/`onFetchError` and the
- *   `createFetch` factory (with `chain`/`overwrite` combination) all mirror
- *   upstream 1:1;
- * - the inline `createEventHook` is the only shared utility pulled in locally
- *   (upstream imports it from `@vueuse/shared`; `@reause/shared` does not
- *   port it yet), all other shared utilities come from `@reause/shared`.
+ * (`source/vueuse/packages/core/useFetch/`).
  *
  * @example
  * const { data, error, isFetching } = useFetch('https://my-api.com')

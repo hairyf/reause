@@ -56,9 +56,8 @@ export interface FormatTimeAgoOptions<UnitNames extends string = UseTimeAgoUnitN
 
 export interface UseTimeAgoOptions<UnitNames extends string = UseTimeAgoUnitNamesDefault> extends FormatTimeAgoOptions<UnitNames> {
   /**
-   * Interval in milliseconds at which the formatted string refreshes so the
-   * relative time stays up to date (upstream: `ConfigurableScheduler`, whose
-   * default ticks every `30_000` ms).
+   * Interval in milliseconds at which the formatted string refreshes so the relative time stays up
+   * to date.
    *
    * @default 30000
    */
@@ -179,26 +178,8 @@ export function formatTimeAgo<UnitNames extends string = UseTimeAgoUnitNamesDefa
 }
 
 /**
- * React port of VueUse's `useTimeAgo`.
- *
  * Map from @vueuse/core `useTimeAgo`
- * (`source/vueuse/packages/core/useTimeAgo/`). Reactive time ago formatter.
- *
- * Divergences from upstream:
- * - upstream returns `ComputedRef<string>`; this port returns a **plain
- *   string** recomputed on every render (house pattern, see
- *   `useTimeAgoIntl`). The refresh timer lives in the house `useNow`, driven
- *   by a `useIntervalFn` scheduler that is cleaned up on unmount — pass new
- *   `time` values to re-render, the interval keeps the result fresh in
- *   between.
- * - upstream `ConfigurableScheduler` → `updateInterval` option (default
- *   `30_000` ms, matching upstream's default `useIntervalFn(cb, 30_000)`).
- * - upstream `controls: true` variant (`Pausable` pause/resume) is not
- *   ported, so `UseTimeAgoOptions` drops the `Controls` boolean generic and
- *   `UseTimeAgoReturn` is not ported (plain string return).
- * - upstream `RefOrValue<Date | number | string>` → plain
- *   `Date | number | string`.
- * - the non-reactive `formatTimeAgo` helper is mirrored 1:1.
+ * (`source/vueuse/packages/core/useTimeAgo/`).
  *
  * @see https://vueuse.org/useTimeAgo
  *

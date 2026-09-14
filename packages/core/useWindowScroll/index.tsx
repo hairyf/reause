@@ -1,17 +1,16 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 /**
- * We have to check if the scroll amount is close enough to some threshold in order to
- * more accurately calculate arrivedState. This is because scrollTop/scrollLeft are non-rounded
- * numbers, while scrollHeight/scrollWidth and clientHeight/clientWidth are rounded.
+ * We have to check if the scroll amount is close enough to some threshold in order to more
+ * accurately calculate arrivedState. This is because scrollTop/scrollLeft are non-rounded numbers,
+ * while scrollHeight/scrollWidth and clientHeight/clientWidth are rounded.
  * https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollHeight#determine_if_an_element_has_been_totally_scrolled
  */
 const ARRIVED_STATE_THRESHOLD_PIXELS = 1
 
 export interface UseWindowScrollOptions {
   /**
-   * Specify a custom `window` instance, e.g. working with iframes or in
-   * testing environments.
+   * Specify a custom `window` instance, e.g. working with iframes or in testing environments.
    */
   window?: Window
 
@@ -23,8 +22,8 @@ export interface UseWindowScrollOptions {
   throttle?: number
 
   /**
-   * The check time when scrolling ends.
-   * This configuration will be setting to (throttle + idle) when the `throttle` is configured.
+   * The check time when scrolling ends. This configuration will be setting to (throttle + idle)
+   * when the `throttle` is configured.
    *
    * @default 200
    */
@@ -43,13 +42,12 @@ export interface UseWindowScrollOptions {
   }
 
   /**
-   * Use MutationObserver to monitor specific DOM changes, such as attribute
-   * modifications, child node additions or removals, or subtree changes.
+   * Use MutationObserver to monitor specific DOM changes, such as attribute modifications, child
+   * node additions or removals, or subtree changes.
    *
-   * Accepted for signature parity with upstream, but has no effect here:
-   * upstream's `useScroll` only registers the observer when the target is an
-   * element other than `window`/`document`, and `useWindowScroll` always
-   * targets the window.
+   * Accepted for signature parity with upstream, but has no effect here: upstream's `useScroll`
+   * only registers the observer when the target is an element other than `window`/`document`, and
+   * `useWindowScroll` always targets the window.
    *
    * @default { mutation: false }
    */
@@ -75,9 +73,8 @@ export interface UseWindowScrollOptions {
   eventListenerOptions?: boolean | AddEventListenerOptions
 
   /**
-   * Optionally specify a scroll behavior of `auto` (default, not smooth
-   * scrolling) or `smooth` (for smooth scrolling) which takes effect when
-   * scrolling with the `setX` / `setY` setters.
+   * Optionally specify a scroll behavior of `auto` (default, not smooth scrolling) or `smooth` (for
+   * smooth scrolling) which takes effect when scrolling with the `setX` / `setY` setters.
    *
    * @default 'auto'
    */
@@ -103,8 +100,8 @@ export interface UseWindowScrollReturn {
   y: number
 
   /**
-   * Whether the window is scrolling. Resets to `false` after `idle`
-   * milliseconds without scroll events.
+   * Whether the window is scrolling. Resets to `false` after `idle` milliseconds without scroll
+   * events.
    */
   isScrolling: boolean
 
@@ -129,8 +126,7 @@ export interface UseWindowScrollReturn {
   }
 
   /**
-   * Re-measure the current scroll position and refresh `arrivedState` /
-   * `directions` / `x` / `y`.
+   * Re-measure the current scroll position and refresh `arrivedState` / `directions` / `x` / `y`.
    */
   measure: () => void
 
@@ -146,41 +142,16 @@ export interface UseWindowScrollReturn {
 }
 
 /**
- * Resolve the `window` to work against: an explicitly provided option wins,
- * otherwise the global `window` on the client (`undefined` on the server).
+ * Resolve the `window` to work against: an explicitly provided option wins, otherwise the global
+ * `window` on the client (`undefined` on the server).
  */
 function resolveWindow(custom?: Window): Window | undefined {
   return custom ?? (typeof window === 'undefined' ? undefined : window)
 }
 
 /**
- * Reactive window scroll.
- *
  * Map from @vueuse/core `useWindowScroll`
- * (`source/vueuse/packages/core/useWindowScroll/`), which delegates to
- * upstream `useScroll(window)`: reactive `x` / `y` scroll position,
- * `isScrolling` with an `idle` timeout, `arrivedState` within `offset`
- * pixels of the edges and per-axis `directions`.
- *
- * React divergences from upstream:
- *
- * 1. Refs → plain state values: upstream returns a writable `computed` for
- *    `x` / `y` and `ShallowRef` / `reactive` objects for the rest; here
- *    every value is React state that updates on re-render. Scroll events
- *    are batched by React, so all values settle together.
- * 2. Writable refs → setter functions: scroll with the `setX` / `setY`
- *    callbacks instead of assigning `x.value`; both are stable
- *    (`useCallback`) and call `window.scrollTo` honoring the `behavior`
- *    option.
- * 3. The `scroll` / `scrollend` listeners (passive, non-capturing per
- *    upstream's `eventListenerOptions` default) are registered inline in a
- *    `useEffect` with cleanup; the idle reset is a plain `setTimeout`
- *    instead of upstream's `useDebounceFn`, and the `throttle` option is a
- *    small trailing throttle (upstream `useThrottleFn(..., { trailing:
- *    true, leading: false })`).
- * 4. The `observe` option is accepted for signature parity but inert:
- *    upstream never registers the MutationObserver when the target is the
- *    window.
+ * (`source/vueuse/packages/core/useWindowScroll/`).
  *
  * @example
  * const { x, y, isScrolling, arrivedState, directions, measure, setX, setY } = useWindowScroll()
@@ -278,8 +249,8 @@ export function useWindowScroll(options: UseWindowScrollOptions = {}): UseWindow
       + el.clientHeight >= el.scrollHeight - offsetRef.current.bottom - ARRIVED_STATE_THRESHOLD_PIXELS
 
     /**
-     * reverse columns and rows behave exactly the other way around,
-     * bottom is treated as top and top is treated as the negative version of bottom
+     * reverse columns and rows behave exactly the other way around, bottom is treated as top and
+     * top is treated as the negative version of bottom
      */
     const rowReversed = display === 'flex' && flexDirection === 'row-reverse'
     const columnReversed = display === 'flex' && flexDirection === 'column-reverse'
