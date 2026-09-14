@@ -56,17 +56,18 @@ export interface UseDropZoneReturn {
    */
   files: File[] | null
   /**
-   * Subscribe to the drop event — fires with the dropped files when a valid drop happens.
+   * Subscribe to the drop event — fires with the dropped files when a valid drop happens. Returns
+   * the off function that unsubscribes it.
    */
-  onDrop: (fn: UseDropZoneCallback) => { off: () => void }
+  onDrop: (fn: UseDropZoneCallback) => () => void
   /**
-   * Subscribe to the drag-enter event.
+   * Subscribe to the drag-enter event. Returns the off function that unsubscribes it.
    */
-  onDragEnter: (fn: UseDropZoneCallback) => { off: () => void }
+  onDragEnter: (fn: UseDropZoneCallback) => () => void
   /**
-   * Subscribe to the drag-leave event.
+   * Subscribe to the drag-leave event. Returns the off function that unsubscribes it.
    */
-  onDragLeave: (fn: UseDropZoneCallback) => { off: () => void }
+  onDragLeave: (fn: UseDropZoneCallback) => () => void
 }
 
 /**
@@ -106,28 +107,22 @@ export function useDropZone(
 
   const onDrop = useCallback((fn: UseDropZoneCallback) => {
     dropFns.current.add(fn)
-    return {
-      off: () => {
-        dropFns.current.delete(fn)
-      },
+    return () => {
+      dropFns.current.delete(fn)
     }
   }, [])
 
   const onDragEnter = useCallback((fn: UseDropZoneCallback) => {
     dragEnterFns.current.add(fn)
-    return {
-      off: () => {
-        dragEnterFns.current.delete(fn)
-      },
+    return () => {
+      dragEnterFns.current.delete(fn)
     }
   }, [])
 
   const onDragLeave = useCallback((fn: UseDropZoneCallback) => {
     dragLeaveFns.current.add(fn)
-    return {
-      off: () => {
-        dragLeaveFns.current.delete(fn)
-      },
+    return () => {
+      dragLeaveFns.current.delete(fn)
     }
   }, [])
 

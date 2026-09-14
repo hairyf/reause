@@ -32,15 +32,15 @@ export interface UseGamepadControls {
    */
   isSupported: boolean
   /**
-   * Register a callback fired with the `index` of a newly connected gamepad. Returns an `off`
-   * handle to unsubscribe — compatible with the `useListener` protocol.
+   * Register a callback fired with the `index` of a newly connected gamepad. Returns the off
+   * function that unsubscribes it — compatible with the `useListener` protocol.
    */
-  onConnected: (fn: (index: number) => void) => { off: () => void }
+  onConnected: (fn: (index: number) => void) => () => void
   /**
-   * Register a callback fired with the `index` of a disconnected gamepad. Returns an `off` handle
-   * to unsubscribe — compatible with the `useListener` protocol.
+   * Register a callback fired with the `index` of a disconnected gamepad. Returns the off function
+   * that unsubscribes it — compatible with the `useListener` protocol.
    */
-  onDisconnected: (fn: (index: number) => void) => { off: () => void }
+  onDisconnected: (fn: (index: number) => void) => () => void
   /**
    * Pause the `requestAnimationFrame` poller — the `gamepads` snapshot stops updating.
    */
@@ -224,25 +224,21 @@ export function useGamepad(options: UseGamepadOptions = {}): UseGamepadReturn {
   }, [])
 
   // Event hooks: upstream `createEventHook()` — one stable subscribe
-  // function per event, returning an `off` handle to unsubscribe.
+  // function per event, returning the off function that unsubscribes it.
   const onConnectedFns = useRef(new Set<(index: number) => void>())
   const onDisconnectedFns = useRef(new Set<(index: number) => void>())
 
   const onConnected = useCallback((fn: (index: number) => void) => {
     onConnectedFns.current.add(fn)
-    return {
-      off: () => {
-        onConnectedFns.current.delete(fn)
-      },
+    return () => {
+      onConnectedFns.current.delete(fn)
     }
   }, [])
 
   const onDisconnected = useCallback((fn: (index: number) => void) => {
     onDisconnectedFns.current.add(fn)
-    return {
-      off: () => {
-        onDisconnectedFns.current.delete(fn)
-      },
+    return () => {
+      onDisconnectedFns.current.delete(fn)
     }
   }, [])
 

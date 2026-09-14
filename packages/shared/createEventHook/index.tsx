@@ -5,8 +5,12 @@
  *
  * @example
  * const resultEvent = createEventHook<Response>()
- * useListener(resultEvent.on, (response) => { console.log(response) })
+ * useListener(resultEvent, (response) => { console.log(response) })
  * resultEvent.trigger(response)
+ *
+ * `on` returns the `off` function itself — the cleanup is invoked directly
+ * (`const off = resultEvent.on(fn); off()`), a deliberate deviation from upstream's `{ off }`
+ * object.
  */
 
 // any extends void = true
@@ -23,7 +27,7 @@ type Callback<T> = IsAny<T> extends true
             : (...param: [T, ...unknown[]]) => void
     )
 
-export type EventHookOn<T = any> = (fn: Callback<T>) => { off: () => void }
+export type EventHookOn<T = any> = (fn: Callback<T>) => () => void
 export type EventHookOff<T = any> = (fn: Callback<T>) => void
 export type EventHookTrigger<T = any> = (...param: Parameters<Callback<T>>) => Promise<unknown[]>
 
@@ -56,11 +60,8 @@ export function createEventHook<T = any>(): EventHookReturn<T> {
 
   const on = (fn: Callback<T>) => {
     fns.add(fn)
-    const offFn = () => off(fn)
 
-    return {
-      off: offFn,
-    }
+    return () => off(fn)
   }
 
   const trigger: EventHookTrigger<T> = (...args) => {

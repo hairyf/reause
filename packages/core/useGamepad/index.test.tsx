@@ -225,8 +225,8 @@ describe('useGamepad', () => {
         Dispatch<SetStateAction<Gamepad[]>>,
         {
           isSupported: boolean
-          onConnected: (fn: (index: number) => void) => { off: () => void }
-          onDisconnected: (fn: (index: number) => void) => { off: () => void }
+          onConnected: (fn: (index: number) => void) => () => void
+          onDisconnected: (fn: (index: number) => void) => () => void
           pause: () => void
           resume: () => void
           isActive: boolean

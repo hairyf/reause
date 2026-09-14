@@ -6,8 +6,8 @@ export default function CreateEventHookDemo() {
   // create the event hook once per component instance
   const [counter] = useState(() => createEventHook<number>())
 
-  // register on mount, unregister via the returned `{ off }` on unmount
-  useEffect(() => counter.on(value => setCount(value)).off, [counter])
+  // register on mount and unregister through the returned off function on unmount
+  useEffect(() => counter.on(value => setCount(value)), [counter])
 
   return (
     <div>

@@ -84,7 +84,7 @@ describe('createEventHook', () => {
 
     expect(listener).toHaveBeenCalledTimes(1)
 
-    const { off: remove } = on(listener)
+    const remove = on(listener)
 
     trigger('xxx')
 
@@ -222,5 +222,37 @@ describe('createEventHook', () => {
     await unmount()
     trigger('after-unmount')
     expect(calls).toEqual(['hello'])
+  })
+
+  it('integrates with useListener when the event hook object is passed directly', async () => {
+    const resultEvent = createEventHook<string>()
+    const calls: string[] = []
+
+    const { unmount } = await renderHook(() => useListener(resultEvent, (value) => {
+      calls.push(value)
+    }))
+
+    resultEvent.trigger('hello')
+    expect(calls).toEqual(['hello'])
+
+    await unmount()
+    resultEvent.trigger('after-unmount')
+    expect(calls).toEqual(['hello'])
+  })
+
+  it('the off function returned by `on` unsubscribes the listener', () => {
+    const listener = vi.fn()
+    const { on, trigger } = createEventHook<string>()
+
+    const off = on(listener)
+
+    trigger('xxx')
+    expect(listener).toHaveBeenCalledTimes(1)
+
+    off()
+    off()
+
+    trigger('xxx')
+    expect(listener).toHaveBeenCalledTimes(1)
   })
 })

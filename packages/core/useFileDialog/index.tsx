@@ -57,8 +57,8 @@ export interface UseFileDialogReturn {
   files: FileList | null
   open: (localOptions?: Partial<UseFileDialogOptions>) => void
   reset: () => void
-  onChange: (fn: (files: FileList | null) => void) => { off: () => void }
-  onCancel: (fn: () => void) => { off: () => void }
+  onChange: (fn: (files: FileList | null) => void) => () => void
+  onCancel: (fn: () => void) => () => void
 }
 
 function prepareInitialFiles(files: UseFileDialogOptions['initialFiles']): FileList | null {
@@ -100,26 +100,22 @@ export function useFileDialog(options: UseFileDialogOptions = {}): UseFileDialog
   const [files, setFiles] = useState<FileList | null>(() => prepareInitialFiles(options.initialFiles))
 
   // Event hooks: upstream `createEventHook()` — one stable subscribe
-  // function per event, returning an `off` handle to unsubscribe. The sets
-  // are stored in refs so the subscribe functions stay identity-stable.
+  // function per event, returning the off function that unsubscribes it. The
+  // sets are stored in refs so the subscribe functions stay identity-stable.
   const changeFns = useRef(new Set<(files: FileList | null) => void>())
   const cancelFns = useRef(new Set<() => void>())
 
   const onChange = useCallback((fn: (files: FileList | null) => void) => {
     changeFns.current.add(fn)
-    return {
-      off: () => {
-        changeFns.current.delete(fn)
-      },
+    return () => {
+      changeFns.current.delete(fn)
     }
   }, [])
 
   const onCancel = useCallback((fn: () => void) => {
     cancelFns.current.add(fn)
-    return {
-      off: () => {
-        cancelFns.current.delete(fn)
-      },
+    return () => {
+      cancelFns.current.delete(fn)
     }
   }, [])
 

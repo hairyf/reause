@@ -184,7 +184,7 @@ describe('useDropZone', () => {
     expect(calls).toHaveLength(1)
   })
 
-  it('should fire onDragEnter / onDragLeave listeners and off() unsubscribes', async () => {
+  it('should fire onDragEnter / onDragLeave listeners and the returned off function unsubscribes', async () => {
     const el = createDropZone()
     const enter = vi.fn()
     const leave = vi.fn()
@@ -200,7 +200,7 @@ describe('useDropZone', () => {
     expect(enter).toHaveBeenCalledTimes(1)
     expect(leave).not.toHaveBeenCalled()
 
-    enterHandle.off()
+    enterHandle()
     await act(() => {
       el.dispatchEvent(dragEvent('dragenter', new DataTransfer()))
     })
@@ -210,7 +210,7 @@ describe('useDropZone', () => {
       el.dispatchEvent(dragEvent('dragleave', new DataTransfer()))
     })
     expect(leave).toHaveBeenCalledTimes(1)
-    leaveHandle.off()
+    leaveHandle()
   })
 
   it('should re-bind listeners when the resolved target changes', async () => {

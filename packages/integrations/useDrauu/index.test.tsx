@@ -325,7 +325,7 @@ describe('useDrauu', () => {
     expect(typeof result.current.setBrush).toBe('function')
   })
 
-  it('should fire each on* registrar and stop it with off()', async () => {
+  it('should fire each on* registrar and stop it with the returned off function', async () => {
     const svg = createSvg()
     const { result, act } = await renderHook(() => useDrauu({ current: svg }))
 
@@ -363,7 +363,7 @@ describe('useDrauu', () => {
     await act(() => result.current.cancel())
     expect(onCanceled).toHaveBeenCalledTimes(1)
 
-    // off() removes exactly that listener and is idempotent
+    // the returned off() removes exactly that listener and is idempotent
     const first = vi.fn()
     const second = vi.fn()
     const handle = result.current.onChanged(first)
@@ -376,8 +376,8 @@ describe('useDrauu', () => {
     expect(secondCalls).toBe(firstCalls)
 
     if (handle) {
-      handle.off()
-      handle.off()
+      handle()
+      handle()
     }
 
     await act(() => drawStroke(svg))

@@ -155,10 +155,8 @@ function useEventHook<T extends (...args: any[]) => void>(): EventHookRegistrar<
 
   const on = useCallback<ListenerOn<T>>((fn) => {
     fnsRef.current.add(fn)
-    return {
-      off: () => {
-        fnsRef.current.delete(fn)
-      },
+    return () => {
+      fnsRef.current.delete(fn)
     }
   }, [])
 

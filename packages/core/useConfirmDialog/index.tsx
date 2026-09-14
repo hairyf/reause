@@ -37,19 +37,20 @@ export interface UseConfirmDialogReturn<RevealData, ConfirmData, CancelData> {
   cancel: (data?: CancelData) => void
 
   /**
-   * Event Hook to be triggered right before dialog creating.
+   * Event Hook to be triggered right before dialog creating. Returns the off function that removes
+   * the listener.
    */
-  onReveal: (fn: (data: RevealData) => void) => { off: () => void }
+  onReveal: (fn: (data: RevealData) => void) => () => void
 
   /**
    * Event Hook to be called on `confirm()`. Gets data object from `confirm` function.
    */
-  onConfirm: (fn: (data: ConfirmData) => void) => { off: () => void }
+  onConfirm: (fn: (data: ConfirmData) => void) => () => void
 
   /**
    * Event Hook to be called on `cancel()`. Gets data object from `cancel` function.
    */
-  onCancel: (fn: (data: CancelData) => void) => { off: () => void }
+  onCancel: (fn: (data: CancelData) => void) => () => void
 }
 
 /**
@@ -93,36 +94,30 @@ export function useConfirmDialog<
     setIsRevealed(revealed.current)
 
   // Event hooks: upstream `createEventHook()` — one stable subscribe function
-  // per event, returning an `off` handle to unsubscribe. The sets are stored
-  // in refs so the subscribe functions stay identity-stable.
+  // per event, returning the off function that unsubscribes it. The sets are
+  // stored in refs so the subscribe functions stay identity-stable.
   const revealFns = useRef(new Set<(data: RevealData) => void>())
   const confirmFns = useRef(new Set<(data: ConfirmData) => void>())
   const cancelFns = useRef(new Set<(data: CancelData) => void>())
 
   const onReveal = useCallback((fn: (data: RevealData) => void) => {
     revealFns.current.add(fn)
-    return {
-      off: () => {
-        revealFns.current.delete(fn)
-      },
+    return () => {
+      revealFns.current.delete(fn)
     }
   }, [])
 
   const onConfirm = useCallback((fn: (data: ConfirmData) => void) => {
     confirmFns.current.add(fn)
-    return {
-      off: () => {
-        confirmFns.current.delete(fn)
-      },
+    return () => {
+      confirmFns.current.delete(fn)
     }
   }, [])
 
   const onCancel = useCallback((fn: (data: CancelData) => void) => {
     cancelFns.current.add(fn)
-    return {
-      off: () => {
-        cancelFns.current.delete(fn)
-      },
+    return () => {
+      cancelFns.current.delete(fn)
     }
   }, [])
 

@@ -50,15 +50,16 @@ export interface UseBroadcastChannelReturn<D, P> {
   isClosed: boolean
 
   /**
-   * Register a callback fired on every `message` event — `useListener` protocol `(fn) => { off }`.
+   * Register a callback fired on every `message` event — `useListener` protocol `(fn) => () => void`
+   * (the returned off function unsubscribes the callback).
    */
-  onMessage: (fn: (event: MessageEvent<D>) => void) => { off: () => void }
+  onMessage: (fn: (event: MessageEvent<D>) => void) => () => void
 
   /**
-   * Register a callback fired on every `messageerror` event — `useListener` protocol `(fn) => { off
-   * }`.
+   * Register a callback fired on every `messageerror` event — `useListener` protocol `(fn) => () =>
+   * void`.
    */
-  onMessageError: (fn: (event: MessageEvent) => void) => { off: () => void }
+  onMessageError: (fn: (event: MessageEvent) => void) => () => void
 }
 
 /**
@@ -96,19 +97,15 @@ export function useBroadcastChannel<D, P>(options: UseBroadcastChannelOptions): 
 
   const onMessage = useCallback((fn: (event: MessageEvent<D>) => void) => {
     messageFns.current.add(fn)
-    return {
-      off: () => {
-        messageFns.current.delete(fn)
-      },
+    return () => {
+      messageFns.current.delete(fn)
     }
   }, [])
 
   const onMessageError = useCallback((fn: (event: MessageEvent) => void) => {
     messageErrorFns.current.add(fn)
-    return {
-      off: () => {
-        messageErrorFns.current.delete(fn)
-      },
+    return () => {
+      messageErrorFns.current.delete(fn)
     }
   }, [])
 

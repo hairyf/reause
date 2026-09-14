@@ -263,12 +263,12 @@ describe('useWebNotification', () => {
     expect(closed).toEqual(['close'])
   })
 
-  it('off() unsubscribes a hook callback', async () => {
+  it('the returned off function unsubscribes a hook callback', async () => {
     installNotificationStub('granted')
 
     const { result, act } = await renderHook(() => useWebNotification())
     const clicked: string[] = []
-    const { off } = result.current.onClick(event => clicked.push(event.type))
+    const off = result.current.onClick(event => clicked.push(event.type))
 
     let instance: Notification | undefined
     await act(async () => {

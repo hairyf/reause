@@ -139,7 +139,7 @@ export function useWebNotification(
   }, [])
 
   // Event hooks: upstream `createEventHook<Event>()` — one stable subscribe
-  // function per event, returning an `off` handle to unsubscribe.
+  // function per event, returning the off function that unsubscribes it.
   const clickFns = useRef(new Set<(event: Event) => void>())
   const showFns = useRef(new Set<(event: Event) => void>())
   const errorFns = useRef(new Set<(event: Event) => void>())
@@ -147,37 +147,29 @@ export function useWebNotification(
 
   const onClick = useCallback((fn: (event: Event) => void) => {
     clickFns.current.add(fn)
-    return {
-      off: () => {
-        clickFns.current.delete(fn)
-      },
+    return () => {
+      clickFns.current.delete(fn)
     }
   }, [])
 
   const onShow = useCallback((fn: (event: Event) => void) => {
     showFns.current.add(fn)
-    return {
-      off: () => {
-        showFns.current.delete(fn)
-      },
+    return () => {
+      showFns.current.delete(fn)
     }
   }, [])
 
   const onError = useCallback((fn: (event: Event) => void) => {
     errorFns.current.add(fn)
-    return {
-      off: () => {
-        errorFns.current.delete(fn)
-      },
+    return () => {
+      errorFns.current.delete(fn)
     }
   }, [])
 
   const onClose = useCallback((fn: (event: Event) => void) => {
     closeFns.current.add(fn)
-    return {
-      off: () => {
-        closeFns.current.delete(fn)
-      },
+    return () => {
+      closeFns.current.delete(fn)
     }
   }, [])
 
@@ -333,8 +325,8 @@ export function useWebNotification(
 
 /**
  * Return type of `useWebNotification` — upstream `UseWebNotificationReturn` with the Vue
- * shallowRefs flattened to plain values and `EventHookOn<Event>` subscribe functions (same `(fn) =>
- * { off }` shape) for the Notification events.
+ * shallowRefs flattened to plain values and the `EventHookOn<Event>` subscribe functions returning
+ * the `off` function instead of upstream's `{ off }` object.
  */
 export interface UseWebNotificationReturn {
   /**
@@ -366,19 +358,19 @@ export interface UseWebNotificationReturn {
    */
   close: () => void
   /**
-   * Subscribe to the notification `click` event; returns an `off` handle.
+   * Subscribe to the notification `click` event; returns the `off` function.
    */
-  onClick: (fn: (event: Event) => void) => { off: () => void }
+  onClick: (fn: (event: Event) => void) => () => void
   /**
-   * Subscribe to the notification `show` event; returns an `off` handle.
+   * Subscribe to the notification `show` event; returns the `off` function.
    */
-  onShow: (fn: (event: Event) => void) => { off: () => void }
+  onShow: (fn: (event: Event) => void) => () => void
   /**
-   * Subscribe to the notification `error` event; returns an `off` handle.
+   * Subscribe to the notification `error` event; returns the `off` function.
    */
-  onError: (fn: (event: Event) => void) => { off: () => void }
+  onError: (fn: (event: Event) => void) => () => void
   /**
-   * Subscribe to the notification `close` event; returns an `off` handle.
+   * Subscribe to the notification `close` event; returns the `off` function.
    */
-  onClose: (fn: (event: Event) => void) => { off: () => void }
+  onClose: (fn: (event: Event) => void) => () => void
 }
