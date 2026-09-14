@@ -1,3 +1,7 @@
+---
+category: Elements
+---
+
 # useSplitter
 
 A hook for resizable panel layouts that supports dragging and keyboard interactions.

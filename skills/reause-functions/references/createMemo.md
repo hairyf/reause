@@ -4,7 +4,7 @@ category: Factory
 
 # createMemo
 
-Turn a pure function into a memoising hook — React port of react-use's `createMemo`.
+Turn a pure function into a memoising hook.
 
 ## Usage
 

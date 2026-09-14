@@ -4,7 +4,7 @@ category: Animation
 
 # useUpdate
 
-A force-update hook — React port of react-use's [`useUpdate`](https://streamich.github.io/react-use/?path=/story/animation-useupdate--docs).
+A force-update hook.
 
 ## Usage
 

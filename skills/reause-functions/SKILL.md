@@ -60,17 +60,17 @@ exported from the package (`@reause/core`, `@reause/shared`, …) named by its
 | [`useControllableState`](references/useControllableState.md) | A hook for combining controlled and uncontrolled state sources | AUTO |
 | [`useCounter`](references/useCounter.md) | A basic counter with `inc` / `dec` / `set` / `reset` and optional `min` / `max` bounds | AUTO |
 | [`useLastChanged`](references/useLastChanged.md) | Records the timestamp of the last change | AUTO |
-| [`useLatest`](references/useLatest.md) | Returns a ref object whose `.current` always holds the latest value of the render that produced it — React port of react-use's [`useLatest`](https://github.com/streamich/react-use/blob/master/docs/useLatest.md) (upstream mapping files: `source/react-use/src/useLatest.ts` | AUTO |
-| [`useList`](references/useList.md) | Tracks an array and returns it with a stable set of immutable mutators — React port of react-use's `useList` | AUTO |
+| [`useLatest`](references/useLatest.md) | Returns a ref whose `.current` always holds the latest rendered value | AUTO |
+| [`useList`](references/useList.md) | Tracks an array and returns it with a stable set of immutable mutators | AUTO |
 | [`useListener`](references/useListener.md) | Bind a callback to a listener registration function returned by a reause hook | AUTO |
 | [`useLocalStorage`](references/useLocalStorage.md) | Reactive [LocalStorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage) | AUTO |
-| [`useMap`](references/useMap.md) | A real `Map` whose mutations re-render — React port of react-hookz's `useMap` | AUTO |
+| [`useMap`](references/useMap.md) | A real `Map` whose mutations re-render | AUTO |
 | [`useMethods`](references/useMethods.md) | `useReducer` sugar — turn an object of pure state transitions into a state value plus one callable method per transition | AUTO |
 | [`usePreviousDistinct`](references/usePreviousDistinct.md) | Just like `usePrevious` | AUTO |
-| [`useQueue`](references/useQueue.md) | State hook that implements a simple FIFO queue — React port of react-use's `useQueue` | AUTO |
+| [`useQueue`](references/useQueue.md) | State hook that implements a simple FIFO queue | AUTO |
 | [`useSafeState`](references/useSafeState.md) | A `useState` whose setter is a no-op once the component has unmounted | AUTO |
 | [`useSessionStorage`](references/useSessionStorage.md) | Reactive [SessionStorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage) | AUTO |
-| [`useSet`](references/useSet.md) | A real `Set` whose mutations re-render — React port of react-hookz's `useSet` | AUTO |
+| [`useSet`](references/useSet.md) | A real `Set` whose mutations re-render | AUTO |
 | [`useStateDebouncedHistory`](references/useStateDebouncedHistory.md) | Shorthand for `useStateHistory` with debounced filter | AUTO |
 | [`useStateHistory`](references/useStateHistory.md) | Track the change history of a state automatically — every change commits a history record — also provides undo and redo functionality | AUTO |
 | [`useStateManualHistory`](references/useStateManualHistory.md) | Manually track the change history of a state when the user calls `commit()` | AUTO |
@@ -83,6 +83,7 @@ exported from the package (`@reause/core`, `@reause/shared`, …) named by its
 | Function | Description | Invocation |
 |----------|-------------|------------|
 | [`useActiveElement`](references/useActiveElement.md) | Reactive `document.activeElement` | AUTO |
+| [`useCollapse`](references/useCollapse.md) | Animate an element's height between `0` and its measured content height | AUTO |
 | [`useDocumentVisibility`](references/useDocumentVisibility.md) | Reactively track [`document.visibilityState`](https://developer.mozilla.org/en-US/docs/Web/API/Document/visibilityState) | AUTO |
 | [`useDraggable`](references/useDraggable.md) | Make elements draggable | AUTO |
 | [`useDropZone`](references/useDropZone.md) | Create a zone where files can be dropped | AUTO |
@@ -95,6 +96,7 @@ exported from the package (`@reause/core`, `@reause/shared`, …) named by its
 | [`useMutationObserver`](references/useMutationObserver.md) | Watch for changes being made to the DOM tree | AUTO |
 | [`useParentElement`](references/useParentElement.md) | Get parent element of the given element | AUTO |
 | [`useResizeObserver`](references/useResizeObserver.md) | Reports changes to the dimensions of an Element's content or the border-box | AUTO |
+| [`useSplitter`](references/useSplitter.md) | A hook for resizable panel layouts that supports dragging and keyboard interactions | AUTO |
 | [`useWindowFocus`](references/useWindowFocus.md) | Reactive window focus state | AUTO |
 | [`useWindowScroll`](references/useWindowScroll.md) | Reactive window scroll | AUTO |
 | [`useWindowSize`](references/useWindowSize.md) | Reactive window size | AUTO |
@@ -172,7 +174,7 @@ exported from the package (`@reause/core`, `@reause/shared`, …) named by its
 | [`useElementHover`](references/useElementHover.md) | Reactive element's hover state | AUTO |
 | [`useElementRemoval`](references/useElementRemoval.md) | Fires when the element or any element containing it is removed from the DOM | AUTO |
 | [`useFocus`](references/useFocus.md) | Reactive utility to track or set the focus state of a DOM element | AUTO |
-| [`useFocusReturn`](references/useFocusReturn.md) | Return focus to the element that was active before an overlay opened — React port of `@mantine/hooks`' `useFocusReturn` (upstream mapping file: `source/mantine/packages/@mantine/hooks/src/use-focus-return/use-focus-return.ts` | AUTO |
+| [`useFocusReturn`](references/useFocusReturn.md) | Return focus to the element that was active before an overlay opened | AUTO |
 | [`useFocusWithin`](references/useFocusWithin.md) | Reactive utility to track if an element or one of its descendants has focus | AUTO |
 | [`useFps`](references/useFps.md) | Reactive FPS (frames per second) | AUTO |
 | [`useGeolocation`](references/useGeolocation.md) | Reactive [Geolocation API](https://developer.mozilla.org/en-US/docs/Web/API/Geolocation_API) | AUTO |
@@ -220,13 +222,13 @@ exported from the package (`@reause/core`, `@reause/shared`, …) named by its
 | [`useIntervalRafFn`](references/useIntervalRafFn.md) | Fire a callback repeatedly on animation frames | AUTO |
 | [`useNow`](references/useNow.md) | Reactive current Date instance | AUTO |
 | [`useRafFn`](references/useRafFn.md) | Call function on every `requestAnimationFrame` | AUTO |
-| [`useRafState`](references/useRafState.md) | State updates coalesced into an animation frame — React port of react-use's `useRafState` | AUTO |
+| [`useRafState`](references/useRafState.md) | State updates coalesced into an animation frame | AUTO |
 | [`useTimeout`](references/useTimeout.md) | A reactive value that becomes `true` after a given time | AUTO |
 | [`useTimeoutFn`](references/useTimeoutFn.md) | Wrapper for `setTimeout` with controls | AUTO |
 | [`useTimeoutRafFn`](references/useTimeoutRafFn.md) | Fire a callback once on the first animation frame at or after a delay | AUTO |
 | [`useTimestamp`](references/useTimestamp.md) | Reactive current timestamp (`Date.now() + offset`) | AUTO |
 | [`useTransition`](references/useTransition.md) | Transition between values | AUTO |
-| [`useUpdate`](references/useUpdate.md) | A force-update hook — React port of react-use's [`useUpdate`](https://streamich.github.io/react-use/?path=/story/animation-useupdate--docs) | AUTO |
+| [`useUpdate`](references/useUpdate.md) | A force-update hook | AUTO |
 
 ### Component
 
@@ -402,8 +404,8 @@ exported from the package (`@reause/core`, `@reause/shared`, …) named by its
 
 | Function | Description | Invocation |
 |----------|-------------|------------|
-| [`createMemo`](references/createMemo.md) | Turn a pure function into a memoising hook — React port of react-use's `createMemo` | AUTO |
-| [`createReducer`](references/createReducer.md) | Build a `useReducer`-shaped hook around a Redux-style middleware chain — React port of react-use's `createReducer` | AUTO |
+| [`createMemo`](references/createMemo.md) | Turn a pure function into a memoising hook | AUTO |
+| [`createReducer`](references/createReducer.md) | Build a `useReducer`-shaped hook around a Redux-style middleware chain | AUTO |
 
 ### Lifecycle
 
@@ -414,10 +416,10 @@ exported from the package (`@reause/core`, `@reause/shared`, …) named by its
 | [`useIsFirstRender`](references/useIsFirstRender.md) | `true` on the very first render of a component instance and `false` on every render after it | AUTO |
 | [`useIsomorphicLayoutEffect`](references/useIsomorphicLayoutEffect.md) | `useLayoutEffect` on the client | AUTO |
 | [`useLogger`](references/useLogger.md) | Console-log a component's lifecycle transitions — mount | AUTO |
-| [`useMount`](references/useMount.md) | Runs a callback once after the component mounts — React port of react-use's `useMount` | AUTO |
+| [`useMount`](references/useMount.md) | Runs a callback once after the component mounts | AUTO |
 | [`useShallowCompareEffect`](references/useShallowCompareEffect.md) | `useEffect` whose dependency list is compared by one-level (shallow) equality instead of reference identity | AUTO |
 | [`useTrackedEffect`](references/useTrackedEffect.md) | `useEffect` that also reports **which** dependencies changed | AUTO |
-| [`useUnmount`](references/useUnmount.md) | Runs a callback when the component unmounts — React port of react-use's [`useUnmount`](https://streamich.github.io/react-use/?path=/story/lifecycle-useunmount--docs) | AUTO |
+| [`useUnmount`](references/useUnmount.md) | Runs a callback when the component unmounts | AUTO |
 | [`useUnmountedRef`](references/useUnmountedRef.md) | A ref that reports whether the component has unmounted | AUTO |
 | [`useUpdateEffect`](references/useUpdateEffect.md) | `useEffect` that skips the first render | AUTO |
 
@@ -425,14 +427,8 @@ exported from the package (`@reause/core`, `@reause/shared`, …) named by its
 
 | Function | Description | Invocation |
 |----------|-------------|------------|
-| [`useError`](references/useError.md) | Returns a referentially stable error dispatcher whose error is re-thrown from a `useEffect` on the next render | AUTO |
-| [`useLockFn`](references/useLockFn.md) | Add a lock to an async function so overlapping calls are dropped rather than run in parallel — React port of ahooks' `useLockFn` | AUTO |
-
-### Uncategorized
-
-| Function | Description | Invocation |
-|----------|-------------|------------|
-| [`useCollapse`](references/useCollapse.md) | Animate an element's height between `0` and its measured content height | AUTO |
-| [`useSplitter`](references/useSplitter.md) | A hook for resizable panel layouts that supports dragging and keyboard interactions | AUTO |
+| [`useError`](references/useError.md) | Returns a stable error dispatcher that re-throws on the next render | AUTO |
+| [`useLockFn`](references/useLockFn.md) | Add a lock to an async function so overlapping calls are dropped | AUTO |
+| [`useMemoizedFn`](references/useMemoizedFn.md) | Keep a function's identity stable while always calling its latest implementation | AUTO |
 
 

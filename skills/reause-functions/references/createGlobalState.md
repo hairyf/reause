@@ -4,7 +4,7 @@ category: State
 
 # createGlobalState
 
-Keep state in the global scope, reusable across React components — React port of react-use's `createGlobalState`.
+Keep state in the global scope, reusable across React components.
 
 ## Usage
 

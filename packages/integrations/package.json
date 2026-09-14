@@ -1,7 +1,7 @@
 {
   "name": "@reause/integrations",
   "type": "module",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "Integrations with third-party services — React port of @vueuse/integrations (experimental, AI-mapped)",
   "license": "MIT",
   "homepage": "https://github.com/hairyf/reause#readme",

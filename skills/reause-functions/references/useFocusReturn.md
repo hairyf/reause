@@ -4,7 +4,7 @@ category: Sensors
 
 # useFocusReturn
 
-Return focus to the element that was active before an overlay opened — React port of `@mantine/hooks`' `useFocusReturn` (upstream mapping file: `source/mantine/packages/@mantine/hooks/src/use-focus-return/use-focus-return.ts`, 65 LOC; the directory ships no test file, so this port's suite is author-written rather than mirrored).
+Return focus to the element that was active before an overlay opened.
 
 ## Usage
 
