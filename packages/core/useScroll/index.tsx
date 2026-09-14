@@ -369,8 +369,11 @@ export function useScroll(
 
   // resolve the element during render so the effect below re-binds the
   // listeners whenever the resolved element changes (upstream `useEventListener`
-  // watches the element target)
-  const trackedElement = element
+  // watches the element target). Depending on the raw ref object instead would
+  // re-bind on every render for an inline `{ current }` target — and the
+  // re-measure in the effect would then set fresh state objects each time,
+  // looping until React bails out with "Maximum update depth exceeded".
+  const trackedElement = unrefElement(element)
 
   useEffect(() => {
     const el = unrefElement(elementRef.current)
