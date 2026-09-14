@@ -1,6 +1,8 @@
 import type { MockInstance } from 'vitest'
+import { StrictMode, useRef, useState } from 'react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { renderHook } from 'vitest-browser-react'
+import { render, renderHook } from 'vitest-browser-react'
+import { userEvent } from 'vitest/browser'
 import { useEventListener } from '../useEventListener'
 
 describe('useEventListener', () => {
@@ -483,5 +485,126 @@ describe('useEventListener', () => {
     shadowRoot2.dispatchEvent(new Event('slotchange'))
 
     expect(shadowListener).toHaveBeenCalledTimes(4)
+  })
+})
+
+/**
+ * The ref-attachment timing tests. Every test above hands the hook a ref that
+ * is already populated on the first render, which is exactly what a real
+ * `useRef<T>(null)` + JSX `ref={...}` component is **not**: React attaches the
+ * element during the commit that follows the first render. A hook that reads
+ * `ref.current` while rendering therefore sees `null` on mount and only notices
+ * the element when some unrelated state change re-renders the component.
+ */
+describe('useEventListener - ref attached by React after the first render', () => {
+  it('binds the element on mount without waiting for an unrelated re-render', async () => {
+    const listener = vi.fn()
+
+    function Demo() {
+      const target = useRef<HTMLDivElement>(null)
+      useEventListener(target, 'click', listener)
+
+      return <div ref={target}>click me</div>
+    }
+
+    const screen = await render(<Demo />)
+
+    await userEvent.click(screen.getByText('click me'))
+
+    expect(listener).toHaveBeenCalledTimes(1)
+  })
+
+  it('binds a conditionally rendered element as soon as it appears', async () => {
+    const listener = vi.fn()
+
+    function Demo() {
+      const [open, setOpen] = useState(false)
+      const target = useRef<HTMLDivElement>(null)
+      useEventListener(target, 'click', listener)
+
+      return (
+        <div>
+          <button type="button" onClick={() => setOpen(true)}>open</button>
+          {open && <div ref={target}>panel</div>}
+        </div>
+      )
+    }
+
+    const screen = await render(<Demo />)
+
+    await userEvent.click(screen.getByText('open'))
+    await userEvent.click(screen.getByText('panel'))
+
+    expect(listener).toHaveBeenCalledTimes(1)
+  })
+
+  it('keeps a manual stop() detached across later re-renders', async () => {
+    const listener = vi.fn()
+
+    function Demo() {
+      const [, forceRender] = useState(0)
+      const target = useRef<HTMLDivElement>(null)
+      const stop = useEventListener(target, 'click', listener)
+
+      return (
+        <div>
+          <div ref={target}>click me</div>
+          <button type="button" onClick={() => forceRender(count => count + 1)}>rerender</button>
+          <button type="button" onClick={() => stop()}>stop</button>
+        </div>
+      )
+    }
+
+    const screen = await render(<Demo />)
+
+    await userEvent.click(screen.getByText('click me'))
+    expect(listener).toHaveBeenCalledTimes(1)
+
+    await userEvent.click(screen.getByText('stop'))
+    await userEvent.click(screen.getByText('rerender'))
+    await userEvent.click(screen.getByText('click me'))
+
+    expect(listener).toHaveBeenCalledTimes(1)
+  })
+})
+
+/**
+ * `<StrictMode>` in dev runs mount → cleanup → mount for every effect. The
+ * binding effect here re-runs on every commit and compares against the
+ * registration it made, so the simulated unmount must clear that memory —
+ * otherwise the second mount finds "nothing changed" and the listeners stay
+ * detached.
+ */
+describe('useEventListener - under <StrictMode>', () => {
+  it('keeps the element listener attached across the double-invoked mount effect', async () => {
+    const listener = vi.fn()
+
+    function Demo() {
+      const target = useRef<HTMLDivElement>(null)
+      useEventListener(target, 'click', listener)
+
+      return <div ref={target}>click me</div>
+    }
+
+    const screen = await render(<StrictMode><Demo /></StrictMode>)
+
+    await userEvent.click(screen.getByText('click me'))
+
+    expect(listener).toHaveBeenCalledTimes(1)
+  })
+
+  it('keeps the window listener attached across the double-invoked mount effect', async () => {
+    const listener = vi.fn()
+
+    function Demo() {
+      useEventListener('keydown', listener)
+
+      return <div>demo</div>
+    }
+
+    await render(<StrictMode><Demo /></StrictMode>)
+    await userEvent.keyboard('{Enter}')
+
+    expect(listener).toHaveBeenCalledTimes(1)
   })
 })

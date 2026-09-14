@@ -1,6 +1,6 @@
 import type { RefObject } from 'react'
-import { isObject, toArray } from '@reause/shared'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { isObject, toArray, useUnmount } from '@reause/shared'
+import { useCallback, useEffect, useRef } from 'react'
 
 type Arrayable<T> = T | T[]
 
@@ -208,45 +208,52 @@ export function useEventListener(
 
   const win = typeof window === 'undefined' ? undefined : window
 
-  const resolvedTargets: EventTarget[] = isTargetFirst
-    ? resolveTargets(args[0] as EventTargetRefs<EventTarget>)
-    : (win ? [win] : [])
-  const resolvedEvents = toArray(eventArg) as string[]
-  const resolvedOptions = optionsArg
-  const listenerCount = toArray(listenerArg).length
-
   // latest raw listener argument, synced each render — the bound dispatcher
   // reads it at dispatch time, so a listener swap needs no re-bind and an
   // inline listener never goes stale
   const listenerRef = useRef(listenerArg)
   listenerRef.current = listenerArg
 
-  // re-bind whenever the resolved targets / events / options change, or the
-  // listener count changes (upstream `watchImmediate` over the raw arguments)
-  const [bind, setBind] = useState(() => ({
-    targets: resolvedTargets,
-    events: resolvedEvents,
-    options: resolvedOptions,
-    listenerCount,
-  }))
-
-  if (!sameValues(bind.targets, resolvedTargets)
-    || !sameValues(bind.events, resolvedEvents)
-    || !sameOptions(bind.options, resolvedOptions)
-    || bind.listenerCount !== listenerCount) {
-    setBind({
-      targets: resolvedTargets,
-      events: resolvedEvents,
-      options: resolvedOptions,
-      listenerCount,
-    })
-  }
-
+  // The binding lives in refs, and the effect below runs after **every** commit
+  // — the React equivalent of upstream's `watchImmediate(..., { flush: 'post' })`.
+  // A ref target is not reactive in React: React attaches `ref.current` during
+  // the commit that follows the render that read the ref, so resolving the
+  // targets while rendering sees `null` on mount and only notices the element
+  // when some unrelated state change re-renders the component.
   const cleanupRef = useRef<Fn | null>(null)
+  const lastBindRef = useRef<{
+    targets: EventTarget[]
+    events: string[]
+    options: boolean | AddEventListenerOptions | undefined
+    listenerCount: number
+  } | null>(null)
 
   useEffect(() => {
-    const { targets, events, options } = bind
-    if (!targets.length || !events.length || !toArray(listenerRef.current).length)
+    const targets = isTargetFirst
+      ? resolveTargets(args[0] as EventTargetRefs<EventTarget>)
+      : (win ? [win] : [])
+    const events = toArray(eventArg) as string[]
+    const options = optionsArg
+    const listenerCount = toArray(listenerArg).length
+
+    const last = lastBindRef.current
+    // an unchanged registration is left exactly as it is — including a target
+    // that has not been attached yet. It also keeps a manual `stop()` detached
+    // until the target / events / options actually change.
+    const unchanged = last !== null
+      && sameValues(last.targets, targets)
+      && sameValues(last.events, events)
+      && sameOptions(last.options, options)
+      && last.listenerCount === listenerCount
+    if (unchanged)
+      return
+
+    // the previous registration is stale: detach it and remember the new args
+    cleanupRef.current?.()
+    cleanupRef.current = null
+    lastBindRef.current = { targets, events, options, listenerCount }
+
+    if (!targets.length || !events.length || !listenerCount)
       return
 
     // snapshot options so removal uses the same values as registration
@@ -266,12 +273,18 @@ export function useEventListener(
     )
 
     cleanupRef.current = () => cleanups.forEach(fn => fn())
+  })
 
-    return () => {
-      cleanupRef.current = null
-      cleanups.forEach(fn => fn())
-    }
-  }, [bind])
+  // unmount-only teardown: the effect above re-runs on every commit, so it
+  // cannot own the cleanup itself. Clearing the recorded bind is what makes the
+  // pattern remount-safe: React StrictMode (dev) and react-refresh both run
+  // mount → cleanup → mount, and without the reset the second mount would find
+  // "no argument changed" and leave a registration that was just removed.
+  useUnmount(() => {
+    cleanupRef.current?.()
+    cleanupRef.current = null
+    lastBindRef.current = null
+  })
 
   // manual cleanup: detaches everything currently registered (upstream `Fn`).
   // The next target / events / options change still re-binds.

@@ -6,7 +6,8 @@ export default function UseEventListenerDemo() {
   const [clicks, setClicks] = useState(0)
   const [keyCount, setKeyCount] = useState(0)
 
-  // ref-like element target — the effect binds once React attaches the ref
+  // ref-like element target — React attaches `target.current` after the first
+  // render, so the hook resolves it from its post-commit effect
   useEventListener(target, 'click', () => {
     setClicks(count => count + 1)
   })

@@ -127,8 +127,8 @@ export function useStartTyping(
       callbackRef.current(event)
   }
 
-  // a plain target (not a getter): `useEventListener` resolves it during
-  // render and re-binds whenever the resolved document changes, and the
+  // a plain target (not a getter): `useEventListener` resolves it after every
+  // commit and re-binds whenever the resolved document changes, and the
   // `typeof document` guard keeps SSR safe
   return useEventListener<KeyboardEvent>(
     { current: doc ?? (typeof document === 'undefined' ? undefined : document) },
