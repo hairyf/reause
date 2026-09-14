@@ -79,29 +79,33 @@ describe('useBase64', () => {
     await expect.poll(() => result.current.base64).toBe('data:text/plain;base64,aGVsbG8=')
   })
 
-  it('should re-transform when a ref-like source changes', async () => {
-    const source: { current: string | undefined } = { current: 'one' }
+  it('re-transforms when the target changes across renders', async () => {
+    // the target is a plain value (no ref unwrapping): a re-render carrying a
+    // new value re-runs the transformation
+    let source = 'one'
 
     const { result, rerender } = await renderHook(() => useBase64(source))
 
     await expect.poll(() => result.current.base64).toBe('data:text/plain;base64,b25l')
 
-    source.current = 'two'
+    source = 'two'
     await rerender()
 
     await expect.poll(() => result.current.base64).toBe('data:text/plain;base64,dHdv')
   })
 
   it('execute manually transforms the latest target', async () => {
-    const source: { current: string | undefined } = { current: 'a' }
+    let source = 'a'
 
-    const { result } = await renderHook(() => useBase64(source))
+    const { result, rerender } = await renderHook(() => useBase64(source))
 
     await expect.poll(() => result.current.base64).toBe('data:text/plain;base64,YQ==')
 
-    source.current = 'ab'
-    result.current.execute()
+    source = 'ab'
+    await rerender()
 
+    // the manual run reads the target of the latest render
+    await expect(result.current.execute()).resolves.toBe('data:text/plain;base64,YWI=')
     await expect.poll(() => result.current.base64).toBe('data:text/plain;base64,YWI=')
   })
 
