@@ -53,7 +53,7 @@ exported from the package (`@reause/core`, `@reause/shared`, …) named by its
 | Function | Description | Invocation |
 |----------|-------------|------------|
 | [`createGlobalState`](references/createGlobalState.md) | Keep state in the global scope | AUTO |
-| [`createInjectionState`](references/createInjectionState.md) | Create global state that can be injected into components | AUTO |
+| [`createScopedHook`](references/createScopedHook.md) | Create global state that can be injected into components | AUTO |
 | [`createSharedHook`](references/createSharedHook.md) | Make a composable function usable with multiple React components | AUTO |
 | [`useAsyncFn`](references/useAsyncFn.md) | Returns state and a callback for an `async` function (or any function returning a promise) — React port of react-use's [`useAsyncFn`](https://github.com/streamich/react-use/blob/master/docs/useAsyncFn.md) (upstream mapping files: `source/react-use/src/useAsyncFn.ts` | AUTO |
 | [`useAsyncState`](references/useAsyncState.md) | Reactive async state | AUTO |

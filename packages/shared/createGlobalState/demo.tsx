@@ -3,7 +3,7 @@ import { useState } from 'react'
 
 // The factory is called once, at module scope: every component below reads and
 // writes the same value, and the store outlives all of them
-const useGlobalValue = createGlobalState<number>(0)
+const useGlobalValue = createGlobalState(0)
 
 function CompA() {
   const [value, setValue] = useGlobalValue()

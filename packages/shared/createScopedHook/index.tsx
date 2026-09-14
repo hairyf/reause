@@ -1,7 +1,7 @@
 import type { Context, PropsWithChildren, ReactNode } from 'react'
 import { createContext, useContext } from 'react'
 
-export interface CreateInjectionStateOptions<Return> {
+export interface createScopedHookOptions<Return> {
   /**
    * Custom injectionKey for InjectionState — the React equivalent of upstream's string/symbol key.
    * React keys a context by object identity, so pass a `createContext(...)` instance; consumers may
@@ -16,13 +16,13 @@ export interface CreateInjectionStateOptions<Return> {
   defaultValue?: Return
 }
 
-export type CreateInjectionStateProvider<Props extends object, ProvideReturn = ReactNode> = (props: PropsWithChildren<Props>) => ProvideReturn
+export type createScopedHookProvider<Props extends object, ProvideReturn = ReactNode> = (props: PropsWithChildren<Props>) => ProvideReturn
 
-export type CreateInjectionStateReturn<Props extends object, ProvideReturn, InjectReturn> = Readonly<[
+export type createScopedHookReturn<Props extends object, ProvideReturn, InjectReturn> = Readonly<[
   /**
    * Render this component to create and provide the state to its descendants.
    */
-  Provider: CreateInjectionStateProvider<Props, ProvideReturn>,
+  Provider: createScopedHookProvider<Props, ProvideReturn>,
   /**
    * Call this hook in a consumer component to inject the state.
    */
@@ -30,14 +30,14 @@ export type CreateInjectionStateReturn<Props extends object, ProvideReturn, Inje
 ]>
 
 /**
- * Map from @vueuse/shared `createInjectionState`.
+ * Map from @vueuse/shared `createScopedHook`.
  *
- * @see https://vueuse.org/createInjectionState
+ * @see https://vueuse.org/createScopedHook
  *
  * @__NO_SIDE_EFFECTS__
  *
  * @example
- * const [CounterStoreProvider, useCounterStore] = createInjectionState(
+ * const [CounterStoreProvider, useCounterStore] = createScopedHook(
  *   ({ initialValue }: { initialValue: number }) => {
  *     const [count, setCount] = useState(initialValue)
  *     return { count, inc: () => setCount(c => c + 1) }
@@ -53,18 +53,18 @@ export type CreateInjectionStateReturn<Props extends object, ProvideReturn, Inje
  *   <Counter />
  * </CounterStoreProvider>
  */
-export function createInjectionState<Props extends object, Return>(
+export function createScopedHook<Props extends object, Return>(
   composable: (props: Props) => Return,
-  options: { defaultValue: Return } & CreateInjectionStateOptions<Return>,
-): CreateInjectionStateReturn<Props, ReactNode, Return>
-export function createInjectionState<Props extends object, Return>(
+  options: { defaultValue: Return } & createScopedHookOptions<Return>,
+): createScopedHookReturn<Props, ReactNode, Return>
+export function createScopedHook<Props extends object, Return>(
   composable: (props: Props) => Return,
-  options?: CreateInjectionStateOptions<Return>,
-): CreateInjectionStateReturn<Props, ReactNode, Return | undefined>
-export function createInjectionState<Props extends object, Return>(
+  options?: createScopedHookOptions<Return>,
+): createScopedHookReturn<Props, ReactNode, Return | undefined>
+export function createScopedHook<Props extends object, Return>(
   composable: (props: Props) => Return,
-  options?: CreateInjectionStateOptions<Return>,
-): CreateInjectionStateReturn<Props, ReactNode, Return | undefined> {
+  options?: createScopedHookOptions<Return>,
+): createScopedHookReturn<Props, ReactNode, Return | undefined> {
   const InjectionContext = options?.injectionKey ?? createContext<Return | undefined>(options?.defaultValue)
 
   function Provider(props: PropsWithChildren<Props>): ReactNode {

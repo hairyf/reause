@@ -26,12 +26,12 @@
 | vueuse      | `createFetch`                     | packages/core/useFetch                          | `packages/core/useFetch/index.tsx`                        | ✅ ported                           |
 | vueuse      | `createGenericProjection`         | packages/math/createGenericProjection           | `packages/math/createGenericProjection/index.tsx`         | ✅ ported                           |
 | react-use   | `createGlobalState`               | src/factory/createGlobalState.ts                | `packages/shared/createGlobalState/index.tsx`             | ✅ ported                           |
-| vueuse      | `createInjectionState`            | packages/shared/createInjectionState            | `packages/shared/createInjectionState/index.tsx`          | ✅ ported                           |
 | react-use   | `createMemo`                      | src/factory/createMemo.ts                       | `packages/shared/createMemo/index.tsx`                    | ✅ ported                           |
 | vueuse      | `createReusableTemplate`          | packages/core/createReusableTemplate            | `packages/core/createPortalSlot/index.tsx`                | ✅ ported                           |
 | vueuse      | `createProjection`                | packages/math/createProjection                  | `packages/math/createProjection/index.tsx`                | ✅ ported                           |
 | vueuse      | `createTemplatePromise`           | packages/core/createTemplatePromise             | `packages/core/createPromisifiedComponent/index.tsx`      | ✅ ported                           |
 | react-use   | `createReducer`                   | src/factory/createReducer.ts                    | `packages/shared/createReducer/index.tsx`                 | ✅ ported                           |
+| vueuse      | `createScopedHook`                | packages/shared/createInjectionState            | `packages/shared/createScopedHook/index.tsx`              | ✅ ported                           |
 | vueuse      | `createSharedComposable`          | packages/shared/createSharedComposable          | `packages/shared/createSharedHook/index.tsx`              | ✅ ported                           |
 | vueuse      | `createSingletonPromise`          | packages/shared/utils                           | `packages/shared/utils/index.tsx`                         | ✅ ported                           |
 | vueuse      | `customStorageEventName`          | packages/core/useStorage                        | `packages/core/useStorage/index.tsx`                      | ✅ ported                           |

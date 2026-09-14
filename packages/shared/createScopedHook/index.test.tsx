@@ -1,15 +1,15 @@
 import { createContext, useContext, useState } from 'react'
 import { describe, expect, it, vi } from 'vitest'
 import { render } from 'vitest-browser-react'
-import { createInjectionState } from '../createInjectionState'
+import { createScopedHook } from '.'
 
-describe('createInjectionState', () => {
+describe('createScopedHook', () => {
   it('is defined', () => {
-    expect(createInjectionState).toBeTypeOf('function')
+    expect(createScopedHook).toBeTypeOf('function')
   })
 
   it('should work for simple nested component', async () => {
-    const [CounterStoreProvider, useCounterStore] = createInjectionState(
+    const [CounterStoreProvider, useCounterStore] = createScopedHook(
       ({ initialValue }: { initialValue: number }) => {
         const [count, setCount] = useState(initialValue)
         return { count, setCount }
@@ -31,7 +31,7 @@ describe('createInjectionState', () => {
   })
 
   it('should have useInjectedState return default value when not providing state', async () => {
-    const [, useCounterStore] = createInjectionState(
+    const [, useCounterStore] = createScopedHook(
       ({ initialValue }: { initialValue: number }) => initialValue,
       { defaultValue: 543742 },
     )
@@ -48,7 +48,7 @@ describe('createInjectionState', () => {
   it('should work for custom injectionKey', async () => {
     const CounterStoreKey = createContext<number | undefined>(undefined)
 
-    const [CounterStoreProvider, useCounterStore] = createInjectionState(
+    const [CounterStoreProvider, useCounterStore] = createScopedHook(
       ({ initialValue }: { initialValue: number }) => initialValue,
       { injectionKey: CounterStoreKey },
     )
@@ -73,7 +73,7 @@ describe('createInjectionState', () => {
   })
 
   it('should return undefined when neither a provider nor a defaultValue exists', async () => {
-    const [, useCounterStore] = createInjectionState(() => 663512)
+    const [, useCounterStore] = createScopedHook(() => 663512)
 
     let injected: number | undefined = 0
 
@@ -89,7 +89,7 @@ describe('createInjectionState', () => {
   })
 
   it('should let an inner provider override the outer one for its own subtree', async () => {
-    const [CounterStoreProvider, useCounterStore] = createInjectionState(
+    const [CounterStoreProvider, useCounterStore] = createScopedHook(
       ({ initialValue }: { initialValue: number }) => initialValue,
     )
 
@@ -111,7 +111,7 @@ describe('createInjectionState', () => {
   })
 
   it('should re-render consumers when the provided state changes', async () => {
-    const [CounterStoreProvider, useCounterStore] = createInjectionState(
+    const [CounterStoreProvider, useCounterStore] = createScopedHook(
       ({ initialValue }: { initialValue: number }) => {
         const [count, setCount] = useState(initialValue)
         return { count, inc: () => setCount(current => current + 1) }
@@ -143,7 +143,7 @@ describe('createInjectionState', () => {
 
   it('should pass exactly the provider props (without children) to the factory, and only on render', async () => {
     const factory = vi.fn((props: { initialValue: number }) => props.initialValue)
-    const [CounterStoreProvider] = createInjectionState(factory)
+    const [CounterStoreProvider] = createScopedHook(factory)
 
     expect(factory).not.toHaveBeenCalled()
 
@@ -164,8 +164,8 @@ describe('createInjectionState', () => {
       return initialValue
     }
 
-    const [CounterStoreProvider] = createInjectionState(useCounterStore)
-    const [AnonymousProvider] = createInjectionState(() => 0)
+    const [CounterStoreProvider] = createScopedHook(useCounterStore)
+    const [AnonymousProvider] = createScopedHook(() => 0)
 
     expect((CounterStoreProvider as { displayName?: string }).displayName).toBe('useCounterStoreProvider')
     expect((AnonymousProvider as { displayName?: string }).displayName).toBe('InjectionStateProvider')

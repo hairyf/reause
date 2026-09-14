@@ -209,15 +209,6 @@ export const functions: FunctionInfo[] = [
     lastUpdated: 1789366373000,
   },
   {
-    name: 'createInjectionState',
-    file: 'packages/shared/createInjectionState/index.tsx',
-    pkg: 'shared',
-    dir: 'createInjectionState',
-    category: 'State',
-    source: 'vueuse',
-    lastUpdated: 1789366373000,
-  },
-  {
     name: 'createMemo',
     file: 'packages/shared/createMemo/index.tsx',
     pkg: 'shared',
@@ -261,6 +252,14 @@ export const functions: FunctionInfo[] = [
     category: 'Factory',
     source: 'react-use',
     lastUpdated: 1789366373000,
+  },
+  {
+    name: 'createScopedHook',
+    file: 'packages/shared/createScopedHook/index.tsx',
+    pkg: 'shared',
+    dir: 'createScopedHook',
+    category: 'State',
+    source: 'vueuse',
   },
   {
     name: 'createSharedHook',
@@ -3205,14 +3204,6 @@ export const pages: FunctionPageInfo[] = [
     lastUpdated: 1789366373000,
   },
   {
-    name: 'createInjectionState',
-    pkg: 'shared',
-    doc: 'packages/shared/createInjectionState/index.md',
-    category: 'State',
-    description: 'create global state that can be injected into components',
-    lastUpdated: 1789366373000,
-  },
-  {
     name: 'createMemo',
     pkg: 'shared',
     doc: 'packages/shared/createMemo/index.md',
@@ -3252,6 +3243,13 @@ export const pages: FunctionPageInfo[] = [
     description:
       "build a `useReducer`-shaped hook around a Redux-style middleware chain — React port of react-use's `createReducer`",
     lastUpdated: 1789366373000,
+  },
+  {
+    name: 'createScopedHook',
+    pkg: 'shared',
+    doc: 'packages/shared/createScopedHook/index.md',
+    category: 'State',
+    description: 'create global state that can be injected into components',
   },
   {
     name: 'createSharedHook',

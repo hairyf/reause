@@ -52,7 +52,6 @@ gh label list --repo hairyf/reause --limit 40
 
 - **VueUse**: `useNow` — package `@vueuse/core` — [docs](https://vueuse.org/core/useNow/) — source `source/vueuse/packages/core/useNow`
 - **reause**: `packages/core/useNow/index.tsx`, exported from `@reause/core`
-- **Status**: ☐ todo · ☐ in progress · ☐ done
 
 ## Upstream API
 
