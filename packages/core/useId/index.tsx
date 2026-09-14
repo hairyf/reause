@@ -4,18 +4,21 @@ import { useId as useReactId, useRef, useState } from 'react'
 // Port of `randomId` from `@mantine/hooks`
 // (`source/mantine/packages/@mantine/hooks/src/utils/random-id/random-id.ts`) —
 // unchanged from upstream, and unexported on purpose: reause ships no equivalent
+// helper to reuse and `packages/shared/**` is outside this port's scope.
+// The `mantine-` prefix is the same one the pre-mount id carries, so both phases
+// have the same shape in markup.
+function randomId(prefix = 'mantine-'): string {
+  return `${prefix}${Math.random().toString(36).slice(2, 11)}`
+}
+
+// `useLayoutEffect` warns when a component renders on the server, so the post-mount swap uses the
+// effect variant there — upstream's `useIsomorphicEffect`
+// (`source/mantine/packages/@mantine/hooks/src/use-isomorphic-effect/`). That choice is the shared
+// `useIsomorphicLayoutEffect` (#923), imported above instead of aliased locally, so the isomorphic
+// branch lives in exactly one place (reference-chain rule).
+
 /**
- * // The `mantine-` prefix is the same one the pre-mount id carries, so both phases // have the
- * same shape in markup. function randomId(prefix = 'mantine-'): string { return
- * `${prefix}${Math.random().toString(36).slice(2, 11)}` }
- *
- * // `useLayoutEffect` warns when a component renders on the server, so the // post-mount swap uses
- * the effect variant there — upstream's // `useIsomorphicEffect` //
- * (`source/mantine/packages/@mantine/hooks/src/use-isomorphic-effect/`). That // choice is the
- * shared `useIsomorphicLayoutEffect` (#923), imported above // instead of aliased locally, so the
- * isomorphic branch lives in exactly one // place (reference-chain rule).
- *
- * /** React port of `@mantine/hooks`' `useId`.
+ * React port of `@mantine/hooks`' `useId`.
  *
  * Map from @mantine/hooks `useId`
  * (`source/mantine/packages/@mantine/hooks/src/use-id/use-id.ts`) — a direct
