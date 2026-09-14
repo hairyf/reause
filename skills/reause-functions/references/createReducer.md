@@ -4,7 +4,7 @@ category: Factory
 
 # createReducer
 
-Build a `useReducer`-shaped hook around a Redux-style middleware chain — React port of react-use's `createReducer`.
+Build a `useReducer`-shaped hook around a Redux-style middleware chain.
 
 ## Usage
 

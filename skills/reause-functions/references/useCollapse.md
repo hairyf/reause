@@ -1,3 +1,7 @@
+---
+category: Elements
+---
+
 # useCollapse
 
 Animate an element's height between `0` and its measured content height.

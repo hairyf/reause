@@ -19,7 +19,6 @@ const clear = useTimeoutRafFn(() => {
 clear()
 ```
 
-
 ## Type Declarations
 
 ```ts

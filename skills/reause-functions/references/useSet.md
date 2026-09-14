@@ -4,7 +4,7 @@ category: State
 
 # useSet
 
-A real `Set` whose mutations re-render — React port of react-hookz's `useSet`.
+A real `Set` whose mutations re-render.
 
 ## Usage
 

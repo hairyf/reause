@@ -30,19 +30,15 @@ async function open() {
 </Promisified>
 ```
 
-## Features
+### Returned Component
 
-- **Programmatic** - call your UI as a promise
-- **Template** - use a React component to render, not a new DSL
-- **TypeScript** - full type safety via generic type
-- **Renderless** - you take full control of the UI
-- **Transition** - accepted for API parity (see below)
+`createPromisifiedComponent` returns a **React component** that you can use anywhere in your tree:
 
-This function is migrated from [vue-template-promise](https://github.com/antfu/vue-template-promise)
-
-## Usage
-
-`createPromisifiedComponent` returns a **React component** that you can use anywhere in your tree.
+- **Programmatic** — call your UI as a promise
+- **Template** — use a React component to render, not a new DSL
+- **TypeScript** — full type safety via generic type
+- **Renderless** — you take full control of the UI
+- **Transition** — accepted for API parity (see below)
 
 ```ts
 import { createPromisifiedComponent } from '@reause/core'
@@ -159,6 +155,8 @@ The render prop provides the following props:
   )}
 </Promisified>
 ```
+
+---
 
 ## Motivation
 

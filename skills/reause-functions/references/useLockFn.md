@@ -4,7 +4,7 @@ category: Side-effects
 
 # useLockFn
 
-Add a lock to an async function so overlapping calls are dropped rather than run in parallel — React port of ahooks' `useLockFn`.
+Add a lock to an async function so overlapping calls are dropped.
 
 ## Usage
 

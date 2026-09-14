@@ -1,7 +1,7 @@
 {
   "name": "@reause/metadata",
   "type": "module",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "Function metadata for generating docs — React port of @vueuse/metadata (experimental, AI-mapped)",
   "license": "MIT",
   "homepage": "https://github.com/hairyf/reause#readme",

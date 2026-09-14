@@ -4,7 +4,7 @@ category: State
 
 # useMap
 
-A real `Map` whose mutations re-render — React port of react-hookz's `useMap`.
+A real `Map` whose mutations re-render.
 
 ## Usage
 

@@ -4,7 +4,7 @@ category: State
 
 # useLatest
 
-Returns a ref object whose `.current` always holds the latest value of the render that produced it — React port of react-use's [`useLatest`](https://github.com/streamich/react-use/blob/master/docs/useLatest.md) (upstream mapping files: `source/react-use/src/useLatest.ts`, 9 LOC, and `docs/useLatest.md`).
+Returns a ref whose `.current` always holds the latest rendered value.
 
 ## Usage
 

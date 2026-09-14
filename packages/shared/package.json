@@ -1,7 +1,7 @@
 {
   "name": "@reause/shared",
   "type": "module",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "Shared utilities — 1:1 React port of @vueuse/shared (experimental, AI-mapped)",
   "license": "MIT",
   "homepage": "https://github.com/hairyf/reause#readme",

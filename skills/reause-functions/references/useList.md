@@ -4,7 +4,7 @@ category: State
 
 # useList
 
-Tracks an array and returns it with a stable set of immutable mutators — React port of react-use's `useList`.
+Tracks an array and returns it with a stable set of immutable mutators.
 
 ## Usage
 

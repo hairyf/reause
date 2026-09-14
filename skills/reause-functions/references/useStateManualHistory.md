@@ -1,7 +1,5 @@
 ---
-title: useStateManualHistory
 category: State
-description: Manually track the change history of a state when the user calls commit()
 ---
 
 # useStateManualHistory

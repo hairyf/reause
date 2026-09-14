@@ -94,8 +94,9 @@ export interface UseFirestoreOptions {
    */
   errorHandler?: (err: Error) => void
   /**
-   * Automatically unsubscribe when the component unmounts. Pass a number to delay the unsubscribe
-   * by that many milliseconds (upstream's `useTimeoutFn`-based delayed dispose).
+   * Automatically unsubscribe when the component unmounts. Pass a number to
+   * delay the unsubscribe by that many milliseconds (upstream's
+   * `useTimeoutFn`-based delayed dispose).
    *
    * @default true
    */

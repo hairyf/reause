@@ -4,7 +4,7 @@ category: Animation
 
 # useRafState
 
-State updates coalesced into an animation frame — React port of react-use's `useRafState`.
+State updates coalesced into an animation frame.
 
 ## Usage
 

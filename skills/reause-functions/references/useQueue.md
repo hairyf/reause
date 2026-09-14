@@ -4,7 +4,7 @@ category: State
 
 # useQueue
 
-State hook that implements a simple FIFO queue — React port of react-use's `useQueue`.
+State hook that implements a simple FIFO queue.
 
 ## Usage
 
