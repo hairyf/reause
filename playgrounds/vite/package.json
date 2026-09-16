@@ -1,6 +1,6 @@
 {
   "name": "@reause/playground-vite",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "private": true,
   "type": "module",
   "description": "Vite playground for reause",

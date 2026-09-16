@@ -10,11 +10,16 @@ Use EventListener with ease. Register using [`addEventListener`](https://develop
 
 ```tsx
 import { useEventListener } from '@reause/core'
+import { useRef } from 'react'
 
-useEventListener(document, 'visibilitychange', (evt) => {
+const button = useRef<HTMLButtonElement>(null)
+
+useEventListener(button, 'click', (evt) => {
   console.log(evt)
 })
 ```
+
+Every target is a React ref, and the listener is typed by that target's own event map — `evt` above is a `PointerEvent`.
 
 ### Default Target
 
@@ -48,7 +53,8 @@ useEventListener(element, 'keydown', (e) => {
 You can pass an array of events to listen to multiple events at once:
 
 ```tsx
-useEventListener(document, ['mouseenter', 'mouseleave'], (evt) => {
+const element = useRef<HTMLDivElement>(null)
+useEventListener(element, ['mouseenter', 'mouseleave'], (evt) => {
   console.log(evt.type)
 })
 ```
@@ -58,8 +64,9 @@ useEventListener(document, ['mouseenter', 'mouseleave'], (evt) => {
 You can also pass an array of targets:
 
 ```tsx
-const buttons = document.querySelectorAll('button')
-useEventListener(buttons, 'click', (evt) => {
+const first = useRef<HTMLButtonElement>(null)
+const second = useRef<HTMLButtonElement>(null)
+useEventListener([first, second], 'click', (evt) => {
   console.log('Button clicked')
 })
 ```
@@ -69,7 +76,8 @@ useEventListener(buttons, 'click', (evt) => {
 Returns a cleanup function to manually unregister the listener:
 
 ```tsx
-const cleanup = useEventListener(document, 'keydown', (e) => {
+const element = useRef<HTMLDivElement>(null)
+const cleanup = useEventListener(element, 'keydown', (e) => {
   console.log(e.key)
 })
 
@@ -105,6 +113,28 @@ export type EventTargetRef<T> = RefObject<T | null | undefined>
  */
 export type EventTargetRefs<T> =
   EventTargetRef<T> | RefObject<T[] | null | undefined> | EventTargetRef<T>[]
+/**
+ * The event map TypeScript binds to a DOM element type — the same map the
+ * element's own `on*` handler properties are typed from. `HTMLElementEventMap`
+ * is the `ElementEventMap & GlobalEventHandlersEventMap` intersection shared by
+ * HTML, SVG and MathML elements, so it is both the fallback and the base every
+ * element-specific map extends.
+ */
+type EventMapOfElement<T> = T extends HTMLVideoElement
+  ? HTMLVideoElementEventMap
+  : T extends HTMLMediaElement
+    ? HTMLMediaElementEventMap
+    : T extends HTMLBodyElement
+      ? HTMLBodyElementEventMap
+      : T extends HTMLFrameSetElement
+        ? HTMLFrameSetElementEventMap
+        : T extends SVGSVGElement
+          ? SVGSVGElementEventMap
+          : T extends SVGElement
+            ? SVGElementEventMap
+            : T extends MathMLElement
+              ? MathMLElementEventMap
+              : HTMLElementEventMap
 /**
  * Map from @vueuse/core `useEventListener`
  * (`source/vueuse/packages/core/useEventListener/`).
@@ -167,14 +197,17 @@ export declare function useEventListener<E extends keyof ShadowRootEventMap>(
 /**
  * Register using addEventListener on mounted, and removeEventListener automatically on unmounted.
  *
- * Overload 5: Explicitly HTMLElement target
+ * Overload 5: Explicit element target, typed by that element's own event map
  *
  * @see https://vueuse.org/useEventListener
  */
-export declare function useEventListener<E extends keyof HTMLElementEventMap>(
-  target: EventTargetRefs<HTMLElement>,
+export declare function useEventListener<
+  T extends Element,
+  E extends keyof EventMapOfElement<T>,
+>(
+  target: EventTargetRefs<T>,
   event: Arrayable<E>,
-  listener: Arrayable<GeneralEventListener<HTMLElementEventMap[E]>>,
+  listener: Arrayable<GeneralEventListener<EventMapOfElement<T>[E]>>,
   options?: boolean | AddEventListenerOptions,
 ): Fn
 /**

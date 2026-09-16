@@ -1,7 +1,7 @@
 {
   "name": "@reause/firebase",
   "type": "module",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "Realtime bindings for Firebase — React port of @vueuse/firebase",
   "license": "MIT",
   "homepage": "https://github.com/hairyf/reause#readme",
