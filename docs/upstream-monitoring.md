@@ -22,6 +22,15 @@
 2. 判定改动是否适用于 reause（涉及已镜像或待镜像的 Hook / 共享工具函数）。
 3. 若适用：创建「合并更新 Issue」（见 [issues-monitoring.md](issues-monitoring.md)）；若不适用，跳过并在下次轮询继续。
 
+**最近一次轮询（2026-09-16，pin `97fd09c3` → `origin/main` `ecebe57e`，6 个提交）**：均**不适用**，未创建 Issue。
+
+| 上游提交                                                      | 判定                                                                                                                                                                                                    |
+| :------------------------------------------------------------ | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `172c507` feat(core): add useWebMCP (#5580)                   | **已移植**（`packages/core/useWebMCP/index.tsx`，接口逐字对应上游），无需重做。                                                                                                                          |
+| `96604dd` fix(useResizeObserver): guard observe (#5593)       | **不适用**：上游把 `if (_el)` 改为 `if (_el instanceof Element)`，防的是 Vue 侧可能传入注释节点；reause 的 `resolveTargets()`（`packages/core/useResizeObserver/index.tsx:55-65`）已用 `unrefElement()` + `if (element)` 过滤，且 DOM 目标契约（AGENTS.md §2）只接受 `RefObject<Element \| null>`，注释节点不可达，无需改动。 |
+| `ecebe57` docs(usePerformanceObserver) typo (#5609)           | **不适用**：上游 demo/文档错字，reause 文档为独立撰写。                                                                                                                                                  |
+| `418c69d`、`49a21e7`、`7c8803d`                               | **不适用**：上游 CI/发版脚本、skills 版本、团队页头像与 size 表，与 reause 无关。                                                                                                                        |
+
 ### 3.1 比 submodule pin 更新的上游 Hook
 
 submodule pin 只在挂载时固定过一次、之后长期不推进（当前 pin 用 `git -C source/vueuse rev-parse HEAD` 查看，`git log --oneline -- source/vueuse` 可确认它自初始提交起未再变更，上游默认分支用 `git -C source/vueuse rev-parse origin/main` 查看；撰写本文时为 `97fd09c3` 对 `418c69d3`），因此比该 pin 更新的上游 Hook 源码**不在磁盘上**：
@@ -132,5 +141,12 @@ $text = ($corpus | ForEach-Object { Get-Content $_.FullName -Raw }) -join "`n"
 
 - `@vueuse/core`（5）：`computedInject`、`createUnrefFn`、`useCurrentElement`、`useVModel`、`useVModels`
 - `@vueuse/shared`（22）：`computedEager`、`computedWithControl`、`createDisposableDirective`、`createRef`、`extendRef`、`get`、`injectLocal`、`provideLocal`、`reactify`、`reactifyObject`、`reactiveComputed`、`reactiveOmit`、`reactivePick`、`set`、`toReactive`、`toRef`、`toRefs`、`tryOnBeforeMount`、`tryOnBeforeUnmount`、`tryOnMounted`、`tryOnScopeDispose`、`tryOnUnmounted`
+
+**复核（2026-09-16 实测，同一 pin `97fd09c3`）**：上游函数总数仍为 **266**（按包拆分同上），命中 **235**、残留 **31**，残留全部落在「重命名移植 + impractical」内，**未新增缺口**。与基线 231/35 的差异只有两条来源：
+
+- `watchArray` 与 `refThrottled` 由第 3(a) 步的散文体升为第 2 步直接命中——即上表「两种口径」预测的 5 项中的 2 项（另 3 项 `watchPausable` / `watchThrottled` / `watchIgnorable` 本就带 `Map from` 注解），故第 2 步命中 231 + 2 = 233。
+- `packages/shared/createGlobalState/` 与 `packages/shared/createScopedHook/` 是**按 reause 名命名**的目录：`createGlobalState` 的注解是 `Map from react-use \`createGlobalState\``（react-use 来源），回查 `@vueuse/shared` 时两条通道都不命中，故上游 `createGlobalState` 落进残留；`createScopedHook` 在 `meta/functions.md` 中被解析到 `packages/shared/createInjectionState`，是第 3(a) 步的重命名移植。两者均为 Vue-only：前者依赖 Vue 的 `effectScope`，后者依赖同为 `impractical` 的 `injectLocal` / `provideLocal` 与 Vue 的 `InjectionKey`。
+
+第 3(a) 步据此复核的残留构成：**重命名移植 10 项**（原 8 项 + `createInjectionState`→`createScopedHook`、`createGlobalState`）+ 27 项 impractical = 37 项上游符号中，`createGlobalState`、`createInjectionState` 二者实为 **react-use 专属移植与 Vue-only 决策**的交集，不构成待办。
 
 **结论**：上游 266 个函数全部有着落，**覆盖度是完整的**；27 个是为 React 主动放弃的 Vue-only `ref` / 响应式 API（含 `computedWithControl`），是决策而非缺口，**不得重新派发**。
