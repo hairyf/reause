@@ -10,11 +10,16 @@ Use EventListener with ease. Register using [`addEventListener`](https://develop
 
 ```tsx
 import { useEventListener } from '@reause/core'
+import { useRef } from 'react'
 
-useEventListener(document, 'visibilitychange', (evt) => {
+const button = useRef<HTMLButtonElement>(null)
+
+useEventListener(button, 'click', (evt) => {
   console.log(evt)
 })
 ```
+
+Every target is a React ref, and the listener is typed by that target's own event map — `evt` above is a `PointerEvent`.
 
 ### Default Target
 
@@ -48,7 +53,8 @@ useEventListener(element, 'keydown', (e) => {
 You can pass an array of events to listen to multiple events at once:
 
 ```tsx
-useEventListener(document, ['mouseenter', 'mouseleave'], (evt) => {
+const element = useRef<HTMLDivElement>(null)
+useEventListener(element, ['mouseenter', 'mouseleave'], (evt) => {
   console.log(evt.type)
 })
 ```
@@ -58,8 +64,9 @@ useEventListener(document, ['mouseenter', 'mouseleave'], (evt) => {
 You can also pass an array of targets:
 
 ```tsx
-const buttons = document.querySelectorAll('button')
-useEventListener(buttons, 'click', (evt) => {
+const first = useRef<HTMLButtonElement>(null)
+const second = useRef<HTMLButtonElement>(null)
+useEventListener([first, second], 'click', (evt) => {
   console.log('Button clicked')
 })
 ```
@@ -69,7 +76,8 @@ useEventListener(buttons, 'click', (evt) => {
 Returns a cleanup function to manually unregister the listener:
 
 ```tsx
-const cleanup = useEventListener(document, 'keydown', (e) => {
+const element = useRef<HTMLDivElement>(null)
+const cleanup = useEventListener(element, 'keydown', (e) => {
   console.log(e.key)
 })
 
