@@ -1269,7 +1269,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useEventListener',
     category: 'Browser',
     source: 'vueuse',
-    lastUpdated: 1789381377000,
+    lastUpdated: 1789521626000,
   },
   {
     name: 'useEventSource',
@@ -3796,7 +3796,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useEventListener/index.md',
     category: 'Browser',
     description: 'use EventListener with ease',
-    lastUpdated: 1789381377000,
+    lastUpdated: 1789521626000,
   },
   {
     name: 'useEventSource',

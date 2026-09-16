@@ -31,7 +31,7 @@
 | vueuse      | `createProjection`                | packages/math/createProjection                  | `packages/math/createProjection/index.tsx`                | ✅ ported                           |
 | vueuse      | `createTemplatePromise`           | packages/core/createTemplatePromise             | `packages/core/createPromisifiedComponent/index.tsx`      | ✅ ported                           |
 | react-use   | `createReducer`                   | src/factory/createReducer.ts                    | `packages/shared/createReducer/index.tsx`                 | ✅ ported                           |
-| vueuse      | `createScopedHook`                | —                                               | `packages/shared/createScopedHook/index.tsx`              | ✅ ported (not in pinned submodule) |
+| vueuse      | `createScopedHook`                | packages/shared/createInjectionState            | `packages/shared/createScopedHook/index.tsx`              | ✅ ported                           |
 | vueuse      | `createSharedComposable`          | packages/shared/createSharedComposable          | `packages/shared/createSharedHook/index.tsx`              | ✅ ported                           |
 | vueuse      | `createSingletonPromise`          | packages/shared/utils                           | `packages/shared/utils/index.tsx`                         | ✅ ported                           |
 | vueuse      | `customStorageEventName`          | packages/core/useStorage                        | `packages/core/useStorage/index.tsx`                      | ✅ ported                           |
