@@ -33,6 +33,23 @@ export type EventTargetRef<T> = RefObject<T | null | undefined>
 export type EventTargetRefs<T> = EventTargetRef<T> | RefObject<T[] | null | undefined> | EventTargetRef<T>[]
 
 /**
+ * The event map TypeScript binds to a DOM element type — the same map the
+ * element's own `on*` handler properties are typed from. `HTMLElementEventMap`
+ * is the `ElementEventMap & GlobalEventHandlersEventMap` intersection shared by
+ * HTML, SVG and MathML elements, so it is both the fallback and the base every
+ * element-specific map extends.
+ */
+type EventMapOfElement<T>
+  = T extends HTMLVideoElement ? HTMLVideoElementEventMap
+    : T extends HTMLMediaElement ? HTMLMediaElementEventMap
+      : T extends HTMLBodyElement ? HTMLBodyElementEventMap
+        : T extends HTMLFrameSetElement ? HTMLFrameSetElementEventMap
+          : T extends SVGSVGElement ? SVGSVGElementEventMap
+            : T extends SVGElement ? SVGElementEventMap
+              : T extends MathMLElement ? MathMLElementEventMap
+                : HTMLElementEventMap
+
+/**
  * Resolve the target argument into the flat list of targets to bind: a ref holding an array
  * contributes its members, an array of refs contributes each ref's `current`, and a single ref
  * contributes its `current`.
@@ -153,14 +170,14 @@ export function useEventListener<E extends keyof ShadowRootEventMap>(
 /**
  * Register using addEventListener on mounted, and removeEventListener automatically on unmounted.
  *
- * Overload 5: Explicitly HTMLElement target
+ * Overload 5: Explicit element target, typed by that element's own event map
  *
  * @see https://vueuse.org/useEventListener
  */
-export function useEventListener<E extends keyof HTMLElementEventMap>(
-  target: EventTargetRefs<HTMLElement>,
+export function useEventListener<T extends Element, E extends keyof EventMapOfElement<T>>(
+  target: EventTargetRefs<T>,
   event: Arrayable<E>,
-  listener: Arrayable<GeneralEventListener<HTMLElementEventMap[E]>>,
+  listener: Arrayable<GeneralEventListener<EventMapOfElement<T>[E]>>,
   options?: boolean | AddEventListenerOptions,
 ): Fn
 

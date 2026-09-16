@@ -1,6 +1,6 @@
 import type { MockInstance } from 'vitest'
 import { StrictMode, useRef, useState } from 'react'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, expectTypeOf, it, vi } from 'vitest'
 import { render, renderHook } from 'vitest-browser-react'
 import { userEvent } from 'vitest/browser'
 import { useEventListener } from '../useEventListener'
@@ -606,5 +606,68 @@ describe('useEventListener - under <StrictMode>', () => {
     await userEvent.keyboard('{Enter}')
 
     expect(listener).toHaveBeenCalledTimes(1)
+  })
+})
+
+/**
+ * Type-level guard for the element-target overload. The listener must be typed
+ * by the target element's **own** event map — an SVG/MathML element is not an
+ * `HTMLElement`, and `HTMLVideoElement` / `HTMLBodyElement` widen the shared
+ * `HTMLElementEventMap` — instead of collapsing to the `Event` fallback.
+ *
+ * The assertions are compile-time only (`expectTypeOf` is a runtime no-op) and
+ * no listener can fire because every ref starts empty, so the single
+ * `renderHook` exists purely to call the hook from a component body.
+ */
+describe('useEventListener - event type inference', () => {
+  it('types the listener from the target element\'s own event map', async () => {
+    const divRef = { current: null as HTMLDivElement | null }
+    const svgRef = { current: null as SVGSVGElement | null }
+    const svgBaseRef = { current: null as SVGElement | null }
+    const mathRef = { current: null as MathMLElement | null }
+    const videoRef = { current: null as HTMLVideoElement | null }
+    const bodyRef = { current: null as HTMLBodyElement | null }
+    const docRef = { current: null as Document | null }
+
+    await renderHook(() => {
+      // the shared `HTMLElementEventMap` — unchanged, kept as the baseline
+      useEventListener(divRef, 'keydown', (evt) => {
+        expectTypeOf(evt).toEqualTypeOf<KeyboardEvent>()
+      })
+
+      // SVG and MathML targets are not `HTMLElement`s: they used to match no
+      // element overload at all and fell through to `Event`
+      useEventListener(svgRef, 'resize', (evt) => {
+        expectTypeOf(evt).toEqualTypeOf<UIEvent>()
+      })
+      useEventListener(svgBaseRef, 'click', (evt) => {
+        expectTypeOf(evt).toEqualTypeOf<PointerEvent>()
+      })
+      useEventListener(mathRef, 'click', (evt) => {
+        expectTypeOf(evt).toEqualTypeOf<PointerEvent>()
+      })
+
+      // element-specific maps that extend `HTMLElementEventMap`
+      useEventListener(videoRef, 'enterpictureinpicture', (evt) => {
+        expectTypeOf(evt).toEqualTypeOf<PictureInPictureEvent>()
+      })
+      useEventListener(bodyRef, 'hashchange', (evt) => {
+        expectTypeOf(evt).toEqualTypeOf<HashChangeEvent>()
+      })
+
+      // an array of events still keeps the union of their event types
+      useEventListener(divRef, ['click', 'focus'], (evt) => {
+        expectTypeOf(evt).toEqualTypeOf<FocusEvent | PointerEvent>()
+      })
+
+      // unaffected overloads: an explicit document target, and the `Event`
+      // fallback an unknown event name still lands on
+      useEventListener(docRef, 'keydown', (evt) => {
+        expectTypeOf(evt).toEqualTypeOf<KeyboardEvent>()
+      })
+      useEventListener(divRef, 'custom-event', (evt) => {
+        expectTypeOf(evt).toEqualTypeOf<Event>()
+      })
+    })
   })
 })
