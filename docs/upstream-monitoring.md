@@ -7,7 +7,7 @@
 - 上游仓库以 git submodule 挂载于根目录 `source/` 下（清单见 [.gitmodules](../.gitmodules)），当前为 `source/vueuse`（VueUse）与 `source/react-use`（react-use）。
 - **首次轮询某个上游前先初始化对应 submodule**：`git submodule update --init source/react-use`（未初始化时 `git submodule status` 会在该条目行首输出 `-`）。
 - 新增上游时以同一模式加入 `source/*`。
-- **除 `source/vueuse` 外的 `source/*` 挂载只用于溯源（provenance-only），不纳入监控**：`source/react-use`、`source/react-hookz`、`source/mantine`、`source/ahooks`（以及已挂载但尚无移植的 `source/usehooks`）仅供 `scripts/update.ts` 的 source registry 解析端口自身的 `Map from <source> \`<上游名>\``注解（#915）；本节至 §3 的轮询仍只覆盖`source/vueuse`（所有者决定：仅 VueUse 更新频繁）。
+- **除 `source/vueuse` 外的 `source/*` 挂载只用于溯源（provenance-only），不纳入监控**：`source/react-use`、`source/react-hookz`、`source/mantine`、`source/ahooks`（以及已挂载但尚无移植的 `source/usehooks`）仅供 `scripts/update.ts` 的 source registry 解析端口自身的 `Map from <source> \`<上游名>\``注解（[#915](https://github.com/hairyf/reause/issues/915)）；本节至 §3 的轮询仍只覆盖`source/vueuse`（所有者决定：仅 VueUse 更新频繁）。
 - 监控内容：对应上游仓库**默认分支**的 Merged PR，判断改动是否适用于 reause。默认分支按上游而异：`source/vueuse` 为 `main`，`source/react-use` 为 `master`。
 
 ## 2. 轮询频率（指数退避）
@@ -22,25 +22,32 @@
 2. 判定改动是否适用于 reause（涉及已镜像或待镜像的 Hook / 共享工具函数）。
 3. 若适用：创建「合并更新 Issue」（见 [issues-monitoring.md](issues-monitoring.md)）；若不适用，跳过并在下次轮询继续。
 
-**最近一次轮询（2026-09-19，pin `97fd09c3` → `origin/main` `c738f50c`，较上次新增 2 个提交）**：均**不适用**，未创建 Issue；pin 未推进，第 1 步的上游函数集合（266）不变。
+**最近一次轮询（2026-09-29，pin [`97fd09c3`](https://github.com/vueuse/vueuse/commit/97fd09c3f03a9b26e9b523d51ee3d888f98b3baf) → `origin/main` [`efdd69a1`](https://github.com/vueuse/vueuse/commit/efdd69a1481205051e85d9c815eaa5840237f2d1)，较上次新增 2 个提交）**：均**不适用**，未创建 Issue；pin 未推进，第 1 步的上游函数集合（266）不变。
+
+| 上游提交                                                                                                                                                                                                              | 判定                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [`efdd69a`](https://github.com/vueuse/vueuse/commit/efdd69a) docs(useSpeechRecognition): guard demo `SpeechGrammarList` for unsupported `webkit`-based browsers ([#5644](https://github.com/vueuse/vueuse/pull/5644)) | **不适用**：上游只给 demo 里的 `new SpeechGrammarList()` 及其后的 `watch(speech.result, …)` 套上 `if (SpeechGrammarList) { … }`，防的是 webkit 系浏览器不支持该构造器（只改 `packages/core/useSpeechRecognition/demo.vue`，+12/-10）。reause 从未移植这段 JSGF grammar：`packages/core/useSpeechRecognition/demo.tsx:4-5` 明确写着「the JSGF SpeechGrammarList part is omitted」，`git grep SpeechGrammarList -- packages` 全文仅 1 命中（就是那句「已省略」注释），无对应代码需要改。                          |
+| [`e2d1bf8`](https://github.com/vueuse/vueuse/commit/e2d1bf8) test(math): add coverage for toValueArgsFlat ([#5566](https://github.com/vueuse/vueuse/pull/5566))                                                       | **不适用**：上游新增 `packages/math/utils.test.ts`（+37 行，8 个 `it`）覆盖 `toValueArgsFlat`；reause 的对应实现是收窄移植 `toArgsFlat`（`packages/math/utils/index.tsx:12`，只接受纯值），8 个用例中有 4 个专测 ref/getter（`shallowRef(1)`、`() => 2`、`deepRef([1, 2, 3])` 等），按 AGENTS.md §2「只读 value-source 只接受纯 `T`」属**故意不支持**；该符号主题已由 [#910](https://github.com/hairyf/reause/issues/910)、[#1013](https://github.com/hairyf/reause/issues/1013) 两个已关闭议题覆盖，不重复开。 |
+
+**上一次轮询（2026-09-19，pin [`97fd09c3`](https://github.com/vueuse/vueuse/commit/97fd09c3f03a9b26e9b523d51ee3d888f98b3baf) → `origin/main` [`c738f50c`](https://github.com/vueuse/vueuse/commit/c738f50c864beebbd4cbd2eee32c2384940e2e78)，较上次新增 2 个提交）**：均**不适用**，未创建 Issue；pin 未推进，第 1 步的上游函数集合（266）不变。
 
 | 上游提交                                                                                        | 判定                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | :---------------------------------------------------------------------------------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `c738f50` fix(watchIgnorable): do not attach debug hooks to the internal counting watch (#5606) | **不适用**：上游缺陷是 `watchIgnorable` 内部那个 sync **计数 watch** 复用了用户传入的 `onTrack` / `onTrigger` 调试钩子，使同一变更被上报两次，修复只是把这两个键从计数 watch 的选项里剔除。reause 的 `packages/shared/useWatchIgnorable/index.tsx` 是 React 重写：忽略屏障由 `lastSeenRef` / `snapshotRef` / `ignoreRef` 三个 ref 加一次 `useWatch` 实现，**不存在第二个计数 watch**；`UseWatchOptions`（`packages/shared/useWatch/index.tsx:7-13`）只暴露 `immediate`，`grep onTrack\|onTrigger packages/*/*/index.tsx` 为 0 命中——Vue 的调试钩子接口在 React 侧没有对应物。该提交附带的 `deep` 计数回归测试同样无对应实现。 |
-| `3cfd9f2` chore: release v15.0.0 (#5615)                                                        | **不适用**：发版提交，只改 14 个 `package.json` 的版本号与生成的 `export-size.*`、`skills/vueuse-functions/references/*`，未触及任何 Hook 或共享工具实现。                                                                                                                                                                                                                                                               |
+| [`c738f50`](https://github.com/vueuse/vueuse/commit/c738f50c864beebbd4cbd2eee32c2384940e2e78) fix(watchIgnorable): do not attach debug hooks to the internal counting watch ([#5606](https://github.com/vueuse/vueuse/pull/5606)) | **不适用**：上游缺陷是 `watchIgnorable` 内部那个 sync **计数 watch** 复用了用户传入的 `onTrack` / `onTrigger` 调试钩子，使同一变更被上报两次，修复只是把这两个键从计数 watch 的选项里剔除。reause 的 `packages/shared/useWatchIgnorable/index.tsx` 是 React 重写：忽略屏障由 `lastSeenRef` / `snapshotRef` / `ignoreRef` 三个 ref 加一次 `useWatch` 实现，**不存在第二个计数 watch**；`UseWatchOptions`（`packages/shared/useWatch/index.tsx:7-13`）只暴露 `immediate`，`grep onTrack\|onTrigger packages/*/*/index.tsx` 为 0 命中——Vue 的调试钩子接口在 React 侧没有对应物。该提交附带的 `deep` 计数回归测试同样无对应实现。 |
+| [`3cfd9f2`](https://github.com/vueuse/vueuse/commit/3cfd9f2d761327e450f3d5e530106f06adcb5137) chore: release v15.0.0 ([#5615](https://github.com/vueuse/vueuse/pull/5615))                                                        | **不适用**：发版提交，只改 14 个 `package.json` 的版本号与生成的 `export-size.*`、`skills/vueuse-functions/references/*`，未触及任何 Hook 或共享工具实现。                                                                                                                                                                                                                                                               |
 
-**上一次轮询（2026-09-16，pin `97fd09c3` → `origin/main` `ecebe57e`，6 个提交）**：均**不适用**，未创建 Issue。
+**上上次轮询（2026-09-16，pin [`97fd09c3`](https://github.com/vueuse/vueuse/commit/97fd09c3f03a9b26e9b523d51ee3d888f98b3baf) → `origin/main` [`ecebe57e`](https://github.com/vueuse/vueuse/commit/ecebe57e3a630c255d271b7134ed0f549c467328)，6 个提交）**：均**不适用**，未创建 Issue。
 
 | 上游提交                                                      | 判定                                                                                                                                                                                                    |
 | :------------------------------------------------------------ | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `172c507` feat(core): add useWebMCP (#5580)                   | **已移植**（`packages/core/useWebMCP/index.tsx`，接口逐字对应上游），无需重做。                                                                                                                          |
-| `96604dd` fix(useResizeObserver): guard observe (#5593)       | **不适用**：上游把 `if (_el)` 改为 `if (_el instanceof Element)`，防的是 Vue 侧可能传入注释节点；reause 的 `resolveTargets()`（`packages/core/useResizeObserver/index.tsx:55-65`）已用 `unrefElement()` + `if (element)` 过滤，且 DOM 目标契约（AGENTS.md §2）只接受 `RefObject<Element \| null>`，注释节点不可达，无需改动。 |
-| `ecebe57` docs(usePerformanceObserver) typo (#5609)           | **不适用**：上游 demo/文档错字，reause 文档为独立撰写。                                                                                                                                                  |
-| `418c69d`、`49a21e7`、`7c8803d`                               | **不适用**：上游 CI/发版脚本、skills 版本、团队页头像与 size 表，与 reause 无关。                                                                                                                        |
+| [`172c507`](https://github.com/vueuse/vueuse/commit/172c5079a574aac95751e6925c035bb395a0b582) feat(core): add useWebMCP ([#5580](https://github.com/vueuse/vueuse/pull/5580))                   | **已移植**（`packages/core/useWebMCP/index.tsx`，接口逐字对应上游），无需重做。                                                                                                                          |
+| [`96604dd`](https://github.com/vueuse/vueuse/commit/96604dd232a1a26e5999af8084b464889ce2d368) fix(useResizeObserver): guard observe ([#5593](https://github.com/vueuse/vueuse/pull/5593))       | **不适用**：上游把 `if (_el)` 改为 `if (_el instanceof Element)`，防的是 Vue 侧可能传入注释节点；reause 的 `resolveTargets()`（`packages/core/useResizeObserver/index.tsx:55-65`）已用 `unrefElement()` + `if (element)` 过滤，且 DOM 目标契约（AGENTS.md §2）只接受 `RefObject<Element \| null>`，注释节点不可达，无需改动。 |
+| [`ecebe57`](https://github.com/vueuse/vueuse/commit/ecebe57e3a630c255d271b7134ed0f549c467328) docs(usePerformanceObserver) typo ([#5609](https://github.com/vueuse/vueuse/pull/5609))           | **不适用**：上游 demo/文档错字，reause 文档为独立撰写。                                                                                                                                                  |
+| [`418c69d`](https://github.com/vueuse/vueuse/commit/418c69d3ed7a9b3f08d19e83e42e63531745e28c)、[`49a21e7`](https://github.com/vueuse/vueuse/commit/49a21e77d3ebad35dee9a5eb004b3504b2646f9f)、[`7c8803d`](https://github.com/vueuse/vueuse/commit/7c8803dc35e564c306881e304534c415a0224a55)                               | **不适用**：上游 CI/发版脚本、skills 版本、团队页头像与 size 表，与 reause 无关。                                                                                                                        |
 
 ### 3.1 比 submodule pin 更新的上游 Hook
 
-submodule pin 只在挂载时固定过一次、之后长期不推进（当前 pin 用 `git -C source/vueuse rev-parse HEAD` 查看，`git log --oneline -- source/vueuse` 可确认它自初始提交起未再变更，上游默认分支用 `git -C source/vueuse rev-parse origin/main` 查看；撰写本文时为 `97fd09c3` 对 `418c69d3`），因此比该 pin 更新的上游 Hook 源码**不在磁盘上**：
+submodule pin 只在挂载时固定过一次、之后长期不推进（当前 pin 用 `git -C source/vueuse rev-parse HEAD` 查看，`git log --oneline -- source/vueuse` 可确认它自初始提交起未再变更，上游默认分支用 `git -C source/vueuse rev-parse origin/main` 查看；撰写本文时为 [`97fd09c3`](https://github.com/vueuse/vueuse/commit/97fd09c3f03a9b26e9b523d51ee3d888f98b3baf) 对 [`418c69d3`](https://github.com/vueuse/vueuse/commit/418c69d3ed7a9b3f08d19e83e42e63531745e28c)），因此比该 pin 更新的上游 Hook 源码**不在磁盘上**：
 
 ```powershell
 Test-Path source/vueuse/packages/core/useWebMCP   # False
@@ -63,7 +70,7 @@ git -C source/vueuse show origin/main:packages/core/useWebMCP/index.md
 
 ### 3.2 覆盖度审计
 
-`meta/functions.md` 由 `scripts/update.ts` 生成：`collectFunctions()` 先遍历 **reause 自己的导出**（`packages/{core,shared,math,integrations,electron,firebase,rxjs}/*/index.tsx`），`generateFunctionsMD()` 再**逐个导出**回查上游 `source/vueuse/packages/<pkg>/<name>/index.ts`（本节其余 `L<n>` 是撰写时的实测坐标，`scripts/update.ts` 重构后即会漂移（#884 重写 resolver 即为一例）；核对时以函数名 / 符号名为准）。检查方向是 **reause → 上游**：上游有、reause 没有的函数根本不会被遍历，也就不会成为一行，表格照旧满屏 `✅ ported`。所以该表是**移植登记表，不是覆盖度证明**——「全部 ✅ ported」不能当作完整性依据。本节把覆盖度审计并入本监控阶段（不新增流水线阶段），按下列三步独立复核。
+`meta/functions.md` 由 `scripts/update.ts` 生成：`collectFunctions()` 先遍历 **reause 自己的导出**（`packages/{core,shared,math,integrations,electron,firebase,rxjs}/*/index.tsx`），`generateFunctionsMD()` 再**逐个导出**回查上游 `source/vueuse/packages/<pkg>/<name>/index.ts`（本节其余 `L<n>` 是撰写时的实测坐标，`scripts/update.ts` 重构后即会漂移（[#884](https://github.com/hairyf/reause/pull/884) 重写 resolver 即为一例）；核对时以函数名 / 符号名为准）。检查方向是 **reause → 上游**：上游有、reause 没有的函数根本不会被遍历，也就不会成为一行，表格照旧满屏 `✅ ported`。所以该表是**移植登记表，不是覆盖度证明**——「全部 ✅ ported」不能当作完整性依据。本节把覆盖度审计并入本监控阶段（不新增流水线阶段），按下列三步独立复核。
 
 **第 1 步：枚举 pin 上的上游函数。** 口径是 `source/vueuse/packages/<pkg>/<dir>/index.ts`，跳过 `_*` 目录（`core/_template`）与没有 `index.ts` 的目录：
 
@@ -105,7 +112,7 @@ $text = ($corpus | ForEach-Object { Get-Content $_.FullName -Raw }) -join "`n"
   - `packages/shared/useWatchArray/index.tsx` L16：`* React port of VueUse's \`watchArray\` — watch for an array with additions and removals.`
   - `packages/shared/useStateThrottled/index.tsx` L10：`* Throttle changing of a state value — React port of VueUse's \`refThrottled\`.`
 
-  其余 6 个（`useWatchImmediate`、`useWatchPausable`、`useWatchThrottled`、`useWatchTriggerable`、`useWatchWithFilter`、`useWatchIgnorable`）都写了 `Map from` 注解（其中 3 个同时也有散文体）。反例：`packages/shared/useStateWithControl/` 的注解是 `Map from @vueuse/shared \`refWithControl\``，与 `computedWithControl`无关；后者是议题 **#14**，已带`impractical` 关闭（所有者结论：Vue 的 computed/effect 依赖追踪在 React 中没有等价实现）。只按名字相似推断就会把一个未移植的上游函数误判为已移植。
+  其余 6 个（`useWatchImmediate`、`useWatchPausable`、`useWatchThrottled`、`useWatchTriggerable`、`useWatchWithFilter`、`useWatchIgnorable`）都写了 `Map from` 注解（其中 3 个同时也有散文体）。反例：`packages/shared/useStateWithControl/` 的注解是 `Map from @vueuse/shared \`refWithControl\``，与 `computedWithControl`无关；后者是议题 **[#14](https://github.com/hairyf/reause/issues/14)**，已带`impractical` 关闭（所有者结论：Vue 的 computed/effect 依赖追踪在 React 中没有等价实现）。只按名字相似推断就会把一个未移植的上游函数误判为已移植。
 
 - **(b) barrel 注释占位**：未实现的由 barrel 以 `// export * from './<name>'` 声明，这就是「已声明未移植」的信号（不得删除）：
 
@@ -121,7 +128,7 @@ $text = ($corpus | ForEach-Object { Get-Content $_.FullName -Raw }) -join "`n"
   gh issue list --repo hairyf/reause --state all --label impractical --limit 200 --json number,title,state
   ```
 
-**基线（2026-09-12 实测，pin `97fd09c3`）**
+**基线（2026-09-12 实测，pin [`97fd09c3`](https://github.com/vueuse/vueuse/commit/97fd09c3f03a9b26e9b523d51ee3d888f98b3baf)）**
 
 | 项                         |    数量 |
 | :------------------------- | ------: |
@@ -149,7 +156,7 @@ $text = ($corpus | ForEach-Object { Get-Content $_.FullName -Raw }) -join "`n"
 - `@vueuse/core`（5）：`computedInject`、`createUnrefFn`、`useCurrentElement`、`useVModel`、`useVModels`
 - `@vueuse/shared`（22）：`computedEager`、`computedWithControl`、`createDisposableDirective`、`createRef`、`extendRef`、`get`、`injectLocal`、`provideLocal`、`reactify`、`reactifyObject`、`reactiveComputed`、`reactiveOmit`、`reactivePick`、`set`、`toReactive`、`toRef`、`toRefs`、`tryOnBeforeMount`、`tryOnBeforeUnmount`、`tryOnMounted`、`tryOnScopeDispose`、`tryOnUnmounted`
 
-**复核（2026-09-16 实测，同一 pin `97fd09c3`）**：上游函数总数仍为 **266**（按包拆分同上），命中 **235**、残留 **31**，残留全部落在「重命名移植 + impractical」内，**未新增缺口**。与基线 231/35 的差异只有两条来源：
+**复核（2026-09-16 实测，同一 pin [`97fd09c3`](https://github.com/vueuse/vueuse/commit/97fd09c3f03a9b26e9b523d51ee3d888f98b3baf)）**：上游函数总数仍为 **266**（按包拆分同上），命中 **235**、残留 **31**，残留全部落在「重命名移植 + impractical」内，**未新增缺口**。与基线 231/35 的差异只有两条来源：
 
 - `watchArray` 与 `refThrottled` 由第 3(a) 步的散文体升为第 2 步直接命中——即上表「两种口径」预测的 5 项中的 2 项（另 3 项 `watchPausable` / `watchThrottled` / `watchIgnorable` 本就带 `Map from` 注解），故第 2 步命中 231 + 2 = 233。
 - `packages/shared/createGlobalState/` 与 `packages/shared/createScopedHook/` 是**按 reause 名命名**的目录：`createGlobalState` 的注解是 `Map from react-use \`createGlobalState\``（react-use 来源），回查 `@vueuse/shared` 时两条通道都不命中，故上游 `createGlobalState` 落进残留；`createScopedHook` 在 `meta/functions.md` 中被解析到 `packages/shared/createInjectionState`，是第 3(a) 步的重命名移植。两者均为 Vue-only：前者依赖 Vue 的 `effectScope`，后者依赖同为 `impractical` 的 `injectLocal` / `provideLocal` 与 Vue 的 `InjectionKey`。
