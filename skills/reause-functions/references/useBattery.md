@@ -54,19 +54,19 @@ export interface UseBatteryReturn {
   /**
    * If the device is currently charging.
    */
-  charging: boolean
+  readonly charging: boolean
   /**
    * The number of seconds until the device becomes fully charged.
    */
-  chargingTime: number
+  readonly chargingTime: number
   /**
    * The number of seconds before the device becomes fully discharged.
    */
-  dischargingTime: number
+  readonly dischargingTime: number
   /**
    * A number between 0 and 1 representing the current charge level.
    */
-  level: number
+  readonly level: number
 }
 /**
  * The `BatteryManager` object handed back by `navigator.getBattery()` — the DOM lib does not ship
@@ -74,10 +74,10 @@ export interface UseBatteryReturn {
  * on the live object.
  */
 export interface BatteryManager extends EventTarget {
-  charging: boolean
-  chargingTime: number
-  dischargingTime: number
-  level: number
+  readonly charging: boolean
+  readonly chargingTime: number
+  readonly dischargingTime: number
+  readonly level: number
 }
 /**
  * Map from @vueuse/core `useBattery`

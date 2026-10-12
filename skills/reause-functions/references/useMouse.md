@@ -79,7 +79,7 @@ export interface UseMouseOptions extends ConfigurableWindow {
    */
   scroll?: boolean
   /**
-   * Reset to initial value when `touchend` event fired
+   * Reset to initial value when `touchend` or `touchcancel` event fired
    *
    * @default false
    */
