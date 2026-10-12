@@ -233,7 +233,7 @@ describe('useMouseInElement', () => {
     unmount()
   })
 
-  it('resets to `initialValue` on `touchend` when touch is enabled', async () => {
+  it.each(['touchend', 'touchcancel'])('resets to `initialValue` on %s when touch is enabled', async (eventType) => {
     const target = createElement(0, 0, 100, 100)
     const targetRef = { current: target }
     const { result, act, unmount } = await renderHook(() =>
@@ -249,10 +249,13 @@ describe('useMouseInElement', () => {
     expect(result.current.x).toBe(20)
 
     await act(() => {
-      window.dispatchEvent(new Event('touchend'))
+      window.dispatchEvent(new Event(eventType))
     })
     expect(result.current.x).toBe(5)
     expect(result.current.y).toBe(6)
+    expect(result.current.sourceType).toBe('mouse')
+    expect(result.current.elementX).toBe(5)
+    expect(result.current.elementY).toBe(6)
 
     unmount()
   })
