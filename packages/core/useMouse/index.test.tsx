@@ -1,4 +1,5 @@
 import type { RefObject } from 'react'
+import type { UseMouseOptions } from '../useMouse'
 import { renderToString } from 'react-dom/server'
 import { afterEach, describe, expect, it } from 'vitest'
 import { render, renderHook } from 'vitest-browser-react'
@@ -163,48 +164,111 @@ describe('useMouse', () => {
     expect(result.current.sourceType).toBe(null)
   })
 
-  it('resets to the initial value on touchend with resetOnTouchEnds', async () => {
-    const { result, act } = await renderHook(() => useMouse({
-      resetOnTouchEnds: true,
-      initialValue: { x: 3, y: 4 },
-    }))
+  it.each(['touchend', 'touchcancel'])('resets to the latest initial value on %s with resetOnTouchEnds', async (eventType) => {
+    const { result, act, rerender } = await renderHook(
+      (props: UseMouseOptions = {}) => useMouse(props),
+      { initialProps: { resetOnTouchEnds: true, initialValue: { x: 3, y: 4 } } },
+    )
 
     await act(() => {
       window.dispatchEvent(createTouchEvent('touchmove', 90, 70, window))
     })
-    expect(result.current.x).toBe(90)
-    expect(result.current.y).toBe(70)
+    expect(result.current).toEqual({ x: 90, y: 70, sourceType: 'touch' })
 
     await act(() => {
-      window.dispatchEvent(createTouchEvent('touchend', 0, 0, window))
+      window.dispatchEvent(new Event(eventType))
     })
+    expect(result.current).toEqual({ x: 3, y: 4, sourceType: 'touch' })
 
-    expect(result.current.x).toBe(3)
-    expect(result.current.y).toBe(4)
-    expect(result.current.sourceType).toBe('touch')
+    await rerender({ resetOnTouchEnds: true, initialValue: { x: 5, y: 6 } })
+    await act(() => {
+      window.dispatchEvent(createTouchEvent('touchmove', 90, 70, window))
+    })
+    await act(() => {
+      window.dispatchEvent(new Event(eventType))
+    })
+    expect(result.current).toEqual({ x: 5, y: 6, sourceType: 'touch' })
   })
 
-  it('ignores the touchend reset when touch is disabled', async () => {
+  it.each(['touchend', 'touchcancel'])('does not reset on %s by default', async (eventType) => {
+    const { result, act } = await renderHook(() => useMouse({ initialValue: { x: 3, y: 4 } }))
+
+    await act(() => {
+      window.dispatchEvent(createTouchEvent('touchmove', 90, 70, window))
+    })
+    await act(() => {
+      window.dispatchEvent(new Event(eventType))
+    })
+    expect(result.current).toEqual({ x: 90, y: 70, sourceType: 'touch' })
+  })
+
+  it.each<UseMouseOptions>([{ touch: false }, { type: 'movement' }])('ignores touch resets with %j', async (options) => {
     const { result, act } = await renderHook(() => useMouse({
-      touch: false,
+      ...options,
       resetOnTouchEnds: true,
       initialValue: { x: 3, y: 4 },
     }))
 
     await act(() => {
-      window.dispatchEvent(createMouseEvent('mousemove', { clientX: 90, clientY: 70 }))
+      window.dispatchEvent(createMouseEvent('mousemove', { clientX: 90, clientY: 70, movementX: 90, movementY: 70 }))
     })
-    expect(result.current.x).toBe(90)
-    expect(result.current.y).toBe(70)
+    expect(result.current).toEqual({ x: 90, y: 70, sourceType: 'mouse' })
+
+    for (const eventType of ['touchend', 'touchcancel']) {
+      await act(() => {
+        window.dispatchEvent(new Event(eventType))
+      })
+      expect(result.current).toEqual({ x: 90, y: 70, sourceType: 'mouse' })
+    }
+  })
+
+  it('rebinds and removes both touch reset listeners', async () => {
+    const first = createFakeWindow()
+    const second = createFakeWindow()
+    const { result, act, rerender, unmount } = await renderHook(
+      (props: UseMouseOptions = {}) => useMouse(props),
+      { initialProps: { window: first.win, resetOnTouchEnds: true } },
+    )
+
+    for (const eventType of ['touchend', 'touchcancel'])
+      expect(first.listeners[eventType]).toHaveLength(1)
+
+    // Changing only initialValue must update the reset without rebinding.
+    const reset = first.listeners.touchcancel?.[0]
+    await rerender({ window: first.win, resetOnTouchEnds: true, initialValue: { x: 5, y: 6 } })
+    expect(first.listeners.touchcancel?.[0]).toBe(reset)
+    await act(() => {
+      fire(first.listeners.touchcancel, new Event('touchcancel'))
+    })
+    expect(result.current).toEqual({ x: 5, y: 6, sourceType: null })
+
+    await rerender({ window: second.win, resetOnTouchEnds: true })
+    for (const eventType of ['touchend', 'touchcancel']) {
+      expect(first.listeners[eventType]).toHaveLength(0)
+      expect(second.listeners[eventType]).toHaveLength(1)
+    }
 
     await act(() => {
-      window.dispatchEvent(createTouchEvent('touchend', 0, 0, window))
+      fire(second.listeners.touchmove, createTouchEvent('touchmove', 90, 70, second.win))
+      fire(first.listeners.touchcancel, new Event('touchcancel'))
     })
+    expect(result.current).toEqual({ x: 90, y: 70, sourceType: 'touch' })
+    await act(() => {
+      fire(second.listeners.touchcancel, new Event('touchcancel'))
+    })
+    expect(result.current).toEqual({ x: 0, y: 0, sourceType: 'touch' })
 
-    // `touch: false` skips the whole touch block, so `touchend` never resets
-    expect(result.current.x).toBe(90)
-    expect(result.current.y).toBe(70)
-    expect(result.current.sourceType).toBe('mouse')
+    await rerender({ window: second.win, resetOnTouchEnds: false })
+    for (const eventType of ['touchend', 'touchcancel'])
+      expect(second.listeners[eventType]).toHaveLength(0)
+
+    await rerender({ window: second.win, resetOnTouchEnds: true })
+    for (const eventType of ['touchend', 'touchcancel'])
+      expect(second.listeners[eventType]).toHaveLength(1)
+
+    await unmount()
+    for (const eventType of ['touchend', 'touchcancel'])
+      expect(second.listeners[eventType]).toHaveLength(0)
   })
 
   it('uses initialValue as the initial state', async () => {

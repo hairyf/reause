@@ -42,7 +42,7 @@ export interface UseMouseOptions extends ConfigurableWindow {
   scroll?: boolean
 
   /**
-   * Reset to initial value when `touchend` event fired
+   * Reset to initial value when `touchend` or `touchcancel` event fired
    *
    * @default false
    */
@@ -204,8 +204,10 @@ export function useMouse(options: UseMouseOptions = {}): UseMouseReturn {
     if (useTouch) {
       trackedTarget.addEventListener('touchstart', touchHandlerWrapper as EventListener, listenerOptions)
       trackedTarget.addEventListener('touchmove', touchHandlerWrapper as EventListener, listenerOptions)
-      if (resetOnTouchEnds)
+      if (resetOnTouchEnds) {
         trackedTarget.addEventListener('touchend', reset as EventListener, listenerOptions)
+        trackedTarget.addEventListener('touchcancel', reset as EventListener, listenerOptions)
+      }
     }
 
     if (win && scroll && typeMode === 'page')
@@ -217,8 +219,10 @@ export function useMouse(options: UseMouseOptions = {}): UseMouseReturn {
       if (useTouch) {
         trackedTarget.removeEventListener('touchstart', touchHandlerWrapper as EventListener, listenerOptions)
         trackedTarget.removeEventListener('touchmove', touchHandlerWrapper as EventListener, listenerOptions)
-        if (resetOnTouchEnds)
+        if (resetOnTouchEnds) {
           trackedTarget.removeEventListener('touchend', reset as EventListener, listenerOptions)
+          trackedTarget.removeEventListener('touchcancel', reset as EventListener, listenerOptions)
+        }
       }
       if (win && scroll && typeMode === 'page')
         win.removeEventListener('scroll', scrollHandlerWrapper, listenerOptions)
