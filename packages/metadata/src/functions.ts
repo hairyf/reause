@@ -832,7 +832,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useBattery',
     category: 'Sensors',
     source: 'vueuse',
-    lastUpdated: 1789366373000,
+    lastUpdated: 1791798088000,
   },
   {
     name: 'useBluetooth',
@@ -1862,7 +1862,7 @@ export const functions: FunctionInfo[] = [
     dir: 'useMouse',
     category: 'Sensors',
     source: 'vueuse',
-    lastUpdated: 1789366373000,
+    lastUpdated: 1791799262000,
   },
   {
     name: 'useMouseInElement',
@@ -3398,7 +3398,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useBattery/index.md',
     category: 'Sensors',
     description: 'reactive [Battery Status API](https://developer.mozilla.org/en-US/docs/Web/API/Battery_Status_API)',
-    lastUpdated: 1789366373000,
+    lastUpdated: 1791798088000,
   },
   {
     name: 'useBluetooth',
@@ -4311,7 +4311,7 @@ export const pages: FunctionPageInfo[] = [
     doc: 'packages/core/useMouse/index.md',
     category: 'Sensors',
     description: 'reactive mouse position',
-    lastUpdated: 1789366373000,
+    lastUpdated: 1791799262000,
   },
   {
     name: 'useMouseInElement',
