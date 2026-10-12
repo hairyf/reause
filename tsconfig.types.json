@@ -7,5 +7,18 @@
     "declarationMap": false,
     "emitDeclarationOnly": true,
     "noEmit": false
-  }
+  },
+  "include": [
+    "packages/*/src/**/*.ts",
+    "packages/*/src/**/*.tsx",
+    "packages/*/*/index.tsx",
+    "packages/*/*/demo.tsx",
+    "packages/skills/**/*.ts",
+    "packages/.vitepress/**/*.ts",
+    "test/**/*.ts",
+    "scripts/**/*.ts",
+    "meta/**/*.ts",
+    "*.config.ts",
+    "*.config.js"
+  ]
 }
